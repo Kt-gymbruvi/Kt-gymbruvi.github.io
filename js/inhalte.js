@@ -39,9 +39,9 @@ window.LINKS = [
   },
   {
     symbol: '📡',
-    titel: 'Klassenfunk – Mitmachen',
-    text: 'PIN eingeben und anonym abstimmen: Wortwolke, Umfrage, Fragen an die Lehrkraft.',
-    adresse: 'https://kt-gymbruvi.github.io/Klassenfunk/#/mitmachen',
+    titel: 'Klassenfunk',
+    text: 'Live abstimmen im Unterricht: Wortwolke, Umfrage, Fragen an die Lehrkraft. Mitmachen mit PIN, anonym.',
+    adresse: 'https://kt-gymbruvi.github.io/Klassenfunk/',
   },
 ]
 
