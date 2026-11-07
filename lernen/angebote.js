@@ -10,7 +10,7 @@
  *   fach:    'bio' | 'sport' | …  (siehe FAECHER)
  *   stufen:  Jahrgänge, z. B. ['7'] oder ['10', 'sek2']; leer = für alle Jahrgänge
  *   thema:   optional, z. B. 'evo' (siehe THEMEN)
- *   text:    kurze Beschreibung (optional)
+ *   text:    kurze Erklärung, was man damit lernt oder macht (ein bis zwei Sätze)
  *   datum:   wann erstellt (zum Sortieren)
  */
 
@@ -45,7 +45,7 @@ window.ANGEBOTE = [
     titel: 'Das Skelett des Menschen',
     fach: 'bio',
     stufen: ['6'],
-    text: 'Knochen erkunden und benennen.',
+    text: 'Der Mensch als Wirbeltier: Knochen an einer Zeichnung entdecken, dann üben – Knochen finden und Knochen benennen.',
     datum: '2026-10-31',
   },
   {
@@ -53,7 +53,7 @@ window.ANGEBOTE = [
     titel: 'Herzzyklus im Schnitt – Systole und Diastole',
     fach: 'bio',
     stufen: ['7'],
-    text: 'Was im Herzen bei jedem Schlag passiert.',
+    text: 'Systole und Diastole Schritt für Schritt: Klappen, Blutfluss und Druckkurven in vier Phasen, mit Herztönen. Mit Stufe für Klasse 7 und für die Oberstufe.',
     datum: '2026-10-30',
   },
   {
@@ -62,7 +62,7 @@ window.ANGEBOTE = [
     fach: 'bio',
     stufen: ['sek2'],
     thema: 'oeko',
-    text: 'Simulation nach Lotka-Volterra.',
+    text: 'Wie schwanken Räuber und Beute? Das Lotka-Volterra-Modell simulieren, die drei Regeln prüfen, eingreifen und das Modell mit Daten vergleichen.',
     datum: '2026-10-05',
   },
   {
@@ -70,7 +70,7 @@ window.ANGEBOTE = [
     titel: 'Enzymaktivität: Simulation und Michaelis-Menten-Diagramm',
     fach: 'bio',
     stufen: ['sek2'],
-    text: 'Substratkonzentration, Temperatur und Hemmung ausprobieren.',
+    text: 'Temperatur, pH-Wert, Substratkonzentration und Hemmung verändern und beobachten, wie sich Michaelis-Menten-Diagramm und Molekülmodell ändern.',
     datum: '2026-10-01',
   },
   {
@@ -78,7 +78,7 @@ window.ANGEBOTE = [
     titel: 'Taktikboard',
     fach: 'sport',
     stufen: [],
-    text: 'Spielzüge zeichnen und abspielen. Gespeichert wird nur auf diesem Gerät.',
+    text: 'Spielzüge für Handball, Fußball, Basketball, Volleyball, Badminton und Völkerball zeichnen und als Animation abspielen. Gespeichert wird nur auf diesem Gerät.',
     datum: '2026-10-25',
   },
 ]

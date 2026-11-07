@@ -27,9 +27,11 @@
     stufe: p.get('stufe'),
     thema: p.get('thema'),
   }
-  let sortierung = 'name'
+  const SORTIERUNGEN = ['jahrgang', 'name', 'datum']
+  let sortierung = 'jahrgang'
   try {
-    sortierung = localStorage.getItem('lernen-sortierung') === 'datum' ? 'datum' : 'name'
+    const g = localStorage.getItem('lernen-sortierung')
+    if (SORTIERUNGEN.includes(g)) sortierung = g
   } catch {
     /* egal */
   }
@@ -132,31 +134,53 @@
   }
 
   // ---------- Karten ----------
+  // Position im Jahrgang (für die Sortierung); „für alle Jahrgänge“ ans Ende
+  const stufenRang = (a) => (a.stufen.length ? Math.min(...a.stufen.map((s) => STUFEN.findIndex((x) => x.id === s))) : STUFEN.length)
+  const nachName = (a, b) => vergleich.compare(a.titel, b.titel)
+
+  function zeile(a) {
+    const li = el('li', 'karte')
+    const link = el('a')
+    link.href = a.ordner + '/'
+    const text = el('span', 'inhalt')
+    text.append(el('span', 'titel', a.titel))
+    if (a.text) text.append(el('span', 'info', a.text))
+    const marken = el('span', 'marken')
+    marken.append(el('span', 'marke fach', name(FAECHER, a.fach)))
+    if (!a.stufen.length) marken.append(el('span', 'marke', 'alle Jahrgänge'))
+    a.stufen.forEach((s) => marken.append(el('span', 'marke', name(STUFEN, s))))
+    if (a.thema) marken.append(el('span', 'marke', name(THEMEN, a.thema)))
+    text.append(marken)
+    link.append(text, el('span', 'oeffnen', 'Öffnen ›'))
+    li.append(link, qrKnopf(a.titel, new URL(a.ordner + '/', location.href).href))
+    return li
+  }
+
   function karten() {
     const suche = $('suche').value.trim().toLocaleLowerCase('de')
-    const liste = ANGEBOTE.filter((a) => passt(a, zustand) && suchtreffer(a, suche)).sort((a, b) =>
-      sortierung === 'datum' ? (b.datum || '').localeCompare(a.datum || '') || vergleich.compare(a.titel, b.titel) : vergleich.compare(a.titel, b.titel),
-    )
+    const liste = ANGEBOTE.filter((a) => passt(a, zustand) && suchtreffer(a, suche))
     const ul = $('karten')
     ul.textContent = ''
     if (!liste.length) {
       ul.append(el('li', 'leer', suche ? 'Nichts gefunden.' : 'Hier gibt es noch keine Lernangebote.'))
       return
     }
+    if (sortierung === 'datum') liste.sort((a, b) => (b.datum || '').localeCompare(a.datum || '') || nachName(a, b))
+    else if (sortierung === 'name') liste.sort(nachName)
+    else liste.sort((a, b) => stufenRang(a) - stufenRang(b) || nachName(a, b))
+
+    // Nach Jahrgang: Zwischenüberschriften (außer ein Jahrgang ist schon gewählt)
+    const gruppieren = sortierung === 'jahrgang' && !zustand.stufe
+    let letzte = null
     liste.forEach((a) => {
-      const li = el('li', 'karte')
-      const link = el('a')
-      link.href = a.ordner + '/'
-      link.append(el('span', 'titel', a.titel))
-      if (a.text) link.append(el('span', 'info', a.text))
-      const marken = el('span', 'marken')
-      marken.append(el('span', 'marke fach', name(FAECHER, a.fach)))
-      if (!a.stufen.length) marken.append(el('span', 'marke', 'alle Jahrgänge'))
-      a.stufen.forEach((s) => marken.append(el('span', 'marke', name(STUFEN, s))))
-      if (a.thema) marken.append(el('span', 'marke', name(THEMEN, a.thema)))
-      link.append(marken)
-      li.append(link, qrKnopf(a.titel, new URL(a.ordner + '/', location.href).href))
-      ul.append(li)
+      if (gruppieren) {
+        const rang = stufenRang(a)
+        if (rang !== letzte) {
+          letzte = rang
+          ul.append(el('li', 'gruppe', rang < STUFEN.length ? STUFEN[rang].name : 'Für alle Jahrgänge'))
+        }
+      }
+      ul.append(zeile(a))
     })
   }
 

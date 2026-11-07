@@ -139,23 +139,32 @@
         color: var(--navy);
       }
       .karten {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
         margin: 0;
         padding: 0;
         list-style: none;
+      }
+      .gruppe {
+        margin: 0.9rem 0 0.1rem;
+        padding-left: 0.75rem;
+        border-left: 5px solid var(--gelb);
+        font-size: 1.2rem;
+        font-weight: 800;
+      }
+      .gruppe:first-child {
+        margin-top: 0;
       }
       .karte {
         position: relative;
       }
       .karte a {
         display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-        height: 100%;
-        padding: 1.1rem 1.25rem 1.1rem;
-        border-radius: 1.25rem;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.9rem 5.5rem 0.9rem 1.2rem;
+        border-radius: 1.1rem;
         background: rgb(22 50 122 / 0.75);
         box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
         color: #fff;
@@ -165,38 +174,52 @@
       .karte a:focus-visible {
         box-shadow: inset 0 0 0 2px var(--gelb);
       }
+      .karte .inhalt {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-width: 0;
+      }
       .karte .titel {
-        padding-right: 3.5rem;
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 800;
         line-height: 1.25;
       }
       .karte .info {
-        color: rgb(255 255 255 / 0.72);
-        font-size: 0.98rem;
+        max-width: 60rem;
+        color: rgb(255 255 255 / 0.78);
+        font-size: 1rem;
+        line-height: 1.45;
       }
       .marken {
         display: flex;
         flex-wrap: wrap;
         gap: 0.35rem;
-        margin-top: auto;
-        padding-top: 0.4rem;
+        padding-top: 0.2rem;
       }
       .marke {
-        padding: 0.1rem 0.6rem;
+        padding: 0.05rem 0.55rem;
         border-radius: 999px;
         background: rgb(255 255 255 / 0.12);
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: 700;
       }
       .marke.fach {
         background: var(--gelb);
         color: var(--navy);
       }
+      .karte .oeffnen {
+        flex-shrink: 0;
+        color: var(--gelb);
+        font-weight: 800;
+        white-space: nowrap;
+      }
       .karte .qr-knopf {
         position: absolute;
-        top: 0.85rem;
-        right: 0.85rem;
+        top: 50%;
+        right: 0.9rem;
+        transform: translateY(-50%);
       }
       .leer {
         padding: 3rem 1rem;
@@ -238,8 +261,11 @@
         #qr-auswahl {
           display: none;
         }
-        .karte .titel {
-          padding-right: 0;
+        .karte a {
+          padding-right: 1.2rem;
+        }
+        .karte .oeffnen {
+          display: none;
         }
       }
     </style>
@@ -262,6 +288,7 @@
         <div class="werkzeugleiste">
           <input id="suche" type="search" placeholder="Suchen, z. B. Herz, Enzym …" aria-label="Lernangebote durchsuchen" autocomplete="off" />
           <select id="sortierung" aria-label="Sortieren">
+            <option value="jahrgang">Nach Jahrgang</option>
             <option value="name">A–Z</option>
             <option value="datum">Neueste zuerst</option>
           </select>
