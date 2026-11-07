@@ -1,4 +1,0 @@
-Beispiel-Merkblatt
-
-Diese Datei zeigt nur, wie Materialien eingebunden werden.
-Vor dem Veröffentlichen löschen und den Eintrag in js/inhalte.js entfernen.

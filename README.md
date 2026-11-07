@@ -30,10 +30,13 @@ Siehe [`werkzeuge/ANLEITUNG.md`](werkzeuge/ANLEITUNG.md). Prüfen mit `node werk
 
 ## Vor der ersten Veröffentlichung
 
-1. Beispiel-Eintrag in `js/inhalte.js` und `materialien/beispiel-merkblatt.txt` löschen.
-2. `impressum.html` ausfüllen (mit der Schulleitung klären) und den roten Entwurfs-Kasten entfernen.
-3. Auf GitHub ein **öffentliches** Repository mit genau dem Namen `Kt-gymbruvi.github.io` anlegen.
-4. Pushen; unter *Settings → Pages* als Quelle „Deploy from a branch“, Branch `main`, Ordner `/ (root)` wählen.
+1. ✅ Überschrift „Lernen mit Spaß“, Beispiel-Material entfernt.
+2. `impressum.html`: `SCHUL_ADRESSE` (zweimal) durch die Adresse der Schulwebseite ersetzen und den roten
+   Entwurfs-Kasten löschen – vorher das OK der Schulleitung einholen.
+3. Prüfen: `node werkzeuge/pruefen.mjs --veroeffentlichen` muss „Keine Probleme gefunden“ melden.
+4. Auf github.com (angemeldet als **Kt-gymbruvi**) ein **öffentliches** Repository mit genau dem Namen
+   `Kt-gymbruvi.github.io` anlegen – leer, ohne README.
+5. Pushen; unter *Settings → Pages* als Quelle „Deploy from a branch“, Branch `main`, Ordner `/ (root)` wählen.
 
 ## Technik
 

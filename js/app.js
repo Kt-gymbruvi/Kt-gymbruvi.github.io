@@ -70,7 +70,7 @@
   // ---------- Kopf ----------
   if (SEITE.titel) {
     document.getElementById('titel').textContent = SEITE.titel
-    document.title = SEITE.titel + ' – Startseite'
+    document.title = SEITE.titel
   }
   document.getElementById('untertitel').textContent = SEITE.untertitel || ''
 
@@ -154,7 +154,8 @@
 
     ziel.textContent = ''
     if (!MATERIALIEN.length) {
-      ziel.append(el('p', 'leer', 'Noch keine Materialien.'))
+      // ohne Materialien den ganzen Bereich ausblenden
+      document.getElementById('material-bereich').hidden = true
       return
     }
     if (!treffer.length) {

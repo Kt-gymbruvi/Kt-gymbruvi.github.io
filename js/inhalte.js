@@ -12,7 +12,7 @@
 
 /** Überschrift oben auf der Seite */
 window.SEITE = {
-  titel: 'Unterricht',
+  titel: 'Lernen mit Spaß',
   untertitel: 'Quiz, Material und Werkzeuge an einem Ort',
 }
 
@@ -71,12 +71,6 @@ window.WERKZEUGE = [
  *   text:   kurze Beschreibung (optional)
  */
 window.MATERIALIEN = [
-  // BEISPIEL – vor dem Veröffentlichen löschen (und materialien/beispiel-merkblatt.txt auch)
-  {
-    fach: 'Beispiel',
-    klasse: '7',
-    titel: 'Beispiel-Merkblatt',
-    datei: 'materialien/beispiel-merkblatt.txt',
-    text: 'So sieht ein Eintrag aus.',
-  },
+  // Beispiel:
+  // { fach: 'Biologie', klasse: '10', titel: 'Merkblatt Fotosynthese', datei: 'materialien/fotosynthese.pdf', text: 'Zum Wiederholen' },
 ]

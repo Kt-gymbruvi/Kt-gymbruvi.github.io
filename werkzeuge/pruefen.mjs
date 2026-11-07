@@ -6,7 +6,9 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const hier = dirname(fileURLToPath(import.meta.url))
-let dateien = process.argv.slice(2)
+// --veroeffentlichen: zusätzlich prüfen, ob die Seite fertig für die Veröffentlichung ist
+const vorVeroeffentlichung = process.argv.includes('--veroeffentlichen')
+let dateien = process.argv.slice(2).filter((a) => !a.startsWith('--'))
 if (!dateien.length) {
   dateien = readdirSync(hier, { withFileTypes: true })
     .filter((d) => d.isDirectory() && existsSync(join(hier, d.name, 'index.html')))
@@ -57,5 +59,21 @@ for (const datei of dateien) {
     for (const t of f.treffer.slice(0, 5)) console.log(`      ${t.slice(0, 110)}`)
   }
 }
+if (vorVeroeffentlichung) {
+  const wurzel = join(hier, '..')
+  const impressum = readFileSync(join(wurzel, 'impressum.html'), 'utf8')
+  const inhalte = readFileSync(join(wurzel, 'js', 'inhalte.js'), 'utf8')
+  const offen = [
+    /class="todo"|SCHUL_ADRESSE|\[Name der/.test(impressum) && 'impressum.html ist noch ein Entwurf (roter Kasten oder Platzhalter)',
+    /beispiel-merkblatt/.test(inhalte) && 'Beispiel-Material steht noch in js/inhalte.js',
+  ].filter(Boolean)
+  console.log('\nVor der Veröffentlichung:')
+  if (!offen.length) console.log('  ✓ Impressum ausgefüllt, kein Beispielmaterial')
+  for (const o of offen) {
+    fehler++
+    console.log(`  ✗ ${o}`)
+  }
+}
+
 console.log(fehler ? `\n${fehler} Problem(e) gefunden.` : '\nKeine Probleme gefunden.')
 process.exit(fehler ? 1 : 0)
