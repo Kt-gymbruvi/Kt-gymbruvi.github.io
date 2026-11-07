@@ -11,6 +11,11 @@ Das ersetzt Google Fonts durch die lokalen Schriften (`lernen/schriften/`), füg
 prüft die Datei. Danach in `lernen/angebote.js` eintragen (Fach, Jahrgänge, Thema). Was das Prüfskript als Fehler meldet
 (z. B. Speichern im Claude-Konto über `window.claude`), muss von Hand entfernt werden.
 
+**Ordnung auf der Seite ändern:** `kt-gymbruvi.github.io/lernen/#bearbeiten` öffnen und mit dem Quizzo-Konto anmelden
+(ist man in Quizzo schon angemeldet, geht es sofort). Dann lassen sich Fach, Jahrgänge, Thema, Titel, Erklärung,
+Reihenfolge (↑ ↓) und „für Schüler sichtbar“ ändern und speichern. Gespeichert wird in der Quizzo-Datenbank
+(Tabelle `lernangebote`, SQL `009`); `lernen/angebote.js` bleibt die Grundlage für neue Angebote.
+
 **Werkzeuge** (kleine eigene Helfer wie Timer) liegen unter `werkzeuge/`:
 
 Jedes Werkzeug ist ein eigener Ordner mit einer `index.html`:

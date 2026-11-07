@@ -229,6 +229,151 @@
         color: rgb(255 255 255 / 0.65);
       }
 
+      /* ---------- Lehrkraft: Anmeldung und Bearbeiten ---------- */
+      .lehrkraft {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+        padding: 0.8rem 1rem;
+        border-radius: 1rem;
+        background: rgb(255 201 40 / 0.12);
+        box-shadow: inset 0 0 0 1px rgb(255 201 40 / 0.4);
+      }
+      .lehrkraft .hinweis {
+        flex-basis: 100%;
+        margin: 0.2rem 0 0;
+      }
+      .anmelden {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem;
+        width: 100%;
+      }
+      .anmelden strong {
+        flex-basis: 100%;
+      }
+      .anmelden input {
+        flex: 1 1 12rem;
+        padding: 0.6rem 0.9rem;
+        border: 0;
+        border-radius: 0.8rem;
+        font: inherit;
+      }
+      .anmelden .fehler {
+        flex-basis: 100%;
+        color: #ff9a9a;
+        font-weight: 700;
+      }
+      .lehrkraft-meldung {
+        margin: 0 0 1rem;
+        padding: 0.7rem 1rem;
+        border-radius: 0.9rem;
+        background: rgb(74 222 128 / 0.18);
+        font-weight: 700;
+      }
+      .karte.bearbeiten {
+        padding: 0.9rem 1rem;
+        border-radius: 1.1rem;
+        background: rgb(22 50 122 / 0.75);
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+      }
+      .karte.bearbeiten.geaendert {
+        box-shadow: inset 0 0 0 2px var(--gelb);
+      }
+      .karte.bearbeiten.versteckt {
+        opacity: 0.6;
+        background: rgb(255 255 255 / 0.05);
+      }
+      .editor {
+        display: flex;
+        gap: 0.8rem;
+      }
+      .pfeile {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .pfeile .knopf {
+        min-height: 2.6rem;
+        padding: 0.3rem 0.8rem;
+      }
+      .felder {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 0.45rem;
+        min-width: 0;
+      }
+      .felder input:not([type='checkbox']),
+      .felder textarea,
+      .felder select {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 0;
+        border-radius: 0.7rem;
+        font: inherit;
+      }
+      .felder input:not([type='checkbox']) {
+        font-weight: 800;
+      }
+      .felder textarea {
+        resize: vertical;
+        font-size: 0.98rem;
+      }
+      .felder .reihe {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .felder .reihe select {
+        width: auto;
+      }
+      .schalter,
+      .stufen-wahl label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-weight: 700;
+      }
+      .stufen-wahl {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 0.9rem;
+      }
+      .stufen-hinweis {
+        color: rgb(255 255 255 / 0.55);
+        font-size: 0.85rem;
+      }
+      .oeffnen-klein {
+        margin-left: auto;
+        font-weight: 700;
+      }
+      .speicherleiste {
+        position: fixed;
+        left: 50%;
+        bottom: 1rem;
+        z-index: 20;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.7rem;
+        max-width: calc(100% - 2rem);
+        padding: 0.7rem 0.9rem 0.7rem 1.2rem;
+        border-radius: 1.2rem;
+        background: var(--navy-dunkel);
+        box-shadow: 0 8px 30px rgb(0 0 0 / 0.45), inset 0 0 0 2px var(--gelb);
+        transform: translateX(-50%);
+        font-weight: 800;
+      }
+      #speicher-meldung {
+        color: #ffd27a;
+        font-weight: 600;
+      }
+
       /* ---------- Handy: Baum wird zu Leisten zum Tippen ---------- */
       @media (max-width: 52rem) {
         .raster {
@@ -293,9 +438,18 @@
             <option value="datum">Neueste zuerst</option>
           </select>
         </div>
+        <div class="lehrkraft" id="lehrkraft" hidden></div>
+        <p class="lehrkraft-meldung" id="lehrkraft-meldung" role="status" hidden></p>
         <ul class="karten" id="karten"></ul>
       </section>
     </main>
+
+    <div class="speicherleiste" id="speicherleiste" hidden>
+      <span id="aenderungen-zahl"></span>
+      <span id="speicher-meldung" role="status"></span>
+      <button type="button" class="knopf" id="speichern">Speichern</button>
+      <button type="button" class="knopf zweit" id="verwerfen">Verwerfen</button>
+    </div>
 
     <dialog id="qr-dialog" aria-labelledby="qr-titel">
       <h2 id="qr-titel"></h2>
@@ -306,6 +460,7 @@
 
     <script src="angebote.js"></script>
     <script src="../js/qrcode.min.js"></script>
+    <script src="datenbank.js"></script>
     <script src="lernen.js"></script>
   </body>
 </html>
