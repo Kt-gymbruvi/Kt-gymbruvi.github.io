@@ -1,0 +1,95 @@
+/* Gemeinsames Aussehen der Werkzeuge (dunkelblau/gelb wie Startseite und Quizzo).
+   Werkzeuge binden zusätzlich ../../style.css ein. */
+
+/* „hidden“ gilt immer – auch bei Elementen mit display: flex */
+[hidden] {
+  display: none !important;
+}
+
+.werkzeug-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(72rem, 100% - 2rem);
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+.werkzeug-kopf a {
+  font-weight: 700;
+  text-decoration: none;
+}
+.werkzeug-kopf a:hover {
+  text-decoration: underline;
+}
+.werkzeug-kopf h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 900;
+  color: var(--gelb);
+}
+
+.werkzeug-inhalt {
+  width: min(72rem, 100% - 2rem);
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.feld {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 700;
+}
+.feld input,
+.feld select,
+.feld textarea {
+  padding: 0.7rem 0.9rem;
+  border: 0;
+  border-radius: 0.9rem;
+  background: #fff;
+  color: var(--navy);
+  font: inherit;
+  font-weight: 600;
+}
+.feld textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+.feld small {
+  font-weight: 400;
+  color: rgb(255 255 255 / 0.65);
+}
+
+.knopf-reihe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.knopf.zweit {
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+}
+.knopf.gross {
+  min-height: 3.5rem;
+  padding: 0.75rem 1.75rem;
+  font-size: 1.35rem;
+}
+.knopf[aria-pressed='true'] {
+  background: var(--gelb);
+  color: var(--navy);
+}
+.knopf:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.hinweis {
+  color: rgb(255 255 255 / 0.65);
+  font-size: 0.95rem;
+}
+
+/* Vollbild (Beamer): Kopf ausblenden */
+:fullscreen .werkzeug-kopf {
+  display: none;
+}

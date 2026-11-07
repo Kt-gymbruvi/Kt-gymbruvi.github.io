@@ -92,6 +92,31 @@
     linkListe.append(li)
   })
 
+  // ---------- Werkzeuge (nach Bereich gruppiert) ----------
+  const WERKZEUGE = window.WERKZEUGE || []
+  const werkzeugListe = document.getElementById('werkzeuge')
+  if (!WERKZEUGE.length) document.getElementById('werkzeuge-bereich').hidden = true
+  const bereiche = [...new Set(WERKZEUGE.map((w) => w.bereich || 'Allgemein'))]
+  bereiche.forEach((b) => {
+    const gruppe = el('li', 'werkzeug-gruppe')
+    if (bereiche.length > 1) gruppe.append(el('h3', null, b))
+    const ul = el('ul', 'werkzeug-karten')
+    WERKZEUGE.filter((w) => (w.bereich || 'Allgemein') === b).forEach((w) => {
+      const li = el('li')
+      const a = el('a', 'werkzeug mit-qr')
+      a.href = w.adresse
+      a.append(el('span', 'werkzeug-symbol', w.symbol || '🧰'))
+      const textteil = el('span', 'werkzeug-text')
+      textteil.append(el('span', 'werkzeug-titel', w.titel))
+      if (w.text) textteil.append(el('span', 'werkzeug-info', w.text))
+      a.append(textteil)
+      li.append(a, qrKnopf(w.titel, volleAdresse(w.adresse)))
+      ul.append(li)
+    })
+    gruppe.append(ul)
+    werkzeugListe.append(gruppe)
+  })
+
   // ---------- Materialien ----------
   const ziel = document.getElementById('materialien')
   const faecherLeiste = document.getElementById('faecher')

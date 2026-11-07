@@ -115,6 +115,83 @@ a {
   color: var(--gelb);
 }
 
+/* Werkzeuge */
+.werkzeuge {
+  margin-top: 3rem;
+}
+.werkzeuge h2,
+.material h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 900;
+}
+.werkzeug-liste,
+.werkzeug-karten {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.werkzeug-gruppe h3 {
+  margin: 1.25rem 0 0.75rem;
+  font-size: 1.4rem;
+  color: var(--gelb);
+}
+.werkzeug-liste > li:first-child h3 {
+  margin-top: 1rem;
+}
+.werkzeug-karten {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  margin-top: 1rem;
+}
+.werkzeug-gruppe h3 + .werkzeug-karten {
+  margin-top: 0;
+}
+.werkzeug-karten li {
+  position: relative;
+}
+.werkzeug {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+  padding: 1rem 5rem 1rem 1.25rem;
+  border-radius: 1.25rem;
+  background: rgb(22 50 122 / 0.7);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  color: #fff;
+  text-decoration: none;
+  transition: box-shadow 0.1s;
+}
+.werkzeug:hover,
+.werkzeug:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--gelb);
+}
+.werkzeug-symbol {
+  font-size: 2.25rem;
+  line-height: 1;
+}
+.werkzeug-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.werkzeug-titel {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.werkzeug-info {
+  color: rgb(255 255 255 / 0.7);
+  font-size: 1rem;
+}
+.werkzeug-karten .qr-knopf {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+}
+
 /* Material */
 .material {
   margin-top: 3rem;
@@ -298,6 +375,12 @@ dialog h2 {
   }
   .eintrag .qr-knopf {
     display: none; /* QR-Codes braucht man am Beamer, nicht auf dem Handy */
+  }
+  .werkzeug-karten .qr-knopf {
+    display: none;
+  }
+  .werkzeug {
+    padding-right: 1.25rem;
   }
 }
 

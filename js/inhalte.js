@@ -34,6 +34,35 @@ window.LINKS = [
 ]
 
 /**
+ * Werkzeuge: kleine Web-Apps im Ordner werkzeuge/<name>/index.html
+ * (eigene oder aus Claude-Artefakten übernommen – Anleitung in werkzeuge/ANLEITUNG.md).
+ *   bereich: Überschrift, unter der das Werkzeug erscheint (z. B. 'Unterricht', 'Sport', 'Biologie')
+ */
+window.WERKZEUGE = [
+  {
+    bereich: 'Unterricht',
+    symbol: '⏱',
+    titel: 'Timer',
+    text: 'Countdown für Arbeitsphasen – groß für den Beamer, mit Signalton.',
+    adresse: 'werkzeuge/timer/',
+  },
+  {
+    bereich: 'Unterricht',
+    symbol: '🎲',
+    titel: 'Gruppen & Zufall',
+    text: 'Gruppen oder Paare auslosen, eine Person ziehen. Namen bleiben auf diesem Gerät.',
+    adresse: 'werkzeuge/gruppen/',
+  },
+  {
+    bereich: 'Sport',
+    symbol: '❤️',
+    titel: 'Herzfrequenz-Zonen',
+    text: 'Trainingsbereiche aus Alter und Ruhepuls berechnen – mit Pulswerten für 15 Sekunden.',
+    adresse: 'werkzeuge/herzfrequenz/',
+  },
+]
+
+/**
  * Materialien.
  *   fach:   Fach (danach wird gruppiert und gefiltert)
  *   klasse: z. B. '7' oder '10–12' (optional)

@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Timer</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../style.css" />
+    <link rel="stylesheet" href="../werkzeug.css" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+      }
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        width: min(72rem, 100% - 2rem);
+        margin: 0 auto;
+        padding-bottom: 1.5rem;
+      }
+      #anzeige {
+        font-size: clamp(5rem, 24vw, 22rem);
+        font-weight: 900;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
+        transition: color 0.2s;
+      }
+      #anzeige.knapp {
+        color: var(--gelb);
+      }
+      #anzeige.ende {
+        color: #ff5a5a;
+        animation: blinken 1s steps(2) infinite;
+      }
+      @keyframes blinken {
+        50% {
+          opacity: 0.25;
+        }
+      }
+      #fortschritt {
+        width: min(48rem, 100%);
+        height: 0.9rem;
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.12);
+        overflow: hidden;
+      }
+      #fortschritt span {
+        display: block;
+        height: 100%;
+        background: var(--gelb);
+        transition: width 0.25s linear;
+      }
+      #aufgabe {
+        width: min(48rem, 100%);
+        padding: 0.6rem 1rem;
+        border: 0;
+        border-radius: 1rem;
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        font-size: clamp(1.25rem, 3vw, 2.25rem);
+        font-weight: 800;
+        text-align: center;
+        outline: 2px dashed rgb(255 255 255 / 0.15);
+      }
+      #aufgabe:focus {
+        outline-color: var(--gelb);
+      }
+      #aufgabe::placeholder {
+        color: rgb(255 255 255 / 0.35);
+      }
+      .einstellen {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        justify-content: center;
+        gap: 0.6rem;
+      }
+      .einstellen .feld input {
+        width: 6rem;
+        text-align: center;
+      }
+      :fullscreen .einstellen,
+      :fullscreen .hinweis {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../">← Startseite</a>
+      <h1>⏱ Timer</h1>
+    </header>
+    <main>
+      <input id="aufgabe" placeholder="Arbeitsauftrag (optional)" aria-label="Arbeitsauftrag" maxlength="80" />
+      <div id="anzeige" role="timer" aria-live="off">05:00</div>
+      <div id="fortschritt" aria-hidden="true"><span style="width: 100%"></span></div>
+
+      <div class="knopf-reihe" style="justify-content: center">
+        <button id="start" class="knopf gross" type="button">▶ Start</button>
+        <button id="zuruecksetzen" class="knopf gross zweit" type="button">↺ Zurück</button>
+        <button id="vollbild" class="knopf gross zweit" type="button">⛶ Vollbild</button>
+        <button id="ton" class="knopf gross zweit" type="button" aria-pressed="true">🔔 Ton an</button>
+      </div>
+
+      <div class="einstellen">
+        <div class="knopf-reihe" role="group" aria-label="Schnellwahl">
+          <button class="knopf zweit" type="button" data-min="1">1 min</button>
+          <button class="knopf zweit" type="button" data-min="2">2 min</button>
+          <button class="knopf zweit" type="button" data-min="3">3 min</button>
+          <button class="knopf zweit" type="button" data-min="5">5 min</button>
+          <button class="knopf zweit" type="button" data-min="10">10 min</button>
+          <button class="knopf zweit" type="button" data-min="15">15 min</button>
+          <button class="knopf zweit" type="button" data-min="20">20 min</button>
+        </div>
+        <label class="feld">Minuten <input id="minuten" type="number" min="0" max="180" value="5" inputmode="numeric" /></label>
+        <label class="feld">Sekunden <input id="sekunden" type="number" min="0" max="59" value="0" inputmode="numeric" /></label>
+      </div>
+      <p class="hinweis">Tipp: Leertaste startet und pausiert. Der Bildschirm bleibt an, solange der Timer läuft (wenn das Gerät es erlaubt).</p>
+    </main>
+
+    <script>
+      ;(function () {
+        'use strict'
+        const $ = (id) => document.getElementById(id)
+        const anzeige = $('anzeige')
+        const balken = $('fortschritt').firstElementChild
+        let gesamt = 300 // Sekunden
+        let rest = 300 * 1000 // Millisekunden
+        let ende = null // Zeitpunkt, wann der Timer abläuft (läuft = nicht null)
+        let ton = true
+        let sperre = null // Bildschirm anlassen
+
+        const format = (ms) => {
+          const s = Math.ceil(ms / 1000)
+          const m = Math.floor(s / 60)
+          return (m < 10 ? '0' : '') + m + ':' + String(s % 60).padStart(2, '0')
+        }
+
+        function zeichnen() {
+          const ms = ende ? Math.max(0, ende - Date.now()) : rest
+          anzeige.textContent = format(ms)
+          balken.style.width = (gesamt ? (100 * ms) / (gesamt * 1000) : 0) + '%'
+          anzeige.classList.toggle('knapp', ms > 0 && ms <= 10000 && gesamt > 10)
+          anzeige.classList.toggle('ende', ms === 0 && gesamt > 0)
+          document.title = (ende ? format(ms) + ' – ' : '') + 'Timer'
+          if (ende && ms === 0) fertig()
+        }
+
+        function setzen(sekunden) {
+          anhalten()
+          gesamt = Math.max(0, Math.min(180 * 60, Math.round(sekunden)))
+          rest = gesamt * 1000
+          $('minuten').value = Math.floor(gesamt / 60)
+          $('sekunden').value = gesamt % 60
+          zeichnen()
+        }
+
+        async function bildschirmAn(an) {
+          try {
+            if (an && 'wakeLock' in navigator) sperre = await navigator.wakeLock.request('screen')
+            else if (!an && sperre) {
+              await sperre.release()
+              sperre = null
+            }
+          } catch {
+            /* nicht schlimm */
+          }
+        }
+
+        function starten() {
+          if (ende || rest <= 0) return
+          ende = Date.now() + rest
+          $('start').textContent = '⏸ Pause'
+          tonVorbereiten()
+          bildschirmAn(true)
+        }
+        function anhalten() {
+          if (!ende) return
+          rest = Math.max(0, ende - Date.now())
+          ende = null
+          $('start').textContent = '▶ Weiter'
+          bildschirmAn(false)
+        }
+        function fertig() {
+          ende = null
+          rest = 0
+          $('start').textContent = '▶ Start'
+          bildschirmAn(false)
+          if (ton) gong()
+        }
+
+        // Signalton ohne Audiodatei (Web Audio). Muss nach einem Klick vorbereitet werden.
+        let audio = null
+        function tonVorbereiten() {
+          try {
+            audio = audio || new (window.AudioContext || window.webkitAudioContext)()
+            if (audio.state === 'suspended') audio.resume()
+          } catch {
+            audio = null
+          }
+        }
+        function gong() {
+          if (!audio) return
+          const jetzt = audio.currentTime
+          ;[0, 0.45, 0.9].forEach((t, i) => {
+            const o = audio.createOscillator()
+            const g = audio.createGain()
+            o.type = 'sine'
+            o.frequency.value = [880, 660, 880][i]
+            g.gain.setValueAtTime(0.0001, jetzt + t)
+            g.gain.exponentialRampToValueAtTime(0.4, jetzt + t + 0.02)
+            g.gain.exponentialRampToValueAtTime(0.0001, jetzt + t + 0.4)
+            o.connect(g).connect(audio.destination)
+            o.start(jetzt + t)
+            o.stop(jetzt + t + 0.42)
+          })
+        }
+
+        $('start').addEventListener('click', () => (ende ? anhalten() : rest > 0 ? starten() : (setzen(gesamt), starten())))
+        $('zuruecksetzen').addEventListener('click', () => {
+          setzen(gesamt)
+          $('start').textContent = '▶ Start'
+        })
+        $('ton').addEventListener('click', (e) => {
+          ton = !ton
+          e.currentTarget.setAttribute('aria-pressed', String(ton))
+          e.currentTarget.textContent = ton ? '🔔 Ton an' : '🔕 Ton aus'
+        })
+        $('vollbild').addEventListener('click', () => {
+          if (document.fullscreenElement) document.exitFullscreen()
+          else document.documentElement.requestFullscreen?.()
+        })
+        document.querySelectorAll('[data-min]').forEach((k) =>
+          k.addEventListener('click', () => {
+            setzen(Number(k.dataset.min) * 60)
+            $('start').textContent = '▶ Start'
+          }),
+        )
+        const eingabe = () => {
+          setzen((Number($('minuten').value) || 0) * 60 + (Number($('sekunden').value) || 0))
+          $('start').textContent = '▶ Start'
+        }
+        $('minuten').addEventListener('change', eingabe)
+        $('sekunden').addEventListener('change', eingabe)
+        document.addEventListener('keydown', (e) => {
+          if (e.code !== 'Space' || e.target.matches('input, textarea, select, button')) return
+          e.preventDefault()
+          $('start').click()
+        })
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible' && ende) bildschirmAn(true)
+        })
+
+        setInterval(zeichnen, 200)
+        zeichnen()
+      })()
+    </script>
+  </body>
+</html>

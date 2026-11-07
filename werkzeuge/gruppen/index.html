@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gruppen &amp; Zufall</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../style.css" />
+    <link rel="stylesheet" href="../werkzeug.css" />
+    <style>
+      .raster {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: minmax(16rem, 22rem) 1fr;
+        align-items: start;
+      }
+      @media (max-width: 52rem) {
+        .raster {
+          grid-template-columns: 1fr;
+        }
+      }
+      .eingabe {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem;
+        border-radius: 1.25rem;
+        background: rgb(22 50 122 / 0.7);
+      }
+      .modi {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      .modi .knopf {
+        min-height: 3rem;
+      }
+      .zahl {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 700;
+      }
+      .zahl input {
+        width: 5rem;
+        padding: 0.6rem;
+        border: 0;
+        border-radius: 0.8rem;
+        font: inherit;
+        text-align: center;
+      }
+      .merken {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+      }
+      .merken input {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      #ergebnis {
+        min-height: 12rem;
+      }
+      .gruppen {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .gruppe {
+        padding: 1rem 1.25rem;
+        border-radius: 1.25rem;
+        background: #fff;
+        color: var(--navy);
+      }
+      .gruppe h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1.2rem;
+        color: var(--navy-hell);
+      }
+      .gruppe ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: clamp(1.15rem, 2vw, 1.6rem);
+        font-weight: 800;
+        line-height: 1.35;
+      }
+      .gezogen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        min-height: 16rem;
+        padding: 2rem;
+        border-radius: 1.5rem;
+        background: var(--gelb);
+        color: var(--navy);
+        text-align: center;
+      }
+      .gezogen strong {
+        font-size: clamp(2.5rem, 8vw, 6rem);
+        line-height: 1.05;
+        overflow-wrap: anywhere;
+      }
+      .gezogen.wirbeln strong {
+        opacity: 0.6;
+      }
+      .leer {
+        padding: 3rem 1rem;
+        border: 3px dashed rgb(255 255 255 / 0.2);
+        border-radius: 1.5rem;
+        text-align: center;
+        color: rgb(255 255 255 / 0.65);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../">← Startseite</a>
+      <h1>🎲 Gruppen &amp; Zufall</h1>
+    </header>
+    <main class="werkzeug-inhalt raster">
+      <section class="eingabe" aria-label="Einstellungen">
+        <label class="feld"
+          >Namen (einer pro Zeile)
+          <textarea id="namen" rows="10" placeholder="Anna&#10;Ben&#10;Can&#10;…" spellcheck="false"></textarea>
+          <small id="anzahl">0 Namen</small>
+        </label>
+        <label class="merken"><input type="checkbox" id="merken" /> Liste auf diesem Gerät merken</label>
+        <p class="hinweis" style="margin: -0.5rem 0 0">Die Namen werden nirgendwohin gesendet. Ohne Haken sind sie nach dem Schließen weg.</p>
+
+        <div class="modi" role="group" aria-label="Was soll ausgelost werden?">
+          <button class="knopf zweit" type="button" data-modus="groesse" aria-pressed="true">Gruppen mit je …</button>
+          <button class="knopf zweit" type="button" data-modus="anzahl" aria-pressed="false">Anzahl Gruppen</button>
+          <button class="knopf zweit" type="button" data-modus="paare" aria-pressed="false">Paare</button>
+          <button class="knopf zweit" type="button" data-modus="ziehen" aria-pressed="false">Eine Person ziehen</button>
+        </div>
+        <label class="zahl" id="zahl-feld"><span id="zahl-text">Personen pro Gruppe</span> <input id="zahl" type="number" min="2" max="30" value="4" inputmode="numeric" /></label>
+        <label class="merken" id="ohne-wdh-feld" hidden><input type="checkbox" id="ohne-wdh" checked /> Niemanden zweimal ziehen</label>
+
+        <button id="los" class="knopf gross" type="button">🎲 Auslosen</button>
+      </section>
+
+      <section id="ergebnis" aria-live="polite" aria-label="Ergebnis">
+        <p class="leer">Namen eintragen und „Auslosen“ tippen.</p>
+      </section>
+    </main>
+
+    <script>
+      ;(function () {
+        'use strict'
+        const $ = (id) => document.getElementById(id)
+        const SPEICHER = 'werkzeug-gruppen'
+        let modus = 'groesse'
+        let gezogen = [] // bereits gezogene Namen (Modus „ziehen“)
+
+        // Fairer Zufall aus dem Browser (crypto), nicht Math.random
+        function zufall(n) {
+          const a = new Uint32Array(1)
+          const grenze = Math.floor(0x100000000 / n) * n
+          do crypto.getRandomValues(a)
+          while (a[0] >= grenze)
+          return a[0] % n
+        }
+        function mischen(liste) {
+          const l = [...liste]
+          for (let i = l.length - 1; i > 0; i--) {
+            const j = zufall(i + 1)
+            ;[l[i], l[j]] = [l[j], l[i]]
+          }
+          return l
+        }
+        const namen = () => [...new Set($('namen').value.split('\n').map((n) => n.trim()).filter(Boolean))]
+
+        // In k Gruppen möglichst gleich groß aufteilen
+        function aufteilen(liste, k) {
+          const gruppen = Array.from({ length: k }, () => [])
+          liste.forEach((n, i) => gruppen[i % k].push(n))
+          return gruppen
+        }
+
+        function el(tag, text, klasse) {
+          const e = document.createElement(tag)
+          if (text != null) e.textContent = text
+          if (klasse) e.className = klasse
+          return e
+        }
+
+        function zeigeGruppen(gruppen, titel) {
+          const ziel = $('ergebnis')
+          ziel.textContent = ''
+          const ul = el('ul', null, 'gruppen')
+          gruppen.forEach((g, i) => {
+            const li = el('li', null, 'gruppe')
+            li.append(el('h3', `${titel} ${i + 1}`))
+            const namenListe = el('ul')
+            g.forEach((n) => namenListe.append(el('li', n)))
+            li.append(namenListe)
+            ul.append(li)
+          })
+          ziel.append(ul)
+        }
+
+        function ziehen(liste) {
+          const ziel = $('ergebnis')
+          let pool = $('ohne-wdh').checked ? liste.filter((n) => !gezogen.includes(n)) : liste
+          if (!pool.length) {
+            gezogen = []
+            pool = liste
+          }
+          const name = pool[zufall(pool.length)]
+          ziel.textContent = ''
+          const box = el('div', null, 'gezogen wirbeln')
+          const anzeige = el('strong', '…')
+          box.append(el('span', 'Dran ist:'), anzeige)
+          ziel.append(box)
+          // kurzes „Durchwirbeln“ für die Spannung
+          let n = 0
+          const t = setInterval(() => {
+            anzeige.textContent = liste[zufall(liste.length)]
+            if (++n >= 12) {
+              clearInterval(t)
+              anzeige.textContent = name
+              box.classList.remove('wirbeln')
+              if ($('ohne-wdh').checked) gezogen.push(name)
+              const rest = liste.filter((x) => !gezogen.includes(x)).length
+              if ($('ohne-wdh').checked) box.append(el('span', rest ? `Noch ${rest} nicht gezogen` : 'Alle waren dran – beim nächsten Mal geht es von vorn los.'))
+            }
+          }, 70)
+        }
+
+        function auslosen() {
+          const liste = namen()
+          if (liste.length < 2) {
+            $('ergebnis').innerHTML = ''
+            $('ergebnis').append(el('p', 'Bitte mindestens zwei Namen eintragen.', 'leer'))
+            return
+          }
+          const z = Math.max(1, Number($('zahl').value) || 1)
+          if (modus === 'ziehen') return ziehen(liste)
+          const gemischt = mischen(liste)
+          if (modus === 'paare') {
+            // ungerade Anzahl: eine Dreiergruppe
+            const k = Math.floor(liste.length / 2)
+            return zeigeGruppen(aufteilen(gemischt, k), 'Paar')
+          }
+          const k = modus === 'anzahl' ? Math.min(z, liste.length) : Math.max(1, Math.round(liste.length / Math.max(2, z)))
+          zeigeGruppen(aufteilen(gemischt, k), 'Gruppe')
+        }
+
+        function modusSetzen(m) {
+          modus = m
+          document.querySelectorAll('[data-modus]').forEach((k) => k.setAttribute('aria-pressed', String(k.dataset.modus === m)))
+          $('zahl-feld').hidden = m === 'paare' || m === 'ziehen'
+          $('ohne-wdh-feld').hidden = m !== 'ziehen'
+          $('zahl-text').textContent = m === 'anzahl' ? 'Anzahl Gruppen' : 'Personen pro Gruppe'
+          $('los').textContent = m === 'ziehen' ? '🎲 Ziehen' : '🎲 Auslosen'
+        }
+
+        function speichern() {
+          const n = namen()
+          $('anzahl').textContent = n.length === 1 ? '1 Name' : `${n.length} Namen`
+          try {
+            if ($('merken').checked) localStorage.setItem(SPEICHER, $('namen').value)
+            else localStorage.removeItem(SPEICHER)
+          } catch {
+            /* egal */
+          }
+        }
+
+        document.querySelectorAll('[data-modus]').forEach((k) => k.addEventListener('click', () => modusSetzen(k.dataset.modus)))
+        $('los').addEventListener('click', auslosen)
+        $('namen').addEventListener('input', () => {
+          gezogen = []
+          speichern()
+        })
+        $('merken').addEventListener('change', speichern)
+
+        try {
+          const alt = localStorage.getItem(SPEICHER)
+          if (alt) {
+            $('namen').value = alt
+            $('merken').checked = true
+          }
+        } catch {
+          /* egal */
+        }
+        speichern()
+        modusSetzen('groesse')
+      })()
+    </script>
+  </body>
+</html>

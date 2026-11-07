@@ -10,12 +10,17 @@ Fast alles steht in **`js/inhalte.js`**:
 
 - `SEITE` – Überschrift und Untertitel
 - `LINKS` – die großen gelben Kacheln (z. B. Quizzo)
+- `WERKZEUGE` – kleine Web-Apps unter `werkzeuge/` (Timer, Gruppen & Zufall, Herzfrequenz-Zonen …)
 - `MATERIALIEN` – die Materialliste (Fach, Klasse, Titel, Datei, Beschreibung)
 
 Neues Material: Datei nach `materialien/` legen (Name ohne Leerzeichen/Umlaute), Eintrag in
 `MATERIALIEN` ergänzen. Jeder Eintrag bekommt automatisch einen QR-Knopf für den Beamer.
 
 Lokal ansehen: `index.html` im Browser öffnen (Doppelklick genügt).
+
+## Werkzeuge und Claude-Artefakte
+
+Siehe [`werkzeuge/ANLEITUNG.md`](werkzeuge/ANLEITUNG.md). Prüfen mit `node werkzeuge/pruefen.mjs`.
 
 ## Wichtig: alles ist öffentlich
 
