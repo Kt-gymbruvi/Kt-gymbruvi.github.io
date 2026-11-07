@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Artbildung – Evolution Sek II</title>
+<style>
+:root{
+  --paper:#EEF3F2; --surface:#FFFFFF; --ink:#18282C; --muted:#4F6368;
+  --line:#C9D6D5; --lagoon:#0B6E6E; --lagoon-soft:#D5EAE8;
+  --ochre:#B7841F; --ochre-soft:#F5E8C8; --coral:#A8405A; --coral-soft:#F3DCE2;
+  --basalt:#2D3B3F;
+  --sans:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#111A1C; --surface:#18252A; --ink:#E4EEEC; --muted:#9DB2B2;
+    --line:#2F4247; --lagoon:#4FB8B3; --lagoon-soft:#173A3B;
+    --ochre:#E0B04F; --ochre-soft:#3A3018; --coral:#E07D95; --coral-soft:#3D2029;
+    --basalt:#C6D6D4;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111A1C; --surface:#18252A; --ink:#E4EEEC; --muted:#9DB2B2;
+  --line:#2F4247; --lagoon:#4FB8B3; --lagoon-soft:#173A3B;
+  --ochre:#E0B04F; --ochre-soft:#3A3018; --coral:#E07D95; --coral-soft:#3D2029;
+  --basalt:#C6D6D4;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:1.0625rem;line-height:1.6}
+img,svg{max-width:100%}
+a{color:var(--lagoon)}
+:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.top ul{display:flex;gap:4px;margin:0 auto;padding:10px 16px;list-style:none;overflow-x:auto;max-width:860px;scrollbar-width:none}
+nav.top a{display:block;white-space:nowrap;font-family:var(--sans);font-weight:500;font-size:.9rem;text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:999px}
+nav.top a:hover{color:var(--ink);background:var(--lagoon-soft)}
+
+main{max-width:860px;margin:0 auto;padding:0 18px 64px}
+.hero{padding:36px 0 12px;display:grid;gap:8px}
+.hero svg{width:100%;height:auto;display:block}
+.tree path{fill:none;stroke-width:3;stroke-linecap:round}
+.tree .grow{stroke-dasharray:400;stroke-dashoffset:400;animation:grow 1.8s ease-out forwards}
+@keyframes grow{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.tree .grow{animation:none;stroke-dashoffset:0}}
+h1{font-family:var(--sans);font-weight:800;font-size:clamp(2.6rem,9vw,4.6rem);line-height:.95;letter-spacing:-.03em;margin:0}
+.lede{font-size:1.15rem;color:var(--muted);max-width:60ch;margin:6px 0 0}
+
+section{padding-top:44px}
+h2{font-family:var(--sans);font-weight:700;font-size:clamp(1.6rem,5vw,2.1rem);letter-spacing:-.015em;line-height:1.1;margin:0 0 14px}
+h3{font-family:var(--sans);font-weight:700;font-size:1.15rem;margin:22px 0 6px}
+p{margin:0 0 12px;max-width:68ch}
+.def{border-left:4px solid var(--lagoon);background:var(--surface);padding:14px 18px;margin:14px 0;border-radius:0 8px 8px 0}
+.def strong{font-family:var(--sans)}
+.note{font-size:.95rem;color:var(--muted)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}
+.stepper-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+button{font-family:var(--sans);font-weight:600;font-size:.95rem;border:1.5px solid var(--lagoon);background:transparent;color:var(--lagoon);padding:8px 14px;border-radius:10px;cursor:pointer}
+button.primary{background:var(--lagoon);color:var(--surface)}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:auto}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots span.on{background:var(--lagoon)}
+.step-text{min-height:5.2em;margin-top:10px}
+.step-text b{font-family:var(--sans)}
+#allo .ind{transition:transform .9s cubic-bezier(.4,.1,.2,1),fill .6s}
+@media (prefers-reduced-motion:reduce){#allo .ind{transition:none}}
+
+.two{display:grid;gap:14px;grid-template-columns:1fr}
+@media (min-width:640px){.two{grid-template-columns:1fr 1fr}}
+.mech{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.mech h4{font-family:var(--sans);margin:0 0 4px;font-size:1rem}
+.mech p{margin:0;font-size:.97rem}
+
+.barrier{list-style:none;padding:0;margin:16px 0;counter-reset:b}
+.barrier li{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.barrier li::before{counter-increment:b;content:counter(b);font-family:var(--sans);font-weight:700;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--lagoon-soft);color:var(--lagoon)}
+.barrier li.post::before{background:var(--coral-soft);color:var(--coral)}
+.barrier .tag{font-family:var(--sans);font-size:.8rem;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.tag.pre{background:var(--lagoon-soft);color:var(--lagoon)}
+.tag.postt{background:var(--coral-soft);color:var(--coral)}
+.zygote-line{font-family:var(--sans);font-weight:700;font-size:.9rem;color:var(--coral);padding:8px 0;text-align:center;border-bottom:2px solid var(--coral)}
+
+.quiz-item{padding:12px 0;border-bottom:1px solid var(--line)}
+.quiz-item p{margin:0 0 8px}
+.quiz-item .opts{display:flex;gap:8px;flex-wrap:wrap}
+.quiz-item .fb{font-size:.95rem;margin-top:8px;display:none}
+.quiz-item.done .fb{display:block}
+.quiz-item.right .fb{color:var(--lagoon)}
+.quiz-item.wrong .fb{color:var(--coral)}
+.score{font-family:var(--sans);font-weight:700}
+
+.finch{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:640px){.finch{grid-template-columns:260px 1fr}}
+.finch-list{display:flex;flex-direction:column;gap:6px}
+.finch-list button{text-align:left;border-color:var(--line);color:var(--ink);font-weight:500}
+.finch-list button[aria-pressed="true"]{border-color:var(--ochre);background:var(--ochre-soft)}
+.finch-info h4{font-family:var(--sans);margin:4px 0 2px;font-size:1.15rem}
+.finch-info em{color:var(--muted)}
+
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0}
+summary{font-family:var(--sans);font-weight:600;cursor:pointer}
+details p{margin:10px 0 0}
+.afb{font-family:var(--sans);font-size:.8rem;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--ochre-soft);color:var(--ochre);margin-right:6px}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.95rem;margin:10px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--sans)}
+footer{max-width:860px;margin:0 auto;padding:24px 18px 40px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<nav class="top" aria-label="Abschnitte">
+  <ul>
+    <li><a href="#art">Artbegriff</a></li>
+    <li><a href="#allopatrisch">Allopatrisch</a></li>
+    <li><a href="#sympatrisch">Sympatrisch</a></li>
+    <li><a href="#isolation">Isolationsmechanismen</a></li>
+    <li><a href="#radiation">Adaptive Radiation</a></li>
+    <li><a href="#fehl">Fehlvorstellungen</a></li>
+    <li><a href="#aufgaben">Aufgaben</a></li>
+  </ul>
+</nav>
+
+<main>
+<header class="hero">
+  <svg class="tree" viewBox="0 0 600 170" role="img" aria-label="Stammbaum: eine Stammart spaltet sich in sechs Arten auf">
+    <path class="grow" d="M300 165 V120" stroke="var(--basalt)"/>
+    <path class="grow" d="M300 120 C300 95 180 100 160 70" stroke="var(--basalt)" style="animation-delay:.3s"/>
+    <path class="grow" d="M300 120 C300 95 420 100 440 70" stroke="var(--basalt)" style="animation-delay:.3s"/>
+    <path class="grow" d="M160 70 C150 40 70 40 60 10" stroke="var(--lagoon)" style="animation-delay:.8s"/>
+    <path class="grow" d="M160 70 C160 40 160 30 160 10" stroke="var(--lagoon)" style="animation-delay:.8s"/>
+    <path class="grow" d="M160 70 C170 40 250 40 260 10" stroke="var(--lagoon)" style="animation-delay:.8s"/>
+    <path class="grow" d="M440 70 C430 40 350 40 340 10" stroke="var(--ochre)" style="animation-delay:.8s"/>
+    <path class="grow" d="M440 70 C440 40 440 30 440 10" stroke="var(--ochre)" style="animation-delay:.8s"/>
+    <path class="grow" d="M440 70 C450 40 530 40 540 10" stroke="var(--coral)" style="animation-delay:.8s"/>
+  </svg>
+  <h1>Artbildung</h1>
+  <p class="lede">Wie aus einer Population zwei Arten werden, welche Barrieren sie getrennt halten und warum auf Inseln plötzlich viele Arten auf einmal entstehen.</p>
+</header>
+
+<section id="art">
+  <h2>Was ist eine Art?</h2>
+  <div class="def"><strong>Biologischer Artbegriff (nach Ernst Mayr):</strong> Eine Art ist eine Gruppe natürlicher Populationen, deren Individuen sich untereinander fortpflanzen und fruchtbare Nachkommen zeugen können und die von anderen solchen Gruppen reproduktiv isoliert sind.</div>
+  <p>Populationsgenetisch heißt das: Eine Art teilt einen <b>gemeinsamen Genpool</b>. Artbildung beginnt, wenn der Genfluss zwischen Teilpopulationen unterbrochen wird, und ist abgeschlossen, wenn <b>reproduktive Isolation</b> besteht.</p>
+  <p class="note">Grenzen des biologischen Artbegriffs: nicht anwendbar auf sich ungeschlechtlich fortpflanzende Organismen und auf Fossilien. Dort nutzt man z. B. den morphologischen Artbegriff (Ähnlichkeit im Bau).</p>
+  <h3>Evolutionsfaktoren, die mitspielen</h3>
+  <p>Mutation und Rekombination erzeugen Variation. Selektion und Gendrift verändern Allelhäufigkeiten. Isolation verhindert, dass sich Unterschiede durch Genfluss wieder ausgleichen.</p>
+</section>
+
+<section id="allopatrisch">
+  <h2>Allopatrische Artbildung</h2>
+  <p>Die Population wird <b>räumlich getrennt</b> (griech. allos = anders, lat. patria = Heimat). Das ist der häufigste Weg der Artbildung.</p>
+  <div class="panel">
+    <svg id="allo" viewBox="0 0 340 180" role="img" aria-label="Simulation der allopatrischen Artbildung">
+      <rect x="0" y="0" width="340" height="180" rx="10" fill="var(--paper)"/>
+      <rect id="river" x="160" y="0" width="20" height="180" fill="var(--lagoon)" opacity="0"/>
+      <g id="allo-dots"></g>
+    </svg>
+    <div class="step-text" id="allo-text" aria-live="polite"></div>
+    <div class="stepper-controls">
+      <button id="allo-prev">Zurück</button>
+      <button id="allo-next" class="primary">Weiter</button>
+      <div class="dots" id="allo-dots-ind" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div>
+  <h3>Beispiele</h3>
+  <p><b>Antilopenziesel am Grand Canyon:</b> Nord- und Südrand werden von verschiedenen, nah verwandten Arten besiedelt; der Canyon wirkt als Barriere.</p>
+  <p><b>Eiszeitliche Refugien:</b> Während der Eiszeiten wurden Populationen in getrennte Rückzugsgebiete gedrängt (z. B. Iberien und Balkan). Bei der Wiederausbreitung trafen sie als verschiedene Arten oder Unterarten wieder aufeinander, etwa Nachtigall und Sprosser.</p>
+</section>
+
+<section id="sympatrisch">
+  <h2>Sympatrische Artbildung</h2>
+  <p>Neue Arten entstehen <b>im selben Gebiet</b>, ohne geografische Barriere. Die Isolation muss hier aus der Biologie der Lebewesen selbst kommen.</p>
+  <div class="two">
+    <div class="mech"><h4>Polyploidie</h4><p>Fehler in der Meiose führen zu Gameten mit doppeltem Chromosomensatz. Die polyploiden Nachkommen sind sofort von der Elternart isoliert, weil Kreuzungen z. B. sterile triploide Nachkommen ergeben. Häufig bei Pflanzen; Kulturweizen ist hexaploid.</p></div>
+    <div class="mech"><h4>Wechsel der ökologischen Nische</h4><p>Die Apfelfruchtfliege lebte auf Weißdorn. Seit dem 19. Jh. nutzt eine Teilpopulation in Nordamerika Äpfel. Paarung findet auf der Wirtsfrucht statt, die Früchte reifen zu unterschiedlicher Zeit: Der Genfluss nimmt stark ab.</p></div>
+    <div class="mech"><h4>Sexuelle Selektion</h4><p>Bei Buntbarschen im Victoriasee bevorzugen Weibchen bestimmte Färbungen der Männchen. Unterschiedliche Lichtverhältnisse in verschiedenen Wassertiefen begünstigen unterschiedliche Vorlieben.</p></div>
+    <div class="mech"><h4>Merksatz</h4><p>Allopatrisch: erst räumliche Trennung, dann reproduktive Isolation. Sympatrisch: reproduktive Isolation entsteht ohne räumliche Trennung.</p></div>
+  </div>
+</section>
+
+<section id="isolation">
+  <h2>Isolationsmechanismen</h2>
+  <p>Isolationsmechanismen verhindern den Genfluss zwischen Arten. Entscheidend ist der Zeitpunkt: vor oder nach der Bildung der Zygote.</p>
+  <ol class="barrier">
+    <li><div><b>Ökologische Isolation</b><span class="tag pre">präzygotisch</span><br>Unterschiedliche Lebensräume im selben Gebiet; die Partner begegnen sich kaum (z. B. eine Strumpfbandnatter-Art lebt vorwiegend im Wasser, eine andere an Land).</div></li>
+    <li><div><b>Zeitliche Isolation</b><span class="tag pre">präzygotisch</span><br>Verschiedene Paarungs- oder Blühzeiten (z. B. Froscharten, die zu unterschiedlichen Zeiten im Frühjahr laichen).</div></li>
+    <li><div><b>Ethologische Isolation</b><span class="tag pre">präzygotisch</span><br>Artspezifische Balz-, Gesangs- oder Lichtsignale werden nur vom eigenen Partner erkannt (z. B. Blinkmuster von Leuchtkäfern).</div></li>
+    <li><div><b>Mechanische Isolation</b><span class="tag pre">präzygotisch</span><br>Begattungsorgane oder Blütenbau passen nicht zusammen (z. B. bei vielen Insekten).</div></li>
+    <li><div><b>Gametische Isolation</b><span class="tag pre">präzygotisch</span><br>Ei- und Samenzellen erkennen sich nicht (z. B. Oberflächenproteine bei Seeigeln, die im freien Wasser ablaichen).</div></li>
+  </ol>
+  <div class="zygote-line">Zygote entsteht</div>
+  <ol class="barrier" start="6" style="counter-reset:b 5">
+    <li class="post"><div><b>Hybridsterblichkeit</b><span class="tag postt">postzygotisch</span><br>Der Hybrid entwickelt sich nicht oder stirbt früh (z. B. Embryonen aus Schaf × Ziege).</div></li>
+    <li class="post"><div><b>Hybridsterilität</b><span class="tag postt">postzygotisch</span><br>Der Hybrid lebt, ist aber unfruchtbar. Maultier: Pferd (2n = 64) × Esel (2n = 62) ergibt 2n = 63; in der Meiose können sich die Chromosomen nicht korrekt paaren.</div></li>
+    <li class="post"><div><b>Hybridzusammenbruch</b><span class="tag postt">postzygotisch</span><br>Die F1-Hybriden sind fruchtbar, ihre Nachkommen aber geschwächt oder steril (z. B. bei Baumwollarten).</div></li>
+  </ol>
+  <p class="note">Präzygotische Mechanismen sind „sparsamer“: Es werden keine Gameten und keine Energie in nicht lebensfähige oder sterile Nachkommen investiert. Deshalb kann Selektion sie verstärken, wenn Hybride einen Nachteil haben.</p>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Selbsttest: prä- oder postzygotisch?</h3>
+    <div id="quiz"></div>
+    <p class="score" id="quiz-score" aria-live="polite"></p>
+  </div>
+</section>
+
+<section id="radiation">
+  <h2>Adaptive Radiation</h2>
+  <div class="def"><strong>Adaptive Radiation:</strong> Aus einer Stammart entstehen in relativ kurzer Zeit viele neue Arten, die durch Anpassung unterschiedliche ökologische Nischen besetzen.</div>
+  <p><b>Voraussetzungen:</b> freie ökologische Nischen und wenig Konkurrenz, z. B. auf neu entstandenen Inseln, nach Massenaussterben oder durch eine Schlüsselinnovation (etwa Flugfähigkeit). Auf Inselgruppen wirken Gründereffekt, geografische Isolation zwischen den Inseln und unterschiedliche Selektion zusammen.</p>
+
+  <h3>Darwinfinken auf Galápagos</h3>
+  <p>Eine kleine Gründerpopulation aus Südamerika besiedelte die Inseln. Heute unterscheiden sich die Arten vor allem im Schnabel, der zur Nahrung passt. Wähle eine Art:</p>
+  <div class="panel finch">
+    <div class="finch-list" id="finch-list" role="group" aria-label="Darwinfinken-Arten"></div>
+    <div>
+      <svg viewBox="0 0 260 180" role="img" aria-label="Kopf eines Finken mit Schnabelform der gewählten Art">
+        <ellipse cx="105" cy="98" rx="62" ry="56" fill="var(--basalt)"/>
+        <circle cx="128" cy="78" r="7" fill="var(--paper)"/><circle cx="130" cy="78" r="3.5" fill="var(--ink)"/>
+        <polygon id="beak" fill="var(--ochre)" points="160,80 160,116 200,100"/>
+      </svg>
+      <div class="finch-info" id="finch-info" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <h3>Weitere Beispiele</h3>
+  <p>Buntbarsche der ostafrikanischen Seen (Hunderte Arten in geologisch kurzer Zeit), Säugetiere nach dem Aussterben der Nicht-Vogel-Dinosaurier vor rund 66 Mio. Jahren, Beuteltiere in Australien, Kleidervögel auf Hawaii.</p>
+
+  <h3>Abgrenzung: Radiation und Konvergenz</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th></th><th>Adaptive Radiation</th><th>Konvergenz</th></tr></thead>
+    <tbody>
+      <tr><td><b>Ausgang</b></td><td>eine gemeinsame Stammart</td><td>nicht näher verwandte Arten</td></tr>
+      <tr><td><b>Umwelt</b></td><td>verschiedene Nischen</td><td>ähnliche Nischen</td></tr>
+      <tr><td><b>Ergebnis</b></td><td>Verwandte werden verschieden (Divergenz)</td><td>Fremde werden ähnlich (analoge Merkmale)</td></tr>
+      <tr><td><b>Beispiel</b></td><td>Darwinfinken</td><td>Beutelmull und Maulwurf</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="fehl">
+  <h2>Typische Fehlvorstellungen</h2>
+  <details><summary>„Die Finken haben ihre Schnäbel verändert, weil sie andere Nahrung brauchten.“</summary><p>Finale, lamarckistische Erklärung. Richtig: In der Population gab es bereits erbliche Variation in der Schnabelform. Individuen mit passenderem Schnabel hatten mehr Nachkommen; die Allelhäufigkeit änderte sich über Generationen.</p></details>
+  <details><summary>„Ein Tier entwickelt sich zu einer neuen Art.“</summary><p>Individuen evolvieren nicht. Artbildung betrifft Populationen und läuft über viele Generationen.</p></details>
+  <details><summary>„Sobald ein Fluss die Population trennt, gibt es zwei Arten.“</summary><p>Die Trennung unterbricht nur den Genfluss. Arten liegen erst vor, wenn reproduktive Isolation entstanden ist; das zeigt sich, wenn die Populationen wieder zusammentreffen.</p></details>
+  <details><summary>„Hybride zwischen Arten sind immer unfruchtbar.“</summary><p>Nicht immer. Viele Pflanzenhybride und manche Tierhybride sind fruchtbar. Hybridisierung kann sogar neue Arten hervorbringen (z. B. Allopolyploidie beim Weizen).</p></details>
+  <details><summary>„Adaptive Radiation heißt, dass sich verschiedene Arten an dieselbe Umwelt anpassen.“</summary><p>Das beschreibt Konvergenz. Bei adaptiver Radiation spaltet sich eine Stammart in viele Arten mit unterschiedlichen Nischen auf.</p></details>
+</section>
+
+<section id="aufgaben">
+  <h2>Übungsaufgaben</h2>
+  <details><summary><span class="afb">AFB I</span>Nennen Sie vier präzygotische Isolationsmechanismen und beschreiben Sie jeweils ein Beispiel. (6 P.)</summary>
+    <p><b>Erwartungshorizont:</b> je 0,5 P. für das Nennen, je 1 P. für ein passendes Beispiel. Z. B. zeitliche Isolation (unterschiedliche Laichzeiten), ethologische Isolation (Blinkmuster der Leuchtkäfer), mechanische Isolation (nicht passende Begattungsorgane), gametische Isolation (Seeigel), ökologische Isolation (Wasser- vs. Landlebensraum).</p></details>
+  <details><summary><span class="afb">AFB II</span>Erläutern Sie die Entstehung der Darwinfinken als adaptive Radiation unter Einbezug der Evolutionsfaktoren. (10 P.)</summary>
+    <p><b>Erwartungshorizont:</b> Gründerpopulation vom Festland, Gründereffekt/Gendrift (2); geografische Isolation zwischen Inseln unterbricht Genfluss (2); Variation durch Mutation und Rekombination (2); unterschiedliche Nahrungsangebote führen zu unterschiedlicher Selektion auf Schnabelform (2); reproduktive Isolation, z. B. über Gesang und Schnabelform bei der Partnerwahl, bei erneutem Kontakt; Besetzung verschiedener Nischen (2).</p></details>
+  <details><summary><span class="afb">AFB III</span>Beurteilen Sie, ob Apfel- und Weißdornpopulation der Apfelfruchtfliege als zwei Arten anzusehen sind. (9 P.)</summary>
+    <p><b>Material (vorgeben):</b> Paarung auf der Wirtsfrucht; Apfel reift früher als Weißdorn; Hybridisierung im Freiland kommt vor, aber selten; Hybride sind fruchtbar.</p>
+    <p><b>Erwartungshorizont:</b> Kriterium biologischer Artbegriff benennen (2); Argumente für Isolation: ökologische und zeitliche Isolation reduzieren Genfluss (3); Argumente dagegen: Hybride kommen vor und sind fruchtbar, Isolation unvollständig (2); begründetes Urteil, z. B. „beginnende sympatrische Artbildung, noch keine vollständig getrennten Arten“ (2).</p></details>
+</section>
+</main>
+
+<footer>Erarbeitet für den Biologieunterricht der gymnasialen Oberstufe (Themenfeld Evolution). Fachliche Inhalte auf Schulbuchniveau; Abgleich mit dem gültigen Kerncurriculum und den Hinweisen zum Zentralabitur empfohlen.</footer>
+
+<script>
+(function(){
+  /* ---------- Allopatrische Artbildung ---------- */
+  const N = 26;
+  let seed = 7;
+  const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const base = Array.from({length:N}, () => ({x: 20 + rnd()*300, y: 20 + rnd()*140}));
+  const g = document.getElementById('allo-dots');
+  const ns = 'http://www.w3.org/2000/svg';
+  const dots = base.map(() => { const c = document.createElementNS(ns,'circle'); c.setAttribute('r','7'); c.setAttribute('class','ind'); g.appendChild(c); return c; });
+  const river = document.getElementById('river');
+  const steps = [
+    '<b>1 Ausgangspopulation.</b> Alle Individuen teilen einen Genpool und paaren sich frei miteinander.',
+    '<b>2 Separation.</b> Eine geografische Barriere (Fluss, Gebirge, Meeresarm) trennt die Population. Der Genfluss ist unterbrochen.',
+    '<b>3 Divergenz.</b> Mutation, Rekombination, unterschiedliche Selektion und Gendrift verändern beide Genpools unabhängig voneinander.',
+    '<b>4 Reproduktive Isolation.</b> Die Barriere verschwindet. Paaren sich die Populationen nicht mehr erfolgreich, sind zwei Arten entstanden.'
+  ];
+  let step = 0;
+  function render(){
+    const css = getComputedStyle(document.documentElement);
+    const neutral = css.getPropertyValue('--muted').trim();
+    const A = css.getPropertyValue('--lagoon').trim();
+    const B = css.getPropertyValue('--coral').trim();
+    river.setAttribute('opacity', step === 1 || step === 2 ? '0.85' : '0');
+    dots.forEach((d,i) => {
+      let {x,y} = base[i];
+      const left = x < 170;
+      if (step >= 1) x = left ? 20 + (x-20)*0.45 : 190 + (x-170)*0.85;
+      if (step === 3) x = left ? x + 25 : x - 25;
+      x = Math.max(12, Math.min(328, x));
+      d.style.transform = `translate(${x}px, ${y}px)`;
+      d.style.fill = step >= 2 ? (left ? A : B) : neutral;
+    });
+    document.getElementById('allo-text').innerHTML = steps[step];
+    document.getElementById('allo-prev').disabled = step === 0;
+    document.getElementById('allo-next').disabled = step === steps.length-1;
+    document.querySelectorAll('#allo-dots-ind span').forEach((s,i) => s.classList.toggle('on', i === step));
+  }
+  document.getElementById('allo-prev').onclick = () => { if (step>0){step--; render();} };
+  document.getElementById('allo-next').onclick = () => { if (step<3){step++; render();} };
+  render();
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', render);
+
+  /* ---------- Quiz Isolationsmechanismen ---------- */
+  const items = [
+    ['Zwei Froscharten laichen im selben Teich, die eine im März, die andere im Mai.', 'pre', 'Zeitliche Isolation: Die Paarung findet gar nicht erst statt.'],
+    ['Ein Maultier ist unfruchtbar.', 'post', 'Hybridsterilität: Der Hybrid existiert, kann sich aber nicht fortpflanzen.'],
+    ['Leuchtkäfer-Weibchen reagieren nur auf das Blinkmuster der eigenen Art.', 'pre', 'Ethologische Isolation über artspezifische Signale.'],
+    ['Spermien einer Seeigelart können die Eizellen einer anderen Art nicht befruchten.', 'pre', 'Gametische Isolation: Es entsteht keine Zygote.'],
+    ['Embryonen aus einer Kreuzung von Schaf und Ziege sterben meist früh ab.', 'post', 'Hybridsterblichkeit: Die Zygote entsteht, entwickelt sich aber nicht weiter.'],
+    ['Die F1-Hybriden zweier Baumwollarten sind fruchtbar, die F2 aber kümmerlich und steril.', 'post', 'Hybridzusammenbruch in späteren Generationen.']
+  ];
+  const quiz = document.getElementById('quiz');
+  let answered = 0, correct = 0;
+  items.forEach(([q, sol, fb]) => {
+    const div = document.createElement('div'); div.className = 'quiz-item';
+    div.innerHTML = `<p>${q}</p><div class="opts"><button data-v="pre">präzygotisch</button><button data-v="post">postzygotisch</button></div><div class="fb"></div>`;
+    div.querySelectorAll('button').forEach(b => b.onclick = () => {
+      if (div.classList.contains('done')) return;
+      const ok = b.dataset.v === sol;
+      div.classList.add('done', ok ? 'right' : 'wrong');
+      div.querySelector('.fb').textContent = (ok ? 'Richtig. ' : 'Nicht ganz. ') + fb;
+      div.querySelectorAll('button').forEach(x => x.disabled = true);
+      answered++; if (ok) correct++;
+      document.getElementById('quiz-score').textContent = `${correct} von ${answered} richtig` + (answered === items.length ? ' – fertig.' : '');
+    });
+    quiz.appendChild(div);
+  });
+
+  /* ---------- Darwinfinken ---------- */
+  const finches = [
+    {n:'Großer Grundfink', s:'Geospiza magnirostris', d:58, l:38, t:4, f:'Sehr hoher, kräftiger Schnabel. Knackt große, harte Samen, die andere Arten nicht öffnen können.'},
+    {n:'Mittlerer Grundfink', s:'Geospiza fortis', d:42, l:32, t:5, f:'Mittelgroße Samen. Langzeitstudien zeigten, dass sich die mittlere Schnabelgröße nach Dürrejahren messbar verändert hat: Selektion in Echtzeit.'},
+    {n:'Kaktusgrundfink', s:'Geospiza scandens', d:24, l:52, t:6, f:'Langer, spitzer Schnabel. Frisst Blüten, Nektar, Pollen und Samen von Opuntien.'},
+    {n:'Spechtfink', s:'Camarhynchus pallidus', d:28, l:44, t:2, f:'Gerader, kräftiger Schnabel. Nutzt Kaktusstacheln oder Zweige als Werkzeug, um Insektenlarven aus Holz zu holen.'},
+    {n:'Waldsängerfink', s:'Certhidea olivacea', d:14, l:34, t:3, f:'Dünner, spitzer Schnabel. Sammelt kleine Insekten von Blättern, ähnlich wie Laubsänger.'}
+  ];
+  const list = document.getElementById('finch-list');
+  const beak = document.getElementById('beak');
+  let cur = {d:42, l:32, t:5}, anim;
+  const pts = p => `150,${98-p.d/2} 150,${98+p.d/2} ${150+p.l+20},${98+p.t}`;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(i){
+    const f = finches[i];
+    list.querySelectorAll('button').forEach((b,j) => b.setAttribute('aria-pressed', i===j));
+    document.getElementById('finch-info').innerHTML = `<h4>${f.n}</h4><em>${f.s}</em><p>${f.f}</p>`;
+    cancelAnimationFrame(anim);
+    const from = {...cur}, t0 = performance.now(), dur = reduce ? 0 : 450;
+    const tick = now => {
+      const k = dur ? Math.min(1,(now-t0)/dur) : 1, e = 1-Math.pow(1-k,3);
+      cur = {d: from.d+(f.d-from.d)*e, l: from.l+(f.l-from.l)*e, t: from.t+(f.t-from.t)*e};
+      beak.setAttribute('points', pts(cur));
+      if (k<1) anim = requestAnimationFrame(tick);
+    };
+    anim = requestAnimationFrame(tick);
+  }
+  finches.forEach((f,i) => { const b = document.createElement('button'); b.textContent = f.n; b.onclick = () => show(i); list.appendChild(b); });
+  show(1);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Escape Room Evolution – Die verlassene Forschungsstation</title>
+<style>
+:root{
+  --bg:#e8edf4; --surface:#ffffff; --surface-2:#f3f6fa; --ink:#101d38; --muted:#4b5975;
+  --navy:#1b2f5e; --navy-2:#2b4687; --signal:#f2b705; --signal-ink:#3b2d00; --signal-soft:#fff3c4;
+  --ok:#25744e; --ok-soft:#dcf1e5; --bad:#b0362a; --bad-soft:#fbe3df; --line:#c6d0df;
+  --plan-floor:#f7f9fc; --plan-wall:#1b2f5e; --plan-grid:#dbe2ed;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1530; --surface:#122247; --surface-2:#0f1d3d; --ink:#e8edf6; --muted:#a8b4cb;
+    --navy:#9db8ff; --navy-2:#c3d3ff; --signal:#ffc933; --signal-ink:#2c2100; --signal-soft:#3a3214;
+    --ok:#62c993; --ok-soft:#173a2b; --bad:#ff8775; --bad-soft:#3d1c1a; --line:#2b3f6e;
+    --plan-floor:#0f1d3d; --plan-wall:#9db8ff; --plan-grid:#1b2c55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a1530; --surface:#122247; --surface-2:#0f1d3d; --ink:#e8edf6; --muted:#a8b4cb;
+  --navy:#9db8ff; --navy-2:#c3d3ff; --signal:#ffc933; --signal-ink:#2c2100; --signal-soft:#3a3214;
+  --ok:#62c993; --ok-soft:#173a2b; --bad:#ff8775; --bad-soft:#3d1c1a; --line:#2b3f6e;
+  --plan-floor:#0f1d3d; --plan-wall:#9db8ff; --plan-grid:#1b2c55;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0 0 .5em;letter-spacing:-.01em}
+h1{font-size:clamp(2rem,6vw,3.1rem);font-weight:800}
+h2{font-size:clamp(1.5rem,4vw,2rem);font-weight:700}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0 0 .9em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px;border-radius:6px}
+
+/* Kopfleiste */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);color:#fff;display:flex;align-items:center;gap:1rem;padding:.55rem clamp(.8rem,3vw,1.5rem);flex-wrap:wrap}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bar{background:#071026}}
+:root[data-theme="dark"] .bar{background:#071026}
+.bar-title{font-family:var(--display);font-weight:700;font-size:1rem;flex:1;min-width:10rem;background:none;border:0;text-align:left;cursor:pointer;padding:.2rem 0;color:#fff}
+.bar-stat{display:flex;align-items:center;gap:.4rem;font-size:.95rem;white-space:nowrap}
+.o2{display:inline-block;width:5.5rem;height:.55rem;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.o2 i{display:block;height:100%;background:#f2b705;transition:width .6s}
+.o2.low i{background:#ff7a66}
+.seal{color:#f2b705}
+
+main{max-width:46rem;margin:0 auto;padding:clamp(1rem,4vw,2rem) clamp(1rem,4vw,1.5rem) 4rem}
+
+/* Startseite */
+.hero{padding:1rem 0 1.5rem}
+.hero .kicker{color:var(--muted);font-size:1rem;margin-bottom:.4rem}
+.hero h1{max-width:14ch}
+.rules{display:grid;gap:.75rem;margin:1.5rem 0}
+.rule{display:grid;grid-template-columns:2.4rem 1fr;gap:.75rem;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem}
+.rule .ico{font-size:1.5rem;line-height:1}
+.rule b{display:block}
+
+/* Grundriss */
+.plan-wrap{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:.75rem;margin:1rem 0}
+.plan{width:100%;height:auto;display:block}
+.plan .floor{fill:var(--plan-floor)}
+.plan .grid line{stroke:var(--plan-grid);stroke-width:1}
+.plan .wall{fill:none;stroke:var(--plan-wall);stroke-width:4}
+.plan .room{cursor:pointer}
+.plan .room rect.r{fill:var(--surface);stroke:var(--plan-wall);stroke-width:3;transition:fill .2s}
+.plan .room:hover rect.r,.plan .room:focus rect.r{fill:var(--signal-soft)}
+.plan .room:focus{outline:none}
+.plan .room:focus-visible rect.r{stroke:var(--signal);stroke-width:5}
+.plan .room text{fill:var(--ink);font-family:var(--display);font-weight:700;font-size:17px}
+.plan .room text.sub{font-family:var(--body);font-weight:400;font-size:13px;fill:var(--muted)}
+.plan .lamp{fill:var(--signal);stroke:var(--signal-ink);stroke-width:1.5}
+.plan .lamp.on{filter:drop-shadow(0 0 6px var(--signal))}
+.plan .done .lamp{fill:var(--ok);stroke:none;filter:none}
+.plan .locked{cursor:not-allowed;opacity:.55}
+.plan .locked rect.r{stroke-dasharray:8 6}
+.plan .secret rect.r{stroke-dasharray:4 5}
+.plan .door-gap{stroke:var(--plan-floor);stroke-width:7}
+.plan .corridor-label{fill:var(--muted);font-family:var(--body);font-size:13px;letter-spacing:.04em}
+@media (prefers-reduced-motion: no-preference){
+  .plan .lamp.on{animation:blink 2.4s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.45}}
+}
+.legend{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;font-size:.92rem;color:var(--muted);padding:.25rem .5rem 0}
+.legend span::before{content:"";display:inline-block;width:.75rem;height:.75rem;border-radius:50%;margin-right:.4rem;vertical-align:-.05rem}
+.legend .l-open::before{background:var(--signal)}
+.legend .l-done::before{background:var(--ok)}
+
+.notepad{background:var(--signal-soft);border:2px dashed var(--signal);border-radius:12px;padding:1rem 1.1rem;margin:1rem 0}
+.notepad h3{margin-bottom:.3rem}
+.frags{display:flex;gap:.5rem;margin:.5rem 0 .2rem;flex-wrap:wrap}
+.frag{width:2.6rem;height:3rem;border-radius:8px;border:2px solid var(--navy);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.4rem;background:var(--surface)}
+.frag.empty{color:var(--muted);border-style:dashed}
+
+/* Raum */
+.back{background:none;border:0;color:var(--navy-2);padding:.4rem 0;cursor:pointer;font-weight:700;margin-bottom:.5rem}
+.room-head{border-left:6px solid var(--signal);padding-left:1rem;margin:.5rem 0 1.25rem}
+.room-head .kc{font-size:.92rem;color:var(--muted);margin:0}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.1rem;margin:1rem 0}
+.task.solved{border-color:var(--ok);box-shadow:inset 5px 0 0 var(--ok)}
+.task-prompt{font-weight:700;margin-bottom:.8rem}
+.task-status{font-size:.9rem;color:var(--ok);font-weight:700;margin-bottom:.4rem}
+.item{border-top:1px solid var(--line);padding:.8rem 0}
+.item:first-of-type{border-top:0;padding-top:.2rem}
+.item p{margin:0 0 .55rem}
+.item.wrong p{color:var(--bad)}
+.item.wrong p::before{content:"✗ ";font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{border:2px solid var(--line);background:var(--surface-2);border-radius:999px;padding:.4rem .8rem;cursor:pointer;font-size:.95rem;min-height:2.6rem}
+.chip[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:var(--surface)}
+.opt{display:flex;gap:.7rem;align-items:flex-start;border:2px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin:.5rem 0;cursor:pointer;background:var(--surface-2);width:100%;text-align:left}
+.opt[aria-checked="true"],.opt[aria-pressed="true"]{border-color:var(--navy);background:var(--signal-soft)}
+.opt .mark{flex:0 0 1.3rem;height:1.3rem;border:2px solid var(--navy);border-radius:50%;margin-top:.15rem;display:grid;place-items:center}
+.opt.multi .mark{border-radius:5px}
+.opt[aria-checked="true"] .mark::after,.opt[aria-pressed="true"] .mark::after{content:"";width:.6rem;height:.6rem;border-radius:inherit;background:var(--navy)}
+.opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+.opt.incorrect{border-color:var(--bad);background:var(--bad-soft)}
+.order-list{list-style:none;margin:0;padding:0}
+.order-list li{display:grid;grid-template-columns:2rem 1fr auto;gap:.6rem;align-items:center;border:2px solid var(--line);border-radius:12px;padding:.6rem .7rem;margin:.45rem 0;background:var(--surface-2)}
+.order-list li.wrong{border-color:var(--bad)}
+.order-list .num{font-family:var(--display);font-weight:800;font-size:1.2rem;color:var(--navy-2);text-align:center}
+.order-list .mv{display:flex;flex-direction:column;gap:.25rem}
+.order-list .mv button{width:2.6rem;height:2.1rem;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;font-size:1rem}
+.order-list .mv button:disabled{opacity:.3;cursor:default}
+.numrow{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin:.5rem 0}
+.numrow label{flex:1 1 14rem}
+.numrow input{width:7rem;font:inherit;font-size:1.15rem;padding:.5rem .6rem;border:2px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink)}
+.numrow input.wrong{border-color:var(--bad)}
+.tablewrap{overflow-x:auto;margin:.3rem 0 .8rem}
+table{border-collapse:collapse;font-size:.95rem;min-width:100%}
+th,td{border:1px solid var(--line);padding:.4rem .6rem;text-align:center}
+th:first-child,td:first-child{text-align:left}
+thead th{background:var(--surface-2)}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem;align-items:center}
+.btn{border:0;border-radius:10px;padding:.7rem 1.15rem;font-weight:700;cursor:pointer;min-height:2.9rem}
+.btn-primary{background:var(--navy);color:var(--surface)}
+.btn-signal{background:var(--signal);color:var(--signal-ink)}
+.btn-ghost{background:transparent;border:2px solid var(--line);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.feedback{margin-top:.7rem;padding:.6rem .8rem;border-radius:10px;font-weight:700}
+.feedback:empty{display:none}
+.feedback.ok{background:var(--ok-soft);color:var(--ok)}
+.feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.hintbox{margin-top:.7rem;border-left:4px solid var(--signal);background:var(--signal-soft);padding:.6rem .8rem;border-radius:0 10px 10px 0}
+.hintbox p{margin:.2rem 0}
+.explain{margin-top:.7rem;padding:.7rem .9rem;border-radius:10px;background:var(--surface-2);border:1px solid var(--line)}
+.reward{text-align:center;background:var(--navy);color:#fff;border-radius:16px;padding:1.4rem 1rem;margin:1.5rem 0}
+.reward .big{font-family:var(--display);font-size:3.5rem;font-weight:800;color:#f2b705;line-height:1;margin:.3rem 0}
+.reward p{margin:.3rem 0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .reward{background:#071026}}
+.bonus{border:2px solid var(--signal);background:var(--surface)}
+.bonus .task-prompt::before{content:"★ Bonus-Siegel: ";color:var(--signal-ink);background:var(--signal);padding:.1rem .4rem;border-radius:6px;margin-right:.3rem;font-size:.9rem}
+
+/* Simulation */
+.sim canvas{width:100%;height:auto;aspect-ratio:16/10;display:block;background:var(--surface-2);border:1px solid var(--line);border-radius:10px}
+.sim .ctrl{display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;margin:.6rem 0}
+.sim .ctrl div{display:flex;flex-direction:column;gap:.3rem}
+.sim .ctrl span{font-size:.9rem;color:var(--muted)}
+.sim .count{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.95rem;margin-top:.5rem}
+.sim .count b{font-family:var(--display)}
+
+/* Ausgang */
+.code-in{font-family:var(--display);font-size:2rem;font-weight:800;letter-spacing:.4em;text-transform:uppercase;width:100%;max-width:16rem;padding:.4rem .7rem;border:3px solid var(--navy);border-radius:12px;background:var(--surface);color:var(--ink);text-align:center}
+.doors{display:grid;gap:.8rem;margin:1rem 0}
+.door{display:grid;grid-template-columns:3rem 1fr;gap:.8rem;align-items:center;text-align:left;border:2px solid var(--line);border-radius:14px;padding:1rem;background:var(--surface);cursor:pointer;width:100%}
+.door .ico{font-size:2rem;text-align:center}
+.door small{display:block;color:var(--muted)}
+.door:disabled{opacity:.5;cursor:not-allowed}
+.door:not(:disabled):hover{border-color:var(--navy)}
+.report{width:100%}
+.report td,.report th{text-align:left;vertical-align:top}
+.tag{display:inline-block;padding:.1rem .55rem;border-radius:99px;font-weight:700;font-size:.88rem;white-space:nowrap}
+.tag.sicher{background:var(--ok-soft);color:var(--ok)}
+.tag.festigen{background:var(--signal-soft);color:var(--signal-ink)}
+.tag.wiederholen{background:var(--bad-soft);color:var(--bad)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tag.festigen{color:var(--signal)}}
+.card-exit{border:3px double var(--navy);border-radius:14px;padding:1.1rem;background:var(--surface);margin:1.2rem 0}
+.foot{margin-top:2.5rem;font-size:.88rem;color:var(--muted);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="bar" id="bar" hidden>
+  <button class="bar-title" id="toMap" type="button">Forschungsstation Isla Brava</button>
+  <span class="bar-stat" title="Sauerstoff"><span aria-hidden="true">O₂</span><span class="o2" id="o2bar"><i></i></span><span id="o2txt">75 min</span></span>
+  <span class="bar-stat"><span class="seal" aria-hidden="true">★</span><span id="sealtxt">0 Siegel</span></span>
+</div>
+<main id="app" aria-live="polite"></main>
+
+<script>
+const DATA = {"rooms":[{"id":"r1","name":"Archiv der Irrtümer","short":"Archiv","fragment":"A","kc":"Synthetische Evolutionstheorie von nichtwissenschaftlichen Vorstellungen abgrenzen; finale Begründungen vermeiden (KC 2.6)","intro":"Im Archiv liegen die Notizen von Besuchern der Station. Nicht alles darin hält wissenschaftlicher Prüfung stand. Die Tür öffnet sich erst, wenn ihr jede Aussage richtig einordnet.","tasks":[{"id":"r1a","type":"classify","prompt":"Ordnet jede Aussage zu.","categories":["wissenschaftlich haltbar","finale Begründung","Vererbung erworbener Eigenschaften","übernatürliche Erklärung"],"items":[{"text":"Giraffen bekamen lange Hälse, weil sie sich nach hohen Blättern streckten und die gewonnene Halslänge vererbten."},{"text":"Bakterien werden resistent, damit sie das Antibiotikum überleben."},{"text":"In einer Bakterienpopulation gibt es schon vor der Behandlung zufällig resistente Varianten. Sie überleben und vermehren sich stärker."},{"text":"Ein so komplexes Organ wie das Auge lässt sich nur durch einen intelligenten Planer erklären."},{"text":"Mutationen entstehen ungerichtet. Ob eine Mutation vorteilhaft ist, entscheidet sich erst in der jeweiligen Umwelt."},{"text":"Eisbären haben ein weißes Fell, um sich vor ihrer Beute zu tarnen."},{"text":"Ein durch Training vergrößerter Muskel wird an die Nachkommen weitergegeben."},{"text":"Die synthetische Evolutionstheorie verbindet Darwins Selektionstheorie mit Erkenntnissen der Genetik und Populationsgenetik."}],"hints":["Achtet auf Formulierungen wie „um zu“ oder „damit“. Sie unterstellen der Evolution ein Ziel.","Prüft bei jeder Aussage: Wird etwas, das ein Individuum im Laufe seines Lebens erwirbt, an die Nachkommen weitergegeben? Das ist nicht möglich, weil erworbene Eigenschaften die Keimzellen nicht verändern."]}],"bonus":{"id":"r1b","prompt":"Welche Formulierung erklärt das weiße Fell der Eisbären ultimat und ohne finale Begründung?","options":["Eisbären haben ein weißes Fell, weil sie es zum Jagen brauchen.","Das Fell der Eisbären wurde weiß, weil sie im Schnee lebten und sich daran anpassten.","Vorfahren mit hellerem Fell wurden von Beutetieren seltener bemerkt, jagten erfolgreicher und hatten mehr Nachkommen. Dadurch nahm der Anteil der Allele für helles Fell in der Population zu.","Das Fell ist weiß, weil in den Haaren kaum Melanin eingelagert wird."],"explain":"Die dritte Formulierung argumentiert über unterschiedliche reproduktive Fitness und die Veränderung von Allelfrequenzen. Die vierte ist eine proximate Erklärung (Mechanismus), keine ultimate. Die ersten beiden unterstellen ein Bedürfnis oder eine gezielte Anpassung."}},{"id":"r2","name":"Genpool-Labor","short":"Genpool-Labor","fragment":"R","kc":"Zusammenwirken von Mutation, Rekombination, Variabilität, reproduktiver Fitness, Isolation und Drift (KC 2.6)","intro":"Auf den Monitoren laufen Protokolle verschiedener Populationen der Insel. Ordnet jedem Protokoll den Evolutionsfaktor zu, der hier wirkt, und berechnet anschließend den Code für das Labor.","tasks":[{"id":"r2a","type":"classify","prompt":"Welcher Evolutionsfaktor wirkt in diesem Szenario hauptsächlich?","categories":["Mutation","Rekombination","Selektion","Gendrift","Isolation"],"items":[{"text":"Durch einen Kopierfehler bei der Replikation entsteht in einer Keimzelle ein neues Allel für eine veränderte Flügelfarbe."},{"text":"Bei der Meiose werden väterliche und mütterliche Chromosomen zufällig auf die Keimzellen verteilt. Geschwister unterscheiden sich daher genetisch."},{"text":"Ein Sturm tötet zufällig 95 % einer Käferpopulation, unabhängig von deren Merkmalen. Die Allelfrequenzen der Überlebenden weichen stark von denen der Ausgangspopulation ab."},{"text":"In einem Dürrejahr knacken Finken mit kräftigeren Schnäbeln die verbliebenen harten Samen und haben mehr überlebende Nachkommen."},{"text":"Ein Lavastrom trennt eine Schneckenpopulation in zwei Teile, zwischen denen kein Genfluss mehr stattfindet."},{"text":"Wenige Eidechsen gelangen auf Treibholz auf eine neue Insel. Die Allelfrequenzen der neuen Population entsprechen nicht denen der Ausgangspopulation."}],"hints":["Fragt euch: Entsteht etwas genetisch Neues (Mutation), wird Vorhandenes neu kombiniert (Rekombination), entscheidet ein Merkmal über den Fortpflanzungserfolg (Selektion), entscheidet der Zufall (Gendrift) oder wird der Genfluss unterbrochen (Isolation)?","Flaschenhalseffekt und Gründereffekt sind beides Sonderfälle der Gendrift."]},{"id":"r2c","type":"numbers","prompt":"Vor dem Sturm betrug die Allelfrequenz von a in der Käferpopulation 10 %. Von den 20 überlebenden Käfern sind 8 AA, 8 Aa und 4 aa. Berechnet die Allelfrequenz von a nach dem Sturm.","fields":[{"label":"Allelfrequenz von a nach dem Sturm","unit":"%"}],"hints":["Jeder Käfer trägt zwei Allele für dieses Gen. Bestimmt zuerst die Gesamtzahl der Allele.","20 Käfer × 2 = 40 Allele. Heterozygote Käfer tragen je ein a-Allel, homozygote aa-Käfer je zwei."]}],"bonus":{"id":"r2b","prompt":"Welche Aussage beschreibt das Zusammenwirken der Evolutionsfaktoren korrekt?","options":["Selektion erzeugt neue Allele, die anschließend durch Mutation in der Population verbreitet werden.","Mutation und Rekombination erzeugen genetische Variabilität und damit phänotypische Variation. Selektion wirkt auf die Phänotypen und verändert über unterschiedliche reproduktive Fitness die Allelfrequenzen.","Gendrift wirkt immer in Richtung einer besseren Angepasstheit der Population.","Isolation verändert Allelfrequenzen direkt, indem sie Mutationen auslöst."],"explain":"Variabilität entsteht ungerichtet durch Mutation und Rekombination. Selektion erzeugt nichts Neues, sondern wirkt auf vorhandene Phänotypen. Gendrift ist zufällig und nicht auf Angepasstheit gerichtet. Isolation unterbricht den Genfluss, löst aber keine Mutationen aus."}},{"id":"r3","name":"Simulationsraum","short":"Simulation","fragment":"T","kc":"Evolutive Prozesse simulieren und Möglichkeiten und Grenzen des Modells diskutieren (KC 2.6)","intro":"Der Stationsrechner simuliert die Allelfrequenz eines Allels A über 100 Generationen, jeweils in 10 parallelen Läufen. Führt Versuche mit verschiedenen Einstellungen durch und beantwortet dann die Fragen des Rechners.","tasks":[{"id":"r3sim","type":"sim"},{"id":"r3a","type":"mc","prompt":"Stellt den Selektionsvorteil auf 0 % und vergleicht N = 10 mit N = 500 (je mehrere Durchläufe). Was beobachtet ihr?","options":["Bei beiden Populationsgrößen bleibt die Allelfrequenz konstant bei 50 %.","Bei N = 500 schwankt die Allelfrequenz stärker, weil mehr Individuen zufällig sterben können.","Bei N = 10 schwankt die Allelfrequenz stark; A geht häufig verloren oder wird fixiert. Bei N = 500 bleibt sie in der Nähe von 50 %."],"hints":["Zählt pro Einstellung, wie viele Linien bei 0 % oder 100 % enden. Der Zähler unter der Grafik hilft euch.","Je kleiner die Population, desto stärker wirkt der Zufall bei der Weitergabe der Allele (Stichprobeneffekt)."]},{"id":"r3b","type":"mc","prompt":"Stellt den Selektionsvorteil von A auf 10 % und vergleicht wieder N = 10 mit N = 500. Welche Aussage ist richtig?","options":["Bei N = 10 setzt sich A schneller und zuverlässiger durch als bei N = 500.","Bei N = 500 setzt sich A in fast allen Läufen durch. Bei N = 10 kann A trotz seines Vorteils durch Zufall verloren gehen.","Selektion wirkt nur in kleinen Populationen, Gendrift nur in großen."],"hints":["Startet bei N = 10 mehrere Durchläufe hintereinander und beobachtet den Zähler „A verloren“.","In kleinen Populationen können Gendrift und Selektion gegeneinander wirken. Der Zufall kann den Selektionsvorteil überdecken."]},{"id":"r3c","type":"multi","prompt":"Welche Vereinfachungen (Grenzen) hat dieses Modell? Wählt alle zutreffenden aus.","options":["Es betrachtet nur ein Gen mit zwei Allelen.","Die Populationsgröße bleibt über alle Generationen konstant.","Es können keine zufälligen Schwankungen der Allelfrequenz dargestellt werden.","Es treten keine neuen Mutationen auf.","Es gibt keinen Genfluss durch Zu- oder Abwanderung.","Das Modell zeigt, dass Selektion zielgerichtet auf eine bessere Angepasstheit hinarbeitet."],"hints":["Überlegt, was in einer echten Population passiert, im Modell aber nirgends eingestellt werden kann.","Zwei Aussagen sind falsch: Eine widerspricht dem, was ihr in der Simulation gesehen habt, die andere enthält eine finale Vorstellung."]}],"bonus":{"id":"r3bo","prompt":"Geparden besitzen eine extrem geringe genetische Variabilität, vermutlich als Folge eines Populationsengpasses. Welche Folgerung ist am besten begründet?","options":["Geparden sind optimal angepasst, weil die Selektion alle ungünstigen Allele entfernt hat.","Durch den Engpass entstehen gezielt neue Mutationen, die die Variabilität wiederherstellen.","Bei Umweltänderungen, etwa neuen Krankheitserregern, ist es weniger wahrscheinlich, dass in der Population passende Varianten vorhanden sind."],"explain":"Ein Engpass verringert die genetische Variabilität durch Zufall (Gendrift), nicht durch Selektion. Mutationen entstehen ungerichtet und stellen Variabilität nur sehr langsam wieder her. Geringe Variabilität bietet der Selektion weniger Material."}},{"id":"r4","name":"Die zwei Inseln","short":"Zwei Inseln","fragment":"E","kc":"Artbildung und Isolationsmechanismen; populationsgenetischer Artbegriff (KC 2.6)","intro":"Vom Fenster aus seht ihr die Nachbarinsel, auf der eine Schneckenpopulation lebt, die einst mit eurer verbunden war. Rekonstruiert, wie aus einer Art zwei werden konnten.","tasks":[{"id":"r4a","type":"order","prompt":"Bringt die Schritte der allopatrischen Artbildung in die richtige Reihenfolge.","items":[{"id":"yna7k","text":"Fällt die Barriere weg, entstehen bei Kontakt keine fruchtbaren Nachkommen mehr. Zwei Arten sind entstanden."},{"id":"ylhsx","text":"In beiden Teilpopulationen treten unabhängig voneinander Mutationen und Rekombination auf. Selektion und Gendrift verändern die Genpools unterschiedlich."},{"id":"07e45","text":"Eine Ausgangspopulation bildet eine Fortpflanzungsgemeinschaft mit gemeinsamem Genpool."},{"id":"4ptot","text":"Eine geografische Barriere trennt die Population. Der Genfluss zwischen den Teilpopulationen wird unterbrochen."},{"id":"xdw5h","text":"Die Genpools unterscheiden sich so stark, dass reproduktive Isolationsmechanismen entstehen."}],"hints":["Am Anfang steht ein gemeinsamer Genpool, am Ende die reproduktive Isolation.","Die Barriere muss vor der unabhängigen Veränderung der Genpools wirken, sonst würde Genfluss die Unterschiede wieder ausgleichen."]},{"id":"r4b","type":"classify","prompt":"Präzygotisch oder postzygotisch? Ordnet die Isolationsmechanismen zu.","categories":["präzygotisch","postzygotisch"],"items":[{"text":"Zwei Froschpopulationen laichen in unterschiedlichen Monaten."},{"text":"Maultiere (Kreuzung aus Pferd und Esel) sind unfruchtbar."},{"text":"Die Balzgesänge zweier Vogelpopulationen unterscheiden sich. Weibchen reagieren nur auf den Gesang der eigenen Population."},{"text":"Hybridembryonen sterben in frühen Entwicklungsstadien ab."},{"text":"Die Begattungsorgane zweier Insektenpopulationen passen nicht zueinander."},{"text":"Spermien können nicht in die Eizellen der anderen Population eindringen."}],"hints":["Präzygotisch heißt: Es kommt gar nicht erst zur Bildung einer Zygote.","Postzygotisch heißt: Eine Zygote entsteht, aber der Hybrid stirbt oder ist unfruchtbar."]},{"id":"r4c","type":"mc","prompt":"Zwei Grillenpopulationen leben im selben Gebiet. Im Labor lassen sie sich kreuzen und haben fruchtbare Nachkommen. Im Freiland paaren sie sich nie, weil die Weibchen nur auf den Gesang der eigenen Population reagieren. Wie sind die Populationen nach dem populationsgenetischen Artbegriff einzustufen?","options":["Als eine Art, weil fruchtbare Nachkommen möglich sind.","Als eine Art, weil sie im selben Gebiet leben.","Als zwei Arten, weil sie unter natürlichen Bedingungen reproduktiv isoliert sind und keine gemeinsame Fortpflanzungsgemeinschaft bilden.","Eine Einstufung ist nicht möglich, da allein das Aussehen über die Artzugehörigkeit entscheidet."],"hints":["Der populationsgenetische Artbegriff stellt auf die Fortpflanzungsgemeinschaft ab, nicht auf das Aussehen.","Entscheidend sind natürliche Bedingungen, nicht das Labor."]}],"bonus":{"id":"r4bo","prompt":"Bei der Apfelfliege legen manche Weibchen ihre Eier auf Äpfel statt wie ursprünglich auf Weißdornfrüchte. Die Paarung findet auf der jeweiligen Wirtspflanze statt. Beide Pflanzen wachsen im selben Gebiet. Welcher Artbildungsmodus liegt nahe?","options":["Allopatrische Artbildung, weil die Wirtspflanzen wie ein Gebirge als geografische Barriere wirken.","Sympatrische Artbildung durch ökologische Isolation infolge des Wirtswechsels, ohne geografische Barriere.","Postzygotische Isolation, weil Hybride zwischen Apfel- und Weißdornfliegen unfruchtbar sind.","Gendrift durch Gründereffekt, weil nur wenige Fliegen den Apfel besiedelt haben."],"explain":"Beide Gruppen leben im selben Gebiet (sympatrisch). Weil die Paarung auf der Wirtspflanze stattfindet, wird der Genfluss durch die Wahl des Wirts eingeschränkt: eine präzygotische, ökologische Isolation."}},{"id":"r5","name":"Verhaltenslabor","short":"Verhalten","fragment":"N","kc":"Kosten und Nutzen von Verhalten für die reproduktive Fitness analysieren; proximate und ultimate Erklärungen; Koevolution ultimat erklären (KC 2.6, 2.7)","intro":"Die Forscherin hat Verhaltensdaten der Inselvögel hinterlassen. Wertet sie aus und trennt sauber zwischen proximaten, ultimaten und finalen Erklärungen.","tasks":[{"id":"r5a","type":"numbers","prompt":"Ein Nektarvogel-Männchen verteidigt ein Revier mit Blütensträuchern. Die Tabelle zeigt Energiegewinn und Verteidigungskosten pro Tag. Bei welcher Reviergröße ist der Nettogewinn maximal und wie hoch ist er?","table":{"head":["Sträucher im Revier","1","2","3","4","5"],"rows":[["Energiegewinn (kJ/Tag)","20","35","45","50","52"],["Verteidigungskosten (kJ/Tag)","5","10","18","28","40"]]},"fields":[{"label":"Optimale Anzahl Sträucher","unit":""},{"label":"Maximaler Nettogewinn","unit":"kJ/Tag"}],"hints":["Nettogewinn = Energiegewinn − Verteidigungskosten. Berechnet ihn für jede Reviergröße.","Die Nettogewinne lauten 15, 25, … Rechnet für 3, 4 und 5 Sträucher weiter."]},{"id":"r5b","type":"classify","prompt":"Rotkehlchen-Männchen singen im Frühjahr. Ordnet die Erklärungen zu.","categories":["proximat","ultimat","final (zu vermeiden)"],"items":[{"text":"Die zunehmende Tageslänge erhöht den Testosteronspiegel, wodurch die Gesangszentren im Gehirn aktiviert werden."},{"text":"Männchen, deren Vorfahren im Frühjahr sangen, verteidigten Reviere erfolgreicher und hatten mehr Nachkommen. So verbreitete sich die genetische Grundlage des Verhaltens."},{"text":"Das Männchen singt, um ein Weibchen anzulocken."},{"text":"Nervenimpulse steuern die Muskeln des Stimmorgans (Syrinx)."},{"text":"Das Männchen singt, damit die Art erhalten bleibt."},{"text":"Singende Männchen haben trotz erhöhter Feindgefahr eine höhere reproduktive Fitness als nicht singende."}],"hints":["Proximat fragt „Wie?“: Hormone, Nerven, Auslöser. Ultimat fragt „Warum hat sich das Verhalten evolutiv durchgesetzt?“: reproduktive Fitness.","„Um zu“ und „damit“ unterstellen ein Ziel. Solche Aussagen sind final."]},{"id":"r5c","type":"mc","prompt":"Die Orchidee Angraecum sesquipedale hat einen rund 30 cm langen Nektarsporn. Sie wird von einem Schwärmer mit ähnlich langem Rüssel bestäubt. Welche Erklärung dieser Koevolution ist ultimat und vermeidet finale Formulierungen?","options":["Die Orchidee bildete einen langen Sporn, damit nur dieser Schwärmer sie bestäubt.","Der Schwärmer streckte seinen Rüssel, um an den Nektar zu kommen, und vererbte die erreichte Länge.","Orchideen mit etwas längerem Sporn wurden wirksamer bestäubt, weil der Falter tiefer eindringen musste. Falter mit längerem Rüssel erreichten mehr Nektar. Die wechselseitige Selektion führte über viele Generationen zu immer längeren Spornen und Rüsseln.","Der Nektarmangel löste gezielte Mutationen aus, die zu längeren Rüsseln führten."],"hints":["Streicht alle Antworten mit Zielformulierungen und solche, bei denen erworbene Eigenschaften vererbt werden.","Bei Koevolution wirken zwei Arten wechselseitig als Selektionsfaktor aufeinander."]}],"bonus":{"id":"r5bo","prompt":"Pfauenhähne tragen sehr lange, auffällige Schwanzfedern. Welche Kosten-Nutzen-Analyse ist am besten begründet?","options":["Der Schwanz dient der Arterhaltung, deshalb spielen seine Kosten keine Rolle.","Der Schwanz verursacht Kosten (Energie, höheres Risiko, gefressen zu werden), die durch einen höheren Paarungserfolg infolge der Weibchenwahl überwogen werden. Insgesamt steigt die reproduktive Fitness.","Der Schwanz verursacht keine Kosten, da Pfauen keine Fressfeinde haben.","Weibchen wählen Männchen mit langem Schwanz, damit ihre Nachkommen schöner werden."],"explain":"Eine Kosten-Nutzen-Analyse wägt beide Seiten in der Währung reproduktive Fitness ab. „Arterhaltung“ und „damit“-Begründungen sind keine ultimaten Erklärungen."}}],"secret":{"name":"Geheimlabor","kc":"Transfer: Isolation, Artbegriff und Biodiversität an neuen Daten beurteilen (AFB III)","intro":"Hinter einer verborgenen Tür liegt das eigentliche Forschungsprojekt der Station: Buntbarsche aus dem Victoriasee. Hier gibt es keine Hilfekarten, und jede Frage hat nur einen Versuch. Wer mindestens zwei der drei Fragen beim ersten Versuch richtig beantwortet, öffnet den Geheimgang.","material":["M1 – Im ostafrikanischen Victoriasee leben zahlreiche nah verwandte Buntbarscharten. Bei zwei Arten sehen die Männchen fast gleich aus, unterscheiden sich aber deutlich in ihrer Prachtfärbung (blau bzw. rot). Die Weibchen wählen ihre Partner nach dieser Färbung. Im Labor lassen sich beide Arten kreuzen, die Hybride sind fruchtbar.","M2 – In Wahlversuchen im Aquarium wurde gezählt, wie oft sich Weibchen mit einem Männchen der eigenen Art paarten (vereinfachte Werte in Anlehnung an Seehausen et al. 1997):","M3 – Durch Nährstoffeinträge ist das Wasser des Victoriasees in den letzten Jahrzehnten deutlich trüber geworden. In trüben Bereichen wurden mehr Hybride und weniger Arten gefunden als in klaren Bereichen."],"table":{"head":["Licht im Aquarium","Paarungen mit eigener Art"],"rows":[["weißes Licht (Farben sichtbar)","ca. 95 %"],["einfarbiges Licht (Farben nicht unterscheidbar)","ca. 50 %"]]},"questions":[{"id":"gq1","prompt":"Welcher Isolationsmechanismus trennt die beiden Arten in klarem Wasser?","options":["Postzygotische Isolation, da die Hybride unfruchtbar sind.","Geografische Isolation, da die Arten in verschiedenen Seen leben.","Präzygotische, ethologische Isolation durch Partnerwahl nach der Prachtfärbung.","Mechanische Isolation, da die Begattungsorgane nicht zueinander passen."],"explain":"Laut M1 sind die Hybride fruchtbar und beide Arten leben im selben See. Getrennt werden sie nur durch die Partnerwahl der Weibchen."},{"id":"gq2","prompt":"Was folgt aus M2 für den Artstatus nach dem populationsgenetischen Artbegriff?","options":["Die Arten sind bereits durch postzygotische Mechanismen dauerhaft getrennt.","Die reproduktive Isolation beruht allein auf der Partnerwahl. Fällt diese Barriere weg, bilden die Populationen wieder eine Fortpflanzungsgemeinschaft und können verschmelzen.","Das Licht verändert den Genotyp der Weibchen.","Die unterschiedliche Färbung beweist für sich genommen, dass es zwei Arten sind."],"explain":"Unter einfarbigem Licht paaren sich die Weibchen zufällig (ca. 50 %). Die Isolation hängt also vollständig von einer Umweltbedingung ab, die Farbwahrnehmung erlaubt."},{"id":"gq3","prompt":"Beurteilt die Folgen der zunehmenden Trübung des Victoriasees (M3) für die Biodiversität.","options":["Die Trübung fördert die Artbildung, weil durch die Nährstoffe mehr Nahrung vorhanden ist.","Die Trübung hat keinen Einfluss, da Arten genetisch festgelegt sind.","Die Trübung schwächt die farbabhängige Partnerwahl. Es kommt vermehrt zu Hybridisierung, sodass Arten verschmelzen können und die Artenvielfalt abnimmt.","Die Trübung führt zu postzygotischer Isolation und damit zu mehr Arten."],"explain":"Wo die präzygotische Barriere wegfällt, fließen die Genpools wieder zusammen. Die Artbildung kann sich so umkehren. Ein Umweltproblem gefährdet hier die Biodiversität über einen evolutionsbiologischen Mechanismus."}]},"exitCard":"Erläutert auf der Ausgangskarte, wie auf der Vulkaninsel aus den Eidechsen, die auf Treibholz angekommen sind (Raum „Genpool-Labor“), eine neue Art entstehen kann. Geht dabei auf das Zusammenwirken von Mutation, Rekombination, Gendrift, Selektion und Isolation ein und vermeidet finale Formulierungen."};
+const KEYS = {"r1a|0":"163bd754a89a","r1a|1":"16e550f711bde9","r1a|2":"200f4a5a996c5","r1a|3":"104be42669ab1a","r1a|4":"179baf159f8067","r1a|5":"72689fe4dedc","r1a|6":"34af5ddc71793","r1a|7":"f75696d6025b6","r1b":"1a6e54e289588f","r2a|0":"ed1d2a8c72e76","r2a|1":"169cdab36bf3ec","r2a|2":"fda2d7e71b8f7","r2a|3":"1cdc503e8f639c","r2a|4":"aea4b9628a765","r2a|5":"1edb84f6be7839","r2c|0":"13f2503f1bdcd","r2b":"fd4846958be3a","r3a":"8bee89f7b98af","r3b":"1608b6779ad8cc","r3c":"10257e7824ae41","r3bo":"1e65cb4ab6b636","r4a|0":"102dfde6444651","r4a|1":"bdc0611761577","r4a|2":"8138a6b3de8a5","r4a|3":"2f11b6f84a470","r4a|4":"c5fb7b83d4417","r4b|0":"19265d1ac0da55","r4b|1":"8d9f8f9f41a06","r4b|2":"e7c7894bc4efc","r4b|3":"148959a79619dd","r4b|4":"1361b911e6ad81","r4b|5":"153e2e35e08a1a","r4c":"c491866fccda7","r4bo":"1c22decb25cfd1","r5a|0":"1188bf961f41ce","r5a|1":"85956fbb809db","r5b|0":"186e47255f5930","r5b|1":"381ccc3555282","r5b|2":"d3d66a50f6574","r5b|3":"14c22c711f08cb","r5b|4":"ceca7871c32b3","r5b|5":"17a92ee14f395b","r5c":"1a8c84e8705ed0","r5bo":"10e74d9a3df341","gq1":"c7926f55c098a","gq2":"1fe2f0e9b5e456","gq3":"1eb38cd0a8f152","exit":"adbbf36616f40"};
+const TOTAL_MIN = 75, HINT_COST = 2, STORE = "escape-evolution-v1";
+
+function h(str, seed = 0x51ED27) {
+  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
+}
+const norm = s => String(s).trim().replace(",", ".").replace(/\s+/g, "").replace(/%$/, "");
+
+/* ---------- Zustand ---------- */
+function fresh(){
+  const rooms = {};
+  DATA.rooms.forEach(r => {
+    rooms[r.id] = { done:false, tasks:{}, bonus:null };
+    r.tasks.forEach(t => { if (t.type !== "sim") rooms[r.id].tasks[t.id] = { ok:false, wrong:0, hints:0 }; });
+  });
+  return { start:null, penalty:0, rooms, secret:{}, exit:null };
+}
+let S;
+try { S = JSON.parse(localStorage.getItem(STORE)) || fresh(); } catch(e){ S = fresh(); }
+if (!S.rooms || Object.keys(S.rooms).length !== DATA.rooms.length) S = fresh();
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(S)); } catch(e){} }
+
+const sel = {}; // aktuelle Auswahl (nicht gespeichert)
+let view = { name: S.exit ? "exit" : S.start ? "map" : "intro", room: null };
+
+const $ = (q, el=document) => el.querySelector(q);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const seals = () => DATA.rooms.filter(r => S.rooms[r.id].bonus === "ok").length;
+const roomsDone = () => DATA.rooms.filter(r => S.rooms[r.id].done).length;
+const secretOk = () => DATA.secret.questions.filter(q => S.secret[q.id] === "ok").length;
+const secretAnswered = () => DATA.secret.questions.filter(q => S.secret[q.id]).length;
+const secretOpen = () => seals() >= 3;
+
+/* ---------- Sauerstoff ---------- */
+function o2Left(){
+  if (!S.start) return TOTAL_MIN;
+  const end = S.exit ? S.exit.at : Date.now();
+  return TOTAL_MIN - (end - S.start)/60000 - S.penalty;
+}
+function tick(){
+  const bar = $("#bar");
+  bar.hidden = !S.start;
+  if (!S.start) return;
+  const left = o2Left(), pct = Math.max(0, Math.min(100, left/TOTAL_MIN*100));
+  $("#o2bar i").style.width = pct + "%";
+  $("#o2bar").classList.toggle("low", left < 10);
+  $("#o2txt").textContent = left > 0 ? Math.ceil(left) + " min" : "leer";
+  $("#sealtxt").textContent = seals() + (seals() === 1 ? " Siegel" : " Siegel");
+}
+setInterval(tick, 5000);
+
+/* ---------- Navigation ---------- */
+function go(name, room){ view = { name, room }; render(); window.scrollTo(0,0); }
+$("#toMap").addEventListener("click", () => go("map"));
+
+function render(){
+  tick();
+  const app = $("#app");
+  if (view.name === "intro") app.innerHTML = introHTML();
+  else if (view.name === "map") app.innerHTML = mapHTML();
+  else if (view.name === "room") app.innerHTML = roomHTML(DATA.rooms.find(r => r.id === view.room));
+  else if (view.name === "secret") app.innerHTML = secretHTML();
+  else if (view.name === "exit") app.innerHTML = exitHTML();
+  bind();
+  const hd = app.querySelector("h1, h2");
+  if (hd){ hd.setAttribute("tabindex","-1"); }
+}
+
+/* ---------- Startseite ---------- */
+function introHTML(){
+  return `
+  <section class="hero">
+    <p class="kicker">Escape Room Evolution · Wiederholung vor der Klausur</p>
+    <h1>Die verlassene Forschungsstation</h1>
+    <p>Ein Sturm hat euch auf die Vulkaninsel Isla Brava verschlagen. In der Forschungsstation ist die Energie ausgefallen, die Türen sind verriegelt, der Sauerstoff wird knapp. Die Forscherin ist verschwunden. Ihr kommt nur heraus, wenn ihr versteht, woran sie gearbeitet hat: an der Evolution der Inselbewohner.</p>
+  </section>
+  <div class="rules">
+    <div class="rule"><span class="ico" aria-hidden="true">🗺️</span><div><b>Fünf Labore, freie Reihenfolge</b>Jedes gelöste Labor verrät einen Code-Buchstaben. Notiert ihn auf Papier.</div></div>
+    <div class="rule"><span class="ico" aria-hidden="true">💡</span><div><b>Hilfekarten</b>Jede Aufgabe hat zwei Hilfen. Jede Hilfe kostet ${HINT_COST} Minuten Sauerstoff. Ist der Sauerstoff aufgebraucht, dürft ihr weiterarbeiten.</div></div>
+    <div class="rule"><span class="ico" aria-hidden="true">★</span><div><b>Bonus-Siegel</b>Nach jedem Labor gibt es eine Zusatzfrage mit nur einem Versuch. Ab drei Siegeln öffnet sich die Haupttür und ein verborgener Raum erscheint.</div></div>
+    <div class="rule"><span class="ico" aria-hidden="true">🚪</span><div><b>Drei Ausgänge</b>Notausgang: alle fünf Labore gelöst. Haupttür: zusätzlich mindestens drei Siegel. Geheimgang: zusätzlich das Geheimlabor bestanden.</div></div>
+  </div>
+  <p>Arbeitet zu zweit oder zu dritt an einem Gerät. Haltet Papier und Stift bereit. Am Ende wartet eine Ausgangskarte, die ihr einzeln schriftlich beantwortet.</p>
+  <div class="actions"><button class="btn btn-signal" data-act="start" type="button">Station betreten</button></div>`;
+}
+
+/* ---------- Grundriss ---------- */
+function roomG(id, x, y, w, hgt, title, sub, state, act){
+  const cls = ["room", state].join(" ");
+  const lampOn = state.includes("open") ? "lamp on" : "lamp";
+  const role = state.includes("locked") ? `aria-disabled="true"` : "";
+  return `<g class="${cls}" data-act="${act}" data-id="${id}" role="button" tabindex="0" ${role} aria-label="${esc(title)}: ${esc(sub)}">
+    <rect class="r" x="${x}" y="${y}" width="${w}" height="${hgt}" rx="6"/>
+    <circle class="${lampOn}" cx="${x+w-18}" cy="${y+18}" r="8"/>
+    <text x="${x+14}" y="${y+hgt/2+2}">${esc(title)}</text>
+    <text class="sub" x="${x+14}" y="${y+hgt/2+22}">${esc(sub)}</text>
+  </g>`;
+}
+function mapHTML(){
+  const rs = DATA.rooms;
+  const st = r => S.rooms[r.id].done ? "done" : "open";
+  const sub = r => S.rooms[r.id].done ? (S.rooms[r.id].bonus === "ok" ? "gelöst · ★" : "gelöst") : "offen";
+  const narrow = window.innerWidth < 560;
+  // Breit: 3 Spalten × 2 Reihen; schmal: 2 Spalten × 3 Reihen
+  const W = 180, H = narrow ? 110 : 130;
+  const pos = narrow ? [[20,20],[220,20],[20,150],[220,150],[20,280],[220,280]]
+                     : [[20,20],[220,20],[420,20],[20,250],[220,250],[420,250]];
+  let g = "";
+  rs.forEach((r,i) => { g += roomG(r.id, pos[i][0], pos[i][1], W, H, r.short, sub(r), st(r), "room"); });
+  const exitState = roomsDone() === rs.length ? (S.exit ? "done" : "open") : "locked";
+  g += roomG("exit", pos[5][0], pos[5][1], W, H, "Ausgang", exitState === "locked" ? `${roomsDone()} von ${rs.length} Laboren` : (S.exit ? "verlassen" : "bereit"), exitState, "exit");
+  const baseW = narrow ? 420 : 620, baseH = narrow ? 410 : 400;
+  let secret = "", vbw = baseW, vbh = baseH;
+  if (secretOpen()){
+    const sst = secretAnswered() === DATA.secret.questions.length ? "done" : "open";
+    const sx = narrow ? 120 : 640, sy = narrow ? 425 : 135;
+    secret = roomG("secret", sx, sy, narrow ? 180 : 150, 110, "Geheimlabor", sst === "done" ? `${secretOk()} von 3` : "entdeckt", "secret " + sst, "secret");
+    if (narrow) vbh = 550; else vbw = 805;
+  }
+  let grid = "";
+  for (let x = 0; x <= vbw; x += 40) grid += `<line x1="${x}" y1="0" x2="${x}" y2="${vbh}"/>`;
+  for (let y = 0; y <= vbh; y += 40) grid += `<line x1="0" y1="${y}" x2="${vbw}" y2="${y}"/>`;
+  const corridor = narrow ? "" : `<text class="corridor-label" x="310" y="208" text-anchor="middle">Hauptkorridor</text>`;
+  const frags = rs.map(r => S.rooms[r.id].done ? `<span class="frag" aria-label="Buchstabe aus ${esc(r.name)}">${r.fragment}</span>` : `<span class="frag empty" aria-label="noch offen">?</span>`).join("");
+  return `
+    <h2>Grundriss der Station</h2>
+    <p>Tippt auf ein Labor, um es zu betreten. Gelbe Lampe: verriegelt. Grüne Lampe: gelöst.</p>
+    <div class="plan-wrap">
+      <svg class="plan" viewBox="0 0 ${vbw} ${vbh}" role="group" aria-label="Grundriss der Forschungsstation">
+        <rect class="floor" x="0" y="0" width="${vbw}" height="${vbh}"/>
+        <g class="grid">${grid}</g>
+        <rect class="wall" x="6" y="6" width="${baseW-12}" height="${baseH-12}" rx="10"/>
+        ${corridor}
+        ${g}${secret}
+      </svg>
+      <div class="legend"><span class="l-open">verriegelt</span><span class="l-done">gelöst</span><span>★ Bonus-Siegel</span></div>
+    </div>
+    <div class="notepad">
+      <h3>Code-Buchstaben</h3>
+      <p style="margin:0">Notiert die Buchstaben in der Reihenfolge der Labore auf eurem Papier. Ihr braucht sie am Ausgang.</p>
+      <div class="frags">${frags}</div>
+    </div>
+    ${secretOpen() && secretAnswered() < 3 ? `<p>Hinter einer Wandverkleidung ist eine Tür aufgetaucht: das <b>Geheimlabor</b>.</p>` : ""}
+    <div class="foot"><span>Fortschritt wird nur auf diesem Gerät gespeichert.</span><button class="linkbtn" data-act="reset" type="button">Neu starten</button></div>`;
+}
+
+/* ---------- Aufgaben ---------- */
+function taskState(r, t){ return S.rooms[r.id].tasks[t.id]; }
+function hintHTML(t, ts){
+  if (!t.hints) return "";
+  const shown = t.hints.slice(0, ts.hints);
+  const more = ts.hints < t.hints.length && !ts.ok;
+  return `${shown.length ? `<div class="hintbox">${shown.map((x,i)=>`<p><b>Hilfe ${i+1}:</b> ${esc(x)}</p>`).join("")}</div>` : ""}
+    ${more ? `<button class="btn btn-ghost" data-act="hint" data-task="${t.id}" type="button">Hilfe ${ts.hints+1} öffnen (−${HINT_COST} min O₂)</button>` : ""}`;
+}
+function taskHTML(r, t){
+  if (t.type === "sim") return simHTML();
+  const ts = taskState(r, t), s = sel[t.id] || {}, solved = ts.ok;
+  let body = "";
+  if (t.type === "classify"){
+    body = t.items.map((it, i) => {
+      const cur = solved ? "solved" : s[i];
+      const wrong = !solved && s._wrong && s._wrong.includes(i);
+      return `<div class="item ${wrong ? "wrong":""}"><p>${esc(it.text)}</p>
+        <div class="chips" role="group" aria-label="Kategorie wählen">${t.categories.map((c, ci) =>
+          `<button type="button" class="chip" data-act="pick" data-task="${t.id}" data-i="${i}" data-v="${ci}" aria-pressed="${solved ? (s[i]===ci) : (cur===ci)}" ${solved?"disabled":""}>${esc(c)}</button>`).join("")}</div></div>`;
+    }).join("");
+  } else if (t.type === "mc"){
+    body = t.options.map((o, i) => `<button type="button" class="opt" role="radio" aria-checked="${s.v===i}" data-act="radio" data-task="${t.id}" data-v="${i}" ${solved?"disabled":""}><span class="mark"></span><span>${esc(o)}</span></button>`).join("");
+  } else if (t.type === "multi"){
+    const set = s.set || [];
+    body = t.options.map((o, i) => `<button type="button" class="opt multi" aria-pressed="${set.includes(i)}" data-act="toggle" data-task="${t.id}" data-v="${i}" ${solved?"disabled":""}><span class="mark"></span><span>${esc(o)}</span></button>`).join("");
+  } else if (t.type === "order"){
+    if (!s.order) { s.order = t.items.map(x => x.id); sel[t.id] = s; }
+    const byId = Object.fromEntries(t.items.map(x => [x.id, x.text]));
+    body = `<ol class="order-list">${s.order.map((id, p) => `<li class="${!solved && s._wrong && s._wrong.includes(p) ? "wrong":""}"><span class="num">${p+1}</span><span>${esc(byId[id])}</span>
+      <span class="mv"><button type="button" aria-label="nach oben" data-act="up" data-task="${t.id}" data-p="${p}" ${p===0||solved?"disabled":""}>▲</button><button type="button" aria-label="nach unten" data-act="down" data-task="${t.id}" data-p="${p}" ${p===s.order.length-1||solved?"disabled":""}>▼</button></span></li>`).join("")}</ol>`;
+  } else if (t.type === "numbers"){
+    if (t.table) body += tableHTML(t.table);
+    body += t.fields.map((f, i) => `<div class="numrow"><label for="${t.id}-${i}">${esc(f.label)}</label><input id="${t.id}-${i}" inputmode="decimal" autocomplete="off" data-task="${t.id}" data-i="${i}" value="${esc((s.vals||[])[i]||"")}" class="${!solved && s._wrong && s._wrong.includes(i) ? "wrong":""}" ${solved?"disabled":""}> <span>${esc(f.unit)}</span></div>`).join("");
+  }
+  return `<section class="task ${solved?"solved":""}" id="task-${t.id}">
+    ${solved ? `<div class="task-status">✓ gelöst</div>` : ""}
+    <div class="task-prompt">${esc(t.prompt)}</div>
+    ${body}
+    ${solved ? "" : `<div class="actions"><button class="btn btn-primary" data-act="check" data-task="${t.id}" type="button">Prüfen</button></div>`}
+    <div class="feedback ${s._fb ? s._fb[0] : ""}" role="status">${s._fb ? esc(s._fb[1]) : ""}</div>
+    ${hintHTML(t, ts)}
+  </section>`;
+}
+function tableHTML(tb){
+  return `<div class="tablewrap"><table><thead><tr>${tb.head.map(x=>`<th>${esc(x)}</th>`).join("")}</tr></thead><tbody>${tb.rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+
+function roomHTML(r){
+  const st = S.rooms[r.id];
+  const b = r.bonus;
+  const bs = sel[b.id] || {};
+  let bonus = "";
+  if (st.done){
+    bonus = `<div class="reward"><p>Die Tür springt auf. Euer Code-Buchstabe:</p><div class="big">${r.fragment}</div><p>Notiert ihn auf eurem Papier.</p></div>
+    <section class="task bonus"><div class="task-prompt">${esc(b.prompt)}</div>
+      ${b.options.map((o,i) => {
+        let cls = "";
+        if (st.bonus) { if (i === bs.right) cls = "correct"; else if (i === bs.v && st.bonus === "fail") cls = "incorrect"; }
+        return `<button type="button" class="opt ${cls}" role="radio" aria-checked="${bs.v===i}" data-act="bradio" data-task="${b.id}" data-v="${i}" ${st.bonus?"disabled":""}><span class="mark"></span><span>${esc(o)}</span></button>`;
+      }).join("")}
+      ${st.bonus ? `<div class="feedback ${st.bonus==="ok"?"ok":"bad"}">${st.bonus==="ok" ? "Richtig – ihr erhaltet ein Siegel ★" : "Leider nicht richtig. Kein Siegel, aber die Erklärung hilft beim Wiederholen."}</div><div class="explain">${esc(b.explain)}</div>`
+        : `<div class="actions"><button class="btn btn-signal" data-act="bcheck" data-room="${r.id}" type="button">Antwort einloggen (ein Versuch)</button><button class="btn btn-ghost" data-act="map" type="button">Ohne Siegel zurück</button></div>`}
+    </section>
+    <div class="actions"><button class="btn btn-primary" data-act="map" type="button">Zurück zum Grundriss</button></div>`;
+  }
+  return `<button class="back" data-act="map" type="button">← Grundriss</button>
+    <header class="room-head"><h2>${esc(r.name)}</h2><p class="kc">${esc(r.kc)}</p></header>
+    <p>${esc(r.intro)}</p>
+    ${r.tasks.map(t => taskHTML(r, t)).join("")}
+    ${bonus}`;
+}
+
+/* ---------- Simulation ---------- */
+const sim = { N:10, s:0, runs:null, fixed:0, lost:0 };
+function simHTML(){
+  const nB = [10,50,500].map(n => `<button type="button" class="chip" data-act="simN" data-v="${n}" aria-pressed="${sim.N===n}">N = ${n}</button>`).join("");
+  const sB = [0,5,10].map(v => `<button type="button" class="chip" data-act="simS" data-v="${v}" aria-pressed="${sim.s===v}">${v} %</button>`).join("");
+  return `<section class="task sim"><div class="task-prompt">Simulation: Allelfrequenz von A (Start 50 %, 100 Generationen, 10 Läufe)</div>
+    <div class="ctrl"><div><span>Populationsgröße</span><div class="chips">${nB}</div></div><div><span>Selektionsvorteil von A</span><div class="chips">${sB}</div></div></div>
+    <canvas id="simc" width="800" height="500" aria-label="Diagramm der Allelfrequenz über 100 Generationen"></canvas>
+    <div class="count" id="simcount">${sim.runs ? countHTML() : "Noch kein Durchlauf gestartet."}</div>
+    <div class="actions"><button class="btn btn-signal" data-act="simrun" type="button">10 Läufe starten</button></div>
+  </section>`;
+}
+function countHTML(){ return `<span>Einstellung: N = ${sim.lastN}, Vorteil ${sim.lastS} %</span><span>A fixiert (100 %): <b>${sim.fixed}</b></span><span>A verloren (0 %): <b>${sim.lost}</b></span><span>beide Allele noch vorhanden: <b>${10-sim.fixed-sim.lost}</b></span>`; }
+function binom(n, p){ let k = 0; for (let i = 0; i < n; i++) if (Math.random() < p) k++; return k; }
+function runSim(){
+  const N = sim.N, s = sim.s/100, G = 100, runs = [];
+  for (let r = 0; r < 10; r++){
+    let p = .5; const tr = [p];
+    for (let g = 0; g < G; g++){
+      const pw = p*(1+s)/(p*(1+s)+(1-p));
+      p = binom(2*N, pw)/(2*N);
+      tr.push(p);
+    }
+    runs.push(tr);
+  }
+  sim.runs = runs; sim.lastN = N; sim.lastS = sim.s;
+  sim.fixed = runs.filter(t => t[G] === 1).length;
+  sim.lost = runs.filter(t => t[G] === 0).length;
+  drawSim(true);
+}
+function drawSim(animate){
+  const c = $("#simc"); if (!c) return;
+  const dpr = window.devicePixelRatio || 1, w = c.clientWidth || 800, hh = w*10/16;
+  c.width = w*dpr; c.height = hh*dpr;
+  const x = c.getContext("2d"); x.scale(dpr, dpr);
+  const cs = getComputedStyle(document.documentElement);
+  const ink = cs.getPropertyValue("--muted").trim(), line = cs.getPropertyValue("--line").trim();
+  const navy = cs.getPropertyValue("--navy").trim(), sig = cs.getPropertyValue("--signal").trim();
+  const L = 46, R = 12, T = 12, B = 34, pw = w-L-R, ph = hh-T-B;
+  const frame = upto => {
+    x.clearRect(0,0,w,hh);
+    x.font = "12px " + cs.getPropertyValue("--body"); x.fillStyle = ink; x.strokeStyle = line; x.lineWidth = 1;
+    [0,.25,.5,.75,1].forEach(v => { const yy = T+ph*(1-v); x.beginPath(); x.moveTo(L,yy); x.lineTo(L+pw,yy); x.stroke(); x.fillText(Math.round(v*100)+" %", 6, yy+4); });
+    [0,25,50,75,100].forEach(g => { const xx = L+pw*g/100; x.fillText(g, xx-6, hh-14); });
+    x.fillText("Generation", L+pw/2-30, hh-1);
+    if (!sim.runs) return;
+    sim.runs.forEach((tr, i) => {
+      x.strokeStyle = i % 2 ? navy : sig; x.lineWidth = 2; x.globalAlpha = .85; x.beginPath();
+      for (let g = 0; g <= upto; g++){ const px = L+pw*g/100, py = T+ph*(1-tr[g]); g ? x.lineTo(px,py) : x.moveTo(px,py); }
+      x.stroke(); x.globalAlpha = 1;
+    });
+  };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!animate || reduce){ frame(100); return; }
+  let g = 0; const step = () => { g = Math.min(100, g+3); frame(g); if (g < 100) requestAnimationFrame(step); }; step();
+}
+
+/* ---------- Geheimlabor ---------- */
+function secretHTML(){
+  const L = DATA.secret;
+  const qs = L.questions.map(q => {
+    const res = S.secret[q.id], s = sel[q.id] || {};
+    return `<section class="task"><div class="task-prompt">${esc(q.prompt)}</div>
+      ${q.options.map((o,i) => {
+        let cls = ""; if (res){ if (i === (S.secret[q.id+"_r"])) cls = "correct"; else if (i === S.secret[q.id+"_v"] && res === "fail") cls = "incorrect"; }
+        return `<button type="button" class="opt ${cls}" role="radio" aria-checked="${(res ? S.secret[q.id+"_v"] : s.v)===i}" data-act="sradio" data-task="${q.id}" data-v="${i}" ${res?"disabled":""}><span class="mark"></span><span>${esc(o)}</span></button>`; }).join("")}
+      ${res ? `<div class="feedback ${res==="ok"?"ok":"bad"}">${res==="ok"?"Richtig.":"Nicht richtig."}</div><div class="explain">${esc(q.explain)}</div>`
+        : `<div class="actions"><button class="btn btn-signal" data-act="scheck" data-task="${q.id}" type="button">Antwort einloggen (ein Versuch)</button></div>`}
+    </section>`;
+  }).join("");
+  const done = secretAnswered() === L.questions.length;
+  return `<button class="back" data-act="map" type="button">← Grundriss</button>
+    <header class="room-head"><h2>${esc(L.name)}</h2><p class="kc">${esc(L.kc)}</p></header>
+    <p>${esc(L.intro)}</p>
+    <section class="task"><p>${esc(L.material[0])}</p><p>${esc(L.material[1])}</p>${tableHTML(L.table)}<p style="margin:0">${esc(L.material[2])}</p></section>
+    ${qs}
+    ${done ? `<div class="reward"><p>${secretOk() >= 2 ? "Der Geheimgang ist offen." : "Der Geheimgang bleibt verschlossen."}</p><div class="big">${secretOk()}/3</div><p>${secretOk() >= 2 ? "Ihr könnt die Station am Ausgang durch den Geheimgang verlassen." : "Ihr könnt die Station trotzdem über die anderen Ausgänge verlassen."}</p></div><div class="actions"><button class="btn btn-primary" data-act="map" type="button">Zurück zum Grundriss</button></div>` : ""}`;
+}
+
+/* ---------- Ausgang ---------- */
+function roomScore(r){
+  let w = 0, hi = 0; Object.values(S.rooms[r.id].tasks).forEach(t => { w += t.wrong; hi += t.hints; });
+  const sc = w + 2*hi;
+  return { w, hi, tag: sc <= 1 ? "sicher" : sc <= 4 ? "festigen" : "wiederholen" };
+}
+function exitHTML(){
+  if (!S.exitCode){
+    return `<button class="back" data-act="map" type="button">← Grundriss</button>
+      <h2>Die Ausgangsschleuse</h2>
+      <p>Ein Tastenfeld leuchtet auf. Gebt die Code-Buchstaben in der Reihenfolge der Labore ein: Archiv, Genpool, Simulation, Inseln, Verhalten.</p>
+      <input class="code-in" id="codein" maxlength="5" autocomplete="off" autocapitalize="characters" aria-label="Code eingeben">
+      <div class="actions"><button class="btn btn-signal" data-act="code" type="button">Code eingeben</button></div>
+      <div class="feedback" id="codefb" role="status"></div>`;
+  }
+  if (!S.exit){
+    const s = seals(), sec = secretAnswered() === 3 && secretOk() >= 2;
+    return `<h2>Drei Türen</h2><p>Die Schleuse ist offen. Welche Tür nehmt ihr?</p>
+      <div class="doors">
+        <button class="door" data-act="door" data-v="Notausgang" type="button"><span class="ico" aria-hidden="true">🚪</span><span><b>Notausgang</b><small>Alle fünf Labore gelöst.</small></span></button>
+        <button class="door" data-act="door" data-v="Haupttür" type="button" ${s>=3?"":"disabled"}><span class="ico" aria-hidden="true">🔐</span><span><b>Haupttür</b><small>${s>=3 ? `Mit ${s} Siegeln geöffnet.` : `Benötigt drei Siegel – ihr habt ${s}.`}</small></span></button>
+        <button class="door" data-act="door" data-v="Geheimgang" type="button" ${sec?"":"disabled"}><span class="ico" aria-hidden="true">🗝️</span><span><b>Geheimgang</b><small>${sec ? "Durch das Geheimlabor freigeschaltet." : "Benötigt das bestandene Geheimlabor."}</small></span></button>
+      </div>
+      ${!sec && s >= 3 && secretAnswered() < 3 ? `<p>Das Geheimlabor ist noch nicht bearbeitet. Ihr könnt <button class="linkbtn" data-act="secret" type="button">zuerst dorthin gehen</button>.</p>` : ""}`;
+  }
+  const used = Math.round((S.exit.at - S.start)/60000);
+  const rows = DATA.rooms.map(r => { const sc = roomScore(r); return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.kc)}</small></td><td>${sc.w}</td><td>${sc.hi}</td><td><span class="tag ${sc.tag}">${sc.tag}</span></td></tr>`; }).join("");
+  return `<div class="reward"><p>Ihr habt die Station verlassen durch den</p><div class="big" style="font-size:2.4rem">${esc(S.exit.door)}</div><p>nach ${used} Minuten · ${seals()} Siegel${secretAnswered()===3 ? ` · Geheimlabor ${secretOk()}/3` : ""}</p></div>
+    <h2>Euer Wiederholungsbericht</h2>
+    <p>Fotografiert diesen Bericht. Wo „festigen“ oder „wiederholen“ steht, solltet ihr vor der Klausur noch einmal ansetzen.</p>
+    <div class="tablewrap"><table class="report"><thead><tr><th>Labor und Kompetenz</th><th>Fehl&shy;versuche</th><th>Hilfen</th><th>Stand</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="card-exit"><h3>Ausgangskarte – einzeln, auf Papier</h3><p style="margin:0">${esc(DATA.exitCard)}</p></div>
+    <div class="foot"><span>Fortschritt wird nur auf diesem Gerät gespeichert.</span><button class="linkbtn" data-act="reset" type="button">Neu starten</button></div>`;
+}
+
+/* ---------- Prüfen ---------- */
+function findTask(id){ for (const r of DATA.rooms) for (const t of r.tasks) if (t.id === id) return [r, t]; return [null,null]; }
+function check(id){
+  const [r, t] = findTask(id), ts = taskState(r, t), s = sel[id] = sel[id] || {};
+  let ok = false, wrong = [], msg = "";
+  if (t.type === "classify"){
+    const miss = t.items.findIndex((_, i) => s[i] === undefined);
+    if (miss >= 0){ s._fb = ["bad", "Ordnet zuerst alle Aussagen zu."]; return render(); }
+    wrong = t.items.map((_, i) => i).filter(i => h(`${id}|${i}|${s[i]}`) !== KEYS[`${id}|${i}`]);
+    ok = !wrong.length; msg = ok ? "" : `${t.items.length - wrong.length} von ${t.items.length} richtig.`;
+  } else if (t.type === "mc"){
+    if (s.v === undefined){ s._fb = ["bad","Wählt eine Antwort."]; return render(); }
+    ok = h(`${id}|${s.v}`) === KEYS[id]; msg = "Das stimmt noch nicht.";
+  } else if (t.type === "multi"){
+    const set = (s.set || []).slice().sort((a,b)=>a-b);
+    if (!set.length){ s._fb = ["bad","Wählt mindestens eine Aussage."]; return render(); }
+    ok = h(`${id}|${set.join(",")}`) === KEYS[id]; msg = "Eure Auswahl stimmt noch nicht. Prüft jede Aussage einzeln.";
+  } else if (t.type === "order"){
+    wrong = s.order.map((x, p) => p).filter(p => h(`${id}|${p}|${s.order[p]}`) !== KEYS[`${id}|${p}`]);
+    ok = !wrong.length; msg = ok ? "" : `${s.order.length - wrong.length} von ${s.order.length} Schritten stehen richtig.`;
+  } else if (t.type === "numbers"){
+    s.vals = t.fields.map((_, i) => ($(`#${id}-${i}`)||{}).value || "");
+    if (s.vals.some(v => !norm(v))){ s._fb = ["bad","Füllt alle Felder aus."]; return render(); }
+    wrong = t.fields.map((_, i) => i).filter(i => h(`${id}|${i}|${norm(s.vals[i])}`) !== KEYS[`${id}|${i}`]);
+    ok = !wrong.length; msg = wrong.length === t.fields.length ? "Das Ergebnis stimmt noch nicht." : "Ein Wert stimmt noch nicht.";
+  }
+  if (ok){
+    ts.ok = true; s._fb = ["ok","Richtig!"]; delete s._wrong;
+    const room = S.rooms[r.id];
+    if (Object.values(room.tasks).every(x => x.ok)) room.done = true;
+  } else {
+    ts.wrong++;
+    // Ab dem zweiten Fehlversuch werden falsche Elemente markiert (nicht bei MC/Mehrfachwahl)
+    s._wrong = ts.wrong >= 2 ? wrong : [];
+    s._fb = ["bad", msg + (ts.wrong >= 2 && wrong.length ? " Die falschen sind markiert." : "")];
+  }
+  save(); render();
+  const el = $(`#task-${id}`); if (el && !ok) el.scrollIntoView({block:"nearest"});
+  if (ok && S.rooms[r.id].done){ const rw = $(".reward"); if (rw) rw.scrollIntoView({block:"center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); }
+}
+
+/* ---------- Ereignisse ---------- */
+function bind(){
+  const app = $("#app");
+  app.onclick = e => {
+    const b = e.target.closest("[data-act]"); if (!b || b.disabled || b.getAttribute("aria-disabled") === "true") return;
+    act(b);
+  };
+  app.onkeydown = e => {
+    const b = e.target.closest("g[data-act]");
+    if (b && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); if (b.getAttribute("aria-disabled") !== "true") act(b); }
+    if (e.target.id === "codein" && e.key === "Enter") act({dataset:{act:"code"}});
+  };
+  app.oninput = e => { const t = e.target; if (t.dataset && t.dataset.task){ const s = sel[t.dataset.task] = sel[t.dataset.task] || {}; s.vals = s.vals || []; s.vals[+t.dataset.i] = t.value; } };
+  if ($("#simc")) drawSim(false);
+}
+function act(b){
+  const d = b.dataset, a = d.act;
+  if (a === "start"){ S.start = Date.now(); save(); go("map"); }
+  else if (a === "map") go("map");
+  else if (a === "room") go("room", d.id);
+  else if (a === "exit") go("exit");
+  else if (a === "secret") go("secret");
+  else if (a === "reset"){ if (confirm("Wirklich neu starten? Der gesamte Fortschritt auf diesem Gerät wird gelöscht.")){ S = fresh(); for (const k in sel) delete sel[k]; save(); go("intro"); } }
+  else if (a === "pick"){ const s = sel[d.task] = sel[d.task] || {}; s[+d.i] = +d.v; if (s._wrong) s._wrong = s._wrong.filter(x => x !== +d.i); render(); }
+  else if (a === "radio" || a === "bradio" || a === "sradio"){ const s = sel[d.task] = sel[d.task] || {}; s.v = +d.v; render(); }
+  else if (a === "toggle"){ const s = sel[d.task] = sel[d.task] || {}; s.set = s.set || []; const v = +d.v; s.set = s.set.includes(v) ? s.set.filter(x => x !== v) : s.set.concat(v); render(); }
+  else if (a === "up" || a === "down"){ const s = sel[d.task], p = +d.p, q = a === "up" ? p-1 : p+1; [s.order[p], s.order[q]] = [s.order[q], s.order[p]]; s._wrong = []; render(); }
+  else if (a === "check") check(d.task);
+  else if (a === "hint"){ const [r, t] = findTask(d.task); const ts = taskState(r, t); if (ts.hints < t.hints.length){ ts.hints++; S.penalty += HINT_COST; save(); render(); const el = $(`#task-${d.task}`); if (el) el.scrollIntoView({block:"nearest"}); } }
+  else if (a === "bcheck"){
+    const r = DATA.rooms.find(x => x.id === d.room), s = sel[r.bonus.id] || {};
+    if (s.v === undefined){ return; }
+    const ok = h(`${r.bonus.id}|${s.v}`) === KEYS[r.bonus.id];
+    s.right = r.bonus.options.findIndex((_, i) => h(`${r.bonus.id}|${i}`) === KEYS[r.bonus.id]);
+    S.rooms[r.id].bonus = ok ? "ok" : "fail"; save(); render();
+  }
+  else if (a === "scheck"){
+    const s = sel[d.task] || {}; if (s.v === undefined) return;
+    const q = DATA.secret.questions.find(x => x.id === d.task);
+    S.secret[q.id] = h(`${q.id}|${s.v}`) === KEYS[q.id] ? "ok" : "fail";
+    S.secret[q.id+"_v"] = s.v;
+    S.secret[q.id+"_r"] = q.options.findIndex((_, i) => h(`${q.id}|${i}`) === KEYS[q.id]);
+    save(); render();
+  }
+  else if (a === "simN"){ sim.N = +d.v; render(); }
+  else if (a === "simS"){ sim.s = +d.v; render(); }
+  else if (a === "simrun"){ runSim(); $("#simcount").innerHTML = countHTML(); }
+  else if (a === "code"){
+    const v = ($("#codein").value || "").toUpperCase().replace(/\s/g,"");
+    if (h("exit|" + v) === KEYS.exit){ S.exitCode = true; save(); render(); }
+    else { const fb = $("#codefb"); fb.className = "feedback bad"; fb.textContent = "Falscher Code. Prüft Buchstaben und Reihenfolge."; }
+  }
+  else if (a === "door"){ S.exit = { door: d.v, at: Date.now() }; save(); render(); window.scrollTo(0,0); }
+}
+let wasNarrow = window.innerWidth < 560;
+window.addEventListener("resize", () => { if ($("#simc")) drawSim(false); const n = window.innerWidth < 560; if (n !== wasNarrow){ wasNarrow = n; if (view.name === "map") render(); } });
+render();
+</script>
+</body>
+</html>

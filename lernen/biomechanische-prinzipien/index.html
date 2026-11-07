@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Biomechanische Prinzipien</title>
+<meta name="description" content="Biomechanische Prinzipien im Sport: Anfangskraft, Beschleunigungsweg, Teilimpulse, Beschleunigungsverlauf, Gegenwirkung und Impulserhaltung. Sechs Labore mit Zeitlupe und Diagrammen, Diagnoseaufgaben und Praxisideen.">
+<style>
+:root{
+  --bg:#ECEFF4; --panel:#FFFFFF; --panel-2:#F2F5F9; --ink:#0F1C2B; --ink-soft:#4A5870; --line:#CAD3E0; --nav:#12324F; --nav-ink:#FFFFFF; --focus:#0B57D0; --acc:#E8590C;
+  --force:#D9480F; --vel:#1971C2; --ang:#7048E8; --pos:#2F9E44; --ref:#7C8794;
+  --ok:#1B6B3B; --ok-bg:#DCEFE2; --warn:#7A5600; --warn-bg:#FFF0C7; --bad:#B3261E; --bad-bg:#FBE3E0; --info:#2A4FB0; --info-bg:#E2E9FB; --grid:#DDE4EE;
+  --body-c:#12324F; --ground:#B9C3D1;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C141D; --panel:#142130; --panel-2:#1A2A3C; --ink:#E8EEF6; --ink-soft:#A7B4C6; --line:#2A3C52; --nav:#D6E4F5; --nav-ink:#0C141D; --focus:#8AB4FF; --acc:#FF9248;
+    --force:#FF8A57; --vel:#6CB4F5; --ang:#B49BFF; --pos:#6FD58A; --ref:#8E9AA8;
+    --ok:#6FD596; --ok-bg:#133422; --warn:#F2C25B; --warn-bg:#3A2F12; --bad:#FF8F85; --bad-bg:#47201D; --info:#9DB7FF; --info-bg:#1E2C5C; --grid:#223246; --body-c:#E8EEF6; --ground:#3A4C63;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C141D; --panel:#142130; --panel-2:#1A2A3C; --ink:#E8EEF6; --ink-soft:#A7B4C6; --line:#2A3C52; --nav:#D6E4F5; --nav-ink:#0C141D; --focus:#8AB4FF; --acc:#FF9248;
+  --force:#FF8A57; --vel:#6CB4F5; --ang:#B49BFF; --pos:#6FD58A; --ref:#8E9AA8;
+  --ok:#6FD596; --ok-bg:#133422; --warn:#F2C25B; --warn-bg:#3A2F12; --bad:#FF8F85; --bad-bg:#47201D; --info:#9DB7FF; --info-bg:#1E2C5C; --grid:#223246; --body-c:#E8EEF6; --ground:#3A4C63;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1040px; margin:0 auto; padding:14px clamp(12px,3vw,24px) 4px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.55rem,5vw,2.3rem); line-height:1.08; margin:0; letter-spacing:-.02em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:76ch; }
+.tabs{ max-width:1040px; margin:8px auto 0; padding:0 clamp(12px,3vw,24px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em 1em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+.viewer{ position:sticky; top:0; z-index:20; max-width:1040px; margin:10px auto 0; padding:0 clamp(12px,3vw,24px); }
+.vbox{ background:var(--panel); border:2px solid var(--ink); border-radius:14px; overflow:hidden; box-shadow:0 6px 0 -2px color-mix(in srgb,var(--ink) 16%,transparent); }
+.vbar{ display:flex; flex-wrap:wrap; gap:6px 8px; padding:6px 8px; border-bottom:1px solid var(--line); align-items:center; background:var(--panel-2); }
+.vbar .btn{ min-height:40px; padding:.1em .7em; min-width:42px; font-size:.95rem; }
+.vbar .scrubw{ flex:1 1 120px; min-width:100px; display:flex; align-items:center; }
+.vt{ font-variant-numeric:tabular-nums; font-weight:700; font-size:.88rem; min-width:6.4em; text-align:right; }
+.vbar .seg button{ min-height:38px; padding:.1em .7em; font-size:.88rem; }
+.viewer.collapsed .vpanes,.viewer.collapsed .vinfo{ display:none; }
+.vpanes{ display:flex; }
+.vpane{ flex:1 1 0; min-width:0; }
+.vpane+.vpane{ border-left:1px solid var(--line); }
+.vpane[hidden]{ display:none; }
+#vChart{ touch-action:pan-y; } #vChart.edit{ touch-action:none; cursor:ns-resize; }
+.vinfo{ padding:5px 12px; font-size:.88rem; min-height:32px; border-top:1px solid var(--line); background:var(--panel); color:var(--ink-soft); }
+.vinfo b{ color:var(--ink); }
+@media (max-width:700px){ :root{ --scene-h:25vh; } .vinfo{ font-size:.8rem; padding:4px 10px; } .vbar .seg .opt-both{ display:none; } .vt{ min-width:5.4em; } }
+.wrap{ max-width:1040px; margin:0 auto; padding:12px clamp(12px,3vw,24px) 40px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.25rem; margin:0 0 8px; line-height:1.2; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.05rem; margin:14px 0 4px; line-height:1.25; }
+.lead{ margin:0 0 10px; max-width:78ch; } .note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; max-width:84ch; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.4em .9em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); } .btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); border-color:var(--nav); }
+.btn.sm{ min-height:40px; font-size:.92rem; padding:.2em .8em; }
+.seg{ display:inline-flex; flex-wrap:wrap; border:2px solid var(--line); border-radius:10px; overflow:hidden; }
+.seg button{ border:0; background:var(--panel); padding:.35em .85em; font-weight:700; cursor:pointer; min-height:42px; border-right:1px solid var(--line); }
+.seg button:last-child{ border-right:0; } .seg button[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); }
+input[type=range]{ width:100%; accent-color:var(--nav); min-height:34px; }
+input[type=number],input[type=text],select,textarea{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+label.fl{ display:block; font-weight:700; font-size:.92rem; margin:10px 0 2px; } label.fl small{ display:block; font-weight:400; color:var(--ink-soft); font-size:.84rem; line-height:1.3; }
+.sl output{ font-variant-numeric:tabular-nums; font-weight:800; }
+.grid2{ display:grid; gap:2px 22px; grid-template-columns:1fr; } @media (min-width:760px){ .grid2{ grid-template-columns:1fr 1fr; } }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--ok-bg); color:var(--ok); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--warn-bg); color:var(--warn); } .fb.info{ background:var(--info-bg); color:var(--info); }
+.warn{ background:var(--warn-bg); color:var(--warn); border-radius:12px; padding:10px 14px; margin:8px 0; font-size:.93rem; }
+.badge{ display:inline-block; font-size:.78rem; font-weight:700; border-radius:99px; padding:1px 10px; border:1px solid var(--line); background:var(--panel-2); margin-right:4px; white-space:nowrap; }
+.badge.ok{ background:var(--ok-bg); color:var(--ok); border-color:transparent; } .badge.info{ background:var(--info-bg); color:var(--info); border-color:transparent; } .badge.tip{ background:var(--warn-bg); color:var(--warn); border-color:transparent; }
+.chips{ display:flex; gap:8px; overflow-x:auto; padding:2px 0 8px; scrollbar-width:thin; }
+.chip{ flex:none; text-align:left; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:8px 12px; cursor:pointer; min-height:54px; max-width:210px; }
+.chip b{ display:block; font-family:var(--display); font-size:.95rem; line-height:1.2; } .chip span{ font-size:.8rem; color:var(--ink-soft); line-height:1.25; display:block; }
+.chip[aria-pressed="true"]{ border-color:var(--nav); box-shadow:0 0 0 2px var(--nav) inset; }
+.labpick{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } @media (min-width:760px){ .labpick{ grid-template-columns:repeat(6,minmax(0,1fr)); } }
+.labpick button{ min-width:0; overflow-wrap:anywhere; hyphens:auto; text-align:left; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:6px 10px; cursor:pointer; min-height:62px; }
+.labpick b{ display:block; font-family:var(--display); font-size:1.05rem; } .labpick span{ display:block; font-size:.78rem; line-height:1.2; color:var(--ink-soft); }
+.labpick button[aria-pressed="true"]{ border-color:var(--nav); box-shadow:0 0 0 2px var(--nav) inset; background:var(--panel-2); }
+.kpis{ display:grid; gap:8px; grid-template-columns:repeat(2,1fr); } @media (min-width:760px){ .kpis{ grid-template-columns:repeat(4,1fr); } }
+.kpis div{ border:1px solid var(--line); border-radius:12px; padding:6px 10px; background:var(--panel); }
+.kpis b{ display:block; font-family:var(--display); font-size:1.2rem; line-height:1.15; } .kpis small{ display:block; color:var(--ink-soft); font-size:.8rem; line-height:1.25; }
+.rule{ border-left:6px solid var(--acc); background:var(--panel-2); border-radius:10px; padding:8px 12px; margin:6px 0 10px; } .rule b{ font-family:var(--display); }
+.mission{ border:2px dashed var(--line); border-radius:12px; padding:8px 12px; margin:8px 0; } .mission.done{ border-style:solid; border-color:var(--ok); background:var(--ok-bg); color:var(--ok); }
+.tbl{ width:100%; border-collapse:collapse; font-size:.9rem; } .tbl th,.tbl td{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; } .tscroll{ overflow-x:auto; max-width:100%; }
+.mx{ border-collapse:separate; border-spacing:3px; font-size:.84rem; } .mx th{ font-weight:700; padding:2px 4px; text-align:left; vertical-align:bottom; } .mx thead th{ text-align:center; font-size:.76rem; } .mx td button{ width:42px; height:42px; border:2px solid transparent; border-radius:8px; font-weight:800; cursor:pointer; background:var(--ok-bg); color:var(--ok); } .mx td button[aria-pressed="true"]{ border-color:var(--ink); } .mx td.no{ background:var(--panel-2); }
+.chart{ display:block; width:100%; } .chart text{ fill:var(--ink); font-family:var(--body); } .chart .tx2{ fill:var(--ink-soft); } .chart .gl{ stroke:var(--grid); } .chart .axl{ stroke:var(--ink-soft); }
+.scene text{ fill:var(--ink); font-family:var(--body); } .scene .tx2{ fill:var(--ink-soft); }
+.opt{ text-align:left; border:2px solid var(--line); border-radius:12px; padding:8px 12px; background:var(--panel); cursor:pointer; display:block; width:100%; margin:6px 0; min-height:46px; }
+.opt.right{ border-color:var(--ok); background:var(--ok-bg); } .opt.wrong{ border-color:var(--bad); background:var(--bad-bg); }
+.pcard{ border-left:8px solid var(--acc); }
+details.task,details.mode{ border-top:1px solid var(--line); padding:6px 0; } details.task>summary,details.mode>summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+ul.plain{ margin:4px 0 0; padding-left:1.2em; } ul.plain li{ margin:3px 0; }
+.gl dt{ font-family:var(--display); font-weight:800; margin-top:10px; } .gl dd{ margin:2px 0 0; max-width:76ch; }
+.eqn{ font-family:ui-monospace,Consolas,monospace; background:var(--panel-2); border-radius:10px; padding:8px 12px; font-size:.95rem; overflow-x:auto; line-height:1.7; }
+.legendrow{ display:flex; flex-wrap:wrap; gap:4px 14px; font-size:.86rem; margin:4px 0; } .legendrow i{ display:inline-block; width:22px; height:0; border-top:3px solid; vertical-align:middle; margin-right:5px; }
+@media print{ .tabs,.btnrow,.viewer .vbar{ display:none !important; } .viewer{ position:static; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Biomechanische Prinzipien</h1>
+  <p>Warum springt man mit Ausholbewegung höher, warum stößt man mit langem Weg weiter, warum dreht sich der Salto in der Hocke schneller? Sechs Labore mit Zeitlupe, Diagrammen und Aufgaben. Alle Werte stammen aus vereinfachten Modellen.</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab" role="tab" data-tab="over" aria-selected="true">Überblick</button>
+  <button type="button" class="tab" role="tab" data-tab="lab" aria-selected="false">Labor</button>
+  <button type="button" class="tab" role="tab" data-tab="diag" aria-selected="false">Diagnose</button>
+  <button type="button" class="tab" role="tab" data-tab="info" aria-selected="false">Info und Aufgaben</button>
+</nav>
+<div class="viewer" id="viewer" hidden>
+  <div class="vbox">
+    <div class="vbar" role="toolbar" aria-label="Zeit und Ansicht">
+      <button type="button" class="btn" data-v="play" aria-label="Zeitlupe abspielen" aria-pressed="false">▶</button>
+      <button type="button" class="btn" data-v="rewind" aria-label="Zum Anfang">⏮</button>
+      <div class="scrubw"><input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Zeitpunkt wählen"></div>
+      <span class="vt" id="vt"></span>
+      <select id="spd" aria-label="Tempo" style="width:auto;min-height:38px;padding:.1em .4em;font-size:.88rem"><option value="0.1">0,1×</option><option value="0.25" selected>0,25×</option><option value="0.5">0,5×</option><option value="1">1×</option></select>
+      <div class="seg" role="group" aria-label="Ansicht"><button type="button" data-v="view" data-m="scene" aria-pressed="true">Szene</button><button type="button" data-v="view" data-m="chart" aria-pressed="false">Diagramm</button><button type="button" class="opt-both" data-v="view" data-m="both" aria-pressed="false">Beides</button></div>
+      <button type="button" class="btn" data-v="fold" aria-pressed="false" aria-label="Messfenster ein- oder ausklappen">▲</button>
+    </div>
+    <div class="vpanes"><div class="vpane" id="vScene"></div><div class="vpane" id="vChart" hidden></div></div>
+    <div class="vinfo" id="vinfo" aria-live="polite"></div>
+  </div>
+</div>
+<main class="wrap">
+  <section id="pane-over"></section>
+  <section id="pane-lab" hidden></section>
+  <section id="pane-diag" hidden></section>
+  <section id="pane-info" hidden></section>
+</main>
+<script>
+(function(){
+'use strict';
+/* =============== Physik der Labore (rein rechnerisch) =============== */
+const G=9.81;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const smooth=x=>{ x=clamp(x,0,1); return x*x*(3-2*x); };
+
+/* 1 Anfangskraft: vollständiger Sprung wie auf einer Kraftmessplatte (Stand, Eintauchen, Abdruck, Flug, Landung) */
+const F_ISO=2.0;
+function simInit(p){
+  const m=p.m, mg=m*G, d=p.d, dt=0.002, kappa=0.8;
+  const rho=Math.exp(-p.wait/250), F0eff=F_ISO+(p.F0f-F_ISO)*rho, Fs=F0eff*mg;
+  if(Fs<=mg*1.0001) return {ok:false,F0:F0eff,mg,reason:'Die Anfangskraft ist nicht größer als die Gewichtskraft: Es gibt keine Beschleunigung nach oben.'};
+  const cm=p.F0f>F_ISO+0.01;
+  let cmA=null;
+  if(cm){
+    const run=tu=>{ const U=0.6, tb0=0.75*tu, Bk=(p.F0f-1)*mg; let v=0,y=0,ymin=0; const T=[],F=[],V=[],Y=[];
+      for(let k=0;k<2500;k++){ const t=k*dt, dip=t<tu?-U*mg*Math.pow(Math.sin(Math.PI*t/tu),2):0, f=mg+dip+Bk*smooth((t-tb0)/0.05); T.push(t); F.push(f); V.push(v); Y.push(y); v+=(f-mg)/m*dt; y+=v*dt; if(y<ymin) ymin=y; if(t>tb0&&v>=0){ T.push(t+dt); F.push(f); V.push(v); Y.push(y); break; } }
+      return {T,F,V,Y,depth:-ymin}; };
+    let lo=0.08,hi=0.9; for(let i=0;i<40;i++){ const mid=(lo+hi)/2; if(run(mid).depth<kappa*d) lo=mid; else hi=mid; } cmA=run((lo+hi)/2);
+  }
+  const t=[],F=[],v=[],e=[],z=[]; let tt=0,vv=0,yb=cm?cmA.depth:0; const eOf=y=>clamp(y/d,0,1);
+  const add=(f,ee,zz)=>{ t.push(tt); F.push(f); v.push(vv); e.push(ee); z.push(zz||0); };
+  const marks={}; const tq=0.3;
+  for(;tt<tq;tt+=dt) add(mg,eOf(yb),0);
+  marks.q=tt;
+  if(cm){ marks.cm=tt; const y0=cmA.depth; for(let k=0;k<cmA.T.length;k++){ vv=cmA.V[k]; yb=cmA.Y[k]+y0; add(cmA.F[k],eOf(yb),0); tt+=dt; } vv=Math.max(0,vv); yb=Math.max(0,yb); }
+  let fcur=F[F.length-1];
+  if(cm&&p.wait>0){ vv=0; for(let k=0;k<Math.round(p.wait/1000/dt);k++){ add(mg,eOf(yb),0); tt+=dt; } fcur=mg; }
+  marks.push=tt; const ftar=y=>Fs+(p.F1f*mg-Fs)*Math.min(1,Math.max(0,y)/d); const f0=fcur, tr=Math.abs(Fs-fcur)>0.02*mg?0.03:0; let tp=0,Jp=0,Fpk=0;
+  while(yb<d&&tt<marks.push+1.5){ let f=ftar(yb); if(tr>0&&tp<tr) f=f0+(f-f0)*tp/tr; add(f,eOf(yb),0); Fpk=Math.max(Fpk,f); vv+=(f-mg)/m*dt; yb+=Math.max(vv,0)*dt; if(vv<0){ vv=0; } Jp+=f*dt; tt+=dt; tp+=dt; if(tp>0.15&&vv<=1e-6) return {ok:false,F0:F0eff,mg,reason:'Die Kraft fällt unter die Gewichtskraft, bevor der Körper abhebt.'}; }
+  if(yb<d) return {ok:false,F0:F0eff,mg,reason:'Die Kraft reicht nicht für einen Absprung.'};
+  const vTO=vv; marks.to=tt; const tf=2*vTO/G;
+  for(let k=0;k<Math.round(tf/dt);k++){ const s=(k+1)*dt; vv=vTO-G*s; add(0,1,vTO*s-0.5*G*s*s); tt+=dt; }
+  marks.land=tt; const tl=0.22, Pl=mg+Math.PI/2*m*vTO/tl; vv=-vTO; let ybl=d;
+  for(let k=0;k<Math.round(tl/dt);k++){ const s=(k+1)*dt, f=mg+(Pl-mg)*Math.sin(Math.PI*s/tl); add(f,eOf(ybl),0); vv+=(f-mg)/m*dt; ybl+=vv*dt; tt+=dt; }
+  marks.landEnd=tt; const eEnd=eOf(ybl);
+  for(let k=0;k<Math.round(0.3/dt);k++){ add(mg,lerp(eEnd,0.8,smooth(k/(0.25/dt))),0); tt+=dt; }
+  const h=vTO*vTO/(2*G);
+  return {ok:true,dt,t,F,v,e,z,mg,F0:F0eff,vTO,h,tf,tPush:marks.to-marks.push,T:tt,marks,cm,depth:cm?cmA.depth:0,Pland:Pl,Ppush:Fpk,Fmin:Math.min(...F.slice(0,Math.round(marks.push/dt))),Jnet:m*vTO,m,d};
+}
+/* 2 Beschleunigungsweg: Kraft sinkt mit der Geschwindigkeit (Kraft-Geschwindigkeits-Beziehung) */
+function rangeOf(v,a,h0){ const ar=a*Math.PI/180, s=Math.sin(ar), c=Math.cos(ar); return v*c/G*(v*s+Math.sqrt(v*v*s*s+2*G*h0)); }
+function simPath(p){
+  const dt=0.0005; let t=0,v=0,s=0; const gs=[0],gv=[0]; let nextG=0.01; const ts=[0],vs=[0],ss=[0],Fs=[p.Fmax]; let tHit=null,k=0;
+  while(s<3.0&&t<4){ const F=p.Fmax*Math.max(0,1-v/p.vmax); v+=F/p.m*dt; s+=v*dt; t+=dt; k++;
+    while(s>=nextG){ gs.push(nextG); gv.push(v); nextG+=0.01; }
+    if(tHit===null){ if(k%10===0){ ts.push(t); vs.push(v); ss.push(s); Fs.push(F); } if(s>=p.s){ tHit=t; ts.push(t); vs.push(v); ss.push(s); Fs.push(F); } } }
+  const vAt=sq=>{ const i=clamp(sq/0.01,0,gs.length-1.0001), j=Math.floor(i); return gv[j]+(gv[j+1]-gv[j])*(i-j); };
+  const vEnd=vAt(p.s), R=rangeOf(vEnd,p.alpha,p.h0), vShort=vAt(0.6), Rshort=rangeOf(vShort,p.alpha,p.h0);
+  const ar=p.alpha*Math.PI/180, tFlight=(vEnd*Math.sin(ar)+Math.sqrt(Math.pow(vEnd*Math.sin(ar),2)+2*G*p.h0))/G;
+  return {gs,gv,vAt,vEnd,R,vShort,Rshort,tPush:tHit,ts,vs,ss,Fs,tFlight,T:(tHit||0)+tFlight,W:0.5*p.m*vEnd*vEnd};
+}
+/* 3 Teilimpulse: Geschwindigkeitsbeiträge dreier Körperteile (Sinusquadrat-Pulse) */
+function chainU(p,i,t){ const t0=p.t[i], D=p.D[i]; if(t<t0||t>t0+D) return 0; const x=Math.sin(Math.PI*(t-t0)/D); return p.A[i]*x*x; }
+function simChain(p){
+  const dt=0.002, tEnd=Math.max(...p.t.map((t,i)=>t+p.D[i]))+0.04; const ts=[],U=[[],[],[]],Sm=[]; let best=0,tb=0;
+  for(let t=0;t<=tEnd+1e-9;t+=dt){ ts.push(t); let s=0; for(let i=0;i<3;i++){ const u=chainU(p,i,t); U[i].push(u); s+=u; } Sm.push(s); if(s>best){ best=s; tb=t; } }
+  const sumA=p.A.reduce((a,b)=>a+b,0), peaks=p.t.map((t,i)=>t+p.D[i]/2);
+  return {ts,U,Sm,vEnd:best,tRel:tb,sumA,eff:best/sumA,T:tEnd,peaks};
+}
+function chainOptimum(p){ const pk=p.D[0]/2; return [0,pk-p.D[1]/2,pk-p.D[2]/2]; }
+/* 4a Rückstoß mit Haftung am Boden */
+function simReact(p){
+  const dt=0.0005, M=p.M, m=p.m, N=(M+m)*G, Ff=p.mu*N, D=p.dur, um=p.u; let vp=0,xp=0,xb=0; const t=[],VP=[],VB=[],XP=[],XB=[],U=[],FR=[],REQ=[]; let vRel=null,reqMax=0,fr=0;
+  const steps=Math.round((D+0.9)/dt);
+  for(let k=0;k<=steps;k++){ const tt=k*dt, x=clamp(tt/D,0,1), u=um*smooth(x), du=tt<D?um*6*x*(1-x)/D:0; reqMax=Math.max(reqMax,m*du);
+    if(Math.abs(vp)<1e-9&&m*du<=Ff){ vp=0; fr=m*du; } else { vp+= (Ff-m*du)/(M+m)*dt; if(vp>0) vp=0; fr=Ff; }
+    if(k%10===0){ t.push(tt); VP.push(vp); VB.push(vp+u); XP.push(xp); XB.push(xp+u*0+xb); U.push(u); FR.push(fr); REQ.push(m*du); }
+    xp+=vp*dt; if(Math.abs(tt-D)<dt/2) vRel=vp+um; }
+  // Ballposition im Bodensystem: Integral der Ballgeschwindigkeit
+  let xbb=0; const XB2=[]; for(let i=0;i<t.length;i++){ XB2.push(xbb); xbb+=(VB[i])*0.005; }
+  let xpp=0; const XP2=[]; for(let i=0;i<t.length;i++){ XP2.push(xpp); xpp+=VP[i]*0.005; }
+  const vpRel=VP[Math.round(D/0.005)]; 
+  return {t,VP,VB,XP:XP2,XB:XB2,U,FR,REQ,cap:Ff,vBall:vRel,vRecoil:vpRel,frac:vRel/um,muCrit:reqMax/N,T:D+0.9,D};
+}
+/* 4b Sprintstart: Reibung begrenzt die Beschleunigung, der Startblock wirkt als Widerlager */
+function simSprint(p){
+  const dt=0.002; const M=p.M||75; const run=useBlock=>{ let t=0,v=0,s=0,t5=null,t10=null; const T=[],V=[],S=[],FX=[]; while(s<10&&t<6){ const lim=(useBlock&&t<p.tb)?p.acap:Math.min(p.acap,p.mu*G); v+=lim*dt; s+=v*dt; t+=dt; if(Math.round(t/dt)%5===0){ T.push(t); V.push(v); S.push(s); FX.push(M*lim); } if(t5===null&&s>=5) t5=t; } t10=t; return {T,V,S,FX,t5,t10}; };
+  return {free:run(false),block:run(true),aLim:Math.min(p.acap,p.mu*G),M,capF:p.mu*M*G};
+}
+/* 5a Salto: Drehimpuls bleibt erhalten, Trägheitsmoment ändert sich */
+function simSalto(p){
+  const dt=0.002, tf=2*p.vy/G, Il=14, It=4, tr=0.12; const t=[],I=[],w=[],th=[],lam=[]; let a=0;
+  for(let tt=0;tt<=tf+1e-9;tt+=dt){ let k=0; if(tt>=p.t1&&tt<p.t1+tr) k=(tt-p.t1)/tr; else if(tt>=p.t1+tr&&tt<p.t2) k=1; else if(tt>=p.t2&&tt<p.t2+tr) k=1-(tt-p.t2)/tr; k=smooth(k); const Ii=lerp(Il,It,k), om=p.L/Ii; t.push(tt); I.push(Ii); w.push(om); lam.push(k); th.push(a*180/Math.PI); a+=om*dt; }
+  const total=th[th.length-1], n=Math.round(total/360), err=total-360*n, stand=n>=1&&Math.abs(err)<=35;
+  const m=70, mg=m*G, tT=0.22, tL=0.25, PT=mg+Math.PI/2*m*p.vy/tT, PL=mg+Math.PI/2*m*p.vy/tL, pt=[],pf=[]; const t0=-0.35, t1=tf+0.4;
+  for(let x=t0;x<=t1+1e-9;x+=0.004){ let f=mg; if(x>=-tT&&x<0) f=mg+(PT-mg)*Math.sin(Math.PI*(x+tT)/tT); else if(x>=0&&x<tf) f=0; else if(x>=tf&&x<tf+tL) f=mg+(PL-mg)*Math.sin(Math.PI*(x-tf)/tL); pt.push(x); pf.push(f); }
+  return {t,I,w,th,lam,tf,total,n,err,stand,Il,It,plate:{t:pt,F:pf,mg,PT,PL,t0,t1}};
+}
+function simPirouette(p){
+  const dt=0.005,Ib=0.9,ma=3.5; const t=[],r=[],I=[],w=[],th=[]; const L=(Ib+2*ma*p.rOut*p.rOut)*p.w0*2*Math.PI; let a=0;
+  for(let tt=0;tt<=p.T+1e-9;tt+=dt){ let k=0; if(tt>=p.tIn&&tt<p.tIn+0.4) k=(tt-p.tIn)/0.4; else if(tt>=p.tIn+0.4&&tt<p.tOut) k=1; else if(tt>=p.tOut&&tt<p.tOut+0.4) k=1-(tt-p.tOut)/0.4; k=smooth(k); const rr=lerp(p.rOut,p.rIn,k), Ii=Ib+2*ma*rr*rr, om=L/Ii; t.push(tt); r.push(rr); I.push(Ii); w.push(om/(2*Math.PI)); th.push(a); a+=om*dt; }
+  const wIn=w[Math.round((p.tIn+0.6)/dt)], Iout=Ib+2*ma*p.rOut*p.rOut, Iin=Ib+2*ma*p.rIn*p.rIn;
+  return {t,r,I,w,th,L,wIn,w0:p.w0,Iout,Iin,ratio:Iout/Iin,Ekin:[0.5*L*L/Iout,0.5*L*L/Iin]};
+}
+/* 6 Kraftverlauf */
+const CURVE_T=0.25,CURVE_TAU=0.05,CURVE_M=7.26,CURVE_FMAX=420,CURVE_N=7;
+const capF=t=>CURVE_FMAX*(1-Math.exp(-t/CURVE_TAU));
+function simCurve(f){
+  const ts=[],F=[],v=[]; const n=CURVE_N, dt=0.001; let vv=0,J=0;
+  const node=i=>capF(i*CURVE_T/(n-1))*f[i];
+  for(let t=0;t<=CURVE_T+1e-9;t+=dt){ const x=t/CURVE_T*(n-1), i=Math.min(n-2,Math.floor(x)), w=x-i; const Fv=node(i)*(1-w)+node(i+1)*w; ts.push(t); F.push(Fv); v.push(vv); vv+=Fv/CURVE_M*dt; J+=Fv*dt; }
+  return {ts,F,v,vEnd:vv,J,node:Array.from({length:n},(_,i)=>node(i))};
+}
+/* =============== Hilfen =============== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const f1=x=>Math.round(x*10)/10;
+const de=(v,d)=>Number(v).toFixed(d).replace('.',',').replace('-','−');
+function niceStep(range,target){ const raw=range/target, e=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/e; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*e; }
+function pathOf(pts){ let s=''; for(let i=0;i<pts.length;i++) s+=(i?'L':'M')+f1(pts[i][0])+' '+f1(pts[i][1]); return s; }
+function decim(x,y,max){ const n=x.length, st=Math.max(1,Math.floor(n/max)), o=[]; for(let i=0;i<n;i+=st) o.push([x[i],y[i]]); if((n-1)%st) o.push([x[n-1],y[n-1]]); return o; }
+
+/* Ein Diagramm-Paneel. o: {x:[min,max], y:[min,max], xl, yl, series:[{x,y,c,w,dash,op}], hl:[{y,c,l}], vl:[{x,c,l,dash}], pts:[{x,y,c,i}], mk:[{x,y,c}], xt:fn, cx:t=>x} */
+function panelSVG(W,H,o,last){
+  const L=48,R=12,T=10,B=last?30:12, pw=W-L-R, ph=H-T-B;
+  const xs=v=>L+pw*(v-o.x[0])/(o.x[1]-o.x[0]), ys=v=>T+ph-ph*(v-o.y[0])/(o.y[1]-o.y[0]);
+  let s=`<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="none" class="axl"/>`;
+  const sy=niceStep(o.y[1]-o.y[0],3.5); for(let v=Math.ceil(o.y[0]/sy)*sy;v<=o.y[1]+1e-9;v+=sy){ s+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${f1(ys(v))}" y2="${f1(ys(v))}"/><text x="${L-5}" y="${f1(ys(v)+3.5)}" text-anchor="end" font-size="10.5" class="tx2">${de(v,sy<1?1:0)}</text>`; }
+  const sx=niceStep(o.x[1]-o.x[0],5); for(let v=Math.ceil(o.x[0]/sx)*sx;v<=o.x[1]+1e-9;v+=sx){ s+=`<line class="gl" x1="${f1(xs(v))}" x2="${f1(xs(v))}" y1="${T}" y2="${T+ph}"/>`; if(last) s+=`<text x="${f1(xs(v))}" y="${T+ph+14}" text-anchor="middle" font-size="10.5" class="tx2">${o.xt?o.xt(v):de(v,sx<1?(sx<0.1?2:1):0)}</text>`; }
+  if(last&&o.xl) s+=`<text x="${f1(L+pw/2)}" y="${H-2}" text-anchor="middle" font-size="10.5" class="tx2">${o.xl}</text>`;
+  s+=`<text x="11" y="${f1(T+ph/2)}" text-anchor="middle" font-size="10.5" font-weight="700" class="tx2" transform="rotate(-90 11 ${f1(T+ph/2)})">${o.yl||''}</text>`;
+  (o.bands||[]).forEach(b=>{ const x0=xs(Math.max(o.x[0],b.x0)), x1=xs(Math.min(o.x[1],b.x1)); if(x1-x0<1) return; s+=`<rect x="${f1(x0)}" y="${T}" width="${f1(x1-x0)}" height="${ph}" style="fill:${b.c}" opacity="${b.op||.13}"/>`; if(b.l&&x1-x0>34) s+=`<text x="${f1((x0+x1)/2)}" y="${T+ph-5}" text-anchor="middle" font-size="9.5" font-weight="700" class="tx2">${b.l}</text>`; });
+  (o.hl||[]).forEach(h=>{ s+=`<line x1="${L}" x2="${W-R}" y1="${f1(ys(h.y))}" y2="${f1(ys(h.y))}" stroke="${h.c||'var(--ink-soft)'}" stroke-width="1.4" stroke-dasharray="5 4"/>${h.l?`<text x="${W-R-3}" y="${f1(ys(h.y)-4)}" text-anchor="end" font-size="10" font-weight="700" style="fill:${h.c||'var(--ink-soft)'}">${h.l}</text>`:''}`; });
+  (o.vl||[]).forEach(h=>{ s+=`<line x1="${f1(xs(h.x))}" x2="${f1(xs(h.x))}" y1="${T}" y2="${T+ph}" stroke="${h.c||'var(--ink-soft)'}" stroke-width="1.4" ${h.dash===false?'':'stroke-dasharray="5 4"'}/>${h.l?`<text x="${f1(xs(h.x)+4)}" y="${T+11}" font-size="10" font-weight="700" style="fill:${h.c||'var(--ink-soft)'}">${h.l}</text>`:''}`; });
+  (o.series||[]).forEach(q=>{ const pts=decim(q.x,q.y,420).map(p=>[xs(p[0]),ys(p[1])]); s+=`<path d="${pathOf(pts)}" fill="none" stroke="${q.c}" stroke-width="${q.w||2.6}" stroke-linejoin="round" ${q.dash?`stroke-dasharray="${q.dash}"`:''} opacity="${q.op||1}"/>`; });
+  (o.mk||[]).forEach(m=>{ s+=`<circle cx="${f1(xs(m.x))}" cy="${f1(ys(m.y))}" r="4.6" style="fill:${m.c};stroke:var(--panel);stroke-width:2"/>`; });
+  if(o.cx) s+=`<line class="cur" data-i="${o.pi}" x1="${f1(L)}" x2="${f1(L)}" y1="${T}" y2="${T+ph}" stroke="var(--ink)" stroke-width="1.5" opacity=".75"/>`;
+  (o.pts||[]).forEach(p=>{ s+=`<circle class="ctl" data-i="${p.i}" tabindex="0" role="slider" aria-label="Kraftwert ${p.i+1}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.v*100)}" cx="${f1(xs(p.x))}" cy="${f1(ys(p.y))}" r="9" style="fill:var(--acc);stroke:var(--panel);stroke-width:2.5;cursor:ns-resize"/>`; });
+  let lx=L+8; (o.leg||[]).forEach((g,k)=>{ s+=`<g font-size="10.5" font-weight="700"><line x1="${f1(lx)}" x2="${f1(lx+18)}" y1="${T+10}" y2="${T+10}" stroke="${g.c}" stroke-width="3" ${g.dash?`stroke-dasharray="${g.dash}"`:''}/><text x="${f1(lx+22)}" y="${T+14}" style="fill:${g.c}">${g.t}</text></g>`; lx+=22+g.t.length*6.1+12; });
+  return {svg:s,ctx:{L,T,pw,ph,xs,ys,cx:o.cx,x:o.x,y:o.y}};
+}
+function renderPanels(W,H,panels){
+  const n=panels.length, gap=4, ph=(H-(n-1)*gap)/n; let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Diagramme zum Versuch">`; const ctx=[];
+  panels.forEach((o,i)=>{ o.pi=i; const r=panelSVG(W,ph,o,i===n-1); s+=`<g transform="translate(0,${f1(i*(ph+gap))})">${r.svg}</g>`; ctx.push(r.ctx); });
+  return {svg:s+'</svg>',ctx};
+}
+
+/* =============== Szenen (viewBox 320 x 260) =============== */
+const SVGH=(inner,lab)=>`<svg class="scene" viewBox="0 0 320 260" role="img" aria-label="${esc(lab||'Szene')}" style="display:block;width:100%;height:auto;max-height:var(--scene-h,min(46vh,380px))">${inner}</svg>`;
+const bodyStroke='stroke="var(--body-c)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+function arrowSVG(x1,y1,x2,y2,c,w){ const a=Math.atan2(y2-y1,x2-x1), l=8; return `<path d="M${f1(x1)} ${f1(y1)} L${f1(x2)} ${f1(y2)} M${f1(x2-l*Math.cos(a-0.45))} ${f1(y2-l*Math.sin(a-0.45))} L${f1(x2)} ${f1(y2)} L${f1(x2-l*Math.cos(a+0.45))} ${f1(y2-l*Math.sin(a+0.45))}" stroke="${c}" stroke-width="${w||3}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`; }
+const ground=(y)=>`<rect x="0" y="${y}" width="320" height="${260-y}" style="fill:var(--ground)" opacity=".45"/><line x1="0" x2="320" y1="${y}" y2="${y}" stroke="var(--ink-soft)" stroke-width="2"/>`;
+
+/* A: Sprung auf der Kraftmessplatte */
+function sceneInit(sim,p,t){
+  if(!sim.ok) return SVGH(`<text x="160" y="120" text-anchor="middle" font-size="14" font-weight="700" style="fill:var(--bad)">Kein Absprung</text><text x="160" y="142" text-anchor="middle" font-size="11.5" class="tx2">Kraft ≤ Gewichtskraft</text>`);
+  const k=100, gx=120, gyB=224, i=Math.min(sim.t.length-1,Math.round(t/sim.dt)), e=sim.e[i], lift=sim.z[i], F=sim.F[i], mk=sim.marks;
+  const hy=lerp(0.60,0.915,e), l=0.46, kx=Math.sqrt(Math.max(0,l*l-(hy/2)*(hy/2))), lean=lerp(52,4,e)*Math.PI/180;
+  const P=(x,y)=>[gx+x*k, gyB-(y+lift)*k];
+  const ank=P(0,0), knee=P(kx,hy/2), hip=P(0,hy), toe=P(0.17,0), sh=P(0.52*Math.sin(lean),hy+0.52*Math.cos(lean)), hd=P(0.52*Math.sin(lean)+0.15*Math.sin(lean),hy+0.52*Math.cos(lean)+0.15*Math.cos(lean));
+  const aa=lerp(-50,175,smooth(e))*Math.PI/180, sx=0.52*Math.sin(lean), sy=hy+0.52*Math.cos(lean);
+  const el=P(sx+0.28*Math.sin(aa),sy-0.28*Math.cos(aa)), ha=P(sx+0.28*Math.sin(aa)+0.27*Math.sin(aa+0.2),sy-0.28*Math.cos(aa)-0.27*Math.cos(aa+0.2));
+  let s=`<rect x="0" y="${gyB+8}" width="320" height="${260-gyB-8}" style="fill:var(--ground)" opacity=".45"/><line x1="0" x2="320" y1="${gyB+8}" y2="${gyB+8}" stroke="var(--ink-soft)" stroke-width="2"/>`;
+  s+=`<rect x="${gx-50}" y="${gyB}" width="120" height="8" rx="2" style="fill:var(--ink-soft)"/><text x="${gx+10}" y="${gyB+24}" text-anchor="middle" font-size="10.5" font-weight="700" class="tx2">Kraftmessplatte</text>`;
+  s+=`<g><line x1="292" x2="292" y1="${gyB}" y2="${f1(gyB-0.5*k)}" stroke="var(--ink-soft)" stroke-width="2"/>`; for(let m=0;m<=5;m++) s+=`<line x1="288" x2="296" y1="${f1(gyB-m*0.1*k)}" y2="${f1(gyB-m*0.1*k)}" stroke="var(--ink-soft)" stroke-width="1.5"/><text x="284" y="${f1(gyB+4-m*0.1*k)}" text-anchor="end" font-size="9.5" class="tx2">${m*10}</text>`;
+  s+=`<text x="292" y="${f1(gyB-0.5*k-8)}" text-anchor="middle" font-size="9.5" class="tx2">cm</text><circle cx="292" cy="${f1(gyB-Math.min(0.5,lift)*k)}" r="5" style="fill:var(--acc)"/><line x1="280" x2="304" y1="${f1(gyB-Math.min(0.5,sim.h)*k)}" y2="${f1(gyB-Math.min(0.5,sim.h)*k)}" stroke="var(--acc)" stroke-dasharray="3 3"/></g>`;
+  s+=`<path d="M${f1(ank[0])} ${f1(ank[1])} L${f1(toe[0])} ${f1(toe[1])}" ${bodyStroke}/><path d="M${f1(ank[0])} ${f1(ank[1])} L${f1(knee[0])} ${f1(knee[1])} L${f1(hip[0])} ${f1(hip[1])} L${f1(sh[0])} ${f1(sh[1])}" ${bodyStroke}/><path d="M${f1(sh[0])} ${f1(sh[1])} L${f1(el[0])} ${f1(el[1])} L${f1(ha[0])} ${f1(ha[1])}" stroke="var(--body-c)" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="${f1(hd[0])}" cy="${f1(hd[1]-6)}" r="11" style="fill:var(--body-c)"/>`;
+  if(F>1){ const len=Math.min(100,F/sim.mg*28); s+=arrowSVG(gx+6,gyB,gx+6,gyB-len,'var(--force)',4); }
+  const ph=t<mk.q?(sim.cm?'Ruhiger Stand':'Hocke halten'):t<mk.push?(sim.cm&&t<mk.push-0.001*0&&sim.F[i]<=sim.mg*1.0001&&t>mk.cm+0.2?'Pause am tiefsten Punkt':'Eintauchen (Ausholbewegung)'):t<mk.to?'Abdruck':t<mk.land?'Flug':t<mk.landEnd?'Landung':'Stand';
+  s+=`<text x="12" y="20" font-size="12" font-weight="800">${ph}</text><text x="12" y="38" font-size="12" font-weight="800" style="fill:var(--force)">Platte: ${de(F,0)} N (${de(F/sim.mg,2)}-fache Gewichtskraft)</text><text x="12" y="55" font-size="10.5" class="tx2">Gewichtskraft ${de(sim.mg,0)} N</text>`;
+  return SVGH(s,'Sprung auf der Kraftmessplatte mit Bodenreaktionskraft');
+}
+/* B: Wurf mit Beschleunigungsweg */
+function scenePath(sim,p,t){
+  const x0=18, sc=8.2, gy=226, top=50; let s=ground(226);
+  s+=`<text x="18" y="20" font-size="11.5" font-weight="700" class="tx2">Beschleunigungsweg ${de(p.s,1)} m</text><line x1="${x0}" x2="${x0+p.s/3*284}" y1="${top}" y2="${top}" stroke="var(--ink-soft)" stroke-width="5" stroke-linecap="round"/><line x1="${x0}" x2="${x0}" y1="${top-8}" y2="${top+8}" stroke="var(--ink)" stroke-width="2"/><line x1="${x0+p.s/3*284}" x2="${x0+p.s/3*284}" y1="${top-8}" y2="${top+8}" stroke="var(--acc)" stroke-width="3"/>`;
+  const ar=p.alpha*Math.PI/180, tPush=sim.tPush||0; let bx,by;
+  const traj=(v,col,dash,w)=>{ const pts=[]; const tf=(v*Math.sin(ar)+Math.sqrt(Math.pow(v*Math.sin(ar),2)+2*G*p.h0))/G; for(let i=0;i<=40;i++){ const tt=tf*i/40; pts.push([x0+v*Math.cos(ar)*tt*sc, gy-(p.h0+v*Math.sin(ar)*tt-0.5*G*tt*tt)*sc]); } return `<path d="${pathOf(pts)}" fill="none" stroke="${col}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''}/>`; };
+  s+=traj(sim.vShort,'var(--ref)','4 4',2)+traj(sim.vEnd,'var(--acc)','',2.4);
+  const lx=(R)=>x0+R*sc; s+=`<line x1="${f1(lx(sim.Rshort))}" x2="${f1(lx(sim.Rshort))}" y1="${gy-8}" y2="${gy+8}" stroke="var(--ref)" stroke-width="3"/><text x="${f1(lx(sim.Rshort))}" y="${gy+22}" text-anchor="middle" font-size="10.5" font-weight="700" style="fill:var(--ref)">${de(sim.Rshort,1)} m (0,6 m Weg)</text><line x1="${f1(lx(sim.R))}" x2="${f1(lx(sim.R))}" y1="${gy-8}" y2="${gy+8}" stroke="var(--acc)" stroke-width="3"/><text x="${f1(Math.min(300,lx(sim.R)))}" y="${gy-12}" text-anchor="end" font-size="11.5" font-weight="800" style="fill:var(--acc)">${de(sim.R,1)} m</text>`;
+  if(t<tPush){ const i=Math.min(sim.ss.length-1,Math.round(t/tPush*(sim.ss.length-1))); bx=x0+sim.ss[i]/3*284; by=top; s+=arrowSVG(bx-6,top-16,bx+22,top-16,'var(--force)',3); }
+  else { const tau=t-tPush; bx=x0+sim.vEnd*Math.cos(ar)*tau*sc; by=gy-(p.h0+sim.vEnd*Math.sin(ar)*tau-0.5*G*tau*tau)*sc; if(by>gy-3) by=gy-3; }
+  s+=`<circle cx="${f1(bx)}" cy="${f1(by)}" r="7" style="fill:var(--body-c)"/>`;
+  return SVGH(s,'Wurf mit Beschleunigungsweg und Flugbahn');
+}
+/* C: Geschwindigkeitsbeiträge als gestapelte Balken */
+const SEGC=['var(--vel)','var(--pos)','var(--force)'], SEGN=['Beine, Hüfte','Rumpf, Schulter','Arm, Hand'];
+function sceneChain(sim,p,t){
+  const base=196, k=11, bx=34, bw=74; let y=base, s=`<line x1="20" x2="310" y1="${base}" y2="${base}" stroke="var(--ink-soft)" stroke-width="2"/>`;
+  let tot=0; for(let i=0;i<3;i++){ const u=chainU(p,i,t), h=u*k; tot+=u; y-=h; s+=`<rect x="${bx}" y="${f1(y)}" width="${bw}" height="${f1(Math.max(0,h))}" style="fill:${SEGC[i]}" opacity=".9"/>`; }
+  for(let i=0;i<3;i++){ const u=chainU(p,i,t); s+=`<rect x="14" y="${208+i*17}" width="11" height="11" rx="2" style="fill:${SEGC[i]}"/><text x="30" y="${218+i*17}" font-size="11.5" font-weight="700">${SEGN[i]}: ${de(u,1)} m/s</text>`; }
+  s+=`<line x1="${bx-8}" x2="${bx+bw+90}" y1="${f1(base-sim.vEnd*k)}" y2="${f1(base-sim.vEnd*k)}" stroke="var(--acc)" stroke-width="2" stroke-dasharray="5 4"/><text x="${bx+bw+12}" y="${f1(base-sim.vEnd*k-5)}" font-size="11" font-weight="700" style="fill:var(--acc)">Maximum der Summe: ${de(sim.vEnd,1)} m/s</text>`;
+  s+=`<line x1="${bx-8}" x2="${bx+bw+90}" y1="${f1(base-sim.sumA*k)}" y2="${f1(base-sim.sumA*k)}" stroke="var(--ref)" stroke-width="1.5" stroke-dasharray="2 4"/><text x="${bx+bw+12}" y="${f1(base-sim.sumA*k-5)}" font-size="10.5" class="tx2">Höchstwert (Summe der Maxima): ${de(sim.sumA,1)} m/s</text>`;
+  s+=`<text x="${bx+bw+12}" y="${f1(base-18)}" font-size="13" font-weight="800">Summe jetzt: ${de(tot,1)} m/s</text>`;
+  return SVGH(s,'Geschwindigkeitsbeiträge der drei Körperteile als gestapelter Balken');
+}
+/* D1: Werfer und Ball mit Haftung; D2: Sprintstart */
+function sceneReact(sim,p,t){
+  const i=Math.min(sim.t.length-1,Math.round(t/0.005)), gy=200, sc=34, px=110+sim.XP[i]*sc, bxx=110+30+sim.XB[i]*sc+ (sim.U[i])*0*sc;
+  let s=ground(gy);
+  const slides=Math.abs(sim.VP[i])>1e-6;
+  s+=`<rect x="${f1(px-16)}" y="${gy-74}" width="32" height="74" rx="6" style="fill:var(--body-c)"/><circle cx="${f1(px)}" cy="${gy-88}" r="12" style="fill:var(--body-c)"/>`;
+  const bx=px+26+sim.U[i]/p.u*34; const bxg=bx;
+  s+=`<circle cx="${f1(bxg)}" cy="${gy-52}" r="8" style="fill:var(--acc)"/>`;
+  const du=t<p.dur?p.u*6*Math.min(1,t/p.dur)*(1-Math.min(1,t/p.dur))/p.dur:0, req=p.m*du, cap=p.mu*(p.M+p.m)*G;
+  s+=arrowSVG(bxg+12,gy-52,bxg+12+Math.min(60,req/10),gy-52,'var(--force)',3)+`<text x="${f1(bxg+14)}" y="${gy-60}" font-size="10.5" font-weight="700" style="fill:var(--force)">Kraft auf den Ball</text>`;
+  s+=arrowSVG(px,gy+14,px+Math.min(70,Math.min(req,cap)/10),gy+14,'var(--pos)',4)+`<text x="${f1(px-14)}" y="${gy+32}" font-size="10.5" font-weight="700" style="fill:var(--pos)">Haftreibung des Bodens</text>`;
+  s+=`<text x="12" y="22" font-size="12" font-weight="700" style="fill:${slides?'var(--bad)':'var(--ok)'}">${slides?'Der Werfer rutscht zurück':'Der Werfer steht fest'}</text><text x="12" y="40" font-size="11" class="tx2">v Ball ${de(sim.VB[i],1)} m/s · v Werfer ${de(sim.VP[i],2)} m/s</text>`;
+  return SVGH(s,'Werfer und Ball: Rückstoß und Haftung');
+}
+function sceneSprint(sim,p,t){
+  const gy=170; let s=ground(gy+30); s+=`<line x1="30" x2="290" y1="${gy+10}" y2="${gy+10}" stroke="var(--ink-soft)" stroke-width="2"/>`;
+  for(let m=0;m<=10;m+=5) s+=`<line x1="${30+m*26}" x2="${30+m*26}" y1="${gy+4}" y2="${gy+16}" stroke="var(--ink)" stroke-width="2"/><text x="${30+m*26}" y="${gy+30}" text-anchor="middle" font-size="11" class="tx2">${m} m</text>`;
+  const posAt=r=>{ let i=0; while(i<r.T.length-1&&r.T[i]<t) i++; return Math.min(10,r.S[i]||0); };
+  const run=(r,y,c,lab)=>{ const x=30+posAt(r)*26; return `<circle cx="${f1(x)}" cy="${y}" r="9" style="fill:${c}"/><text x="30" y="${y-14}" font-size="11.5" font-weight="700" style="fill:${c}">${lab}: ${de(r.t10,2)} s</text>`; };
+  s+=run(sim.free,gy-60,'var(--ref)','ohne Block')+run(sim.block,gy-10,'var(--acc)','mit Startblock');
+  s+=`<text x="12" y="20" font-size="11.5" class="tx2">Haftreibung begrenzt die Beschleunigung</text><text x="12" y="36" font-size="11.5" font-weight="700">auf ${de(sim.aLim,1)} m/s²</text>`;
+  return SVGH(s,'Sprintstart über 10 Meter mit und ohne Startblock');
+}
+/* E: Salto und Pirouette */
+const TUCK={ // Gelenkpunkte relativ zum Körperschwerpunkt (m): Kopf, Schulter, Hüfte, Knie, Knöchel, Ellbogen, Hand
+  lay:{head:[0,0.86],sh:[0,0.6],hip:[0,0],kn:[0,-0.46],an:[0,-0.92],el:[0,0.88],ha:[0,1.14]},
+  tuck:{head:[0.34,0.52],sh:[0.2,0.4],hip:[0,0],kn:[0.4,0.2],an:[0.12,-0.2],el:[0.36,0.1],ha:[0.4,0.2]}
+};
+function sceneSalto(sim,p,t){
+  const i=Math.min(sim.t.length-1,Math.round(t/0.002)), k=92, gy=240; const th=sim.th[i]*Math.PI/180, lam=sim.lam[i]; let s=ground(gy);
+  const x0=60, vx=1.5, tt=sim.t[i], cmY=0.98+p.vy*tt-0.5*G*tt*tt, cx=x0+vx*tt*k*1.9, cy=gy-cmY*k;
+  const J=n=>[lerp(TUCK.lay[n][0],TUCK.tuck[n][0],lam),lerp(TUCK.lay[n][1],TUCK.tuck[n][1],lam)];
+  const R=pt=>{ const x=pt[0],y=pt[1]; const rx=x*Math.cos(th)+y*Math.sin(th), ry=-x*Math.sin(th)+y*Math.cos(th); return [cx+rx*k,cy-ry*k]; };
+  const hd=R(J('head')),sh=R(J('sh')),hp=R(J('hip')),kn=R(J('kn')),an=R(J('an')),el=R(J('el')),ha=R(J('ha'));
+  // Flugbahn
+  const tr=[]; for(let j=0;j<=30;j++){ const q=sim.tf*j/30; tr.push([x0+vx*q*k*1.9,gy-(0.98+p.vy*q-0.5*G*q*q)*k]); } s+=`<path d="${pathOf(tr)}" fill="none" stroke="var(--ref)" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+  s+=`<path d="M${f1(an[0])} ${f1(an[1])} L${f1(kn[0])} ${f1(kn[1])} L${f1(hp[0])} ${f1(hp[1])} L${f1(sh[0])} ${f1(sh[1])}" ${bodyStroke}/><path d="M${f1(sh[0])} ${f1(sh[1])} L${f1(el[0])} ${f1(el[1])} L${f1(ha[0])} ${f1(ha[1])}" stroke="var(--body-c)" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="${f1(hd[0])}" cy="${f1(hd[1])}" r="9" style="fill:var(--body-c)"/><circle cx="${f1(cx)}" cy="${f1(cy)}" r="3" style="fill:var(--acc)"/>`;
+  s+=`<text x="12" y="20" font-size="11.5" font-weight="700">Drehung ${de(sim.th[i],0)}° · ω = ${de(sim.w[i],1)} rad/s</text><text x="12" y="36" font-size="11" class="tx2">I = ${de(sim.I[i],1)} kg·m²</text><text x="12" y="52" font-size="11" class="tx2">L = ${de(p.L,0)} kg·m²/s (konstant)</text>`;
+  return SVGH(s,'Salto: Körperhaltung und Drehung in der Flugphase');
+}
+function scenePirouette(sim,p,t){
+  const i=Math.min(sim.t.length-1,Math.round(t/0.005)), cx=160, cy=140, k=120; const th=sim.th[i], r=sim.r[i]*k; let s=`<circle cx="${cx}" cy="${cy}" r="${f1(p.rOut*k)}" fill="none" stroke="var(--ref)" stroke-dasharray="3 5"/>`;
+  const x1=cx+r*Math.cos(th), y1=cy+r*Math.sin(th), x2=cx-r*Math.cos(th), y2=cy-r*Math.sin(th);
+  s+=`<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="var(--body-c)" stroke-width="7" stroke-linecap="round"/><circle cx="${f1(x1)}" cy="${f1(y1)}" r="7" style="fill:var(--acc)"/><circle cx="${f1(x2)}" cy="${f1(y2)}" r="7" style="fill:var(--acc)"/><circle cx="${cx}" cy="${cy}" r="17" style="fill:var(--body-c)"/>`;
+  s+=`<text x="12" y="20" font-size="11.5" font-weight="700">Armradius ${de(sim.r[i],2)} m · ${de(sim.w[i],1)} Umdrehungen pro s</text><text x="12" y="37" font-size="11" class="tx2">Blick von oben auf die Skaterin. Die Punkte sind die Hände.</text>`;
+  return SVGH(s,'Pirouette von oben: Arme am Körper oder ausgestreckt');
+}
+/* F: Gerät auf der Bahn */
+function sceneCurve(sim,p,t){
+  const i=Math.min(sim.ts.length-1,Math.round(t/0.001)); let s=ground(200); const x0=24; let pos=0; for(let j=0;j<=i;j++) pos+=sim.v[j]*0.001;
+  s+=`<line x1="${x0}" x2="296" y1="150" y2="150" stroke="var(--ink-soft)" stroke-width="4" stroke-linecap="round"/>`; const bx=x0+Math.min(1,pos/3.2)*268;
+  s+=`<circle cx="${f1(bx)}" cy="150" r="12" style="fill:var(--body-c)"/>`+arrowSVG(bx-6,120,bx-6+sim.F[i]/CURVE_FMAX*70,120,'var(--force)',4)+`<text x="${f1(bx)}" y="108" font-size="11.5" font-weight="800" style="fill:var(--force)">F = ${de(sim.F[i],0)} N</text><text x="12" y="22" font-size="12" font-weight="700">v = ${de(sim.v[i],1)} m/s</text><text x="12" y="40" font-size="11" class="tx2">Weg ${de(pos,2)} m · Gerät ${CURVE_M} kg</text>`;
+  return SVGH(s,'Gerät wird auf einer Bahn mit dem gewählten Kraftverlauf beschleunigt');
+}
+/* =============== Die sechs Labore =============== */
+const C_F='var(--force)',C_V='var(--vel)',C_A='var(--ang)',C_P='var(--pos)',C_R='var(--ref)',C_INK='var(--ink)';
+const sl=(k,label,hint,min,max,step,dec)=>({k,label,hint,min,max,step,dec});
+const pct=x=>(x>=0?'+':'−')+de(Math.abs(x)*100,0)+' %';
+const LABS={};
+const LABORDER=['init','path','chain','curve','react','rot'];
+
+/* ---- 1 Anfangskraft ---- */
+LABS.init={n:1,short:'Anfangskraft',pick:'Anfangskraft',title:'Prinzip der Anfangskraft',
+  stmt:'Je größer die Kraft zu Beginn der Beschleunigung, desto größer die Endgeschwindigkeit. Eine Ausholbewegung (Gegenbewegung) mit kurzer Umkehrphase erhöht die Anfangskraft.',
+  ex:'Sprung mit Eintauchen, Wurf mit Ausholen, Aufschlag mit Bogenspannung',
+  def:()=>({m:75,F0f:2.3,F1f:1.1,d:0.5,wait:0}),
+  sliders:[sl('m','Körpermasse m','in kg',50,110,1,0),sl('F0f','Anfangskraft F₀','in Vielfachen der Gewichtskraft. Ohne Ausholen etwa 2,0',1.5,3.2,0.05,2),sl('F1f','Kraft am Ende F₁','kurz vor dem Absprung, in Vielfachen der Gewichtskraft',0.6,1.6,0.05,2),sl('d','Beschleunigungsweg d','Streckweg des Körperschwerpunkts in m',0.3,0.6,0.01,2),sl('wait','Wartezeit am tiefsten Punkt','Pause zwischen Eintauchen und Abdruck in ms (Kopplungszeit)',0,600,25,0)],
+  presets:[{t:'Ohne Ausholen',d:'Squat Jump: F₀ = 2,0',set:{F0f:2.0,wait:0}},{t:'Mit Ausholen',d:'Counter-Movement-Jump',set:{F0f:2.3,wait:0}},{t:'Ausholen, dann Pause',d:'400 ms warten',set:{F0f:2.3,wait:400}},{t:'Starke Vordehnung',d:'F₀ = 2,8',set:{F0f:2.8,wait:0}}],
+  sim:p=>simInit(p), base:p=>simInit(Object.assign({},p,{F0f:F_ISO,wait:0})),
+  T:s=>s.ok?s.T:0.5,
+  kpis:(s,p,b)=>s.ok?[[de(s.vTO,2)+' m/s','Absprunggeschwindigkeit'],[de(s.h*100,0)+' cm','Sprunghöhe (aus v² / 2g)'],[de(s.tf*1000,0)+' ms','Flugzeit: Platte zeigt Null. Daraus h = g·t²/8'],[de(s.Ppush/s.mg,2)+'-fach','Spitze beim Abdruck (Gewichtskraft = 1)']]:[['–','kein Absprung']],
+  verdict:(s,p,b)=>!s.ok?s.reason:`Kraftmessplatte: ${s.cm?`Beim Eintauchen sinkt die Kraft bis auf das ${de(s.Fmin/s.mg,2)}-fache der Gewichtskraft (Körper wird nach unten beschleunigt), beim Abbremsen steigt sie darüber. `:'Aus der Hocke steigt die Kraft ohne vorheriges Eintauchen an. '}Die Anfangskraft des Abdrucks beträgt ${de(s.F0,2)}·mg, ohne Ausholbewegung wären es ${de(F_ISO,1)}·mg. Ergebnis: ${de(s.h*100,0)} cm statt ${de(b.h*100,0)} cm (${pct(s.h/b.h-1)}). In der Luft misst die Platte null, die Flugzeit ${de(s.tf*1000,0)} ms ergibt h = g·t²/8 = ${de(G*s.tf*s.tf/8*100,0)} cm. Eine Pause am tiefsten Punkt lässt den Vorteil abklingen (Modellannahme: Halbwertszeit etwa 170 ms). Der Schwerpunkt wird hier nur senkrecht betrachtet.`,
+  observe:['Vergleiche „Ohne Ausholen“ und „Mit Ausholen“: Woran erkennst du auf der Platte das Eintauchen?','Lies die Flugzeit ab (Kraft = 0) und berechne die Sprunghöhe mit h = g·t²/8.','Erhöhe die Wartezeit: Wo erscheint die Pause in der Kurve und was passiert mit der Anfangskraft?','Die Fläche zwischen Kurve und Gewichtslinie ist der Kraftstoß. Wo ist er positiv, wo negativ?'],
+  mission:{t:'Springe mindestens 5 cm höher als ohne Ausholbewegung.',ok:(s,p,b)=>s.ok&&s.h>=b.h+0.05},
+  plots:(s,p,ref)=>{ if(!s.ok) return [{x:[0,1],y:[0,1],xl:'',yl:''}]; const mk=s.marks, T=s.T, fmax=Math.ceil(Math.max(s.Pland,s.Ppush,ref&&ref.sim.ok?ref.sim.Pland:0)/500)*500+300;
+    const hold=p.wait>0&&s.cm?p.wait/1000:0;
+    const bands=[{x0:0,x1:s.cm?mk.cm:mk.push,c:C_R,op:.1,l:s.cm?'Stand':'Hocke'}]; if(s.cm) bands.push({x0:mk.cm,x1:mk.push-hold,c:C_A,op:.14,l:'Eintauchen'}); if(hold>0) bands.push({x0:mk.push-hold,x1:mk.push,c:C_R,op:.2,l:'Pause'}); bands.push({x0:mk.push,x1:mk.to,c:C_F,op:.14,l:'Abdruck'},{x0:mk.to,x1:mk.land,c:C_V,op:.12,l:'Flug'},{x0:mk.land,x1:mk.landEnd,c:C_P,op:.15,l:'Landung'});
+    const P1={x:[0,Math.ceil(T*10)/10],y:[0,fmax],xl:'Zeit in s',yl:'Bodenkraft in N',series:[],hl:[{y:s.mg,c:C_R,l:'Gewichtskraft'}],bands,cx:t=>t,leg:[{c:C_F,t:'Kraftmessplatte'}]};
+    if(ref&&ref.sim.ok){ const sh=s.marks.to-ref.sim.marks.to; P1.series.push({x:ref.sim.t.map(x=>x+sh),y:ref.sim.F,c:C_R,dash:'5 4',w:2}); P1.leg.push({c:C_R,t:'Vergleich',dash:'5 4'}); }
+    P1.series.push({x:s.t,y:s.F,c:C_F});
+    const P2={x:P1.x,y:[Math.floor(-Math.max(s.vTO,1)*10)/10-0.2,Math.ceil(s.vTO*2)/2+0.4],xl:'Zeit in s',yl:'v in m/s',series:[],hl:[{y:0,c:C_R}],bands:[{x0:mk.push,x1:mk.to,c:C_F,op:.14},{x0:mk.to,x1:mk.land,c:C_V,op:.12}],cx:P1.cx};
+    if(ref&&ref.sim.ok){ const sh=s.marks.to-ref.sim.marks.to; P2.series.push({x:ref.sim.t.map(x=>x+sh),y:ref.sim.v,c:C_R,dash:'5 4',w:2}); }
+    P2.series.push({x:s.t,y:s.v,c:C_V}); return [P1,P2]; },
+  scene:sceneInit,
+  info:(s,p,t)=>s.ok?`Sprunghöhe <b>${de(s.h*100,0)} cm</b> · Flugzeit ${de(s.tf*1000,0)} ms · Absprung ${de(s.vTO,2)} m/s`:'Kein Absprung möglich'};
+
+/* ---- 2 Beschleunigungsweg ---- */
+LABS.path={n:2,short:'Beschleunigungsweg',pick:'Weg',title:'Prinzip des optimalen Beschleunigungsweges',
+  stmt:'Der Beschleunigungsweg soll so lang wie sinnvoll möglich sein. Auf einem längeren Weg wirkt die Kraft länger, die Arbeit und damit die Endgeschwindigkeit wachsen.',
+  ex:'Kugelstoßen (Angleiten, Drehstoß), Speerwurf, Basketballwurf',
+  def:()=>({m:7.26,Fmax:700,vmax:20,s:1.2,alpha:38,h0:2}),
+  sliders:[sl('m','Masse des Geräts m','in kg (Kugel 7,26 kg)',0.5,10,0.1,1),sl('Fmax','Größte Kraft Fₘₐₓ','die der Sportler am Anfang aufbringen kann, in N',200,1200,25,0),sl('s','Beschleunigungsweg s','Weg des Geräts bis zum Abwurf in m',0.3,3,0.05,2),sl('alpha','Abwurfwinkel','in Grad',20,55,1,0)],
+  presets:[{t:'Stoß aus dem Stand',d:'kurzer Weg 0,6 m',set:{s:0.6}},{t:'Angleiten',d:'Weg 1,5 m',set:{s:1.5}},{t:'Drehstoß',d:'Weg 2,2 m',set:{s:2.2}}],
+  sim:p=>simPath(p), base:p=>simPath(p), T:s=>s.T+0.2,
+  kpis:(s,p)=>[[de(s.vEnd,1)+' m/s','Abwurfgeschwindigkeit'],[de(s.R,1)+' m','Wurfweite'],[de(s.W,0)+' J','Arbeit am Gerät ½·m·v²'],[pct(s.R/s.Rshort-1),'Weite gegenüber 0,6 m Weg']],
+  verdict:(s,p)=>`Auf ${de(p.s,1)} m Weg erreicht das Gerät ${de(s.vEnd,1)} m/s, auf 0,6 m nur ${de(s.vShort,1)} m/s. Die Wurfweite hängt etwa vom Quadrat der Geschwindigkeit ab, deshalb gewinnt man ${de(s.R-s.Rshort,1)} m. Der Zuwachs wird mit längerem Weg kleiner, weil die Kraft des Sportlers bei hoher Geschwindigkeit sinkt (Modell: F = Fₘₐₓ·(1 − v/vₘₐₓ)). Ein beliebig langer Weg ist daher nicht „optimal“.`,
+  observe:['Vergrößere den Weg schrittweise. Wo flacht die Kurve ab?','Warum ist die Wurfweite fast quadratisch von der Geschwindigkeit abhängig?','Vergleiche leichte und schwere Geräte.'],
+  mission:{t:'Erreiche mit der 7,26-kg-Kugel mindestens 20 m Wurfweite.',ok:(s,p)=>s.R>=20},
+  plots:(s,p,ref)=>{ const gs=s.gs, P1={x:[0,3],y:[0,Math.ceil(Math.max(...s.gv,ref?Math.max(...ref.sim.gv):0)/5)*5],xl:'Beschleunigungsweg in m',yl:'v in m/s',series:[],mk:[{x:p.s,y:s.vEnd,c:C_F}],vl:[{x:p.s,c:C_F}],cx:t=>{ if(!s.tPush) return p.s; if(t>=s.tPush) return p.s; const i=Math.min(s.ss.length-1,Math.round(t/s.tPush*(s.ss.length-1))); return s.ss[i]; },leg:[{c:C_V,t:'v(s)'}]};
+    if(ref){ P1.series.push({x:ref.sim.gs,y:ref.sim.gv,c:C_R,dash:'5 4',w:2}); P1.leg.push({c:C_R,t:'Vergleich',dash:'5 4'}); } P1.series.push({x:gs,y:s.gv,c:C_V});
+    const xs=[],ys=[]; for(let q=0.3;q<=3.0001;q+=0.05){ xs.push(q); ys.push(rangeOf(s.vAt(q),p.alpha,p.h0)); }
+    const P2={x:[0,3],y:[0,Math.ceil(Math.max(...ys)/5)*5],xl:'Beschleunigungsweg in m',yl:'Wurfweite in m',series:[{x:xs,y:ys,c:C_F}],mk:[{x:p.s,y:s.R,c:C_F}],vl:[{x:p.s,c:C_F}],cx:P1.cx}; return [P1,P2]; },
+  scene:scenePath, info:(s,p)=>`Weg ${de(p.s,2)} m · v = ${de(s.vEnd,1)} m/s · Wurfweite <b>${de(s.R,1)} m</b>`};
+
+/* ---- 3 Teilimpulse ---- */
+LABS.chain={n:3,short:'Teilimpulse',pick:'Teil\u00ADimpulse',title:'Prinzip der zeitlichen Koordination von Teilimpulsen',
+  stmt:'Die Teilimpulse der beteiligten Körperteile müssen zeitlich so abgestimmt sein, dass sich ihre Geschwindigkeitsbeiträge zum Zeitpunkt der Endgeschwindigkeit möglichst gut addieren.',
+  ex:'Wurf, Stoß, Schlag, Sprungwurf: Beine, Rumpf, Arm, Hand nacheinander',
+  def:()=>({A:[4,4.5,5],D:[0.30,0.20,0.12],t:[0,0.30,0.50]}),
+  sliders:[],
+  presets:[{t:'Nacheinander',d:'ohne Überlappung',set:{t:[0,0.30,0.50]}},{t:'Alle gleichzeitig',d:'Einsatz bei t = 0',set:{t:[0,0,0]}},{t:'Arm zu spät',d:'Hand setzt nach dem Rumpf ein',set:{t:[0,0.05,0.28]}},{t:'Abgestimmt',d:'Maxima fallen zusammen',set:'opt'}],
+  sim:p=>simChain(p), base:p=>simChain(p), T:s=>s.T,
+  kpis:(s,p)=>[[de(s.vEnd,1)+' m/s','Endgeschwindigkeit (Maximum der Summe)'],[de(s.eff*100,0)+' %','Anteil der Summe aller Einzelmaxima'],[de(s.tRel*1000,0)+' ms','Zeitpunkt des Maximums'],[de(s.sumA,1)+' m/s','Summe der Einzelmaxima (Höchstwert)']],
+  verdict:(s,p)=>{ const sp=Math.max(...s.peaks)-Math.min(...s.peaks); return `Die Endgeschwindigkeit beträgt ${de(s.vEnd,1)} m/s, das sind ${de(s.eff*100,0)} % des Höchstwerts ${de(s.sumA,1)} m/s. Die Geschwindigkeitsmaxima der drei Teilimpulse liegen ${de(sp*1000,0)} ms auseinander. ${s.eff>0.97?'Sie fallen fast zusammen: Die Beiträge addieren sich voll.':'Je weiter die Maxima auseinanderliegen, desto weniger addieren sie sich.'} Annahme des Modells: Jedes Gelenk liefert einen Beitrag, der anwächst und wieder abklingt. In manchen Büchern wird die Abstimmung anders beschrieben (zum Beispiel „der nächste Teilimpuls setzt ein, wenn der vorherige sein Maximum erreicht hat“). Prüfe die Formulierung deines Buches.`; },
+  observe:['Beginne mit „Nacheinander“: Das Maximum ist nur so hoch wie der größte Einzelbeitrag.','Verschiebe den Einsatz von Rumpf und Arm mit den Reglern und beobachte die Summenkurve.','Wo liegen bei „Abgestimmt“ die Maxima der drei Kurven?'],
+  mission:{t:'Erreiche mindestens 95 % der größtmöglichen Endgeschwindigkeit.',ok:(s)=>s.eff>=0.95},
+  plots:(s,p,ref)=>{ const ts=s.ts.map(x=>x*1000), ymax=Math.ceil(s.sumA/2)*2+1; const ser=[]; if(ref) ser.push({x:ref.sim.ts.map(x=>x*1000),y:ref.sim.Sm,c:C_R,dash:'5 4',w:2});
+    for(let i=0;i<3;i++) ser.push({x:ts,y:s.U[i],c:[C_V,C_P,C_F][i],w:2});
+    ser.push({x:ts,y:s.Sm,c:C_INK,w:3.2});
+    return [{x:[0,Math.ceil(s.T*1000/100)*100],y:[0,ymax],xl:'Zeit in ms',yl:'v in m/s',series:ser,hl:[{y:s.sumA,c:C_R,l:'Summe der Maxima'}],mk:[{x:s.tRel*1000,y:s.vEnd,c:'var(--acc)'}],cx:t=>t*1000,leg:[{c:C_V,t:'Beine'},{c:C_P,t:'Rumpf'},{c:C_F,t:'Arm'},{c:C_INK,t:'Summe'}]}]; },
+  scene:sceneChain, info:(s,p)=>`Endgeschwindigkeit <b>${de(s.vEnd,1)} m/s</b> (${de(s.eff*100,0)} % des Höchstwerts)`};
+
+/* ---- 4 Beschleunigungsverlauf ---- */
+const CURVE_PRE=[{t:'Ideal',d:'schnell aufbauen, hoch bleiben',f:[1,1,1,1,1,1,1]},{t:'Stetig ansteigend',d:'langsam aufbauen',f:[0.3,0.45,0.6,0.75,0.9,1,1]},{t:'Kraftloch',d:'Einbruch in der Mitte',f:[1,1,1,0.4,1,1,1]},{t:'Früher Gipfel',d:'Kraft fällt ab',f:[1,1,0.8,0.6,0.45,0.35,0.3]},{t:'Später Anstieg',d:'zu spät aktiviert',f:[0.1,0.2,0.35,0.55,0.8,1,1]}];
+LABS.curve={n:4,short:'Beschleunigungsverlauf',pick:'Verlauf',title:'Prinzip der optimalen Tendenz im Beschleunigungsverlauf',
+  stmt:'Bei Bewegungen auf hohe Endgeschwindigkeit soll der Kraft- und Beschleunigungsverlauf bis zum Ende hoch bleiben. Kraftlöcher, frühe Gipfel und ein später Kraftaufbau kosten Kraftstoß.',
+  ex:'Stoßen, Werfen, Schlagen, Sprinten: Kraft steigt schnell an und bricht nicht ein',
+  def:()=>({f:[1,1,1,1,1,1,1]}),sliders:[],
+  presets:CURVE_PRE.map(q=>({t:q.t,d:q.d,set:{f:q.f}})),
+  sim:p=>simCurve(p.f), base:p=>simCurve([1,1,1,1,1,1,1]), T:s=>CURVE_T+0.02,
+  kpis:(s,p,b)=>[[de(s.vEnd,1)+' m/s','Endgeschwindigkeit'],[de(s.vEnd/b.vEnd*100,0)+' %','Anteil vom Ideal'],[de(s.J,0)+' N·s','Kraftstoß ∫F dt'],[de(Math.max(...s.F),0)+' N','größte Kraft']],
+  verdict:(s,p,b)=>`Mit diesem Kraftverlauf erreicht das Gerät ${de(s.vEnd,1)} m/s, das sind ${de(s.vEnd/b.vEnd*100,0)} % des Ideals. Der Kraftstoß ∫F dt (Fläche unter der Kurve) bestimmt die Geschwindigkeit: v = ∫F dt / m. Die gestrichelte Linie zeigt, wie schnell die Kraft höchstens aufgebaut werden kann (Aktivierung der Muskeln). Das Ideal folgt dieser Linie und bleibt dann hoch.`,
+  observe:['Wähle nacheinander alle Kurven und vergleiche die Endgeschwindigkeit.','Ziehe einzelne Punkte im Diagramm nach oben oder unten oder nutze die Pfeiltasten.','Was kostet ein Kraftloch, was ein früher Gipfel?'],
+  mission:{t:'Gestalte den Verlauf so, dass du mindestens 97 % des Ideals erreichst.',ok:(s,p,b)=>s.vEnd/b.vEnd>=0.97},
+  plots:(s,p,ref)=>{ const tm=s.ts.map(x=>x*1000), cap=s.ts.map(capF), nodes=p.f.map((f,i)=>({x:i*CURVE_T/(CURVE_N-1)*1000,y:s.node[i],i,v:f}));
+    const P1={x:[0,CURVE_T*1000*1.05],y:[0,CURVE_FMAX*1.1],xl:'Zeit in ms',yl:'Kraft in N',series:[{x:tm,y:cap,c:C_R,dash:'5 4',w:2}],pts:nodes,cx:t=>t*1000,leg:[{c:C_F,t:'Kraft F'},{c:C_R,t:'mögliche Kraft',dash:'5 4'}]};
+    if(ref) P1.series.push({x:ref.sim.ts.map(x=>x*1000),y:ref.sim.F,c:C_R,w:2,op:.7}); P1.series.push({x:tm,y:s.F,c:C_F});
+    const P2={x:[0,CURVE_T*1000*1.05],y:[0,13],xl:'Zeit in ms',yl:'v in m/s',series:[{x:tm,y:s.v,c:C_V}],cx:t=>t*1000}; return [P1,P2]; },
+  scene:sceneCurve, edit:true, info:(s,p)=>`Endgeschwindigkeit <b>${de(s.vEnd,1)} m/s</b> · Kraftstoß ${de(s.J,0)} N·s`};
+
+/* ---- 5 Gegenwirkung ---- */
+LABS.react={n:5,short:'Gegenwirkung',pick:'Gegen\u00ADwirkung',title:'Prinzip der Gegenwirkung',
+  stmt:'Kräfte treten immer paarweise auf: Die Kraft von A auf B ist so groß wie die Kraft von B auf A (actio = reactio). Um Kraft wirksam einzusetzen, braucht man ein festes Widerlager.',
+  ex:'Abstoßen vom Boden, Startblock, Stemmschritt, Stand beim Stoßen, Rückstoß',
+  def:()=>({mode:'push',M:70,m:6,u:12,dur:0.25,mu:0.3,acap:6.5,tb:0.35,mus:0.5,Ms:75}),
+  modes:[['push','Rückstoß beim Werfen'],['sprint','Sprintstart']],
+  slidersBy:{push:[sl('M','Masse des Werfers','in kg',45,100,1,0),sl('m','Masse des Balls','in kg (Medizinball)',1,12,0.5,1),sl('mu','Haftreibungszahl μ des Bodens','0,05 Eis, 0,3 glatter Hallenboden, 0,8 Gummi oder Spikes',0,1,0.05,2)],
+    sprint:[sl('mus','Haftreibungszahl μ der Bahn','0,35 nass, 0,6 trocken, 1,0 Spikes',0.2,1.2,0.05,2),sl('acap','Muskelbedingte Beschleunigung','größte Beschleunigung, die die Beine erzeugen, in m/s²',4,9,0.25,2),sl('Ms','Masse des Läufers','in kg',50,100,1,0)]},
+  presetsBy:{push:[{t:'Eis',d:'μ = 0,05',set:{mu:0.05}},{t:'Glatter Hallenboden',d:'μ = 0,3',set:{mu:0.3}},{t:'Gummiboden',d:'μ = 0,8',set:{mu:0.8}}],sprint:[{t:'Nasse Bahn',d:'μ = 0,35',set:{mus:0.35}},{t:'Trockene Bahn',d:'μ = 0,6',set:{mus:0.6}},{t:'Spikes',d:'μ = 1,0',set:{mus:1.0}}]},
+  sim:p=>p.mode==='push'?simReact(p):simSprint({mu:p.mus,acap:p.acap,tb:p.tb,M:p.Ms}), base:p=>null,
+  T:(s,p)=>p.mode==='push'?s.T:Math.max(s.free.t10,s.block.t10)+0.1,
+  kpis:(s,p)=>p.mode==='push'?[[de(s.vBall,2)+' m/s','Geschwindigkeit des Balls'],[de(s.vRecoil,2)+' m/s','Rückstoß des Werfers'],[de(s.frac*100,0)+' %','Anteil der möglichen Ballgeschwindigkeit'],[de(s.muCrit,2),'nötige Haftreibungszahl μ']]:[[de(s.free.t10,2)+' s','10 m ohne Startblock'],[de(s.block.t10,2)+' s','10 m mit Startblock'],[de(s.free.t10-s.block.t10,2)+' s','Gewinn durch den Block'],[de(s.aLim,1)+' m/s²','Grenze durch Reibung']],
+  verdict:(s,p)=>p.mode==='push'?`Die Kraftmessplatte unter dem Werfer misst die waagerechte Reaktionskraft des Bodens: Sie folgt der nötigen Kraft, bis die Grenze μ·N erreicht ist (${de(s.cap,0)} N), danach ist sie gedeckelt und der Werfer rutscht. Der Werfer bringt den Ball relativ zu sich auf ${de(p.u,0)} m/s. Wenn der Boden nicht genug Haftung bietet (μ unter ${de(s.muCrit,2)}), rutscht der Werfer zurück: Die Gegenkraft des Balls schiebt ihn nach hinten und der Ball erreicht nur ${de(s.vBall,2)} m/s im Bodensystem. Der Impuls bleibt erhalten: m·v_Ball + M·v_Werfer = 0, solange der Boden nichts beiträgt. Mit fester Haftung wirkt der Boden als Widerlager.`:`Die waagerechte Platte zeigt ${de(s.block.FX[3],0)} N mit Block, ohne Block höchstens ${de(s.capF,0)} N (μ·m·g). Ohne Block begrenzt die Haftreibung die Beschleunigung auf ${de(s.aLim,1)} m/s². Der Startblock liefert eine Gegenkraft unabhängig vom Boden und hilft deshalb vor allem bei geringer Haftung (hier ${de(s.free.t10-s.block.t10,2)} s). Bei guter Haftung (μ ≥ ${de(p.acap/G,2)}) bremst die Reibung nicht, der Gewinn verschwindet.`,
+  observe:['Senke die Haftreibungszahl: Ab welchem μ rutscht der Werfer und wo wird die Plattenkurve gedeckelt?','Prüfe die Impulsbilanz: Wie groß sind m·v_Ball und M·v_Werfer?','Im Sprintstart: Wie hoch ist die waagerechte Plattenkraft mit und ohne Block? Bei welchem μ bringt der Block nichts mehr?'],
+  mission:{t:'Werfer: Wähle μ so, dass er nicht rutscht. Sprint: Finde ein μ, bei dem der Block mehr als 0,2 s bringt.',ok:(s,p)=>p.mode==='push'?s.frac>=0.999:(s.free.t10-s.block.t10>0.2)},
+  plots:(s,p)=>{ if(p.mode==='push'){ const t=s.t.map(x=>x*1000), X=[0,Math.round(s.T*1000/100)*100], fm=Math.ceil(Math.max(...s.REQ,s.cap)/100)*100+60;
+      return [{x:X,y:[Math.floor(Math.min(...s.VP)-1),Math.ceil(Math.max(...s.VB)+1)],xl:'Zeit in ms',yl:'v in m/s',series:[{x:t,y:s.VB,c:C_F},{x:t,y:s.VP,c:C_V}],hl:[{y:0,c:C_R}],cx:q=>q*1000,leg:[{c:C_F,t:'Ball'},{c:C_V,t:'Werfer'}]},
+        {x:X,y:[0,fm],xl:'Zeit in ms',yl:'F waagerecht in N',series:[{x:t,y:s.REQ,c:C_R,dash:'5 4',w:2},{x:t,y:s.FR,c:C_P}],hl:[{y:s.cap,c:C_P,l:'Grenze μ·N'}],cx:q=>q*1000,leg:[{c:C_P,t:'Kraftmessplatte'},{c:C_R,t:'nötige Kraft',dash:'5 4'}]}]; }
+    const X=[0,Math.max(s.free.t10,s.block.t10)]; return [{x:X,y:[0,10],xl:'Zeit in s',yl:'Weg in m',series:[{x:s.free.T,y:s.free.S,c:C_R},{x:s.block.T,y:s.block.S,c:C_F}],cx:q=>q,leg:[{c:C_R,t:'ohne Block'},{c:C_F,t:'mit Block'}]},{x:X,y:[0,Math.ceil(s.M*p.acap*1.1/100)*100],xl:'Zeit in s',yl:'F waagerecht in N',series:[{x:s.free.T,y:s.free.FX,c:C_R},{x:s.block.T,y:s.block.FX,c:C_F}],hl:[{y:s.capF,c:C_P,l:'Haftgrenze μ·m·g'}],cx:q=>q,leg:[{c:C_R,t:'Platte, ohne Block'},{c:C_F,t:'Platte, mit Block'}]}]; },
+  scene:(s,p,t)=>p.mode==='push'?sceneReact(s,p,t):sceneSprint(s,p,t),
+  info:(s,p)=>p.mode==='push'?`Ball <b>${de(s.vBall,2)} m/s</b> · Rückstoß ${de(s.vRecoil,2)} m/s`:`10 m: ohne Block ${de(s.free.t10,2)} s · <b>mit Block ${de(s.block.t10,2)} s</b>`};
+
+/* ---- 6 Impulserhaltung ---- */
+LABS.rot={n:6,short:'Impulserhaltung',pick:'Drehimpuls',title:'Prinzip der Impulserhaltung (Drehimpulserhaltung)',
+  stmt:'Ohne äußeres Drehmoment bleibt der Drehimpuls L = I·ω erhalten. Verkleinert sich das Trägheitsmoment I, nimmt die Winkelgeschwindigkeit ω zu.',
+  ex:'Salto gehockt, Pirouette mit angelegten Armen, Flugphase beim Weitsprung',
+  def:()=>({mode:'salto',L:50,vy:3.7,t1:0.12,t2:0.60,w0:1.5,rOut:0.7,rIn:0.1,tIn:1.5,tOut:3.5,T:5}),
+  modes:[['salto','Salto'],['pir','Pirouette']],
+  slidersBy:{salto:[sl('L','Drehimpuls L aus dem Absprung','in kg·m²/s',20,100,1,0),sl('vy','Absprunggeschwindigkeit nach oben','in m/s, bestimmt die Flugzeit',3,4.6,0.1,1),sl('t1','Beginn der Hocke','nach dem Absprung in s',0,0.5,0.02,2),sl('t2','Öffnen der Hocke','Zeitpunkt in s',0.2,0.95,0.02,2)],
+    pir:[sl('w0','Drehzahl mit gestreckten Armen','Umdrehungen pro Sekunde',0.5,3,0.1,1),sl('rOut','Armradius außen','in m',0.4,0.8,0.05,2),sl('rIn','Armradius innen','in m',0.05,0.3,0.05,2),sl('tIn','Arme anlegen bei','in s',0.5,3,0.1,1),sl('tOut','Arme öffnen bei','in s',2,4.5,0.1,1)]},
+  presetsBy:{salto:[{t:'Einfacher Salto',d:'Hocke 0,12 bis 0,60 s',set:{L:50,vy:3.7,t1:0.12,t2:0.60}},{t:'Ohne Hocke',d:'gestreckt',set:{t1:0,t2:0}},{t:'Doppelsalto',d:'mehr Drehimpuls',set:{L:80,vy:4.2,t1:0.1,t2:0.75}}],pir:[{t:'Arme anlegen',d:'Standard',set:{w0:1.5,rOut:0.7,rIn:0.1}},{t:'Kaum Unterschied',d:'Arme nur halb an',set:{rIn:0.4}}]},
+  sim:p=>p.mode==='salto'?simSalto(p):simPirouette(p), base:p=>null, T:(s,p)=>p.mode==='salto'?s.tf:p.T,
+  kpis:(s,p)=>p.mode==='salto'?[[de(s.total,0)+'°','Drehung in der Luft'],[de(s.total/360,2),'Umdrehungen'],[s.stand?'ja':'nein','Landung aufrecht (360° ± 35°)'],[de(s.tf,2)+' s','Flugzeit']]:[[de(s.w0,1)+' → '+de(s.wIn,1),'Umdrehungen pro s: außen → innen'],[de(s.ratio,1)+'×','Verhältnis der Trägheitsmomente'],[de(s.Iout,2)+' | '+de(s.Iin,2),'Trägheitsmoment in kg·m² (außen | innen)'],[de(s.Ekin[1]/s.Ekin[0],1)+'×','Rotationsenergie innen gegenüber außen']],
+  verdict:(s,p)=>p.mode==='salto'?`Der Drehimpuls bleibt in der Luft konstant (${de(p.L,0)} kg·m²/s). In der Hocke sinkt I von ${de(s.Il,0)} auf ${de(s.It,0)} kg·m², die Drehgeschwindigkeit steigt auf das ${de(s.Il/s.It,1)}-fache. Insgesamt dreht sich der Körper um ${de(s.total,0)}°. ${s.stand?'Das passt zu einer aufrechten Landung.':s.n<1?'Das reicht nicht für eine ganze Drehung: Mehr Drehimpuls oder länger in der Hocke bleiben.':'Der Körper landet nicht aufrecht: Öffne die Hocke früher oder später.'} Die Kraftmessplatte zeigt in der Flugphase null: Es wirkt keine äußere Kraft und kein äußeres Drehmoment, deshalb bleibt L konstant. Der Drehimpuls entsteht nur beim Absprung. Hinweis: Der Salto ist hier nur ein Rechenmodell. Übe ihn nie ohne Anleitung und Hilfestellung.`:`Der Drehimpuls bleibt erhalten: L = I·ω. Das Trägheitsmoment sinkt um den Faktor ${de(s.ratio,1)}, die Drehzahl steigt deshalb von ${de(s.w0,1)} auf ${de(s.wIn,1)} Umdrehungen pro Sekunde. Die Rotationsenergie wächst um denselben Faktor, denn die Muskeln leisten Arbeit beim Heranziehen der Arme.`,
+  observe:['Salto: Öffne die Hocke zu früh oder zu spät und beobachte die Landung.','Welche Größe ändert sich in der Luft, welche bleibt gleich?','Pirouette: Warum steigt die Rotationsenergie, obwohl der Drehimpuls gleich bleibt?'],
+  mission:{t:'Salto: Lande aufrecht (360° ± 35°). Pirouette: Erreiche mindestens 5 Umdrehungen pro Sekunde.',ok:(s,p)=>p.mode==='salto'?s.stand:s.wIn>=5},
+  plots:(s,p)=>{ const t=s.t; if(p.mode==='salto'){ const pl=s.plate, X=[pl.t0,pl.t1]; return [{x:X,y:[0,Math.max(420,Math.ceil(s.total/180)*180+60)],xl:'Zeit in s',yl:'Drehwinkel in °',series:[{x:t,y:s.th,c:C_A}],hl:[{y:360,c:C_R,l:'360°'},...(s.total>500?[{y:720,c:C_R,l:'720°'}]:[])],vl:[{x:p.t1,c:C_P},{x:p.t2,c:C_P}],cx:q=>q,leg:[{c:C_A,t:'Winkel'},{c:C_P,t:'Hocke an/aus',dash:'5 4'}]},{x:X,y:[0,Math.ceil(Math.max(...s.w)/5)*5+2],xl:'Zeit in s',yl:'ω in rad/s',series:[{x:t,y:s.w,c:C_V}],cx:q=>q,leg:[{c:C_V,t:'Winkelgeschwindigkeit'}]},{x:X,y:[0,Math.ceil(pl.PT/500)*500+300],xl:'Zeit in s (0 = Absprung)',yl:'Bodenkraft in N',series:[{x:pl.t,y:pl.F,c:C_F}],hl:[{y:pl.mg,c:C_R,l:'Gewichtskraft'}],bands:[{x0:-0.22,x1:0,c:C_F,op:.14,l:'Absprung'},{x0:0,x1:s.tf,c:C_V,op:.12,l:'Flug: Platte zeigt 0'},{x0:s.tf,x1:s.tf+0.25,c:C_P,op:.15,l:'Landung'}],cx:q=>q,leg:[{c:C_F,t:'Kraftmessplatte (70 kg)'}]}]; }
+    return [{x:[0,p.T],y:[0,Math.ceil(Math.max(...s.w)+1)],xl:'Zeit in s',yl:'U pro s',series:[{x:t,y:s.w,c:C_V}],cx:q=>q,leg:[{c:C_V,t:'Drehzahl'}]},{x:[0,p.T],y:[0,Math.ceil(Math.max(...s.I))+0.5],xl:'Zeit in s',yl:'I in kg·m²',series:[{x:t,y:s.I,c:C_P}],cx:q=>q,leg:[{c:C_P,t:'Trägheitsmoment'}]}]; },
+  scene:(s,p,t)=>p.mode==='salto'?sceneSalto(s,p,t):scenePirouette(s,p,t),
+  info:(s,p)=>p.mode==='salto'?`Drehung <b>${de(s.total,0)}°</b> · ${s.stand?'aufrecht':'nicht aufrecht'}`:`Drehzahl ${de(s.w0,1)} → <b>${de(s.wIn,1)}</b> U/s`};
+/* =============== Inhalte =============== */
+const PRINC=[
+ {n:1,lab:'init',name:'Prinzip der Anfangskraft',stmt:'Je größer die Kraft zu Beginn der Beschleunigung, desto größer die Endgeschwindigkeit. Eine Ausholbewegung mit kurzer Umkehrphase erhöht sie.',ex:'Sprung mit Eintauchen, Wurf mit Ausholen, Aufschlag mit Bogenspannung',idea:'Dehnungs-Verkürzungs-Zyklus: Die vorgedehnte Muskulatur und die Sehnen geben Energie ab, der Dehnungsreflex erhöht die Kraft. Zu lange Pausen am Umkehrpunkt verschenken den Vorteil.',err:'„Ausholen verlängert nur den Weg.“ Die Anfangskraft ist größer, auch wenn der Weg gleich bleibt.'},
+ {n:2,lab:'path',name:'Prinzip des optimalen Beschleunigungsweges',stmt:'Der Beschleunigungsweg soll so lang wie sinnvoll möglich sein, damit Kraftstoß und Arbeit und damit die Endgeschwindigkeit groß werden.',ex:'Angleiten oder Drehstoß beim Kugelstoßen, Zugweg beim Speerwurf',idea:'Arbeit W = F·s = ½·m·v². Bei gleicher Kraft wächst v mit der Wurzel des Weges. Technik und Muskelkraft begrenzen den Weg, deshalb „optimal“ und nicht „unendlich“.',err:'„Je länger der Weg, desto besser, immer.“ Bei hoher Geschwindigkeit sinkt die Kraft, der Zuwachs wird kleiner.'},
+ {n:3,lab:'chain',name:'Prinzip der zeitlichen Koordination von Teilimpulsen',stmt:'Die Teilimpulse der beteiligten Körperteile müssen zeitlich so abgestimmt sein, dass sich ihre Geschwindigkeitsbeiträge zum Zeitpunkt der Endgeschwindigkeit addieren.',ex:'Beine, Hüfte, Rumpf, Arm und Hand beim Wurf, Stoß oder Schlag',idea:'Die Endgeschwindigkeit ist die Summe der Beiträge der Glieder. Setzen sie ohne Überlappung nacheinander ein, bleibt die Summe so klein wie der größte Einzelbeitrag.',err:'„Alle Muskeln gleichzeitig anspannen.“ Gleichzeitig ist nicht abgestimmt: Die Maxima sollen zusammenfallen.'},
+ {n:4,lab:'curve',name:'Prinzip der optimalen Tendenz im Beschleunigungsverlauf',stmt:'Bei Bewegungen auf hohe Endgeschwindigkeit soll der Kraft- und Beschleunigungsverlauf bis zum Ende hoch bleiben. Kraftlöcher und frühe Gipfel kosten Kraftstoß.',ex:'Stoßen, Werfen, Schlagen, Sprinten',idea:'Kraftstoß ∫F dt = m·Δv: Die Fläche unter der Kraft-Zeit-Kurve bestimmt die Geschwindigkeit. Jede Delle in der Kurve verkleinert die Fläche.',err:'„Die Kraft soll immer weiter steigen.“ Gemeint ist: schnell aufbauen und nicht einbrechen.'},
+ {n:5,lab:'react',name:'Prinzip der Gegenwirkung',stmt:'Kräfte treten immer paarweise auf (actio = reactio). Um Kraft wirksam einzusetzen, braucht man ein festes Widerlager.',ex:'Abstoßen vom Boden, Startblock, Stemmschritt, Rückstoß beim Werfen',idea:'F(A auf B) = −F(B auf A). Auf glattem Boden kann man nur so viel Kraft einsetzen, wie die Haftreibung hält (F ≤ μ·N). Der Gesamtimpuls bleibt ohne äußere Kraft erhalten.',err:'„Die Gegenkraft hebt die Kraft auf.“ Beide Kräfte greifen an verschiedenen Körpern an.'},
+ {n:6,lab:'rot',name:'Prinzip der Impulserhaltung (Drehimpulserhaltung)',stmt:'Ohne äußeres Drehmoment bleibt der Drehimpuls L = I·ω erhalten. Sinkt das Trägheitsmoment, steigt die Winkelgeschwindigkeit.',ex:'Salto gehockt, Pirouette mit angelegten Armen',idea:'Das Trägheitsmoment hängt vom Abstand der Massen zur Drehachse ab (I ~ m·r²). In der Luft ändert sich L nicht, nur I und ω.',err:'„Der Drehimpuls wird durch das Anziehen größer.“ Er bleibt gleich, die Rotationsenergie wächst durch die Arbeit der Muskeln.'}
+];
+const MXC=['1 Anfangskraft','2 Weg','3 Teilimpulse','4 Verlauf','5 Gegenwirkung','6 Drehimpuls'];
+const MATRIX=[
+ ['Kugelstoßen',{1:'Angleiten: Rückneigung und Vordehnung vor dem Stoß',2:'Angleiten und Drehstoß verlängern den Weg der Kugel',3:'Beine, Hüfte, Rumpf und Arm nacheinander',4:'Die Kraft steigt bis zum Abstoß',5:'Standbein und Stemmschritt als Widerlager'}],
+ ['Speerwurf',{1:'Bogenspannung dehnt die Muskeln vor',2:'Langer Zugweg des Wurfarms',3:'Bein, Hüfte, Rumpf, Arm und Hand nacheinander',5:'Stemmschritt blockiert den Körper'}],
+ ['Sprung mit Eintauchen',{1:'Eintauchen und kurze Umkehr erhöhen die Anfangskraft',2:'Die Beugetiefe bestimmt den Streckweg',3:'Armschwung und Beinstreckung abgestimmt',5:'Der Boden ist das Widerlager'}],
+ ['Hochsprung (Flop)',{1:'Anlauf und Absprungstemmschritt mit kurzer Umkehr',3:'Schwungbein, Arme und Streckung koordiniert',6:'Drehimpuls aus der Kurve lässt den Körper über die Latte rotieren'}],
+ ['Sprintstart',{2:'Beschleunigungsweg der Beine im Block',3:'Beine, Rumpf und Arme nacheinander',4:'Kraft früh aufbauen und bis zum Verlassen des Blocks hoch halten',5:'Startblock und Spikes als Widerlager'}],
+ ['Basketball-Sprungwurf',{1:'Kniebeuge vor dem Sprung',2:'Der Wurfarm streckt sich über einen langen Weg',3:'Beine, Rumpf, Arm und Handgelenk nacheinander',5:'Abdruck vom Boden'}],
+ ['Volleyball-Aufschlag und Angriff',{1:'Bogenspannung von Rumpf und Schulter',3:'Rumpf, Schulter, Arm und Hand nacheinander',4:'Die Hand wird bis zum Treffpunkt beschleunigt, ohne Abbremsen'}],
+ ['Salto im Turnen',{1:'Anlauf und Absprung mit Vordehnung',3:'Absprung und Armzug abgestimmt',5:'Der Absprung drückt gegen den Boden',6:'Hocke verkleinert das Trägheitsmoment, der Körper dreht schneller'}]
+];
+const DIAG=[
+ {t:'Beim Standweitsprung springt Mia aus der tiefen Hocke ohne Eintauchen weiter ab. Springt sie mit kurzem Eintauchen, kommt sie deutlich weiter. Welches Prinzip erklärt vor allem den Gewinn durch das Eintauchen?',ok:0,lab:'init',why:'Beim Eintauchen werden die Muskeln vorgedehnt, die Kraft zu Beginn des Abdrucks ist größer (Anfangskraft). Bleibt sie unten stehen, klingt der Vorteil ab.'},
+ {t:'Beim Kugelstoßen stößt Jonas aus dem Stand. Mit Angleiten stößt er weiter. Welches Prinzip erklärt das vor allem?',ok:1,lab:'path',why:'Das Angleiten verlängert den Weg, auf dem die Kugel beschleunigt wird. Auf längerem Weg wirkt die Kraft länger, die Arbeit und die Endgeschwindigkeit wachsen.'},
+ {t:'Beim Basketball-Sprungwurf streckt Tom Beine, Rumpf, Arm und Handgelenk nacheinander. Setzt der Arm zu früh ein, wird der Wurf kürzer. Welches Prinzip?',ok:2,lab:'chain',why:'Die Beiträge von Beinen, Rumpf und Arm müssen zeitlich so abgestimmt sein, dass sie sich zum Abwurf addieren (Koordination von Teilimpulsen).'},
+ {t:'Beim Volleyballaufschlag verlangsamt sich die Hand kurz vor dem Treffpunkt, weil der Ellbogen abbremst. Der Ball wird langsamer. Welches Prinzip wurde verletzt?',ok:3,lab:'curve',why:'Der Kraft- und Beschleunigungsverlauf bricht vor dem Ende ein. Das verkleinert den Kraftstoß (optimale Tendenz im Beschleunigungsverlauf).'},
+ {t:'Auf der nassen Bahn rutscht ein Sprinter beim Start weg. Mit Startblock und Spikes gelingt der Start. Welches Prinzip?',ok:4,lab:'react',why:'Der Läufer kann nur so viel Kraft nach hinten einsetzen, wie das Widerlager (Boden oder Block) hält. Die Gegenkraft treibt ihn nach vorn.'},
+ {t:'Eine Turnerin zieht beim Salto die Knie an die Brust und dreht schneller. Zum Landen streckt sie sich. Welches Prinzip?',ok:5,lab:'rot',why:'Der Drehimpuls bleibt in der Luft erhalten. In der Hocke sinkt das Trägheitsmoment, deshalb steigt die Winkelgeschwindigkeit.'},
+ {t:'Eine Kraftmessplatte zeigt beim Counter-Movement-Jump: Die Bodenkraft sinkt zuerst unter das Körpergewicht, steigt dann stark an und ist beim Beginn des Aufwärtsschubs größer als beim Sprung ohne Eintauchen. Welches Prinzip steckt dahinter?',ok:0,lab:'init',why:'Das Eintauchen mit anschließender Bewegungsumkehr erhöht die Kraft am Beginn der Streckung (Anfangskraft, Dehnungs-Verkürzungs-Zyklus).'},
+ {t:'Eine Schülerin stößt auf einer glatten Matte einen schweren Medizinball aus dem Stand. Ihre Füße rutschen nach hinten, der Ball fliegt nur kurz. Welches Prinzip erklärt das?',ok:4,lab:'react',why:'Die Gegenkraft des Balls schiebt sie zurück, die Haftung der Matte reicht nicht als Widerlager. Der Ball bekommt weniger Geschwindigkeit im Bodensystem.'}
+];
+const GLOS=[
+ ['Kraftstoß (Impuls einer Kraft)','Produkt aus Kraft und Zeit, bei veränderlicher Kraft die Fläche unter der Kraft-Zeit-Kurve: J = ∫F dt = m·Δv.'],
+ ['Arbeit','W = F·s bei gleichgerichteter Kraft. Die Arbeit am Gerät erhöht seine Bewegungsenergie: W = ½·m·v².'],
+ ['Teilimpuls','Geschwindigkeitsbeitrag eines Körperteils (zum Beispiel Rumpf oder Arm) zur Endgeschwindigkeit eines Geräts oder Körperteils.'],
+ ['Ausholbewegung, Gegenbewegung','Bewegung entgegen der Zielrichtung vor dem eigentlichen Abdruck oder Wurf (Eintauchen, Rückneigung).'],
+ ['Dehnungs-Verkürzungs-Zyklus','Auf die Dehnung einer Muskel-Sehnen-Einheit folgt unmittelbar die Verkürzung. Elastische Energie und Dehnungsreflex erhöhen die Kraft.'],
+ ['Kopplungszeit (Amortisationsphase)','Zeit zwischen Dehnung und Verkürzung am Umkehrpunkt. Ist sie zu lang, geht der Vorteil verloren.'],
+ ['Widerlager','Fester Körper (Boden, Startblock, Standbein), an dem sich die Kraft abstützen kann.'],
+ ['Haftreibung','Kraft, die ein Rutschen verhindert. Sie ist höchstens μ·N, mit der Normalkraft N und der Haftreibungszahl μ.'],
+ ['Drehimpuls','L = I·ω. Er bleibt ohne äußeres Drehmoment erhalten.'],
+ ['Trägheitsmoment','Maß dafür, wie schwer sich ein Körper um eine Achse drehen lässt. Es wächst mit dem Abstand der Massen von der Achse (I ~ m·r²).'],
+ ['Schwerpunkt','Punkt, an dem man sich die gesamte Masse vereint denken kann. Seine Bahn in der Luft ist eine Parabel, unabhängig von Drehungen des Körpers.']
+];
+const ITASKS=[
+ {afb:'I',t:'Prinzipien nennen',p:6,op:'Nenne',text:'Nenne die sechs biomechanischen Prinzipien und ordne jedem ein Beispiel aus dem Sport zu.',load:'over',sol:['Anfangskraft: Sprung mit Eintauchen (1 P)','Optimaler Beschleunigungsweg: Angleiten beim Kugelstoßen (1 P)','Zeitliche Koordination von Teilimpulsen: Wurf, Stoß (1 P)','Optimale Tendenz im Beschleunigungsverlauf: kein Kraftabfall beim Abwurf (1 P)','Gegenwirkung: Startblock, Stemmschritt (1 P)','Impulserhaltung (Drehimpuls): Salto, Pirouette (1 P)']},
+ {afb:'II',t:'Anfangskraft erklären',p:6,op:'Erkläre',text:'Erkläre mit dem Labor 1, warum man mit Ausholbewegung höher springt und warum eine lange Pause am tiefsten Punkt den Vorteil verringert.',load:'init',sol:['Ausholen vordehnt die Muskeln, die Kraft zu Beginn der Streckung ist größer (2 P).','Größere Kraft bedeutet größere Beschleunigung vom Anfang an, die Absprunggeschwindigkeit und Sprunghöhe wachsen (2 P).','Eine lange Pause lässt die gespeicherte Spannung und den Reflexanteil abklingen (Kopplungszeit) (2 P).']},
+ {afb:'II',t:'Weg und Wurfweite',p:7,op:'Erläutere',text:'Erläutere mit dem Labor 2 den Zusammenhang zwischen Beschleunigungsweg, Endgeschwindigkeit und Wurfweite. Beurteile, warum „so lang wie möglich“ nicht unbegrenzt gilt.',load:'path',sol:['Längerer Weg: mehr Arbeit, W = ½·m·v², höhere Endgeschwindigkeit (2 P).','Die Wurfweite wächst etwa mit v² (2 P).','Grenzen: Die Kraft sinkt bei hoher Geschwindigkeit, der Zuwachs wird kleiner; Technik und Körper begrenzen den Weg (3 P).']},
+ {afb:'II',t:'Teilimpulse abstimmen',p:6,op:'Beschreibe',text:'Beschreibe in Labor 3, wie sich die Endgeschwindigkeit ändert, wenn der Arm zu spät einsetzt. Leite eine Technikanweisung ab.',load:'chain',sol:['Zu später Einsatz: Die Maxima fallen auseinander, die Summe bleibt klein (2 P).','Abgestimmt: Maxima fallen zusammen, die Endgeschwindigkeit ist am größten (2 P).','Anweisung: Arm beginnt, während Rumpf noch beschleunigt; Bewegung läuft von den Beinen zur Hand (2 P).']},
+ {afb:'II',t:'Gegenwirkung anwenden',p:6,op:'Erkläre',text:'Erkläre mit Labor 5, warum Spikes oder ein Startblock die 10-m-Zeit verbessern können, und formuliere das Prinzip der Gegenwirkung.',load:'react',sol:['Der Läufer kann höchstens die Haftreibung μ·N als Kraft nach vorn nutzen (2 P).','Der Block liefert eine Gegenkraft unabhängig vom Boden (2 P).','Prinzip: Kräfte treten paarweise auf, ein festes Widerlager ist nötig (2 P).']},
+ {afb:'II',t:'Drehimpuls berechnen',p:6,op:'Berechne',text:'Ein Springer dreht in gestreckter Haltung mit ω = 3 rad/s. In der Hocke sinkt sein Trägheitsmoment auf ein Viertel. Berechne die neue Winkelgeschwindigkeit und erkläre die Rolle des Drehimpulses.',load:'rot',sol:['L = I·ω bleibt gleich, also I₁·ω₁ = I₂·ω₂ (2 P).','I₂ = ¼·I₁ ergibt ω₂ = 4·ω₁ = 12 rad/s (2 P).','Ohne äußeres Drehmoment ändert sich der Drehimpuls in der Luft nicht (2 P).']},
+ {afb:'III',t:'Eine Bewegung analysieren',p:8,op:'Analysiere',text:'Analysiere eine Bewegung deiner Wahl (zum Beispiel Volleyballaufschlag) mit den biomechanischen Prinzipien. Entwickle zwei Technikhinweise und prüfe sie an den Laboren. Beurteile die Grenzen der Modelle.',load:'lab',sol:['Passende Prinzipien werden begründet zugeordnet (3 P).','Zwei konkrete, sinnvolle Technikhinweise (2 P).','Prüfung am Labor und Grenzen: Modelle sind vereinfacht, Annahmen wie konstante Masse und eindimensionale Bewegung (3 P).']},
+ {afb:'III',t:'Aussagen beurteilen',p:7,op:'Beurteile',text:'Beurteile die Aussagen: „Je länger der Beschleunigungsweg, desto besser, in jeder Sportart“ und „Das Prinzip der optimalen Tendenz verlangt immer einen ansteigenden Kraftverlauf“.',load:'curve',sol:['Erste Aussage: Gilt eingeschränkt, begrenzt durch Kraft-Geschwindigkeits-Beziehung, Technik, Regeln (3 P).','Zweite Aussage: Gemeint ist schneller Aufbau und kein Einbruch, nicht ständiges Ansteigen (2 P).','Begründung mit Beobachtungen aus den Laboren 2 und 4 (2 P).']}
+];
+const PRAXIS=[
+ {t:'Sprunghöhe aus der Flugzeit',w:'Zwei Sprünge (mit und ohne Eintauchen) werden im Zeitlupenvideo gefilmt (Smartphone). Aus der Flugzeit t gilt für die Sprunghöhe h = g·t²/8, wenn Absprung und Landung auf gleicher Höhe liegen. Vergleiche die Höhen und deute sie mit Labor 1. Steht eine Kraftmessplatte zur Verfügung (zum Beispiel an einer Hochschule oder in der Physiksammlung), vergleiche die gemessene Kurve mit der Kurve aus Labor 1.',s:'Rutschfester Boden, Hallenschuhe, Abstand von 2 m zu Wänden und Geräten, kurzes Aufwärmen, Landung auf beiden Beinen, wenige Versuche je Person, Abbruch bei Schmerzen oder Unsicherheit.'},
+ {t:'Medizinballstoß mit kurzem und langem Weg',w:'Ein Ball (2 bis 3 kg) wird aus dem Stand und mit einem Ausfallschritt gestoßen. Weiten messen und mit Labor 2 vergleichen.',s:'Wurfrichtung und Sektor festlegen und freihalten, Würfe nur auf Kommando, sicherer Stand, nicht gegeneinander werfen, Ball nicht über die Köpfe von anderen führen.'},
+ {t:'Drehimpuls auf dem Drehstuhl',w:'Auf einem Drehstuhl mit zwei leichten Gewichten (höchstens 1 bis 2 kg) die Arme ein- und ausstrecken. Die Drehzahl wird gefilmt und mit Labor 6 verglichen.',s:'Stuhl mit Fußstütze und Hilfe daneben, nur langsam anschieben, nicht stehen, wenn Schwindel auftritt abbrechen. Saltos und freie Drehungen gehören nicht in ein Schülerexperiment, sondern nur unter qualifizierter Anleitung ins Gerätturnen.'},
+ {t:'Start mit und ohne Widerlager',w:'Sprint über 10 m aus der Hocke (Startstellung ohne Block) auf rutschigem und rutschfestem Untergrund. Zeiten vergleichen und mit Labor 5 deuten.',s:'Bahn und Auslauf frei, ausreichend Auslauf hinter der Ziellinie, geeignete Schuhe, nasse oder staubige Böden vermeiden, die Gruppengröße so wählen, dass die Aufsicht alle im Blick hat.'}
+];
+/* =============== Zustand und Messfenster =============== */
+const S={tab:'over',lab:'init',P:{},ref:{},sim:null,base:null,T:1,tcur:0,play:false,speed:0.25,vview:window.innerWidth>=900?'both':'scene',ctx:[],diag:{},fp:{},score:{ok:0,n:0},mx:null,flight:0.55};
+LABORDER.forEach(id=>{ S.P[id]=LABS[id].def(); });
+const curL=()=>LABS[S.lab], curP=()=>S.P[S.lab];
+function compute(){ const L=curL(), p=curP(); S.sim=L.sim(p); S.base=L.base?L.base(p):null; S.T=Math.max(0.2,L.T(S.sim,p)); S.tcur=Math.min(S.tcur,S.T); }
+function paneSizes(n){ const box=$('.vpanes'), total=Math.max(280,Math.round(box.clientWidth||340)), both=S.vview==='both'; const W=both?Math.floor(total/2):total; const H=Math.round(Math.max(both?230:200,Math.min(320,W*0.64))); return {W,H:Math.round(H*(n>=3?1.3:1))}; }
+function drawViewer(){
+  if($('#viewer').hidden) return; const L=curL(), p=curP();
+  const sc=$('#vScene'), ch=$('#vChart'); sc.hidden=S.vview==='chart'; ch.hidden=S.vview==='scene';
+  $$('.vbar [data-v="view"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.vview));
+  if(!sc.hidden) sc.innerHTML=L.scene(S.sim,p,S.tcur);
+  if(!ch.hidden){ const panels=L.plots(S.sim,p,S.ref[S.lab]); const {W,H}=paneSizes(panels.length); const r=renderPanels(W,H,panels); ch.innerHTML=r.svg; S.ctx=r.ctx; ch.classList.toggle('edit',!!L.edit); }
+  moveCursor(true);
+}
+function moveCursor(skipScene){
+  const L=curL(), p=curP(); if(!S.sim) return;
+  if(!skipScene){ const sc=$('#vScene'); if(!sc.hidden) sc.innerHTML=L.scene(S.sim,p,S.tcur); }
+  $$('#vChart .cur').forEach(el=>{ const c=S.ctx[+el.dataset.i]; if(!c||!c.cx) return; const xv=Math.min(c.x[1],Math.max(c.x[0],c.cx(S.tcur))); const x=f1(c.xs(xv)); el.setAttribute('x1',x); el.setAttribute('x2',x); });
+  $('#vt').textContent='t = '+de(S.tcur,S.T>2?1:2)+' s';
+  $('#vinfo').innerHTML=L.info(S.sim,p,S.tcur); $('#scrub').value=Math.round(S.tcur/S.T*1000);
+}
+function setT(t){ S.tcur=Math.max(0,Math.min(S.T,t)); moveCursor(); }
+let rafId=null,lastTs=0;
+function stopPlay(){ S.play=false; if(rafId) cancelAnimationFrame(rafId); rafId=null; const b=$('[data-v="play"]'); b.setAttribute('aria-pressed','false'); b.textContent='▶'; b.setAttribute('aria-label','Zeitlupe abspielen'); }
+function startPlay(){ if(S.tcur>=S.T-1e-6) S.tcur=0; S.play=true; const b=$('[data-v="play"]'); b.setAttribute('aria-pressed','true'); b.textContent='⏸'; b.setAttribute('aria-label','Pause'); lastTs=0; rafId=requestAnimationFrame(tick); }
+function tick(ts){ if(!S.play) return; if(!lastTs) lastTs=ts; const dt=Math.min(0.1,(ts-lastTs)/1000); lastTs=ts; const sp=curL().T===undefined?1:S.speed*(S.T>3?8:1); S.tcur+=dt*sp; if(S.tcur>=S.T){ S.tcur=S.T; moveCursor(); stopPlay(); return; } moveCursor(); rafId=requestAnimationFrame(tick); }
+
+/* =============== Reiter: Überblick =============== */
+function renderOver(){
+  let h=`<div class="card"><h2>Sechs Prinzipien, sechs Labore</h2><p class="lead">Biomechanische Prinzipien beschreiben, wie man Bewegungen auf hohe Endgeschwindigkeit oder gute Drehung optimiert. Jedes Prinzip hat ein Labor mit Zeitlupe, Diagrammen und einer Mission. Dazu kommen Diagnoseaufgaben und Praxisideen.</p><div class="warn">Die Bezeichnungen und die Reihenfolge der Prinzipien unterscheiden sich je nach Lehrwerk. Hier wird die verbreitete Sechser-Liste nach Hochmuth verwendet. Prüfe, welche Fassung im Kerncurriculum und in eurem Buch steht.</div></div>`;
+  PRINC.forEach(q=>{ h+=`<div class="card pcard"><h3 style="margin-top:0">${q.n}. ${esc(q.name)}</h3><div class="rule"><b>${esc(q.stmt)}</b></div><p style="margin:4px 0"><b>Typisch:</b> ${esc(q.ex)}</p><p style="margin:4px 0"><b>Physik dahinter:</b> ${esc(q.idea)}</p><p class="note"><b>Häufige Fehlvorstellung:</b> ${esc(q.err)}</p><div class="btnrow"><button type="button" class="btn primary" data-act="openlab" data-lab="${q.lab}">Im Labor ausprobieren</button></div></div>`; });
+  h+=`<div class="card"><h2>Wo begegnet mir welches Prinzip?</h2><p class="lead">Tippe ein Feld an, dann erscheint die Erklärung.</p><div class="tscroll"><table class="mx"><thead><tr><th></th>${MXC.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>`;
+  MATRIX.forEach((r,i)=>{ h+=`<tr><th scope="row">${esc(r[0])}</th>${[1,2,3,4,5,6].map(c=>r[1][c]?`<td><button type="button" data-act="mx" data-r="${i}" data-c="${c}" aria-pressed="${S.mx&&S.mx[0]===i&&S.mx[1]===c}" aria-label="${esc(r[0])}: ${esc(MXC[c-1])}">✓</button></td>`:'<td class="no"></td>').join('')}</tr>`; });
+  h+=`</tbody></table></div>`; if(S.mx){ const r=MATRIX[S.mx[0]]; h+=`<div class="fb info" role="status"><b>${esc(r[0])}, ${esc(MXC[S.mx[1]-1])}:</b> ${esc(r[1][S.mx[1]])}</div>`; }
+  h+=`<p class="note">Mehrere Prinzipien wirken in einer Bewegung gleichzeitig. Die Zuordnung zeigt, wo das Prinzip besonders gut zu beobachten ist.</p></div>`;
+  $('#pane-over').innerHTML=h;
+}
+
+/* =============== Reiter: Labor =============== */
+function sliderHTML(L,p){
+  if(S.lab==='chain'){ const A=p.A; return `<div class="grid2">${[1,2].map(i=>`<div class="sl"><label class="fl" for="lc_${i}">Einsatz ${i===1?'Rumpf, Schulter':'Arm, Hand'}: <output id="lco_${i}">${de(p.t[i]*1000,0)} ms</output><small>Beginn des Teilimpulses nach dem Start der Beine</small></label><input type="range" id="lc_${i}" data-arr="t" data-idx="${i}" min="0" max="0.6" step="0.01" value="${p.t[i]}"></div>`).join('')}</div><details class="mode"><summary>Weitere Einstellungen: Stärke der Teilimpulse</summary><div class="grid2">${[0,1,2].map(i=>`<div class="sl"><label class="fl" for="la_${i}">${['Beine, Hüfte','Rumpf, Schulter','Arm, Hand'][i]}: <output id="lao_${i}">${de(A[i],1)} m/s</output><small>größter Geschwindigkeitsbeitrag</small></label><input type="range" id="la_${i}" data-arr="A" data-idx="${i}" min="1" max="8" step="0.5" value="${A[i]}"></div>`).join('')}</div></details>`; }
+  if(S.lab==='curve') return `<p class="note">Ziehe die orangen Punkte im Diagramm (Ansicht „Diagramm“ oder „Beides“) nach oben oder unten. Mit den Pfeiltasten verstellst du den fokussierten Punkt. Wert 100 % bedeutet: so viel Kraft wie in diesem Moment höchstens möglich ist.</p><div class="legendrow">${p.f.map((f,i)=>`<span>Punkt ${i+1}: <b id="cf_${i}">${Math.round(f*100)} %</b></span>`).join('')}</div>`;
+  const defs=L.slidersBy?L.slidersBy[p.mode]:L.sliders; return `<div class="grid2">${defs.map(q=>`<div class="sl"><label class="fl" for="lp_${q.k}">${q.label}: <output id="lo_${q.k}">${de(p[q.k],q.dec)}</output><small>${q.hint}</small></label><input type="range" id="lp_${q.k}" data-lp="${q.k}" min="${q.min}" max="${q.max}" step="${q.step}" value="${p[q.k]}"></div>`).join('')}</div>`;
+}
+function liveHTML(){
+  const L=curL(), p=curP(), s=S.sim, b=S.base, k=L.kpis(s,p,b), done=L.mission.ok(s,p,b);
+  return `<div class="kpis">${k.map(x=>`<div><b>${x[0]}</b><small>${x[1]}</small></div>`).join('')}</div><div class="fb info" role="status" style="margin-top:10px">${L.verdict(s,p,b)}</div><div class="mission${done?' done':''}"><b>${done?'✓ Mission geschafft: ':'Mission: '}</b>${esc(L.mission.t)}</div>`;
+}
+function renderLab(){
+  const L=curL(), p=curP(); let h='';
+  h+=`<div class="card"><div class="labpick" role="group" aria-label="Labor wählen">${LABORDER.map(id=>`<button type="button" data-act="pick" data-lab="${id}" aria-pressed="${S.lab===id}"><b>${LABS[id].n}</b><span>${esc(LABS[id].pick)}</span></button>`).join('')}</div></div>`;
+  h+=`<div class="card"><h2>${L.n}. ${esc(L.title)}</h2><div class="rule"><b>${esc(L.stmt)}</b></div><p class="note">Typisch: ${esc(L.ex)}</p>`;
+  if(L.modes) h+=`<div class="seg" role="group" aria-label="Versuch wählen">${L.modes.map(m=>`<button type="button" data-act="mode" data-m="${m[0]}" aria-pressed="${p.mode===m[0]}">${m[1]}</button>`).join('')}</div>`;
+  const pre=L.presetsBy?L.presetsBy[p.mode]:L.presets;
+  h+=`<h3>Ausgangslagen</h3><div class="chips" role="group" aria-label="Ausgangslagen">${pre.map((q,i)=>`<button type="button" class="chip" data-act="preset" data-i="${i}"><b>${esc(q.t)}</b><span>${esc(q.d)}</span></button>`).join('')}</div>`;
+  h+=`<h3>Einstellungen</h3><div id="sliders">${sliderHTML(L,p)}</div>`;
+  h+=`<div class="btnrow">${['init','path','chain','curve'].includes(S.lab)?`<button type="button" class="btn sm" data-act="ref">Aktuellen Lauf als Vergleich merken</button><button type="button" class="btn sm" data-act="unref" ${S.ref[S.lab]?'':'disabled'}>Vergleich löschen</button>`:''}<button type="button" class="btn sm" data-act="reset">Zurücksetzen</button><button type="button" class="btn sm" data-act="copy">Protokoll kopieren</button></div></div>`;
+  h+=`<div class="card"><h2>Ergebnis</h2><div id="live">${liveHTML()}</div></div>`;
+  h+=`<div class="card"><h2>Beobachte</h2><ul class="plain">${L.observe.map(o=>`<li>${esc(o)}</li>`).join('')}</ul><p class="note">Oben im Messfenster: ▶ startet die Zeitlupe, der Regler wählt ein Standbild. Im Diagramm kannst du antippen, um den Zeitpunkt zu wählen.</p></div>`;
+  $('#pane-lab').innerHTML=h;
+}
+function refreshLab(){ compute(); const e=$('#live'); if(e) e.innerHTML=liveHTML(); drawViewer(); }
+function protocol(){ const L=curL(), p=curP(), k=L.kpis(S.sim,p,S.base).map(x=>x[1]+': '+x[0]); return [`Protokoll Labor ${L.n}: ${L.title}`,'Einstellungen: '+JSON.stringify(p).replace(/[{}"]/g,'').replace(/,/g,', '),...k,'Hinweis: vereinfachtes Lernmodell.'].join('\n'); }
+function copyText(txt,btn,label){ const done=()=>{ if(btn){ const o=label||btn.textContent; btn.textContent='Kopiert'; setTimeout(()=>btn.textContent=o,1500); } }; if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done,()=>{}); else { const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){} ta.remove(); } }
+
+/* =============== Kraftmessplatte lesen =============== */
+const FPCURVES=[{n:1,p:{m:75,F0f:2.3,F1f:1.1,d:0.5,wait:400}},{n:2,p:{m:75,F0f:2.3,F1f:1.1,d:0.5,wait:0}},{n:3,p:{m:75,F0f:2.0,F1f:1.1,d:0.5,wait:0}}];
+const FPQ=[
+ {q:'Welche Kurve gehört zum Sprung ohne Eintauchen (Squat Jump, Start aus der Hocke)?',opts:['Kurve 1','Kurve 2','Kurve 3'],ok:2,why:'Bei Kurve 3 sinkt die Kraft vor dem Abdruck nicht unter das Körpergewicht: Es gibt keine Abwärtsbewegung, die Kraft steigt direkt aus der Ruhe an.'},
+ {q:'Bei welcher Kurve wartet die Person lange am tiefsten Punkt, bevor sie sich abdrückt?',opts:['Kurve 1','Kurve 2','Kurve 3'],ok:0,why:'Bei Kurve 1 liegt nach dem Eintauchen eine waagerechte Strecke bei der Gewichtskraft, erst danach steigt die Kraft an. Die Vorspannung ist verloren, die Sprunghöhe ist geringer als bei Kurve 2.'},
+ {q:'Kurve 2: Lies die Flugzeit ab (Kraft = 0) und berechne die Sprunghöhe mit h = g·t²/8. Wie hoch springt die Person?',opts:['etwa 35 cm','etwa 70 cm','etwa 140 cm'],ok:0,why:'Die Flugzeit beträgt etwa 0,53 s. Aufwärts und abwärts dauern je die Hälfte, deshalb h = g·(t/2)²/2 = g·t²/8 ≈ 35 cm. Mit g·t²/2 (etwa 140 cm) würde man so tun, als sei die ganze Zeit Fallzeit.'}
+];
+function fpHTML(){
+  let h=`<div class="card"><h2>Kraftmessplatte lesen</h2><p class="lead">Eine Kraftmessplatte misst die Kraft des Bodens auf den Körper (Bodenreaktionskraft). Drei Sprünge derselben Person wurden aufgezeichnet. Die rote gestrichelte Linie ist die Gewichtskraft.</p><div id="fpChart"></div>`;
+  FPQ.forEach((q,i)=>{ const st=S.fp[i]; h+=`<h3>${i+1}. ${esc(q.q)}</h3>${q.opts.map((o,j)=>`<button type="button" class="opt${st!=null?(j===q.ok?' right':j===st?' wrong':''):''}" data-act="fpq" data-i="${i}" data-j="${j}" ${st!=null?'disabled':''}>${esc(o)}</button>`).join('')}`; if(st!=null) h+=`<div class="fb ${st===q.ok?'ok':'no'}" role="status">${st===q.ok?'Richtig. ':'Nicht ganz. '}${esc(q.why)}</div>`; });
+  return h+`<div class="btnrow"><button type="button" class="btn sm" data-act="openlab" data-lab="init">Im Labor 1 nachstellen</button></div></div>`;
+}
+function fillFp(){ const el=$('#fpChart'); if(!el) return; const W=Math.max(280,Math.round(el.clientWidth||340)); const sims=FPCURVES.map(c=>simInit(c.p));
+  const panels=sims.map((s,i)=>({x:[0,2.8],y:[0,3000],xl:'Zeit in s',yl:'Kraft in N',series:[{x:s.t,y:s.F,c:C_F}],hl:[{y:s.mg,c:C_R,l:i===0?'Gewichtskraft':''}],leg:[{c:C_F,t:'Kurve '+FPCURVES[i].n}]}));
+  el.innerHTML=renderPanels(W,Math.min(540,Math.round(W*0.95)+70),panels).svg; }
+
+/* =============== Reiter: Diagnose =============== */
+function renderDiag(){
+  let h=`<div class="card"><h2>Diagnose: Welches Prinzip steckt dahinter?</h2><p class="lead">Lies die Situation und wähle das Prinzip, das sie am besten erklärt. Danach siehst du die Begründung und kannst den Versuch im Labor nachstellen.</p>${S.score.n?`<span class="badge info">Richtig: ${S.score.ok} von ${S.score.n}</span>`:''}</div>`;
+  h+=fpHTML();
+  DIAG.forEach((d,i)=>{ const st=S.diag[i]; h+=`<div class="card"><h3 style="margin-top:0">Situation ${i+1}</h3><p style="margin:2px 0 8px">${esc(d.t)}</p>${PRINC.map((q,j)=>`<button type="button" class="opt${st?(j===d.ok?' right':j===st.c?' wrong':''):''}" data-act="diag" data-i="${i}" data-j="${j}" ${st?'disabled':''}>${q.n}. ${esc(q.name.replace('Prinzip der ','').replace('Prinzip des ',''))}</button>`).join('')}`;
+    if(st) h+=`<div class="fb ${st.c===d.ok?'ok':'no'}" role="status">${st.c===d.ok?'Richtig. ':'Nicht ganz. Gemeint ist: '+esc(PRINC[d.ok].name)+'. '}${esc(d.why)}</div><div class="btnrow"><button type="button" class="btn sm" data-act="openlab" data-lab="${d.lab}">Im Labor ausprobieren</button></div>`; h+='</div>'; });
+  $('#pane-diag').innerHTML=h; fillFp();
+}
+
+/* =============== Reiter: Info und Aufgaben =============== */
+function renderInfo(){
+  let h=`<div class="card"><h2>Formeln</h2><div class="eqn">Kraftstoß: J = ∫F dt = m·Δv<br>Arbeit: W = F·s = ½·m·v²<br>Wurfweite: x = (v·cos α/g)·(v·sin α + √(v²·sin²α + 2·g·h₀))<br>Sprunghöhe aus der Flugzeit: h = g·t²/8<br>Haftreibung: F ≤ μ·N<br>Drehimpuls: L = I·ω (konstant ohne äußeres Drehmoment)</div><p class="note">Alle Labore rechnen eindimensional oder mit einer Drehachse, ohne Luftwiderstand, mit vereinfachten Kraftverläufen. Die Zahlen sollen Prinzipien zeigen, nicht einzelne Athletinnen und Athleten messen.</p></div>`;
+  h+=`<div class="card"><h2>So liest du eine Kraftmessplatte</h2><ul class="plain"><li><b>Gewichtslinie:</b> Im ruhigen Stand zeigt die Platte die Gewichtskraft m·g.</li><li><b>Unter der Gewichtslinie:</b> Der Körper wird nach unten beschleunigt (zum Beispiel beim Eintauchen).</li><li><b>Über der Gewichtslinie:</b> Der Körper wird nach oben beschleunigt (Abbremsen und Abdruck).</li><li><b>Null:</b> Der Körper ist in der Luft. Die Dauer ist die Flugzeit, daraus folgt h = g·t²/8.</li><li><b>Fläche:</b> Die Fläche zwischen Kurve und Gewichtslinie ist der Kraftstoß und gleich m·Δv. Oberhalb positiv, unterhalb negativ.</li><li><b>Landung:</b> Die Spitze liegt meist weit über dem Körpergewicht, weil der Körper in kurzer Zeit abgebremst wird.</li></ul><p class="note">Echte Platten messen oft drei Richtungen. Hier wird in Labor 1 und 6 die senkrechte und in Labor 5 die waagerechte Kraft gezeigt.</p></div>`;
+  h+=`<div class="card"><h2>Rechner: Sprunghöhe aus der Flugzeit</h2><label class="fl" for="fl">Flugzeit: <output id="flo">${de(S.flight,2)} s</output></label><input type="range" id="fl" data-fl="1" min="0.3" max="0.8" step="0.01" value="${S.flight}"><p id="flr" style="margin:6px 0"><b>${de(G*S.flight*S.flight/8*100,0)} cm</b> Sprunghöhe (Schwerpunkt, Absprung und Landung auf gleicher Höhe)</p></div>`;
+  h+=`<div class="card"><h2>Praxisideen mit Sicherheitshinweisen</h2><div class="warn">Sicherheit zuerst: Aufsichtspflicht, Geräteaufbau, Gruppengröße und Abbruchkriterien richten sich nach der Schule und den Sicherheitsbestimmungen. Das musst du für deine Halle und Gruppe selbst prüfen. Wer nicht mitmachen kann, übernimmt Messen, Filmen oder Auswerten.</div>${PRAXIS.map(q=>`<details class="task"><summary>${esc(q.t)}</summary><p><b>Auftrag:</b> ${esc(q.w)}</p><p><b>Sicherheit:</b> ${esc(q.s)}</p></details>`).join('')}</div>`;
+  h+=`<div class="card"><h2>Annahmen und Grenzen</h2><ul class="plain"><li>Die Modelle sind stark vereinfacht: Kraftverläufe sind einfache Kurven, Körper werden als Punkte oder wenige Glieder behandelt.</li><li>Die Anfangskraft wird vorgegeben. Wie groß sie wird, hängt von Dehnungsreflex und Sehnenelastizität ab, das wird nicht berechnet.</li><li>Teilimpulse sind vorgegebene Geschwindigkeitsbeiträge, die Wechselwirkung zwischen den Gliedern wird nicht simuliert.</li><li>Die Figuren dienen der Anschauung, die Bewegungen sind nicht anatomisch genau.</li><li>Keine Aussagen über einzelne Personen und keine Trainingsvorgaben.</li></ul></div>`;
+  h+=`<div class="card"><h2>Begriffe</h2><dl class="gl">${GLOS.map(([t,d])=>`<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl></div>`;
+  h+=`<div class="card"><h2>Aufgaben</h2><p class="note">Die Punktzahlen sind ein Vorschlag. Notengebung und Bewertungsmaßstab richten sich nach den Beschlüssen eurer Fachkonferenz.</p>`;
+  ITASKS.forEach((t,i)=>{ h+=`<details class="task"><summary><span class="badge">AFB ${t.afb}</span>${i+1}. ${esc(t.t)} <span class="badge">${t.p} P</span></summary><p><b>${t.op}:</b> ${esc(t.text)}</p><div class="btnrow"><button type="button" class="btn sm" data-act="itask" data-load="${t.load}">Passende Einstellung öffnen</button></div><details><summary style="cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:700">Erwartungshorizont</summary><div class="sol"><ul class="plain">${t.sol.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></details></details>`; });
+  h+='</div>';
+  h+=`<div class="card"><details class="mode"><summary>Hinweise für die Lehrkraft</summary><p><b>Einsatz:</b> Überblick und Matrix zum Einstieg, je Gruppe ein Labor mit Mission, Diagnoseaufgaben im Plenum, danach Praxisphase mit Video und Auswertung.</p><p><b>Typische Fehlvorstellungen:</b> „Mehr Kraft heißt immer mehr Endgeschwindigkeit, egal wie lange oder auf welchem Weg“; „Gegenkräfte heben sich auf“; „Der Drehimpuls wächst beim Anziehen der Arme“; „Alle Muskeln gleichzeitig anspannen ist am besten“.</p><p><b>Einordnung:</b> Die Prinzipienliste folgt der verbreiteten Fassung nach Hochmuth. Formulierungen, Reihenfolge und Zahl der Prinzipien weichen in Lehrwerken ab. Die Zuordnung zu Kompetenzbereichen und Themenfeldern im Kerncurriculum Sport und in den Vorgaben zum Abitur musst du auf nibis.de prüfen.</p><p><b>Bewertung:</b> Die Punktevorschläge sind unverbindlich. Notengebung bleibt deine Verantwortung und folgt den Fachkonferenzbeschlüssen.</p><p><b>Datenschutz:</b> Die App speichert nichts. Videos von Schülerinnen und Schülern nur mit Einverständnis und nach Schulvorgaben anfertigen und löschen.</p></details></div>`;
+  $('#pane-info').innerHTML=h;
+}
+
+/* =============== Steuerung =============== */
+function renderTab(){ ({over:renderOver,lab:renderLab,diag:renderDiag,info:renderInfo}[S.tab])(); }
+function showTab(t){
+  S.tab=t; $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t)); ['over','lab','diag','info'].forEach(k=>{ $('#pane-'+k).hidden=k!==t; });
+  const vis=t==='lab'; $('#viewer').hidden=!vis; if(!vis) stopPlay();
+  if(vis) compute(); renderTab(); if(vis) drawViewer(); window.scrollTo({top:0});
+}
+function openLab(id){ S.lab=id; S.tcur=0; stopPlay(); showTab('lab'); }
+function applyPreset(i){ const L=curL(), p=curP(); const q=(L.presetsBy?L.presetsBy[p.mode]:L.presets)[i]; if(q.set==='opt'){ p.t=chainOptimum(p); } else { Object.keys(q.set).forEach(k=>{ p[k]=Array.isArray(q.set[k])?q.set[k].slice():q.set[k]; }); } S.tcur=0; stopPlay(); compute(); renderLab(); drawViewer(); }
+document.addEventListener('input',e=>{
+  const t=e.target; if(t.id==='scrub'){ stopPlay(); setT(t.value/1000*S.T); return; }
+  if(t.id==='spd'){ S.speed=parseFloat(t.value); return; }
+  if(t.dataset.fl){ S.flight=parseFloat(t.value); $('#flo').textContent=de(S.flight,2)+' s'; $('#flr').innerHTML=`<b>${de(G*S.flight*S.flight/8*100,0)} cm</b> Sprunghöhe (Schwerpunkt, Absprung und Landung auf gleicher Höhe)`; return; }
+  const p=curP();
+  if(t.dataset.lp){ p[t.dataset.lp]=parseFloat(t.value); const q=(curL().slidersBy?curL().slidersBy[p.mode]:curL().sliders).find(x=>x.k===t.dataset.lp); const o=$('#lo_'+t.dataset.lp); if(o) o.textContent=de(p[t.dataset.lp],q.dec); refreshLab(); return; }
+  if(t.dataset.arr){ const i=+t.dataset.idx; p[t.dataset.arr][i]=parseFloat(t.value); const o=$((t.dataset.arr==='t'?'#lco_':'#lao_')+i); if(o) o.textContent=t.dataset.arr==='t'?de(p.t[i]*1000,0)+' ms':de(p.A[i],1)+' m/s'; refreshLab(); return; }
+});
+document.addEventListener('click',e=>{
+  const v=e.target.closest('[data-v]'); if(v){ const k=v.dataset.v;
+    if(k==='play'){ if(S.play) stopPlay(); else startPlay(); } else if(k==='rewind'){ stopPlay(); setT(0); }
+    else if(k==='view'){ S.vview=v.dataset.m; drawViewer(); } else if(k==='fold'){ const c=$('#viewer').classList.toggle('collapsed'); v.setAttribute('aria-pressed',c); v.textContent=c?'▼':'▲'; }
+    return; }
+  const tb=e.target.closest('.tab'); if(tb){ showTab(tb.dataset.tab); return; }
+  const a=e.target.closest('[data-act]'); if(!a) return; const act=a.dataset.act;
+  switch(act){
+    case 'openlab': openLab(a.dataset.lab); break;
+    case 'pick': S.lab=a.dataset.lab; S.tcur=0; stopPlay(); compute(); renderLab(); drawViewer(); break;
+    case 'mode': curP().mode=a.dataset.m; S.tcur=0; stopPlay(); compute(); renderLab(); drawViewer(); break;
+    case 'preset': applyPreset(+a.dataset.i); break;
+    case 'ref': S.ref[S.lab]={sim:S.sim,p:JSON.parse(JSON.stringify(curP()))}; renderLab(); drawViewer(); break;
+    case 'unref': delete S.ref[S.lab]; renderLab(); drawViewer(); break;
+    case 'reset': { const m=curP().mode; S.P[S.lab]=curL().def(); if(m) S.P[S.lab].mode=m; delete S.ref[S.lab]; S.tcur=0; stopPlay(); compute(); renderLab(); drawViewer(); break; }
+    case 'copy': copyText(protocol(),a); break;
+    case 'mx': S.mx=[+a.dataset.r,+a.dataset.c]; renderOver(); break;
+    case 'fpq': { const i=+a.dataset.i, j=+a.dataset.j; if(S.fp[i]!=null) break; S.fp[i]=j; S.score.n++; if(j===FPQ[i].ok) S.score.ok++; renderDiag(); break; }
+    case 'diag': { const i=+a.dataset.i, j=+a.dataset.j; if(S.diag[i]) break; S.diag[i]={c:j}; S.score.n++; if(j===DIAG[i].ok) S.score.ok++; renderDiag(); break; }
+    case 'itask': { const l=a.dataset.load; if(l==='over'||l==='lab'){ showTab(l==='lab'?'lab':'over'); } else openLab(l); break; }
+  }
+});
+/* Kraftverlauf bearbeiten (Labor 4) */
+let drag=-1;
+function setCtl(i,val){ const f=curP().f; f[i]=Math.max(0,Math.min(1,val)); const e=$('#cf_'+i); if(e) e.textContent=Math.round(f[i]*100)+' %'; refreshLab(); }
+function ctlAt(ev){ const ch=$('#vChart'), r=ch.getBoundingClientRect(), c=S.ctx[0]; if(!c) return -1; let best=-1,bd=900; $$('#vChart .ctl').forEach(el=>{ const cx=+el.getAttribute('cx')+r.left, cy=+el.getAttribute('cy')+r.top; const d=(cx-ev.clientX)**2+(cy-ev.clientY)**2; if(d<bd){ bd=d; best=+el.dataset.i; } }); return best; }
+function dragTo(ev){ if(drag<0) return; const ch=$('#vChart'), r=ch.getBoundingClientRect(), c=S.ctx[0]; const py=ev.clientY-r.top-c.T; const val=(c.ph-py)/c.ph*(c.y[1]-c.y[0])+c.y[0]; const cap=capF(drag*CURVE_T/(CURVE_N-1)); setCtl(drag,val/cap); }
+const chEl=document.getElementById('vChart');
+chEl.addEventListener('pointerdown',ev=>{ if(S.lab==='curve'){ const i=ctlAt(ev); if(i>=0){ drag=i; try{ chEl.setPointerCapture(ev.pointerId); }catch(e){} ev.preventDefault(); dragTo(ev); return; } }
+  pickT(ev); chEl.dataset.dn='1'; try{ chEl.setPointerCapture(ev.pointerId); }catch(e){} });
+chEl.addEventListener('pointermove',ev=>{ if(drag>=0) dragTo(ev); else if(chEl.dataset.dn==='1') pickT(ev); });
+['pointerup','pointercancel'].forEach(n=>chEl.addEventListener(n,()=>{ drag=-1; chEl.dataset.dn=''; }));
+function pickT(ev){ if(S.lab==='path') return; const r=chEl.getBoundingClientRect(), y=ev.clientY-r.top, n=S.ctx.length; if(!n) return; const pi=Math.min(n-1,Math.max(0,Math.floor(y/(r.height/n)))), c=S.ctx[pi]; if(!c||!c.cx) return; const x=(ev.clientX-r.left-c.L)/c.pw*(c.x[1]-c.x[0])+c.x[0]; const sl=(c.cx(1)-c.cx(0)); if(!sl) return; stopPlay(); setT((x-c.cx(0))/sl); }
+chEl.addEventListener('keydown',ev=>{ const el=ev.target.closest&&ev.target.closest('.ctl'); if(!el) return; const i=+el.dataset.i, f=curP().f; if(ev.key==='ArrowUp'||ev.key==='ArrowRight'){ setCtl(i,f[i]+0.05); } else if(ev.key==='ArrowDown'||ev.key==='ArrowLeft'){ setCtl(i,f[i]-0.05); } else return; ev.preventDefault(); const ne=$(`#vChart .ctl[data-i="${i}"]`); if(ne) ne.focus(); });
+let rsz=null; window.addEventListener('resize',()=>{ clearTimeout(rsz); rsz=setTimeout(()=>{ if(S.tab==='lab') drawViewer(); if(S.tab==='diag') fillFp(); },120); });
+$('[data-v="view"][data-m="scene"]').setAttribute('aria-pressed',S.vview==='scene'); $('[data-v="view"][data-m="both"]').setAttribute('aria-pressed',S.vview==='both');
+
+/* =============== Start =============== */
+(function init(){ showTab('over'); })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Akrobatik – Pyramiden und Choreografie</title>
+<style>
+:root{
+  --bg:#EDF1F6; --surface:#FFFFFF; --mat:#DCE4EF; --ink:#13213A; --muted:#56637B; --line:#D0D8E4;
+  --navy:#17366B; --yellow:#F2C230; --u:#1F4C93; --o:#F2C230; --h:#9AA3B2; --figline:#13213A;
+  --ok:#1E7A4C; --warn:#A6461B;
+  --head:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow","Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1424; --surface:#13213A; --mat:#1A2B47; --ink:#E8EEF7; --muted:#9AA8C0; --line:#26375A;
+    --navy:#0E2349; --u:#7FA6E8; --o:#F2C230; --h:#7C8698; --figline:#0B1424; --ok:#5CC48F; --warn:#F09A6E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1424; --surface:#13213A; --mat:#1A2B47; --ink:#E8EEF7; --muted:#9AA8C0; --line:#26375A;
+  --navy:#0E2349; --u:#7FA6E8; --o:#F2C230; --h:#7C8698; --figline:#0B1424; --ok:#5CC48F; --warn:#F09A6E;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+h1,h2,h3{font-family:var(--head);font-weight:700;line-height:1.05;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+header.top{background:var(--navy);color:#fff;padding:20px 16px 0}
+.hero{max-width:1100px;margin:0 auto;display:flex;align-items:flex-end;gap:16px;justify-content:space-between}
+.hero h1{font-size:clamp(2.6rem,9vw,4.4rem);letter-spacing:.01em}
+.hero p{margin:4px 0 16px;color:#C9D6EC;max-width:36ch}
+.hero svg{width:min(200px,38vw);height:auto;flex:none;margin-bottom:-2px}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);border-bottom:4px solid var(--yellow)}
+nav.tabs .in{max-width:1100px;margin:0 auto;display:flex;overflow-x:auto;padding:0 8px}
+nav.tabs button{background:none;border:0;color:#C9D6EC;font-family:var(--head);font-size:1.25rem;font-weight:600;padding:10px 14px;cursor:pointer;white-space:nowrap;border-radius:6px 6px 0 0}
+nav.tabs button[aria-selected="true"]{background:var(--yellow);color:#13213A}
+main{max-width:1100px;margin:0 auto;padding:18px 14px 60px}
+section[hidden]{display:none}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-bottom:16px}
+.filters .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.filters .lbl{color:var(--muted);font-size:.9rem;margin-right:2px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:.95rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.card .pic{background:var(--mat);padding:10px 8px 0;border-bottom:3px solid var(--line)}
+.card .pic svg{display:block;width:100%;height:150px}
+.card .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{font-size:1.55rem}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:.88rem;color:var(--muted)}
+.meta span{background:var(--bg);border-radius:4px;padding:1px 7px}
+.lvl{display:inline-flex;gap:3px;align-items:center}
+.lvl i{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block}
+.lvl i.on{background:var(--yellow);box-shadow:0 0 0 1px var(--figline) inset}
+details{border-top:1px solid var(--line);padding-top:6px}
+details summary{cursor:pointer;font-weight:600}
+dl{margin:6px 0 0}
+dt{font-weight:600;font-size:.92rem;margin-top:6px}
+dd{margin:0;color:var(--ink)}
+dd.safe{color:var(--warn)}
+.btn{border:0;border-radius:6px;padding:8px 14px;cursor:pointer;font-weight:600;background:var(--ink);color:var(--bg)}
+.btn.y{background:var(--yellow);color:#13213A}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{padding:4px 10px;font-size:.9rem}
+.card .btn{margin-top:auto;align-self:flex-start}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem;color:var(--muted);margin:-4px 0 14px}
+.legend b{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:4px;border:2px solid var(--figline)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:.88rem;color:var(--muted);flex:1 1 140px}
+label.f.narrow{flex:0 1 110px}
+input[type=text],input[type=number],select,textarea{background:var(--bg);border:1.5px solid var(--line);border-radius:6px;padding:7px 9px;color:var(--ink);width:100%}
+textarea{min-height:60px;resize:vertical}
+.checks{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.checks li{display:flex;gap:8px;align-items:flex-start}
+.checks .s{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;font-size:.8rem}
+.checks .s.ok{background:var(--ok)} .checks .s.no{background:var(--warn)}
+.sum{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--head);font-size:1.3rem;margin-top:10px}
+.sum b{color:var(--muted);font-family:var(--body);font-weight:500;font-size:.9rem;display:block}
+
+ol.steps{list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:st}
+ol.steps li{counter-increment:st;display:grid;grid-template-columns:34px 70px 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px}
+ol.steps li.t{border-left:5px solid var(--yellow)}
+ol.steps li.p{border-left:5px solid var(--u)}
+ol.steps li::before{content:counter(st);font-family:var(--head);font-size:1.5rem;text-align:center;color:var(--muted)}
+.thumb{background:var(--mat);border-radius:6px;height:52px;display:grid;place-items:center;font-family:var(--head);color:var(--muted)}
+.thumb svg{width:100%;height:52px}
+.stepmain{display:grid;gap:5px;min-width:0}
+.stepmain .nm{font-weight:600}
+.stepmain .sub{display:grid;grid-template-columns:90px 1fr;gap:6px}
+.stepmain .sub input{padding:4px 7px;font-size:.92rem}
+.acts{display:flex;flex-direction:column;gap:4px}
+.acts button{background:var(--bg);border:1px solid var(--line);border-radius:5px;width:32px;height:28px;cursor:pointer}
+.empty{color:var(--muted);padding:18px;text-align:center;border:2px dashed var(--line);border-radius:8px}
+@media (max-width:560px){
+  ol.steps li{grid-template-columns:26px 1fr auto}
+  ol.steps li .thumb{display:none}
+  .stepmain .sub{grid-template-columns:1fr}
+}
+
+table.rate{width:100%;border-collapse:collapse}
+table.rate td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.rate td.c{width:1%;white-space:nowrap}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 10px;cursor:pointer;min-width:38px;border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--yellow);color:#13213A;font-weight:700}
+.crit-del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:1.1rem}
+.tiny{font-size:.85rem;color:var(--muted)}
+.evals{display:grid;gap:8px;margin-top:10px}
+.evals .ev{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--bg);border-radius:6px;padding:8px 10px}
+
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.rule{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--u);border-radius:8px;padding:12px 14px}
+.rule h3{font-size:1.35rem;margin-bottom:6px}
+.rule ul{margin:0;padding-left:18px}
+.rule li{margin:3px 0}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+
+svg .o{fill:none;stroke:var(--figline);stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+svg .c{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+svg .hd{stroke:var(--figline);stroke-width:2.5}
+svg .floor{stroke:var(--muted);stroke-width:2;opacity:.5}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <div class="hero">
+    <div>
+      <h1>Akrobatik</h1>
+      <p>Pyramiden auswählen, zur Choreografie verbinden, kriteriengeleitet bewerten. Für Jahrgang 8, Turnen und Bewegungskünste.</p>
+    </div>
+    <div id="heroPic" aria-hidden="true"></div>
+  </div>
+</header>
+<nav class="tabs" aria-label="Bereiche"><div class="in" role="tablist">
+  <button role="tab" data-tab="bibliothek" aria-selected="true">Pyramiden</button>
+  <button role="tab" data-tab="planer" aria-selected="false">Choreo-Planer</button>
+  <button role="tab" data-tab="bewertung" aria-selected="false">Bewertung</button>
+  <button role="tab" data-tab="sicherheit" aria-selected="false">Sicherheit</button>
+</div></nav>
+
+<main>
+<section id="bibliothek">
+  <div class="filters">
+    <div class="grp"><span class="lbl">Personen</span><span id="fP"></span></div>
+    <div class="grp"><span class="lbl">Stufe</span><span id="fL"></span></div>
+  </div>
+  <div class="legend"><span><b style="background:var(--u)"></b>Untenperson</span><span><b style="background:var(--o)"></b>Obenperson</span><span><b style="background:var(--h)"></b>Helferin/Helfer</span><span>Blassere Figuren stehen dahinter.</span></div>
+  <div class="grid" id="lib"></div>
+</section>
+
+<section id="planer" hidden>
+  <div class="panel">
+    <div class="row">
+      <label class="f">Choreografie<select id="chSel"></select></label>
+      <button class="btn y" id="chNew">Neue Choreo</button>
+      <button class="btn ghost" id="chDel">Choreo löschen</button>
+    </div>
+  </div>
+  <div class="panel" id="chMeta">
+    <div class="row">
+      <label class="f">Gruppenname<input type="text" id="mName" placeholder="z. B. Gruppe 3"></label>
+      <label class="f narrow">Gruppengröße<input type="number" id="mSize" min="2" max="12"></label>
+      <label class="f narrow">Tempo (BPM)<input type="number" id="mBpm" min="60" max="200"></label>
+      <label class="f">Musik<input type="text" id="mMusic" placeholder="Titel / Interpret"></label>
+    </div>
+    <div class="sum" id="sum"></div>
+  </div>
+  <div class="panel">
+    <h2 style="font-size:1.5rem;margin-bottom:8px">Check für die Präsentation</h2>
+    <ul class="checks" id="checks"></ul>
+  </div>
+  <ol class="steps" id="steps"></ol>
+  <div class="panel" style="margin-top:14px">
+    <div class="row">
+      <label class="f">Pyramide<select id="addP"></select></label>
+      <button class="btn" id="addPBtn">Pyramide hinzufügen</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Übergang<select id="addT"></select></label>
+      <label class="f">Eigener Übergang (optional)<input type="text" id="addTOwn" placeholder="z. B. Laola-Welle"></label>
+      <button class="btn" id="addTBtn">Übergang hinzufügen</button>
+    </div>
+    <p class="tiny" style="margin:10px 0 0">Rollen bitte nur mit Kürzeln eintragen. Gespeichert wird nur auf diesem Gerät.</p>
+  </div>
+</section>
+
+<section id="bewertung" hidden>
+  <div class="panel">
+    <div class="row">
+      <label class="f">Bewertete Gruppe<input type="text" id="eGroup" placeholder="z. B. Gruppe 3"></label>
+      <label class="f">Bewertet von<input type="text" id="eBy" placeholder="z. B. Gruppe 1"></label>
+    </div>
+  </div>
+  <div class="panel">
+    <h2 style="font-size:1.5rem;margin-bottom:4px">Qualitätskriterien</h2>
+    <p class="tiny" style="margin:0 0 8px">0 = nicht erfüllt, 1 = teilweise, 2 = überwiegend, 3 = vollständig. Die Kriterien könnt ihr gemeinsam anpassen.</p>
+    <table class="rate"><tbody id="rateBody"></tbody></table>
+    <div class="row" style="margin-top:10px">
+      <label class="f">Neues Kriterium<input type="text" id="critNew" placeholder="z. B. Kreative Pyramidenform"></label>
+      <button class="btn ghost" id="critAdd">Kriterium hinzufügen</button>
+      <button class="btn ghost" id="critReset">Standardkriterien</button>
+    </div>
+    <label class="f" style="margin-top:10px">Das war besonders gut / Tipp<textarea id="eNote"></textarea></label>
+    <div class="sum" id="eSum"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn y" id="eSave">Bewertung speichern</button>
+      <button class="btn ghost" id="eClear">Bogen leeren</button>
+    </div>
+    <p class="tiny" style="margin:10px 0 0">Dieser Bogen ist für die Fremdbewertung durch Mitschülerinnen und Mitschüler. Die Notengebung erfolgt nach dem Arbeitsplan: 60 % Ausführung, 20 % Kenntnisse und Reflexion, 20 % Engagement.</p>
+  </div>
+  <div class="panel">
+    <h2 style="font-size:1.5rem">Gespeicherte Bewertungen</h2>
+    <div class="evals" id="evals"></div>
+  </div>
+</section>
+
+<section id="sicherheit" hidden>
+  <div class="rules" id="rules"></div>
+</section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- Figuren ---------- */
+const G={
+ bank:{l:[[[0,0],[20,0],[20,-45]],[[20,-45],[72,-48]],[[72,-48],[72,0]]],h:[84,-54]},
+ standW:{l:[[[25,0],[48,-45],[70,0]],[[48,-45],[48,-82]],[[30,-112],[48,-82],[66,-112]]],h:[48,-96]},
+ stand:{l:[[[40,0],[50,-45],[60,0]],[[50,-45],[50,-82]],[[50,-80],[75,-62]]],h:[50,-95]},
+ standT:{l:[[[40,0],[50,-45],[60,0]],[[50,-45],[50,-82]],[[20,-75],[50,-80],[80,-75]]],h:[50,-95]},
+ standA:{l:[[[40,0],[50,-45],[60,0]],[[50,-45],[50,-82]],[[34,-112],[50,-82],[66,-112]]],h:[50,-96]},
+ lunge:{l:[[[0,0],[35,-45]],[[35,-45],[75,-45],[75,0]],[[35,-45],[32,-85]],[[33,-80],[60,-60]]],h:[31,-97]},
+ lean:{l:[[[42,0],[30,-42],[16,-78]],[[17,-76],[55,-70]]],h:[12,-90]},
+ liege:{l:[[[0,-8],[55,-8],[60,-62]],[[18,-8],[22,-55]]],h:[-8,-10]},
+ flieger:{l:[[[0,0],[75,0]],[[62,0],[72,-26]]],h:[86,-2]},
+ stuetzL:{l:[[[0,0],[4,-36],[70,-47]]],h:[-8,-42]}
+};
+function figBounds(f,acc){const g=G[f.g],d=f.d||0,x=f.x+d*14,y=(f.y||0)-d*8;
+  const pts=g.l.flat().concat([[g.h[0]-9,g.h[1]-9],[g.h[0]+9,g.h[1]+9]]);
+  pts.forEach(([px,py])=>{const tx=f.f?x-px:x+px,ty=y+py;acc[0]=Math.min(acc[0],tx);acc[1]=Math.min(acc[1],ty);acc[2]=Math.max(acc[2],tx);acc[3]=Math.max(acc[3],ty);});}
+function figSVG(f){const g=G[f.g],d=f.d||0,x=f.x+d*14,y=(f.y||0)-d*8;
+  const tr=f.f?`translate(${x} ${y}) scale(-1 1)`:`translate(${x} ${y})`;
+  const col=`var(--${f.r})`;const p=g.l.map(s=>'M'+s.map(q=>q.join(' ')).join(' L')).join(' ');
+  return `<g transform="${tr}" opacity="${1-d*0.3}"><path d="${p}" class="o"/><path d="${p}" class="c" stroke="${col}"/><circle cx="${g.h[0]}" cy="${g.h[1]}" r="8" fill="${col}" class="hd"/></g>`;}
+function pyrSVG(figs,label){const b=[1e9,1e9,-1e9,-1e9];figs.forEach(f=>figBounds(f,b));
+  const pad=12,vx=b[0]-pad,vy=b[1]-pad,w=b[2]-b[0]+pad*2,h=Math.max(b[3],4)-b[1]+pad*2;
+  const sorted=[...figs].sort((a,c)=>(c.d||0)-(a.d||0));
+  return `<svg viewBox="${vx} ${vy} ${w} ${h}" role="img" aria-label="${label}"><line class="floor" x1="${vx}" y1="4" x2="${vx+w}" y2="4"/>${sorted.map(figSVG).join('')}</svg>`;}
+
+/* ---------- Pyramiden ---------- */
+const P=[
+{id:'bankstand',n:'Bankstand',p:2,h:1,lv:1,f:[{g:'bank',x:0,r:'u'},{g:'standW',x:0,y:-48,r:'o'},{g:'stand',x:178,r:'h',f:1}],
+ a:'U geht in die Bank: Hände unter den Schultern, Knie unter der Hüfte, Rücken gerade. O steigt von der Seite auf, ein Fuß aufs Becken, ein Fuß auf den Schulterbereich.',
+ ha:'O richtet sich langsam auf, Arme hoch, Körperspannung. 3 Sekunden halten.',
+ ab:'O steigt über das Becken nach hinten ab, ohne sich abzudrücken.',
+ s:'Nie auf die Mitte der Wirbelsäule treten. Helfer gibt beim Aufrichten die Hand.'},
+{id:'doppelbank',n:'Doppelbank',p:2,h:0,lv:1,f:[{g:'bank',x:0,r:'u'},{g:'bank',x:0,y:-48,r:'o'}],
+ a:'U geht in die Bank. O setzt die Knie auf das Becken und die Hände auf die Schultern von U.',
+ ha:'Beide Rücken gerade, Blick nach unten. Variation: O streckt ein Bein nach hinten.',
+ ab:'O nimmt erst die Hände, dann die Knie zurück.',
+ s:'Nur auf Becken und Schulterblätter stützen, nie auf die Wirbelsäule.'},
+{id:'liegestuetz',n:'Liegestütz auf der Bank',p:2,h:0,lv:1,f:[{g:'bank',x:60,r:'u'},{g:'stuetzL',x:10,r:'o'}],
+ a:'U geht in die Bank. O stützt die Hände auf den Boden und legt die Fußspitzen auf das Becken von U.',
+ ha:'O hält den Körper gestreckt wie ein Brett, kein Hohlkreuz.',
+ ab:'O setzt einen Fuß nach dem anderen auf den Boden zurück.',
+ s:'Füße auf das Becken, nicht auf den unteren Rücken.'},
+{id:'gegengewicht',n:'Gegengewicht',p:2,h:0,lv:1,f:[{g:'lean',x:0,r:'u'},{g:'lean',x:110,r:'o',f:1}],
+ a:'Beide stehen sich gegenüber, Fußspitzen fast berührend, und fassen sich am Handgelenk.',
+ ha:'Gleichzeitig gestreckt zurücklehnen, bis die Arme gestreckt sind. Variation: gemeinsam in die Hocke und wieder hoch.',
+ ab:'Auf Kommando gleichzeitig zurück in den Stand.',
+ s:'Handgelenkgriff hält sicherer als Händedruck. Loslassen nur auf Kommando.'},
+{id:'oberschenkel',n:'Oberschenkelstand',p:2,h:1,lv:2,f:[{g:'lunge',x:0,r:'u'},{g:'standA',x:2,y:-45,r:'o'},{g:'stand',x:170,r:'h',f:1}],
+ a:'U im Ausfallschritt, vorderes Knie über dem Fuß, Oberschenkel waagerecht. U fasst O an der Hüfte. O stellt einen Fuß hüftnah auf den Oberschenkel.',
+ ha:'O richtet sich mit Körperspannung auf, Arme hoch, das freie Bein angelegt oder als Standwaage.',
+ ab:'O steigt mit Helferhand nach vorn ab.',
+ s:'Fuß nie aufs Knie stellen. Helfer sichert am Oberarm.'},
+{id:'flieger',n:'Flieger',p:2,h:1,lv:2,f:[{g:'liege',x:20,r:'u'},{g:'flieger',x:45,y:-66,r:'o'},{g:'stand',x:218,r:'h',f:1}],
+ a:'U liegt in Rückenlage, Beine angewinkelt. U setzt die Fußsohlen an die Hüftknochen von O, beide fassen sich an den Händen.',
+ ha:'U streckt die Beine senkrecht, O liegt gestreckt mit Körperspannung. Fortgeschritten: Hände lösen, Arme seitlich.',
+ ab:'U beugt die Beine langsam, O setzt die Füße auf den Boden.',
+ s:'Nur auf Matten. Helfer seitlich an Schulter und Oberarm.'},
+{id:'faecher',n:'Fächer',p:3,h:0,lv:1,f:[{g:'lean',x:20,r:'u'},{g:'standT',x:55,r:'o'},{g:'lean',x:190,r:'u',f:1}],
+ a:'Die mittlere Person steht stabil in leichter Grätsche. Die beiden äußeren fassen je eine Hand im Handgelenkgriff.',
+ ha:'Beide Außenpersonen lehnen sich gleichzeitig gestreckt nach außen, die Mitte hält dagegen.',
+ ab:'Auf Kommando gemeinsam aufrichten.',
+ s:'Gleichzeitig lehnen, sonst wird die Mitte zur Seite gezogen.'},
+{id:'bank21',n:'Bankpyramide 2–1',p:3,h:1,lv:2,f:[{g:'bank',x:0,r:'u',d:1},{g:'bank',x:0,r:'u'},{g:'bank',x:7,y:-52,r:'o'},{g:'stand',x:190,r:'h',f:1}],
+ a:'U1 und U2 gehen nebeneinander in die Bank, mit einer Handbreit Abstand. O setzt je ein Knie auf ein Becken und je eine Hand auf eine Schulter von U1 und U2.',
+ ha:'Alle Rücken gerade, Blick nach unten, 3 Sekunden halten.',
+ ab:'O steigt zuerst ab, dann lösen sich U1 und U2.',
+ s:'Abstand der Untenleute halten, sonst rutscht O in die Lücke.'},
+{id:'stand21',n:'Stand auf zwei Bänken',p:3,h:2,lv:2,f:[{g:'stand',x:-75,r:'h'},{g:'bank',x:0,r:'u',d:1},{g:'bank',x:0,r:'u'},{g:'standW',x:7,y:-52,r:'o'},{g:'stand',x:192,r:'h',f:1}],
+ a:'U1 und U2 in der Bank nebeneinander. O steigt mit Helferhand auf und stellt je einen Fuß auf ein Becken.',
+ ha:'O richtet sich auf, Arme hoch.',
+ ab:'Mit Helferhand nach hinten absteigen.',
+ s:'Zwei Helfer, einer je Seite. Nur auf Matten.'},
+{id:'thron',n:'Thron',p:3,h:1,lv:2,f:[{g:'lunge',x:0,r:'u',d:1},{g:'lunge',x:0,r:'u'},{g:'standA',x:9,y:-49,r:'o'},{g:'stand',x:188,r:'h',f:1}],
+ a:'U1 und U2 im Ausfallschritt nebeneinander, Oberschenkel waagerecht. O stellt je einen Fuß hüftnah auf einen Oberschenkel.',
+ ha:'U1 und U2 halten O an den Unterschenkeln. O steht aufrecht, Arme hoch.',
+ ab:'O springt mit Helferhand nach vorn ab.',
+ s:'Füße nie auf die Knie stellen.'},
+{id:'doppelstand',n:'Doppelter Bankstand',p:4,h:2,lv:2,f:[{g:'bank',x:0,r:'u'},{g:'standW',x:0,y:-48,r:'o'},{g:'bank',x:220,r:'u',f:1},{g:'standW',x:220,y:-48,r:'o',f:1}],
+ a:'Zwei Bänke mit dem Kopf zueinander. Auf jeder steigt eine Obenperson wie beim Bankstand auf.',
+ ha:'Beide Obenleute richten sich gleichzeitig auf, Arme hoch oder Handfassung in der Mitte.',
+ ab:'Gleichzeitig über das Becken absteigen.',
+ s:'Je ein Helfer, bis der Bankstand sicher sitzt.'},
+{id:'stuetzfaecher',n:'Liegestütz-Fächer',p:3,h:0,lv:2,f:[{g:'stuetzL',x:10,r:'o'},{g:'bank',x:60,r:'u'},{g:'stuetzL',x:202,r:'o',f:1}],
+ a:'U in der Bank. O1 legt die Füße aufs Becken, O2 auf die Schulterblätter von U, beide im Liegestütz.',
+ ha:'Beide Obenleute strecken sich gleichzeitig, U hält mit Körperspannung.',
+ ab:'Erst O2, dann O1 setzt die Füße zurück.',
+ s:'Füße nur auf Becken und Schulterblätter, nicht auf die Wirbelsäule.'},
+{id:'p321',n:'Pyramide 3–2–1',p:6,h:2,lv:3,f:[{g:'stand',x:-75,r:'h'},{g:'bank',x:0,r:'u',d:2},{g:'bank',x:0,r:'u',d:1},{g:'bank',x:0,r:'u'},{g:'bank',x:7,y:-48,r:'u',d:1},{g:'bank',x:7,y:-48,r:'u'},{g:'bank',x:14,y:-96,r:'o'},{g:'stand',x:218,r:'h',f:1}],
+ a:'Unten drei in der Bank nebeneinander. Zwei knien je zwischen zwei Untenleuten (Knie auf die Becken, Hände auf die Schultern). Die Spitze steigt mit Helferhand auf.',
+ ha:'Alle Rücken gerade, 3 Sekunden ruhig halten. Eine Person gibt die Kommandos.',
+ ab:'Strikt von oben nach unten: erst die Spitze, dann die Mitte. Nicht zusammensacken lassen.',
+ s:'Nur auf Matten, zwei Helfer an der Spitze. Die leichtesten Personen nach oben.'}
+];
+const T=['Einlauf / Auftritt','Standbild zu Beginn','Rolle vorwärts','Rolle rückwärts','Positionswechsel (Laufweg)','Drehung','Strecksprung','Rad / Radwende','Synchrone Armbewegung','Welle (nacheinander)','Gehen im Takt','Schlussbild mit Präsentationsgeste'];
+const CRIT_DEF=['Körperspannung in den Pyramiden','Stabilität: jede Pyramide 3 Sekunden ruhig gehalten','Sicherer Auf- und Abbau (Reihenfolge, Griffpunkte)','Fließende Übergänge ohne Leerlauf','Synchronität und Timing zur Musik','Vielfalt und Schwierigkeit der Pyramiden','Präsentation: Ausdruck, Anfangs- und Schlussbild'];
+const byId=Object.fromEntries(P.map(x=>[x.id,x]));
+
+/* ---------- Speicher ---------- */
+const KEY='akrobatik.v1';
+let S;
+function load(){try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
+  if(!S||!Array.isArray(S.choreos))S={choreos:[],cur:null,crit:CRIT_DEF.slice(),evals:[],draft:{}};
+  if(!S.crit||!S.crit.length)S.crit=CRIT_DEF.slice(); if(!S.evals)S.evals=[]; if(!S.draft)S.draft={};
+  if(!S.choreos.length)newChoreo(true);
+  if(!S.choreos.find(c=>c.id===S.cur))S.cur=S.choreos[0].id;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function uid(){return Math.random().toString(36).slice(2,9)}
+function cur(){return S.choreos.find(c=>c.id===S.cur)}
+function newChoreo(silent){const c={id:uid(),name:'Neue Gruppe',size:4,bpm:120,music:'',steps:[]};S.choreos.push(c);S.cur=c.id;if(!silent){save();}}
+const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1800)}
+
+/* ---------- Bibliothek ---------- */
+const flt={p:'alle',l:'alle'};
+function chips(){
+  const pv=['alle','2','3','4+'],lv=['alle','1','2','3'];
+  document.getElementById('fP').innerHTML=pv.map(v=>`<button class="chip" data-k="p" data-v="${v}" aria-pressed="${flt.p===v}">${v==='alle'?'Alle':v}</button>`).join(' ');
+  document.getElementById('fL').innerHTML=lv.map(v=>`<button class="chip" data-k="l" data-v="${v}" aria-pressed="${flt.l===v}">${v==='alle'?'Alle':v}</button>`).join(' ');
+}
+function lvl(n){return `<span class="lvl" title="Stufe ${n} von 3">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span>`}
+function renderLib(){
+  chips();
+  const list=P.filter(x=>(flt.p==='alle'||(flt.p==='4+'?x.p>=4:x.p==+flt.p))&&(flt.l==='alle'||x.lv==+flt.l));
+  document.getElementById('lib').innerHTML=list.length?list.map(x=>`<article class="card">
+    <div class="pic">${pyrSVG(x.f,x.n)}</div>
+    <div class="body"><h3>${esc(x.n)}</h3>
+    <div class="meta"><span>${x.p} Personen</span><span>${x.h?x.h+' Helfer':'ohne Helfer'}</span><span>Stufe ${lvl(x.lv)}</span></div>
+    <details><summary>Aufbau, Halten, Abbau</summary><dl>
+      <dt>Aufbau</dt><dd>${esc(x.a)}</dd><dt>Halten</dt><dd>${esc(x.ha)}</dd><dt>Abbau</dt><dd>${esc(x.ab)}</dd><dt>Sicherheit</dt><dd class="safe">${esc(x.s)}</dd></dl></details>
+    <button class="btn y sm" data-add="${x.id}">Zur Choreo hinzufügen</button></div></article>`).join(''):'<div class="empty">Keine Pyramide passt zu diesem Filter.</div>';
+}
+document.getElementById('bibliothek').addEventListener('click',e=>{
+  const c=e.target.closest('.chip');if(c){flt[c.dataset.k]=c.dataset.v;renderLib();return}
+  const a=e.target.closest('[data-add]');if(a){addStep({t:'p',id:a.dataset.add,c:8,r:''});toast(`„${byId[a.dataset.add].n}“ zu „${cur().name}“ hinzugefügt`)}
+});
+
+/* ---------- Planer ---------- */
+function addStep(s){cur().steps.push(s);save();renderPlan()}
+function renderPlan(){
+  const c=cur();
+  document.getElementById('chSel').innerHTML=S.choreos.map(x=>`<option value="${x.id}" ${x.id===S.cur?'selected':''}>${esc(x.name||'Ohne Namen')}</option>`).join('');
+  const set=(id,v)=>{const el=document.getElementById(id);if(document.activeElement!==el)el.value=v};
+  set('mName',c.name);set('mSize',c.size);set('mBpm',c.bpm);set('mMusic',c.music);
+  document.getElementById('addP').innerHTML=P.map(x=>`<option value="${x.id}">${esc(x.n)} (${x.p}${x.h?' + '+x.h+' H':''})</option>`).join('');
+  document.getElementById('addT').innerHTML=T.map(t=>`<option>${esc(t)}</option>`).join('');
+  const st=document.getElementById('steps');
+  st.innerHTML=c.steps.length?c.steps.map((s,i)=>{
+    const isP=s.t==='p',py=isP?byId[s.id]:null;
+    return `<li class="${s.t}"><div class="thumb">${isP?pyrSVG(py.f,py.n):'Übergang'}</div>
+      <div class="stepmain"><div class="nm">${isP?esc(py.n)+` <span class="tiny">${py.p} P.${py.h?' + '+py.h+' H':''}</span>`:esc(s.n)}</div>
+      <div class="sub"><input type="number" min="1" max="64" value="${s.c}" data-i="${i}" data-f="c" aria-label="Zählzeiten"><input type="text" value="${esc(s.r)}" data-i="${i}" data-f="r" placeholder="${isP?'Rollen, z. B. U: AB, CD  O: EF':'Notiz, z. B. auf Zählzeit 5 los'}"></div></div>
+      <div class="acts"><button data-mv="${i}" data-d="-1" aria-label="nach oben">▲</button><button data-mv="${i}" data-d="1" aria-label="nach unten">▼</button><button data-rm="${i}" aria-label="entfernen">✕</button></div></li>`}).join(''):'<li class="empty" style="display:block">Noch leer. Füge unten Pyramiden und Übergänge hinzu oder wähle sie in der Bibliothek.</li>';
+  renderChecks();
+}
+function renderChecks(){
+  const c=cur(),ps=c.steps.filter(s=>s.t==='p'),uniq=new Set(ps.map(s=>s.id));
+  const tooBig=ps.map(s=>byId[s.id]).filter(p=>p.p+p.h>c.size);
+  const tooBigOnly=ps.map(s=>byId[s.id]).filter(p=>p.p>c.size);
+  let gap=false;for(let i=1;i<c.steps.length;i++){if(c.steps[i].t==='p'&&c.steps[i-1].t==='p')gap=true}
+  const first=c.steps[0],last=c.steps[c.steps.length-1];
+  const items=[
+    [uniq.size>=4,`Mindestens 4 verschiedene Pyramiden (aktuell ${uniq.size})`],
+    [ps.length>0&&!gap,'Zwischen zwei Pyramiden steht immer ein Übergang'],
+    [tooBigOnly.length===0,tooBigOnly.length?`Zu wenige Personen für: ${[...new Set(tooBigOnly.map(p=>p.n))].join(', ')}`:'Gruppe ist groß genug für alle Pyramiden'],
+    [tooBig.length===0,tooBig.length?`Helfer aus einer anderen Gruppe nötig für: ${[...new Set(tooBig.map(p=>p.n))].join(', ')}`:'Helfer kommen aus der eigenen Gruppe'],
+    [!!first&&first.t==='t'&&!!last&&last.t==='t','Anfang und Schluss sind gestaltet (Auftritt, Schlussbild)']
+  ];
+  document.getElementById('checks').innerHTML=items.map(([ok,t])=>`<li><span class="s ${ok?'ok':'no'}">${ok?'✓':'!'}</span><span>${esc(t)}</span></li>`).join('');
+  const counts=c.steps.reduce((a,s)=>a+(+s.c||0),0),sec=Math.round(counts*60/(+c.bpm||120));
+  document.getElementById('sum').innerHTML=`<div><b>Pyramiden</b>${ps.length}</div><div><b>Übergänge</b>${c.steps.length-ps.length}</div><div><b>Zählzeiten</b>${counts}</div><div><b>Dauer ca.</b>${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')} min</div>`;
+}
+document.getElementById('steps').addEventListener('input',e=>{const i=e.target.dataset.i;if(i==null)return;const s=cur().steps[+i];
+  if(e.target.dataset.f==='c')s.c=Math.max(0,+e.target.value||0);else s.r=e.target.value;save();renderChecks()});
+document.getElementById('steps').addEventListener('click',e=>{const st=cur().steps;
+  const m=e.target.closest('[data-mv]');if(m){const i=+m.dataset.mv,j=i+ +m.dataset.d;if(j<0||j>=st.length)return;[st[i],st[j]]=[st[j],st[i]];save();renderPlan();return}
+  const r=e.target.closest('[data-rm]');if(r){st.splice(+r.dataset.rm,1);save();renderPlan()}});
+['mName','mSize','mBpm','mMusic'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{const c=cur(),v=e.target.value;
+  if(id==='mName')c.name=v;if(id==='mSize')c.size=Math.max(1,+v||1);if(id==='mBpm')c.bpm=+v||120;if(id==='mMusic')c.music=v;save();
+  if(id==='mName')document.querySelector(`#chSel option[value="${c.id}"]`).textContent=v||'Ohne Namen';renderChecks()}));
+document.getElementById('chSel').addEventListener('change',e=>{S.cur=e.target.value;save();renderPlan()});
+document.getElementById('chNew').addEventListener('click',()=>{newChoreo();renderPlan();document.getElementById('mName').focus();document.getElementById('mName').select()});
+document.getElementById('chDel').addEventListener('click',()=>{const c=cur();if(!confirm(`„${c.name}“ wirklich löschen?`))return;
+  S.choreos=S.choreos.filter(x=>x.id!==c.id);if(!S.choreos.length)newChoreo(true);S.cur=S.choreos[0].id;save();renderPlan()});
+document.getElementById('addPBtn').addEventListener('click',()=>addStep({t:'p',id:document.getElementById('addP').value,c:8,r:''}));
+document.getElementById('addTBtn').addEventListener('click',()=>{const own=document.getElementById('addTOwn');const n=own.value.trim()||document.getElementById('addT').value;own.value='';addStep({t:'t',n,c:8,r:''})});
+
+/* ---------- Bewertung ---------- */
+function renderRate(){
+  const d=S.draft;d.r=d.r||{};
+  document.getElementById('rateBody').innerHTML=S.crit.map((k,i)=>`<tr><td>${esc(k)}</td><td class="c"><span class="seg">${[0,1,2,3].map(v=>`<button data-k="${esc(k)}" data-v="${v}" aria-pressed="${d.r[k]===v}" aria-label="${esc(k)}: ${v}">${v}</button>`).join('')}</span></td><td class="c"><button class="crit-del" data-del="${i}" aria-label="Kriterium entfernen">✕</button></td></tr>`).join('');
+  const set=(id,v)=>{const el=document.getElementById(id);if(document.activeElement!==el)el.value=v||''};
+  set('eGroup',d.g);set('eBy',d.b);set('eNote',d.n);
+  const pts=S.crit.reduce((a,k)=>a+(d.r[k]??0),0),max=S.crit.length*3,done=S.crit.filter(k=>d.r[k]!=null).length;
+  document.getElementById('eSum').innerHTML=`<div><b>Punkte</b>${pts} / ${max}</div><div><b>Bewertet</b>${done} von ${S.crit.length}</div>`;
+  document.getElementById('evals').innerHTML=S.evals.length?S.evals.slice().reverse().map(e=>`<div class="ev"><div><strong>${esc(e.g||'Ohne Gruppe')}</strong> <span class="tiny">von ${esc(e.b||'–')}, ${esc(e.d)}</span>${e.n?`<div class="tiny">${esc(e.n)}</div>`:''}</div><div style="display:flex;gap:8px;align-items:center"><strong>${e.p}/${e.m}</strong><button class="crit-del" data-ev="${e.id}" aria-label="Bewertung löschen">✕</button></div></div>`).join(''):'<div class="tiny">Noch keine Bewertung gespeichert.</div>';
+}
+document.getElementById('bewertung').addEventListener('click',e=>{
+  const b=e.target.closest('.seg button');if(b){const k=b.dataset.k,v=+b.dataset.v;S.draft.r=S.draft.r||{};S.draft.r[k]=S.draft.r[k]===v?undefined:v;save();renderRate();return}
+  const del=e.target.closest('[data-del]');if(del){S.crit.splice(+del.dataset.del,1);save();renderRate();return}
+  const ev=e.target.closest('[data-ev]');if(ev){S.evals=S.evals.filter(x=>x.id!==ev.dataset.ev);save();renderRate()}});
+['eGroup','eBy','eNote'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{S.draft[{eGroup:'g',eBy:'b',eNote:'n'}[id]]=e.target.value;save()}));
+document.getElementById('critAdd').addEventListener('click',()=>{const el=document.getElementById('critNew'),v=el.value.trim();if(!v||S.crit.includes(v))return;S.crit.push(v);el.value='';save();renderRate()});
+document.getElementById('critReset').addEventListener('click',()=>{S.crit=CRIT_DEF.slice();save();renderRate()});
+document.getElementById('eClear').addEventListener('click',()=>{S.draft={};save();renderRate()});
+document.getElementById('eSave').addEventListener('click',()=>{const d=S.draft,r=d.r||{};
+  if(!S.crit.every(k=>r[k]!=null)){toast('Bitte erst alle Kriterien bewerten');return}
+  const p=S.crit.reduce((a,k)=>a+r[k],0);
+  S.evals.push({id:uid(),g:d.g||'',b:d.b||'',n:d.n||'',p,m:S.crit.length*3,d:new Date().toLocaleDateString('de-DE')});
+  S.draft={};save();renderRate();toast('Bewertung gespeichert')});
+
+/* ---------- Sicherheit ---------- */
+const RULES=[
+ ['Vor dem Start',['Schmuck und Uhren ab, lange Haare zusammen.','Barfuß oder in Gymnastikschuhen, keine Socken auf glatten Matten.','Unter allen Pyramiden mit Obenperson liegen Matten.','Erst aufwärmen: Rumpf, Handgelenke, Körperspannung.']],
+ ['Die Bank',['Hände senkrecht unter den Schultern, Knie unter der Hüfte.','Rücken gerade wie ein Tisch, Bauch fest, Blick nach unten.','Belastbar sind nur Becken und Schulterblätter, nie die Mitte der Wirbelsäule.']],
+ ['Auf- und Abbau',['Aufbau von unten nach oben, Abbau von oben nach unten.','Eine Person gibt laut die Kommandos, z. B. „Auf“, „Halt“, „Ab“.','Aufsteigen ruhig und von der Seite, nie springen.','Absteigen kontrolliert, nicht von oben abspringen.','Wer wackelt oder Schmerzen hat, sagt sofort „Stopp“, dann wird abgebaut.']],
+ ['Helfen und Sichern',['Helfer stehen nah an der Obenperson, nicht an der Bank.','Gegriffen wird am Oberarm oder an der Hüfte, nicht an der Hand allein.','Ab Stufe 2 ist mindestens ein Helfer Pflicht, bei 3–2–1 zwei.','Helfer bleiben, bis die Obenperson wieder am Boden ist.']],
+ ['Rollenverteilung',['Kräftige, stabile Personen nach unten, leichte nach oben.','Rollen dürfen getauscht werden, aber nie unter Zwang.','Keine Pyramide höher als zwei Ebenen über Kopfhöhe der Untenleute.']]
+];
+document.getElementById('rules').innerHTML=RULES.map(([h,l])=>`<div class="rule"><h3>${h}</h3><ul>${l.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('');
+
+/* ---------- Tabs ---------- */
+const TABS=['bibliothek','planer','bewertung','sicherheit'];
+function show(t){if(!TABS.includes(t))t='bibliothek';
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  TABS.forEach(x=>document.getElementById(x).hidden=x!==t);
+  if(t==='planer')renderPlan();if(t==='bewertung')renderRate();}
+document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(!b)return;show(b.dataset.tab);try{history.replaceState(null,'','#'+b.dataset.tab)}catch(_){}window.scrollTo({top:0})});
+
+/* ---------- Start ---------- */
+load();
+document.getElementById('heroPic').innerHTML=pyrSVG(byId.p321.f.filter(f=>f.r!=='h'),'Pyramide 3–2–1');
+renderLib();
+show((location.hash||'').slice(1));
+</script>
+</body>
+</html>

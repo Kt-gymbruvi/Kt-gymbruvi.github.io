@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gendrift und Hardy-Weinberg</title>
+<meta name="description" content="Gendrift simulieren, Hardy-Weinberg-Gleichgewicht berechnen, Flaschenhals und Gründereffekt untersuchen. Biologie Oberstufe, Evolution.">
+<style>
+:root{
+  --bg:#EAF0EA; --panel:#FFFFFF; --panel-2:#F2F6F1; --ink:#16251D; --ink-soft:#4F6258; --line:#C8D5CB;
+  --paper:#FBFDFB; --grid-minor:#E3ECE4; --grid-major:#BFD0C3; --axis:#26372E;
+  --A:#2F6FDB; --H:#7A57D1; --a:#E07B22; --poly:#6F7F76; --mean:#16251D; --det:#B3261E;
+  --stage:#0F2219; --stage-2:#18362B; --stage-ink:#E7F2EB; --stage-soft:#9CB7A6; --dotA:#5E9CFF; --dota:#FF9B4F;
+  --btn:#16251D; --btn-ink:#FFFFFF; --focus:#0B57D0; --accent:#F2B84B;
+  --good:#17693B; --good-bg:#DCF1E4; --bad:#A3241B; --bad-bg:#FBE0DC; --note:#6B4A00; --note-bg:#FFF2CF;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1511; --panel:#15221B; --panel-2:#1B2C23; --ink:#E7F2EB; --ink-soft:#A3BAAB; --line:#2B4235;
+    --paper:#0F1B15; --grid-minor:#18271F; --grid-major:#2B4538; --axis:#CFE3D6;
+    --A:#6FA3FF; --H:#A58BFF; --a:#FF9B4F; --poly:#9DB0A5; --mean:#E7F2EB; --det:#FF8A80;
+    --stage:#08120D; --stage-2:#123023; --btn:#E7F2EB; --btn-ink:#0C1511; --focus:#8AB4FF;
+    --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1511; --panel:#15221B; --panel-2:#1B2C23; --ink:#E7F2EB; --ink-soft:#A3BAAB; --line:#2B4235;
+  --paper:#0F1B15; --grid-minor:#18271F; --grid-major:#2B4538; --axis:#CFE3D6;
+  --A:#6FA3FF; --H:#A58BFF; --a:#FF9B4F; --poly:#9DB0A5; --mean:#E7F2EB; --det:#FF8A80;
+  --stage:#08120D; --stage-2:#123023; --btn:#E7F2EB; --btn-ink:#0C1511; --focus:#8AB4FF;
+  --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; font-variant-numeric:tabular-nums; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1280px; margin:0 auto; padding:16px clamp(12px,3vw,28px) 6px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.6rem,4.8vw,2.4rem); line-height:1.1; margin:0; letter-spacing:-.015em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:70ch; }
+.tabs{ max-width:1280px; margin:6px auto 0; padding:0 clamp(12px,3vw,28px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em .95em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.wrap{ max-width:1280px; margin:0 auto; padding:12px clamp(12px,3vw,28px) 24px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.2rem; margin:0 0 8px; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.02rem; margin:12px 0 4px; }
+.lead{ margin:0 0 10px; max-width:72ch; }
+.note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.45em .95em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn[aria-pressed="true"]{ background:var(--btn); color:var(--btn-ink); border-color:var(--btn); }
+.seg{ display:flex; border:2px solid var(--line); border-radius:10px; overflow:hidden; margin:6px 0; }
+.seg button{ flex:1; border:0; background:var(--panel); padding:.35em .5em; font-weight:700; font-size:.92rem; cursor:pointer; min-height:46px; }
+.seg button+button{ border-left:2px solid var(--line); }
+.seg button[aria-pressed="true"]{ background:var(--btn); color:var(--btn-ink); }
+.txtin, input[type=number]{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+label.fl{ display:block; font-weight:700; font-size:.92rem; color:var(--ink-soft); margin:8px 0 3px; }
+
+/* Raster für Simulations-Reiter */
+.pgrid{ display:grid; grid-template-columns:minmax(0,1fr); gap:14px; align-items:start; }
+.pgrid .left{ display:contents; }
+.viz{ order:1; position:sticky; top:env(safe-area-inset-top,0px); z-index:30; padding:8px 10px; margin-bottom:0; }
+.ctlcard{ order:2; margin-bottom:0; } .more{ order:3; margin-bottom:0; }
+@media (min-width:1000px){
+  .pgrid{ grid-template-columns:minmax(0,1fr) 420px; }
+  .pgrid .left{ display:flex; flex-direction:column; gap:14px; }
+  .viz,.ctlcard,.more{ order:0; } .viz{ top:calc(env(safe-area-inset-top,0px) + 8px); padding:12px 14px; }
+}
+.chart-head{ display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+.ctabs{ display:flex; gap:4px; flex:1; align-items:center; min-width:0; }
+.ctab{ flex:1; min-width:0; border:2px solid var(--line); background:var(--panel); border-radius:10px; padding:.2em .1em; font-weight:700; font-size:.72rem; line-height:1.15; cursor:pointer; min-height:44px; color:var(--ink-soft); }
+.ctab[aria-selected="true"]{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+@media (min-width:700px){ .ctab{ flex:none; padding:.3em .8em; font-size:.9rem; } .ctabs{ flex:none; } .chart-head{ justify-content:space-between; } }
+.plot{ border-radius:10px; overflow:hidden; background:var(--paper); border:1px solid var(--line); }
+.plot svg{ display:block; width:100%; height:auto; }
+.legend{ display:flex; flex-wrap:wrap; gap:2px 12px; margin:6px 0 0; padding:0; list-style:none; font-size:.76rem; line-height:1.3; color:var(--ink-soft); }
+.legend li{ display:flex; align-items:center; gap:6px; }
+.legend i{ display:inline-block; width:20px; height:0; border-top:3px solid; }
+.legend i.dash{ border-top-style:dashed; }
+@media (min-width:700px){ .legend{ font-size:.82rem; } }
+.strip{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px; }
+.stat{ background:var(--panel-2); border-radius:10px; padding:3px 8px; display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
+.stat span{ font-size:.74rem; color:var(--ink-soft); line-height:1.2; }
+.stat b{ font-family:var(--display); font-size:1.02rem; white-space:nowrap; }
+@media (min-width:700px){ .stat{ display:block; padding:6px 10px; } .stat span{ display:block; font-size:.78rem; } .stat b{ font-size:1.15rem; } }
+.mini-btn{ border:0; background:none; font-weight:700; cursor:pointer; min-height:44px; min-width:44px; padding:0 6px; }
+.viz.collapsed .plot,.viz.collapsed .legend{ display:none; }
+.viz.collapsed .mini-btn span{ display:inline-block; transform:rotate(180deg); }
+/* SVG */
+.gm{ stroke:var(--grid-minor); stroke-width:.7; } .gM{ stroke:var(--grid-major); stroke-width:1.1; }
+.tk{ font-size:15px; fill:var(--ink-soft); } .al{ font-size:16px; fill:var(--ink); font-weight:700; }
+.tl{ fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.5; opacity:.8; }
+.t-fix{ stroke:var(--A); } .t-lost{ stroke:var(--a); } .t-poly{ stroke:var(--poly); opacity:.7; }
+.t-mean{ fill:none; stroke:var(--mean); stroke-width:3.6; stroke-linecap:round; stroke-linejoin:round; }
+.t-det{ fill:none; stroke:var(--det); stroke-width:2.6; stroke-dasharray:8 6; }
+.t-ref{ fill:none; stroke:var(--ink-soft); stroke-width:2; stroke-dasharray:3 5; }
+.lbl{ font-size:15px; font-weight:700; fill:var(--ink); paint-order:stroke; stroke:var(--paper); stroke-width:4px; }
+.shade{ fill:var(--a); opacity:.14; }
+
+/* Regler */
+.ctl{ padding:8px 0 10px; border-top:1px solid var(--line); }
+.ctlcard > .ctl:first-of-type, .card > .ctl:first-child{ border-top:0; }
+.ctl-head{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.ctl-head label{ font-weight:700; display:flex; gap:8px; align-items:center; }
+.dotc{ width:12px; height:12px; border-radius:50%; background:var(--c,var(--ink-soft)); flex:none; }
+.ctl output{ font-family:var(--display); font-weight:800; font-size:1.05rem; white-space:nowrap; }
+.ctl input[type=range]{ width:100%; height:44px; margin:2px 0; accent-color:var(--c,var(--btn)); background:transparent; }
+.ctl-desc{ margin:0; font-size:.86rem; color:var(--ink-soft); }
+.sw{ display:flex; gap:10px; align-items:flex-start; padding:10px 0 4px; border-top:1px solid var(--line); cursor:pointer; min-height:44px; }
+.sw input{ width:24px; height:24px; flex:none; margin-top:2px; accent-color:var(--btn); }
+.sw b{ display:block; } .sw span{ font-size:.86rem; color:var(--ink-soft); display:block; }
+.sub{ padding-left:34px; }
+.seedrow{ display:flex; gap:8px; align-items:center; }
+
+/* Genpool */
+.stage{ background:radial-gradient(120% 100% at 50% 40%,var(--stage-2) 0%,var(--stage) 75%); color:var(--stage-ink); border-radius:16px; padding:10px; }
+.stage svg{ display:block; width:100%; height:auto; }
+.pop-in{ animation:pop .45s ease both; transform-box:fill-box; transform-origin:center; }
+@keyframes pop{ from{ transform:scale(.5); opacity:0; } to{ transform:scale(1); opacity:1; } }
+.counts{ display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
+.cnt{ border-radius:10px; padding:4px 12px; font-weight:700; background:var(--panel-2); }
+.cnt i{ display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:6px; vertical-align:-1px; }
+.status{ background:var(--panel-2); border-left:6px solid var(--accent); border-radius:10px; padding:8px 12px; margin:8px 0; }
+
+/* Hardy-Weinberg */
+.hwgrid{ display:grid; gap:14px; grid-template-columns:minmax(0,1fr); }
+@media (min-width:900px){ .hwgrid.two{ grid-template-columns:1fr 1fr; align-items:start; } }
+.hwgrid .card{ margin-bottom:0; }
+table.t{ width:100%; border-collapse:collapse; font-size:.95rem; margin:8px 0; }
+table.t th, table.t td{ text-align:right; padding:6px 8px; border-bottom:1px solid var(--line); }
+table.t th:first-child, table.t td:first-child{ text-align:left; }
+table.t th{ font-size:.82rem; color:var(--ink-soft); }
+.sw-dot{ display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+.calc{ background:var(--panel-2); border-radius:12px; padding:8px 14px; margin:8px 0; font-size:.98rem; }
+.calc p{ margin:4px 0; }
+.eq{ font-family:var(--display); font-weight:700; }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--good-bg); color:var(--good); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--note-bg); color:var(--note); }
+ol.cond{ margin:6px 0 0; padding-left:1.3em; } ol.cond li{ margin:4px 0; }
+.cnts{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+.cnts label{ font-weight:700; font-size:.85rem; color:var(--ink-soft); display:block; }
+
+/* Aufgaben */
+details.task{ border-top:1px solid var(--line); padding:8px 0; }
+details.task summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:10px; }
+details.task .badge{ flex:none; font-size:.8rem; font-weight:700; border-radius:99px; padding:2px 10px; background:var(--panel-2); border:1px solid var(--line); }
+details.task p{ margin:6px 0; max-width:75ch; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+details.task ul{ margin:4px 0 0; padding-left:1.2em; }
+details.teacher{ max-width:1280px; margin:0 auto 40px; padding:0 clamp(12px,3vw,28px); }
+details.teacher > .inner{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:6px 16px 14px; }
+details.teacher summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; }
+details.teacher li, details.teacher p{ font-size:.95rem; max-width:80ch; }
+details.teacher h3{ font-family:var(--display); font-size:1.02rem; margin:12px 0 4px; }
+@media (prefers-reduced-motion:reduce){ .pop-in{ animation:none; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Gendrift und Hardy-Weinberg</h1>
+  <p>Biologie Oberstufe, Evolution. Zufall im Genpool beobachten, das Hardy-Weinberg-Gleichgewicht berechnen und die Folgen von Flaschenhals und Gründereffekt untersuchen.</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab" role="tab" data-tab="pool" aria-selected="true">Genpool</button>
+  <button type="button" class="tab" role="tab" data-tab="sim" aria-selected="false">Simulation</button>
+  <button type="button" class="tab" role="tab" data-tab="scen" aria-selected="false">Szenarien</button>
+  <button type="button" class="tab" role="tab" data-tab="hw" aria-selected="false">Hardy-Weinberg</button>
+  <button type="button" class="tab" role="tab" data-tab="myst" aria-selected="false">Rätsel</button>
+  <button type="button" class="tab" role="tab" data-tab="task" aria-selected="false">Aufgaben</button>
+</nav>
+
+<main class="wrap">
+<!-- 1 Genpool -->
+<section id="pane-pool">
+  <div class="card">
+    <h2>Genpool: Zufall in kleinen Populationen</h2>
+    <p class="lead">Jede Kapsel ist ein Individuum mit zwei Allelen (blau = A, orange = a). Für die nächste Generation werden 2N Allele zufällig aus dem Genpool gezogen, mit Zurücklegen. Wiederhole den Vorgang und beobachte, was mit den Häufigkeiten passiert.</p>
+    <div class="stage"><svg id="poolSvg" viewBox="0 0 640 260" role="img" aria-label="Individuen der aktuellen Generation"></svg></div>
+    <div class="btnrow">
+      <button type="button" class="btn primary" id="poolStep">Nächste Generation</button>
+      <button type="button" class="btn" id="poolAuto" aria-pressed="false">Automatisch</button>
+      <button type="button" class="btn" id="poolReset">Neu starten</button>
+    </div>
+    <div class="counts" id="poolCounts"></div>
+    <div class="status" id="poolStatus" aria-live="polite"></div>
+    <div id="poolCtl"></div>
+    <h3>Verlauf der Häufigkeit von A</h3>
+    <div class="plot" id="poolHist"></div>
+    <p class="note">Wiederhole den Versuch mehrmals mit demselben N. Jeder Verlauf sieht anders aus, denn es entscheidet allein der Zufall.</p>
+  </div>
+</section>
+
+<!-- 2 Simulation -->
+<section id="pane-sim" hidden>
+  <div class="pgrid">
+    <div class="left">
+      <div class="card viz" id="vizSim">
+        <div class="chart-head"><div class="ctabs" role="tablist" aria-label="Diagrammart" data-for="sim"></div><button type="button" class="mini-btn" data-collapse="vizSim" aria-label="Diagramm einklappen"><span aria-hidden="true">▲</span></button></div>
+        <div class="plot" id="plotSim"></div>
+        <ul class="legend" id="legSim"></ul>
+        <div class="strip" id="stripSim"></div>
+      </div>
+      <div class="card more" id="moreSim"></div>
+    </div>
+    <div class="card ctlcard" id="ctlSim"></div>
+  </div>
+</section>
+
+<!-- 3 Szenarien -->
+<section id="pane-scen" hidden>
+  <div class="pgrid">
+    <div class="left">
+      <div class="card viz" id="vizScen">
+        <div class="chart-head"><div class="ctabs" role="tablist" aria-label="Diagrammart" data-for="scen"></div><button type="button" class="mini-btn" data-collapse="vizScen" aria-label="Diagramm einklappen"><span aria-hidden="true">▲</span></button></div>
+        <div class="plot" id="plotScen"></div>
+        <ul class="legend" id="legScen"></ul>
+        <div class="strip" id="stripScen"></div>
+      </div>
+      <div class="card more" id="moreScen"></div>
+    </div>
+    <div class="card ctlcard" id="ctlScen"></div>
+  </div>
+</section>
+
+<!-- 4 Hardy-Weinberg -->
+<section id="pane-hw" hidden>
+  <div class="card">
+    <h2>Das Hardy-Weinberg-Gleichgewicht</h2>
+    <p class="lead">In einer idealen Population bleiben die Allelhäufigkeiten von Generation zu Generation gleich. Die Genotypen treten dann mit den Häufigkeiten p², 2pq und q² auf (p + q = 1). Das gilt nur, wenn fünf Bedingungen erfüllt sind:</p>
+    <ol class="cond">
+      <li><b>Sehr große Population</b> (keine Gendrift)</li>
+      <li><b>Zufallspaarung</b> (keine Partnerwahl, keine Inzucht)</li>
+      <li><b>Keine Selektion</b> (alle Genotypen gleich fortpflanzungserfolgreich)</li>
+      <li><b>Keine Mutation</b></li>
+      <li><b>Keine Migration</b> (kein Genfluss)</li>
+    </ol>
+    <p class="note">Das Modell dient als Nullmodell: Weicht eine reale Population davon ab, wirkt mindestens eine evolutionäre Kraft. Im Reiter Simulation kannst du die Bedingungen einzeln verletzen.</p>
+  </div>
+  <div class="hwgrid two">
+    <div class="card" id="hwA"></div>
+    <div class="card" id="hwB"></div>
+  </div>
+  <div class="card" id="hwC" style="margin-top:14px"></div>
+</section>
+
+<!-- 5 Rätsel -->
+<section id="pane-myst" hidden>
+  <div class="pgrid">
+    <div class="left">
+      <div class="card viz" id="vizMyst">
+        <div class="chart-head"><div class="ctabs"><span class="note" style="margin:0">12 Populationen, 80 Generationen</span></div><button type="button" class="mini-btn" data-collapse="vizMyst" aria-label="Diagramm einklappen"><span aria-hidden="true">▲</span></button></div>
+        <div class="plot" id="plotMyst"></div>
+        <ul class="legend" id="legMyst"></ul>
+      </div>
+    </div>
+    <div class="card ctlcard" id="ctlMyst"></div>
+  </div>
+</section>
+
+<!-- 6 Aufgaben -->
+<section id="pane-task" hidden>
+  <div class="card">
+    <h2>Aufgaben</h2>
+    <p class="note" style="margin-top:0">„Versuch einrichten“ stellt die Simulation passend ein. Die Lösungshinweise sind aufklappbar.</p>
+    <div id="taskList"></div>
+  </div>
+</section>
+</main>
+
+<details class="teacher">
+  <summary>Hinweise für die Lehrkraft</summary>
+  <div class="inner">
+    <h3>Modellannahmen und Vereinfachungen</h3>
+    <ul>
+      <li>Wright-Fisher-Modell: diploide Population mit N Individuen (2N Allele), getrennte Generationen, zufällige Paarung. Die Nachkommengeneration entsteht durch Ziehen von 2N Allelen mit Zurücklegen (Binomialverteilung). Bei großen Populationen wird die Normalnäherung verwendet.</li>
+      <li>Ein Genort mit zwei Allelen A und a. p ist die Häufigkeit von A, q = 1 − p die von a.</li>
+      <li>Selektion wirkt gegen a: Fitness AA = 1, Aa = 1 − h·s, aa = 1 − s. h = 0 bedeutet rezessiv, h = 0,5 intermediär, h = 1 dominant wirkendes schädliches Allel.</li>
+      <li>Mutation erfolgt symmetrisch (A→a und a→A mit derselben Rate). Migration kommt aus einer großen Quellpopulation mit fester Allelhäufigkeit. Die Reihenfolge je Generation: Selektion, Mutation, Migration, Drift.</li>
+      <li>Heterozygotie H = 2pq. Die erwartete Abnahme bei reiner Drift beträgt H<sub>t</sub> = H<sub>0</sub>·(1 − 1/2N)<sup>t</sup>. Die mittlere Zeit bis zum Verlust oder zur Fixierung beträgt etwa −4N·(p·ln p + q·ln q) Generationen (Näherung).</li>
+      <li>Der χ²-Test mit einem Freiheitsgrad (kritischer Wert 3,84 bei α = 0,05) ist eine Erweiterung über den üblichen Schulstoff hinaus. Bei erwarteten Häufigkeiten unter 5 ist er ungenau.</li>
+      <li>Der Startwert des Zufalls (Seed) macht Läufe reproduzierbar. Mit „Neu würfeln“ erhalten Lernende neue Ergebnisse.</li>
+      <li>Die Beispiele zu Mukoviszidose und MN-Blutgruppen sind Lehrbuchwerte, vereinfacht und gerundet. Bitte bei Bedarf gegen eure Schulbuchdaten prüfen.</li>
+    </ul>
+    <h3>Einsatz und Anforderungsbereiche</h3>
+    <ul>
+      <li>Die Aufgaben sind mit Anforderungsbereichen (I bis III) und Operatoren gekennzeichnet. Die Lösungshinweise können als Erwartungshorizont dienen. Punktezuteilung und Notengebung liegen in deiner Verantwortung und folgen den Fachkonferenzbeschlüssen.</li>
+      <li>Vorschlag für 90 Minuten: Genpool und Simulation (25 Minuten), Hardy-Weinberg-Rechner (25 Minuten), Szenarien (20 Minuten), Rätsel und Sicherung (20 Minuten).</li>
+      <li>Differenzierung: Unterstützung mit Genpool und Aufgaben 1 bis 3. Erweiterung mit Selektion, Szenarien, χ²-Test und Rätsel.</li>
+    </ul>
+    <h3>Typische Fehlvorstellungen</h3>
+    <ul>
+      <li>„Dominante Allele werden mit der Zeit häufiger.“ Ohne weitere Kräfte bleiben die Häufigkeiten konstant.</li>
+      <li>„Rezessive Allele sterben aus.“ Sie bleiben in Heterozygoten erhalten.</li>
+      <li>„Gendrift führt zu besser angepassten Populationen.“ Drift ist ungerichtet und kann Anpassung sogar verhindern.</li>
+      <li>„Das Hardy-Weinberg-Gleichgewicht beschreibt reale, stabile Populationen.“ Es ist ein Vergleichsmodell.</li>
+      <li>„Gendrift gibt es nur in kleinen Populationen.“ Sie wirkt immer, bei großen Populationen aber sehr langsam.</li>
+    </ul>
+    <h3>Hinweise</h3>
+    <p>Die Zuordnung zum Kerncurriculum Niedersachsen und zu den Zentralabitur-Vorgaben bitte auf nibis.de prüfen. Die Seite speichert keine Daten.</p>
+  </div>
+</details>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const fmt=(x,d=2)=>Number(x).toFixed(d).replace('.',',');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- Zufall und Modell ---------- */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ let u=0; while(u===0) u=r(); const v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function binom(n,p,r){
+  if(p<=0) return 0; if(p>=1) return n;
+  const v=n*p*(1-p);
+  if(v>=15) return clamp(Math.round(n*p+Math.sqrt(v)*gauss(r)),0,n);
+  let k=0; for(let i=0;i<n;i++) if(r()<p) k++; return k;
+}
+function detStep(p,f){
+  if(f.selOn){ const q=1-p, w2=1-f.h*f.s, w3=1-f.s, wb=p*p+2*p*q*w2+q*q*w3; p=(p*p+p*q*w2)/wb; }
+  if(f.mutOn) p=p*(1-f.mu)+(1-p)*f.mu;
+  if(f.migOn) p=(1-f.m)*p+f.m*f.pm;
+  return p;
+}
+function simulate(c){
+  const r=mulberry32(c.seed), traj=[];
+  for(let i=0;i<c.R;i++){
+    let p=c.p0f?c.p0f(r):c.p0; const row=[p];
+    for(let t=0;t<c.G;t++){ p=detStep(p,c.f); if(c.drift){ const n=2*c.Nof(t); p=binom(n,p,r)/n; } row.push(p); }
+    traj.push(row);
+  }
+  let pd=c.p0d!==undefined?c.p0d:c.p0; const det=[pd]; for(let t=0;t<c.G;t++){ pd=detStep(pd,c.f); det.push(pd); }
+  const meanP=[], meanH=[];
+  for(let t=0;t<=c.G;t++){ let sp=0, sh=0; traj.forEach(row=>{ sp+=row[t]; sh+=2*row[t]*(1-row[t]); }); meanP.push(sp/c.R); meanH.push(sh/c.R); }
+  return {traj,det,meanP,meanH};
+}
+function summary(res,G){
+  let fixA=0,fixa=0,poly=0,ts=[]; const R=res.traj.length;
+  res.traj.forEach(row=>{ const f=row[G]; if(f>=1) fixA++; else if(f<=0) fixa++; else poly++; const t=row.findIndex(v=>v<=0||v>=1); if(t>0) ts.push(t); });
+  return {R,fixA,fixa,poly,meanP:res.meanP[G],meanH:res.meanH[G],tMean:ts.length?ts.reduce((a,b)=>a+b,0)/ts.length:null,nT:ts.length};
+}
+
+/* ---------- Zustand ---------- */
+const NLIST=[4,6,8,10,15,20,30,50,100,200,500,1000];
+const S={tab:'pool',
+ pool:{N:10,p0:0.5,gen:0,al:[],hist:[],auto:false,timer:0},
+ sim:{Ni:2,p0:.5,G:100,R:20,seed:7,drift:true,selOn:false,s:.1,h:.5,mutOn:false,mu:.01,migOn:false,m:.05,pm:.2,view:'p',res:null},
+ scen:{type:'bottle',pb:.8,Nv:200,Nb:4,t1:20,dur:4,Nn:200,ps:.9,nf:3,Nnew:100,view:'p',res:null,cfg:null},
+ hw:{p:.5,F:0,X:2500,c0:1787,c1:3039,c2:1303},
+ myst:{type:null,res:null,cfg:null,seed:1,tip:0,done:false,mean:false}};
+const get=k=>k.split('.').reduce((o,x)=>o[x],S);
+const set=(k,v)=>{ const a=k.split('.'), last=a.pop(); a.reduce((o,x)=>o[x],S)[last]=v; };
+
+/* ---------- Eingabe-Elemente ---------- */
+const SPEC={
+ 'pool.N':{l:'Individuen N',min:2,max:40,step:1,f:v=>v,c:'--A',d:'Anzahl der Individuen, also 2N Allele.'},
+ 'pool.p0':{l:'Start: Häufigkeit von A',min:.1,max:.9,step:.05,f:v=>fmt(v,2),c:'--A'},
+ 'sim.Ni':{l:'Populationsgröße N (Individuen)',min:0,max:11,step:1,f:v=>NLIST[v],c:'--A',d:'Je kleiner N, desto stärker wirkt der Zufall.'},
+ 'sim.p0':{l:'Start: Häufigkeit von A (p)',min:.05,max:.95,step:.05,f:v=>fmt(v,2),c:'--A'},
+ 'sim.G':{l:'Generationen',min:20,max:300,step:10,f:v=>v,c:'--poly'},
+ 'sim.R':{l:'Anzahl unabhängiger Populationen',min:1,max:50,step:1,f:v=>v,c:'--poly'},
+ 'sim.s':{l:'Selektionskoeffizient s',min:0,max:.5,step:.01,f:v=>fmt(v,2),c:'--a',d:'Fitness-Nachteil von aa. Bei s = 0,1 pflanzen sich aa 10 % weniger fort.'},
+ 'sim.h':{l:'Dominanzgrad h',min:0,max:1,step:.1,f:v=>fmt(v,1),c:'--a',d:'0: a rezessiv, 0,5: intermediär, 1: a dominant schädlich.'},
+ 'sim.mu':{l:'Mutationsrate',min:0,max:.05,step:.005,f:v=>fmt(v,3),c:'--H',d:'Anteil der Allele, die pro Generation in das andere Allel mutieren (in beide Richtungen gleich).'},
+ 'sim.m':{l:'Migrantenanteil m',min:0,max:.3,step:.01,f:v=>fmt(v,2),c:'--H',d:'Anteil der Individuen, die pro Generation aus der Quellpopulation einwandern.'},
+ 'sim.pm':{l:'Häufigkeit von A in der Quellpopulation',min:0,max:1,step:.05,f:v=>fmt(v,2),c:'--H'},
+ 'scen.pb':{l:'Häufigkeit von A vor dem Ereignis',min:.5,max:.99,step:.01,f:v=>fmt(v,2),c:'--A',d:'Bei 0,80 ist Allel a mit 20 % noch recht häufig.'},
+ 'scen.Nv':{l:'Populationsgröße vorher',min:20,max:500,step:10,f:v=>v,c:'--poly'},
+ 'scen.Nb':{l:'Populationsgröße im Flaschenhals',min:2,max:50,step:1,f:v=>v,c:'--a'},
+ 'scen.t1':{l:'Beginn des Flaschenhalses (Generation)',min:5,max:50,step:1,f:v=>v,c:'--a'},
+ 'scen.dur':{l:'Dauer des Flaschenhalses (Generationen)',min:1,max:10,step:1,f:v=>v,c:'--a'},
+ 'scen.Nn':{l:'Populationsgröße danach',min:20,max:500,step:10,f:v=>v,c:'--poly'},
+ 'scen.ps':{l:'Häufigkeit von A in der Ursprungspopulation',min:.5,max:.99,step:.01,f:v=>fmt(v,2),c:'--A',d:'Bei 0,90 ist Allel a mit 10 % selten.'},
+ 'scen.nf':{l:'Gründer (Individuen)',min:1,max:20,step:1,f:v=>v,c:'--a',d:'Jedes Individuum bringt 2 Allele mit.'},
+ 'scen.Nnew':{l:'Größe der neuen Population (ab Generation 1)',min:20,max:500,step:10,f:v=>v,c:'--poly'},
+ 'hw.p':{l:'Häufigkeit von A (p)',min:0,max:1,step:.01,f:v=>fmt(v,2),c:'--A'},
+ 'hw.F':{l:'Inzuchtkoeffizient F',min:0,max:1,step:.05,f:v=>fmt(v,2),c:'--H',d:'F = 0: Zufallspaarung. F = 1: nur Paarung unter Gleichen.'}
+};
+function slHTML(k){ const s=SPEC[k]; return `<div class="ctl" style="--c:var(${s.c})"><div class="ctl-head"><label for="i_${k}"><span class="dotc"></span>${s.l}</label><output id="o_${k}"></output></div><input type="range" data-k="${k}" id="i_${k}" min="${s.min}" max="${s.max}" step="${s.step}">${s.d?`<p class="ctl-desc">${s.d}</p>`:''}</div>`; }
+function swHTML(k,title,desc){ return `<label class="sw"><input type="checkbox" data-k="${k}"><div><b>${title}</b><span>${desc}</span></div></label>`; }
+function syncInputs(root){
+  $$('input[data-k]',root).forEach(el=>{
+    const k=el.dataset.k, v=get(k);
+    if(el.type==='checkbox') el.checked=!!v; else el.value=v;
+    const o=$('#o_'+k); if(o&&SPEC[k]) o.textContent=SPEC[k].f(+v);
+  });
+  $$('[data-show]',root).forEach(el=>{ el.hidden=!get(el.dataset.show); });
+}
+
+/* ---------- Diagramm-Bausteine ---------- */
+const CW=600,CH=330,ML=64,MR=16,MT=16,MB=54,PW=CW-ML-MR,PHT=CH-MT-MB;
+const niceCeil=v=>{ const e=Math.pow(10,Math.floor(Math.log10(v))), m=v/e; return (m<=1?1:m<=1.2?1.2:m<=1.5?1.5:m<=2?2:m<=2.5?2.5:m<=3?3:m<=4?4:m<=5?5:m<=6?6:m<=8?8:10)*e; };
+const tickStep=max=>{ const raw=max/5, e=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/e; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*e; };
+const decOf=s=>(Math.abs(s-Math.round(s))<1e-9?0:(Math.abs(s*10-Math.round(s*10))<1e-9?1:2));
+function axes(o){
+  const X=v=>ML+(v-o.x0)/(o.x1-o.x0)*PW, Y=v=>MT+PHT-(v-o.y0)/(o.y1-o.y0)*PHT;
+  let g=`<rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}" fill="var(--paper)"/>`;
+  const dy=decOf(o.ys), dx=decOf(o.xs);
+  if(o.xt!==false){
+    for(let k=Math.ceil(o.x0/(o.xs/5)-1e-9); k*(o.xs/5)<=o.x1+1e-9; k++){ const v=k*o.xs/5; g+=`<line class="gm" x1="${X(v).toFixed(1)}" x2="${X(v).toFixed(1)}" y1="${MT}" y2="${MT+PHT}"/>`; }
+    for(let k=Math.ceil(o.x0/o.xs-1e-9); k*o.xs<=o.x1+1e-9; k++){ const v=k*o.xs; g+=`<line class="gM" x1="${X(v).toFixed(1)}" x2="${X(v).toFixed(1)}" y1="${MT}" y2="${MT+PHT}"/><text class="tk" x="${X(v).toFixed(1)}" y="${MT+PHT+19}" text-anchor="middle">${fmt(v,dx)}</text>`; }
+  }
+  for(let k=Math.ceil(o.y0/(o.ys/5)-1e-9); k*(o.ys/5)<=o.y1+1e-9; k++){ const v=k*o.ys/5; g+=`<line class="gm" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" x1="${ML}" x2="${ML+PW}"/>`; }
+  for(let k=Math.ceil(o.y0/o.ys-1e-9); k*o.ys<=o.y1+1e-9; k++){ const v=k*o.ys; g+=`<line class="gM" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" x1="${ML}" x2="${ML+PW}"/><text class="tk" x="${ML-8}" y="${(Y(v)+5).toFixed(1)}" text-anchor="end">${fmt(v,dy)}</text>`; }
+  g+=`<rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}" fill="none" stroke="var(--axis)" stroke-width="1.6"/>`;
+  g+=`<text class="al" x="${ML+PW/2}" y="${CH-10}" text-anchor="middle">${o.xl}</text><text class="al" transform="translate(17 ${MT+PHT/2}) rotate(-90)" text-anchor="middle">${o.yl}</text>`;
+  return {X,Y,g};
+}
+const svgO=label=>`<svg viewBox="0 0 ${CW} ${CH}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(label)}"><defs><clipPath id="cpx"><rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}"/></clipPath></defs>`;
+function linePath(ax,arr,step){ let d=''; for(let t=0;t<arr.length;t+=step){ d+=(t?'L':'M')+ax.X(t).toFixed(1)+' '+ax.Y(arr[t]).toFixed(1)+' '; } const last=arr.length-1; if(last%step) d+='L'+ax.X(last).toFixed(1)+' '+ax.Y(arr[last]).toFixed(1); return d; }
+function drawTraj(el,res,o){
+  const G=o.G, tr=res.traj, step=Math.max(1,Math.ceil(G/220));
+  const xs=G<=30?5:G<=60?10:G<=120?20:G<=250?50:100;
+  let s='';
+  const shade=ax=>o.shade?`<rect class="shade" x="${ax.X(o.shade.t0).toFixed(1)}" y="${MT}" width="${(ax.X(o.shade.t1)-ax.X(o.shade.t0)).toFixed(1)}" height="${PHT}"/>`:'';
+  if(o.view==='p'){
+    const ax=axes({x0:0,x1:G,y0:0,y1:1,xs,ys:.2,xl:'Generation',yl:'Häufigkeit von A (p)'});
+    s=svgO('Verlauf der Allelhäufigkeit in mehreren Populationen')+ax.g+shade(ax);
+    if(o.shade) s+=`<text class="lbl" x="${(ax.X(o.shade.t0)+5).toFixed(1)}" y="${MT+18}">${o.shade.label}</text>`;
+    s+='<g clip-path="url(#cpx)">';
+    const cl=row=>{ const f=row[G]; return f>=1?'t-fix':(f<=0?'t-lost':'t-poly'); };
+    ['t-poly','t-lost','t-fix'].forEach(c=>{ tr.forEach(row=>{ if(cl(row)===c) s+=`<path class="tl ${c}" d="${linePath(ax,row,step)}"/>`; }); });
+    if(o.ref!==undefined) s+=`<line class="t-ref" x1="${ML}" x2="${ML+PW}" y1="${ax.Y(o.ref).toFixed(1)}" y2="${ax.Y(o.ref).toFixed(1)}"/>`;
+    if(o.showDet) s+=`<path class="t-det" d="${linePath(ax,res.det,step)}"/>`;
+    if(o.showMean) s+=`<path class="t-mean" d="${linePath(ax,res.meanP,step)}"/>`;
+    s+='</g></svg>';
+  } else if(o.view==='H'){
+    const ax=axes({x0:0,x1:G,y0:0,y1:.5,xs,ys:.1,xl:'Generation',yl:'Heterozygotie H = 2pq'});
+    s=svgO('Verlauf der Heterozygotie')+ax.g+shade(ax)+'<g clip-path="url(#cpx)">';
+    tr.forEach(row=>{ const h=row.map(p=>2*p*(1-p)); s+=`<path class="tl t-poly" style="opacity:.35" d="${linePath(ax,h,step)}"/>`; });
+    if(o.expH) s+=`<path class="t-det" d="${linePath(ax,o.expH,step)}"/>`;
+    s+=`<path class="t-mean" d="${linePath(ax,res.meanH,step)}"/></g></svg>`;
+  } else {
+    const bins=new Array(12).fill(0);
+    tr.forEach(row=>{ const f=row[G]; if(f<=0) bins[0]++; else if(f>=1) bins[11]++; else bins[1+Math.min(9,Math.floor(f*10))]++; });
+    const ymax=niceCeil(Math.max(2,...bins)*1.1), ys=tickStep(ymax);
+    const ax=axes({x0:0,x1:12,y0:0,y1:ymax,xs:1,ys,xl:'Endwert von p nach '+G+' Generationen',yl:'Anzahl Populationen',xt:false});
+    s=svgO('Verteilung der Endwerte')+ax.g;
+    bins.forEach((n,i)=>{ const x=ax.X(i)+3, w=PW/12-6, y=ax.Y(n), col=i===0?'var(--a)':(i===11?'var(--A)':'var(--poly)'); if(n>0) s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${(MT+PHT-y).toFixed(1)}" rx="3" fill="${col}"/><text class="lbl" x="${(x+w/2).toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle">${n}</text>`; });
+    s+=`<text class="tk" x="${ax.X(.5)}" y="${MT+PHT+19}" text-anchor="middle">p = 0</text><text class="tk" x="${ax.X(6)}" y="${MT+PHT+19}" text-anchor="middle">0 &lt; p &lt; 1</text><text class="tk" x="${ax.X(11.5)}" y="${MT+PHT+19}" text-anchor="middle">p = 1</text></svg>`;
+  }
+  el.innerHTML=s;
+}
+function legendFor(view,o){
+  if(view==='p') return `<li><i style="border-color:var(--A)"></i>A fixiert (p = 1)</li><li><i style="border-color:var(--a)"></i>a fixiert (p = 0)</li><li><i style="border-color:var(--poly)"></i>polymorph</li>${o.showMean?'<li><i style="border-color:var(--mean);border-top-width:4px"></i>Mittelwert</li>':''}${o.showDet?'<li><i class="dash" style="border-color:var(--det)"></i>ohne Drift (deterministisch)</li>':''}${o.ref!==undefined?'<li><i class="dash" style="border-color:var(--ink-soft)"></i>Ursprungspopulation</li>':''}`;
+  if(view==='H') return `<li><i style="border-color:var(--mean);border-top-width:4px"></i>Mittelwert aller Populationen</li><li><i style="border-color:var(--poly)"></i>einzelne Populationen</li>${o.expH?'<li><i class="dash" style="border-color:var(--det)"></i>erwartet bei reiner Drift</li>':''}`;
+  return '<li><i style="border-color:var(--a)"></i>a fixiert</li><li><i style="border-color:var(--A)"></i>A fixiert</li><li><i style="border-color:var(--poly)"></i>polymorph</li>';
+}
+const VIEWS=[['p','Häufigkeit'],['H','Heterozygotie'],['D','Verteilung']];
+function buildViewTabs(){ $$('.ctabs[data-for]').forEach(c=>{ const k=c.dataset.for; c.innerHTML=VIEWS.map(v=>`<button type="button" class="ctab" role="tab" data-v="${v[0]}" aria-selected="${S[k].view===v[0]}">${v[1]}</button>`).join(''); }); }
+function expectedH(h0,Nof,G){ const out=[h0]; let h=h0; for(let t=0;t<G;t++){ h*=1-1/(2*Nof(t)); out.push(h); } return out; }
+
+/* ---------- 1 Genpool ---------- */
+function poolInit(){
+  const P=S.pool, n=2*P.N, kA=Math.round(P.p0*n); P.al=[]; for(let i=0;i<n;i++) P.al.push(i<kA?1:0);
+  for(let i=n-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [P.al[i],P.al[j]]=[P.al[j],P.al[i]]; }
+  P.gen=0; P.hist=[kA/n]; stopPool(); renderPool(true);
+}
+function poolFixed(){ const h=S.pool.hist, p=h[h.length-1]; return p===0||p===1; }
+function poolStep(){
+  const P=S.pool; if(poolFixed()){ stopPool(); return; }
+  const n=2*P.N, old=P.al, nw=[]; let sum=0;
+  for(let i=0;i<n;i++){ const a=old[Math.floor(Math.random()*n)]; nw.push(a); sum+=a; }
+  P.al=nw; P.gen++; P.hist.push(sum/n); renderPool(true); if(poolFixed()) stopPool();
+}
+function stopPool(){ const P=S.pool; P.auto=false; clearInterval(P.timer); const b=$('#poolAuto'); if(b){ b.setAttribute('aria-pressed','false'); b.textContent='Automatisch'; } }
+function renderPool(anim){
+  const P=S.pool, N=P.N, cols=Math.min(N,10), rows=Math.ceil(N/cols), cw=Math.min(62,600/cols), ch=48, W=640, H=rows*ch+24;
+  let s='', cAA=0,cAa=0,caa=0, nA=0; const x0=(W-cols*cw)/2;
+  for(let i=0;i<N;i++){
+    const a=P.al[2*i], b=P.al[2*i+1], r=Math.floor(i/cols), c=i%cols, cx=x0+c*cw+cw/2, cy=12+r*ch+ch/2, g=a+b;
+    nA+=a+b; if(g===2) cAA++; else if(g===1) cAa++; else caa++;
+    const col=g===2?'var(--dotA)':(g===1?'#B9A2FF':'var(--dota)'), rw=Math.min(52,cw-8), dr=Math.min(11,rw/5);
+    s+=`<g class="${anim?'pop-in':''}" style="animation-delay:${((i%cols)*18)+(r*10)}ms"><rect x="${(cx-rw/2).toFixed(1)}" y="${cy-15}" width="${rw.toFixed(1)}" height="30" rx="15" fill="rgba(255,255,255,.07)" stroke="${col}" stroke-width="2"/><circle cx="${(cx-rw/4).toFixed(1)}" cy="${cy}" r="${dr}" fill="${a?'var(--dotA)':'var(--dota)'}"/><circle cx="${(cx+rw/4).toFixed(1)}" cy="${cy}" r="${dr}" fill="${b?'var(--dotA)':'var(--dota)'}"/></g>`;
+  }
+  const svg=$('#poolSvg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=s;
+  const n=2*N, p=nA/n, fx=p===0||p===1;
+  $('#poolCounts').innerHTML=`<span class="cnt">Generation ${P.gen}</span><span class="cnt"><i style="background:var(--A)"></i>AA: ${cAA}</span><span class="cnt"><i style="background:var(--H)"></i>Aa: ${cAa}</span><span class="cnt"><i style="background:var(--a)"></i>aa: ${caa}</span><span class="cnt">p = ${nA}/${n} = ${fmt(p,2)}</span>`;
+  $('#poolStatus').innerHTML=fx?`<b>${p===1?'Allel a ist verloren, A ist fixiert.':'Allel A ist verloren, a ist fixiert.'}</b> Die Population ist nach ${P.gen} Generationen monomorph. Ohne Mutation oder Zuwanderung kommt das Allel nie zurück.`:(P.gen===0?'Drücke „Nächste Generation“: 2N Allele werden zufällig aus dem Genpool gezogen.':`Es gab ${P.gen} Ziehung${P.gen===1?'':'en'}. Die Häufigkeit von A betrug zu Beginn ${fmt(P.hist[0],2)}, jetzt ${fmt(p,2)}.`);
+  $('#poolStep').disabled=fx; $('#poolAuto').disabled=fx;
+  const G=Math.max(10,P.gen), ax=axes({x0:0,x1:G,y0:0,y1:1,xs:G<=10?2:(G<=30?5:10),ys:.2,xl:'Generation',yl:'Häufigkeit von A (p)'});
+  let h=svgO('Verlauf der Allelhäufigkeit')+ax.g+`<path class="t-mean" d="${linePath(ax,P.hist,1)}"/>`;
+  P.hist.forEach((v,t)=>{ h+=`<circle cx="${ax.X(t).toFixed(1)}" cy="${ax.Y(v).toFixed(1)}" r="4.5" fill="var(--mean)"/>`; });
+  $('#poolHist').innerHTML=h+'</svg>';
+}
+$('#poolStep').addEventListener('click',poolStep);
+$('#poolReset').addEventListener('click',poolInit);
+$('#poolAuto').addEventListener('click',function(){ const P=S.pool; if(P.auto){ stopPool(); return; } if(poolFixed()) return; P.auto=true; this.setAttribute('aria-pressed','true'); this.textContent='Anhalten'; P.timer=setInterval(poolStep,850); });
+$('#poolCtl').innerHTML=slHTML('pool.N')+slHTML('pool.p0');
+
+/* ---------- 2 Simulation ---------- */
+$('#ctlSim').innerHTML=`<h2>Parameter</h2>${slHTML('sim.Ni')}${slHTML('sim.p0')}${slHTML('sim.G')}${slHTML('sim.R')}
+ <div class="ctl"><div class="ctl-head"><label for="seedIn"><span class="dotc"></span>Startwert des Zufalls (Seed)</label></div><div class="seedrow"><input type="number" id="seedIn" min="1" max="99999" step="1"><button type="button" class="btn" id="btnDice">Neu würfeln</button></div><p class="ctl-desc">Gleicher Seed und gleiche Parameter ergeben das gleiche Ergebnis.</p></div>
+ <h2 style="margin-top:12px">Bedingungen des Gleichgewichts</h2>
+ <p class="note" style="margin-top:0">Jeder Schalter verletzt eine Bedingung. Sind alle aus, gilt das Hardy-Weinberg-Gleichgewicht.</p>
+ ${swHTML('sim.drift','Genetische Drift','Endliche Population: Zufallsstichprobe der Allele in jeder Generation.')}
+ ${swHTML('sim.selOn','Selektion gegen Allel a','Genotypen haben unterschiedlichen Fortpflanzungserfolg.')}
+ <div class="sub" data-show="sim.selOn">${slHTML('sim.s')}${slHTML('sim.h')}</div>
+ ${swHTML('sim.mutOn','Mutation','Allele verändern sich zufällig in das jeweils andere Allel.')}
+ <div class="sub" data-show="sim.mutOn">${slHTML('sim.mu')}</div>
+ ${swHTML('sim.migOn','Migration (Genfluss)','Individuen wandern aus einer Quellpopulation ein.')}
+ <div class="sub" data-show="sim.migOn">${slHTML('sim.m')}${slHTML('sim.pm')}</div>
+ <h3>Vorlagen</h3>
+ <div class="btnrow" style="margin-top:4px"><button type="button" class="btn" data-pre="hw">Alle Bedingungen erfüllt</button><button type="button" class="btn" data-pre="drift">Nur Drift</button><button type="button" class="btn" data-pre="sel">Drift und Selektion</button></div>`;
+const PRE={
+ hw:{drift:false,selOn:false,mutOn:false,migOn:false},
+ drift:{drift:true,selOn:false,mutOn:false,migOn:false},
+ sel:{drift:true,selOn:true,mutOn:false,migOn:false,s:.1,h:.5}
+};
+function simCfg(){ const s=S.sim; return {R:s.R,G:s.G,p0:s.p0,seed:s.seed,drift:s.drift,Nof:()=>NLIST[s.Ni],f:{selOn:s.selOn,s:s.s,h:s.h,mutOn:s.mutOn,mu:s.mu,migOn:s.migOn,m:s.m,pm:s.pm}}; }
+const pureDrift=s=>s.drift&&!s.selOn&&!s.mutOn&&!s.migOn;
+function runSim(){ S.sim.res=simulate(simCfg()); renderSim(); }
+function renderSim(){
+  const s=S.sim, res=s.res, N=NLIST[s.Ni]; if(!res) return;
+  const forces=s.selOn||s.mutOn||s.migOn, opt={G:s.G,view:s.view,showMean:true,showDet:forces};
+  if(s.view==='H'&&pureDrift(s)) opt.expH=expectedH(res.meanH[0],()=>N,s.G);
+  drawTraj($('#plotSim'),res,opt); $('#legSim').innerHTML=legendFor(s.view,opt);
+  const sm=summary(res,s.G);
+  $('#stripSim').innerHTML=`<div class="stat"><span>A fixiert</span><b>${sm.fixA}/${sm.R}</b></div><div class="stat"><span>a fixiert</span><b>${sm.fixa}/${sm.R}</b></div><div class="stat"><span>polymorph</span><b>${sm.poly}/${sm.R}</b></div>`;
+  let more=`<h2>Auswertung</h2><table class="t"><tr><th>Größe</th><th>Wert</th></tr><tr><td>Mittlere Häufigkeit von A nach ${s.G} Generationen</td><td>${fmt(sm.meanP,2)}</td></tr><tr><td>Mittlere Heterozygotie H = 2pq (Start: ${fmt(res.meanH[0],2)})</td><td>${fmt(sm.meanH,2)}</td></tr>`;
+  if(pureDrift(s)){ const p=s.p0, T=-4*N*(p*Math.log(p)+(1-p)*Math.log(1-p)), He=res.meanH[0]*Math.pow(1-1/(2*N),s.G); more+=`<tr><td>Erwartete Heterozygotie bei reiner Drift</td><td>${fmt(He,2)}</td></tr><tr><td>Mittlere Zeit bis zur Fixierung (Beobachtung, ${sm.nT} Populationen)</td><td>${sm.tMean!==null?fmt(sm.tMean,0)+' Gen.':'–'}</td></tr><tr><td>Mittlere Zeit nach Theorie (Näherung)</td><td>${fmt(T,0)} Gen.</td></tr>`; }
+  more+='</table>';
+  let txt='';
+  if(!s.drift&&!forces) txt='<b>Hardy-Weinberg-Gleichgewicht:</b> Alle Linien liegen auf derselben waagerechten Geraden. Die Allelhäufigkeit bleibt konstant.';
+  else if(!s.drift&&forces) txt='<b>Ohne Drift:</b> Alle Populationen verlaufen gleich, und zwar entlang der roten Linie. Sie zeigt den gerichteten Verlauf der wirkenden Kraft.';
+  else if(pureDrift(s)) txt=N<=20?'<b>Kleine Population:</b> starke zufällige Schwankungen. In vielen Populationen geht ein Allel schnell verloren, das andere wird fixiert.':(N>=200?'<b>Große Population:</b> Die Linien bleiben lange nahe am Startwert. Drift wirkt, aber langsam.':'<b>Mittlere Population:</b> Die Linien streuen allmählich auseinander.');
+  else txt='<b>Mehrere Kräfte:</b> Vergleiche mit der roten Linie (nur gerichtete Kräfte) und achte auf die Streuung durch Drift. Selektion, Mutation und Migration wirken gerichtet, Drift ungerichtet.';
+  more+=`<div class="status">${txt}</div><div class="btnrow"><button type="button" class="btn" id="btnCopySim">Protokoll kopieren</button></div><p class="note" id="copyMsg" aria-live="polite">Das Protokoll enthält Parameter und Ergebnisse, keine persönlichen Daten.</p><textarea id="copyArea" class="txtin" style="min-height:120px;font-size:.9rem" readonly hidden aria-label="Protokolltext"></textarea>`;
+  $('#moreSim').innerHTML=more; syncInputs($('#ctlSim')); const si=$('#seedIn'); if(document.activeElement!==si) si.value=s.seed;
+}
+function simProtocol(){
+  const s=S.sim, sm=summary(s.res,s.G), N=NLIST[s.Ni]; const f=[];
+  f.push(s.drift?'Genetische Drift (endliche Population)':'ohne Drift (unendlich große Population)');
+  if(s.selOn) f.push(`Selektion gegen a (s = ${fmt(s.s,2)}, h = ${fmt(s.h,1)})`);
+  if(s.mutOn) f.push(`Mutation (Rate ${fmt(s.mu,3)})`);
+  if(s.migOn) f.push(`Migration (m = ${fmt(s.m,2)}, p der Quelle = ${fmt(s.pm,2)})`);
+  return `Protokoll Gendrift-Simulation\nPopulationsgröße N = ${N}\nStartwert p = ${fmt(s.p0,2)}\nGenerationen = ${s.G}\nPopulationen = ${s.R}\nSeed = ${s.seed}\nWirkende Kräfte: ${f.join('; ')}\n\nErgebnis nach ${s.G} Generationen:\nA fixiert: ${sm.fixA}/${sm.R}\na fixiert: ${sm.fixa}/${sm.R}\npolymorph: ${sm.poly}/${sm.R}\nMittlere Häufigkeit von A: ${fmt(sm.meanP,2)}\nMittlere Heterozygotie: ${fmt(sm.meanH,2)}\n`;
+}
+
+/* ---------- 3 Szenarien ---------- */
+$('#ctlScen').innerHTML=`<h2>Ereignis</h2><div class="seg" id="segScen" role="group" aria-label="Szenario"><button type="button" data-t="bottle" aria-pressed="true">Flaschenhals</button><button type="button" data-t="founder" aria-pressed="false">Gründereffekt</button></div>
+ <div id="scBottle">${slHTML('scen.pb')}${slHTML('scen.Nv')}${slHTML('scen.Nb')}${slHTML('scen.t1')}${slHTML('scen.dur')}${slHTML('scen.Nn')}</div>
+ <div id="scFounder" hidden>${slHTML('scen.ps')}${slHTML('scen.nf')}${slHTML('scen.Nnew')}</div>
+ <div class="btnrow"><button type="button" class="btn" id="btnScenDice">Neu würfeln</button></div>`;
+function scenRun(){
+  const c=S.scen; let cfg;
+  if(c.type==='bottle') cfg={R:30,G:80,p0:c.pb,seed:S.sim.seed+11,drift:true,Nof:t=>(t>=c.t1&&t<c.t1+c.dur)?c.Nb:(t<c.t1?c.Nv:c.Nn),f:{}};
+  else cfg={R:40,G:40,p0:c.ps,p0d:c.ps,seed:S.sim.seed+23,drift:true,Nof:()=>c.Nnew,f:{},p0f:r=>binom(2*c.nf,c.ps,r)/(2*c.nf)};
+  c.cfg=cfg; c.res=simulate(cfg); scenRender();
+}
+function scenRender(){
+  const c=S.scen, res=c.res, cfg=c.cfg, G=cfg.G, bott=c.type==='bottle';
+  $('#scBottle').hidden=!bott; $('#scFounder').hidden=bott;
+  $$('#segScen button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===c.type));
+  const opt={G,view:c.view,showMean:true,showDet:false};
+  if(bott) opt.shade={t0:c.t1,t1:Math.min(G,c.t1+c.dur),label:'Flaschenhals'}; else opt.ref=c.ps;
+  if(c.view==='H') opt.expH=expectedH(res.meanH[0],cfg.Nof,G);
+  drawTraj($('#plotScen'),res,opt); $('#legScen').innerHTML=legendFor(c.view,opt)+(bott?'<li><i style="border-color:var(--a);opacity:.4;border-top-width:8px"></i>Flaschenhals</li>':'');
+  const sm=summary(res,G); let lostA=0; res.traj.forEach(r=>{ if(r[G]>=1) lostA++; });
+  if(bott){
+    const afterT=Math.min(G,c.t1+c.dur), lostNow=res.traj.filter(r=>r[afterT]>=1).length;
+    $('#stripScen').innerHTML=`<div class="stat"><span>a nach Engpass weg</span><b>${lostNow}/${sm.R}</b></div><div class="stat"><span>H vorher</span><b>${fmt(res.meanH[Math.max(0,c.t1-1)],2)}</b></div><div class="stat"><span>H danach</span><b>${fmt(res.meanH[afterT],2)}</b></div>`;
+    $('#moreScen').innerHTML=`<h2>Flaschenhals-Effekt</h2><p>Eine große Population schrumpft für kurze Zeit auf wenige Individuen. Die überlebenden ${2*c.Nb} Allele sind eine Zufallsstichprobe des ursprünglichen Genpools. Seltene Allele gehen mit hoher Wahrscheinlichkeit verloren, und die Heterozygotie sinkt auch dann, wenn die Population später wieder wächst.</p><div class="status">In ${lostNow}/${sm.R} Populationen ist Allel a direkt nach dem Flaschenhals bereits verschwunden. Die genetische Vielfalt erholt sich nur durch Mutation oder Zuwanderung.</div><h3>Beispiele (vereinfacht)</h3><ul class="note"><li>Nördlicher See-Elefant: Die Art wurde durch Jagd Ende des 19. Jahrhunderts auf wenige Dutzend Tiere reduziert. Heute gibt es viele Tausend Tiere, aber nur geringe genetische Variabilität.</li><li>Geparden zeigen ebenfalls eine auffallend geringe genetische Vielfalt, die auf einen früheren Flaschenhals zurückgeführt wird.</li></ul>`;
+  } else {
+    let meanQ=0, noA=0; res.traj.forEach(r=>{ meanQ+=1-r[0]; if(r[0]>=1) noA++; });
+    const hi=res.traj.filter(r=>(1-r[0])>2*(1-c.ps)).length;
+    $('#stripScen').innerHTML=`<div class="stat"><span>Ursprung q</span><b>${fmt(1-c.ps,2)}</b></div><div class="stat"><span>a fehlt</span><b>${noA}/${sm.R}</b></div><div class="stat"><span>q mehr als doppelt</span><b>${hi}/${sm.R}</b></div>`;
+    $('#moreScen').innerHTML=`<h2>Gründereffekt</h2><p>Wenige Individuen gründen eine neue Population, zum Beispiel auf einer Insel. Ihre ${2*c.nf} Allele sind eine Zufallsstichprobe der Ursprungspopulation. In manchen Kolonien fehlt ein seltenes Allel ganz, in anderen ist es durch Zufall viel häufiger als im Ursprung (gestrichelte Linie).</p><div class="status">Mittlere Häufigkeit von a in den neuen Kolonien zu Beginn: ${fmt(meanQ/sm.R,2)} (Ursprung: ${fmt(1-c.ps,2)}). Die Streuung ist der Gründereffekt.</div><h3>Beispiel (vereinfacht)</h3><ul class="note"><li>Das rezessive Ellis-van-Creveld-Syndrom tritt in einer Amish-Gemeinschaft in Pennsylvania auffallend häufig auf. Das wird auf wenige Gründer zurückgeführt, von denen einer das Allel trug.</li></ul>`;
+  }
+  syncInputs($('#ctlScen'));
+}
+$('#segScen').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.scen.type=b.dataset.t; scenRun(); });
+$('#btnScenDice').addEventListener('click',()=>{ S.sim.seed=1+Math.floor(Math.random()*9999); scenRun(); });
+
+/* ---------- 4 Hardy-Weinberg ---------- */
+function buildHW(){
+  $('#hwA').innerHTML=`<h2>Allelfrequenz zu Genotypfrequenz</h2>${slHTML('hw.p')}${slHTML('hw.F')}
+   <div class="plot" style="margin-top:8px"><svg id="hwSvg" viewBox="0 0 600 300" role="img" aria-label="Quadratdiagramm und Balkendiagramm der Genotypen"></svg></div><div id="hwTable"></div>`;
+  $('#hwB').innerHTML=`<h2>Aus der Häufigkeit Erkrankter zur Trägerhäufigkeit</h2>
+   <p class="lead">Bei einer rezessiven Krankheit kennt man nur die Häufigkeit der Erkrankten (aa = q²). Daraus lassen sich q, p und die Häufigkeit der gesunden Träger berechnen, wenn Hardy-Weinberg gilt.</p>
+   <label class="fl" for="xIn">Es erkrankt etwa 1 von …</label><input type="number" class="txtin" id="xIn" min="2" max="1000000" step="1">
+   <div class="btnrow"><button type="button" class="btn" data-x="2500">Mukoviszidose (1 : 2500)</button><button type="button" class="btn" data-x="10000">Beispiel 1 : 10 000</button></div><div id="hwBres"></div>`;
+  $('#hwC').innerHTML=`<h2>Test: Ist die Population im Gleichgewicht?</h2><p class="lead">Gib die beobachteten Genotypzahlen ein. Die Seite berechnet die Allelhäufigkeiten, die erwarteten Zahlen und einen χ²-Test (Erweiterung).</p>
+   <div class="btnrow" style="margin-top:0"><button type="button" class="btn" data-c="1787,3039,1303">MN-Blutgruppen (Beispieldaten)</button><button type="button" class="btn" data-c="45,10,45">Heterozygotendefizit</button></div>
+   <div class="cnts"><label>AA<input type="number" class="txtin" min="0" step="1" id="c0"></label><label>Aa<input type="number" class="txtin" min="0" step="1" id="c1"></label><label>aa<input type="number" class="txtin" min="0" step="1" id="c2"></label></div><div id="hwCres"></div>`;
+}
+function hwAupd(){
+  const h=S.hw, p=h.p, q=1-p, F=h.F;
+  const g=[p*p+F*p*q, 2*p*q*(1-F), q*q+F*p*q], g0=[p*p,2*p*q,q*q];
+  const sq=260, x0=26, y0=24, px=p*sq, qx=q*sq; let s='';
+  const rect=(x,y,w,hh,c,t)=>`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${hh.toFixed(1)}" fill="${c}" stroke="var(--paper)" stroke-width="2"/>${w>34&&hh>22?`<text x="${(x+w/2).toFixed(1)}" y="${(y+hh/2+5).toFixed(1)}" text-anchor="middle" font-size="15" font-weight="700" fill="${c==='var(--a)'?'#16251D':'#fff'}">${t}</text>`:''}`;
+  s+=rect(x0,y0,px,px,'var(--A)','AA')+rect(x0+px,y0,qx,px,'var(--H)','Aa')+rect(x0,y0+px,px,qx,'var(--H)','Aa')+rect(x0+px,y0+px,qx,qx,'var(--a)','aa');
+  s+=`<text class="tk" x="${x0+px/2}" y="${y0-6}" text-anchor="middle">p</text><text class="tk" x="${x0+px+qx/2}" y="${y0-6}" text-anchor="middle">q</text><text class="tk" x="${x0-7}" y="${y0+px/2+5}" text-anchor="end">p</text><text class="tk" x="${x0-7}" y="${y0+px+qx/2+5}" text-anchor="end">q</text>`;
+  const bx=336, bw=34, base=276, hh=220, cols=['var(--A)','var(--H)','var(--a)'], nm=['AA','Aa','aa'];
+  for(let i=0;i<3;i++){ const x=bx+i*84; s+=`<rect x="${x}" y="${(base-g0[i]*hh).toFixed(1)}" width="${bw}" height="${(g0[i]*hh).toFixed(1)}" fill="none" stroke="${cols[i]}" stroke-width="2.5" stroke-dasharray="4 3"/><rect x="${x+bw+4}" y="${(base-g[i]*hh).toFixed(1)}" width="${bw}" height="${(g[i]*hh).toFixed(1)}" fill="${cols[i]}"/><text class="tk" x="${x+bw+2}" y="${base+17}" text-anchor="middle">${nm[i]}</text>`; }
+  s+=`<line x1="${bx-6}" x2="${bx+3*84}" y1="${base}" y2="${base}" stroke="var(--axis)" stroke-width="1.5"/><text class="tk" x="${bx-8}" y="${base-hh+5}" text-anchor="end">1</text><text class="tk" x="${bx-8}" y="${base+4}" text-anchor="end">0</text><text class="tk" x="${bx+126}" y="${base-hh-10}" text-anchor="middle">gestrichelt: Gleichgewicht</text>`;
+  $('#hwSvg').innerHTML=s;
+  $('#hwTable').innerHTML=`<table class="t"><tr><th>Genotyp</th><th>Formel</th><th>Häufigkeit</th><th>Gleichgewicht</th></tr>
+   <tr><td><span class="sw-dot" style="background:var(--A)"></span>AA</td><td>p²${F>0?' + F·p·q':''}</td><td>${fmt(g[0],3)}</td><td>${fmt(g0[0],3)}</td></tr>
+   <tr><td><span class="sw-dot" style="background:var(--H)"></span>Aa</td><td>2pq${F>0?'·(1 − F)':''}</td><td>${fmt(g[1],3)}</td><td>${fmt(g0[1],3)}</td></tr>
+   <tr><td><span class="sw-dot" style="background:var(--a)"></span>aa</td><td>q²${F>0?' + F·p·q':''}</td><td>${fmt(g[2],3)}</td><td>${fmt(g0[2],3)}</td></tr></table>
+   <p class="note">${F>0?'Inzucht verändert nur die Genotypen: weniger Heterozygote, mehr Homozygote. Die Allelhäufigkeit p bleibt gleich.':'Das Quadrat zeigt: Die Flächen p², pq, pq und q² ergeben zusammen 1.'}</p>`;
+  syncInputs($('#hwA'));
+}
+function hwBupd(){
+  const X=Math.max(2,S.hw.X||2), q2=1/X, q=Math.sqrt(q2), p=1-q, het=2*p*q, hom=p*p;
+  $('#hwBres').innerHTML=`<div class="calc"><p>1. q² = 1/${X} = <span class="eq">${fmt(q2,5)}</span></p><p>2. q = √q² = <span class="eq">${fmt(q,4)}</span></p><p>3. p = 1 − q = <span class="eq">${fmt(p,4)}</span></p><p>4. Heterozygote (Träger): 2pq = 2 · ${fmt(p,3)} · ${fmt(q,3)} = <span class="eq">${fmt(het,4)}</span>, das entspricht etwa <b>1 von ${fmt(1/het,0)}</b></p><p>5. Homozygot gesund: p² = <span class="eq">${fmt(hom,4)}</span></p></div><p class="note">Die Werte sind Lehrbuchbeispiele und gerundet. Auffällig: Es gibt viel mehr gesunde Träger als Erkrankte.</p>`;
+}
+function hwCupd(){
+  const h=S.hw, c=[h.c0,h.c1,h.c2].map(v=>Math.max(0,Math.round(+v||0))), N=c[0]+c[1]+c[2];
+  if(N<1){ $('#hwCres').innerHTML='<p class="note">Gib Zahlen ein.</p>'; return; }
+  const p=(2*c[0]+c[1])/(2*N), q=1-p, e=[p*p*N,2*p*q*N,q*q*N], chi=e.reduce((a,x,i)=>a+(x>0?Math.pow(c[i]-x,2)/x:0),0);
+  const F=e[1]>0?1-c[1]/e[1]:0, small=e.some(x=>x<5), sig=chi>3.84;
+  $('#hwCres').innerHTML=`<table class="t"><tr><th>Genotyp</th><th>beobachtet</th><th>erwartet</th><th>(B − E)² / E</th></tr>${['AA','Aa','aa'].map((n,i)=>`<tr><td><span class="sw-dot" style="background:var(--${['A','H','a'][i]})"></span>${n}</td><td>${c[i]}</td><td>${fmt(e[i],1)}</td><td>${fmt(e[i]>0?Math.pow(c[i]-e[i],2)/e[i]:0,2)}</td></tr>`).join('')}<tr><th>Summe</th><th>${N}</th><th>${fmt(e[0]+e[1]+e[2],1)}</th><th>χ² = ${fmt(chi,2)}</th></tr></table>
+   <div class="calc"><p>Allelhäufigkeiten aus den Daten: p = (2·${c[0]} + ${c[1]}) / (2·${N}) = <span class="eq">${fmt(p,4)}</span>, q = <span class="eq">${fmt(q,4)}</span></p><p>Fixierungsindex F = 1 − (beobachtete Heterozygote / erwartete Heterozygote) = <span class="eq">${fmt(F,3)}</span></p></div>
+   <div class="fb ${sig?'no':'ok'}"><b>${sig?'Abweichung vom Gleichgewicht.':'Kein Hinweis auf eine Abweichung.'}</b> χ² = ${fmt(chi,2)} ${sig?'liegt über':'liegt unter'} dem kritischen Wert 3,84 (ein Freiheitsgrad, α = 0,05). ${sig?(F>0.1?'Es gibt weniger Heterozygote als erwartet (zum Beispiel durch Inzucht oder Aufspaltung in Teilpopulationen).':(F<-0.1?'Es gibt mehr Heterozygote als erwartet.':'Mindestens eine der fünf Bedingungen ist wahrscheinlich verletzt.')):'Die Daten sind mit Hardy-Weinberg vereinbar.'}</div>
+   ${small?'<div class="fb tip">Mindestens ein Erwartungswert liegt unter 5. Der χ²-Test ist dann ungenau.</div>':''}
+   <h3>Nach einer Generation Zufallspaarung</h3><p class="note" style="margin-top:0">Selbst wenn die Genotypen vom Gleichgewicht abweichen, stellt sich bei Zufallspaarung schon nach einer Generation das Hardy-Weinberg-Verhältnis ein (p bleibt gleich):</p><table class="t"><tr><th></th><th>AA</th><th>Aa</th><th>aa</th></tr><tr><td>jetzt</td><td>${fmt(c[0]/N,3)}</td><td>${fmt(c[1]/N,3)}</td><td>${fmt(c[2]/N,3)}</td></tr><tr><td>nächste Generation</td><td>${fmt(p*p,3)}</td><td>${fmt(2*p*q,3)}</td><td>${fmt(q*q,3)}</td></tr></table>`;
+}
+function hwShowAll(){ hwAupd(); $('#xIn').value=S.hw.X; hwBupd(); ['c0','c1','c2'].forEach(k=>{ $('#'+k).value=S.hw[k]; }); hwCupd(); }
+$('#hwB').addEventListener('input',e=>{ if(e.target.id==='xIn'){ S.hw.X=+e.target.value||2; hwBupd(); } });
+$('#hwB').addEventListener('click',e=>{ const b=e.target.closest('[data-x]'); if(b){ S.hw.X=+b.dataset.x; $('#xIn').value=S.hw.X; hwBupd(); } });
+$('#hwC').addEventListener('input',e=>{ if(/^c[012]$/.test(e.target.id)){ S.hw[e.target.id]=+e.target.value; hwCupd(); } });
+$('#hwC').addEventListener('click',e=>{ const b=e.target.closest('[data-c]'); if(b){ const v=b.dataset.c.split(',').map(Number); S.hw.c0=v[0]; S.hw.c1=v[1]; S.hw.c2=v[2]; ['c0','c1','c2'].forEach(k=>{ $('#'+k).value=S.hw[k]; }); hwCupd(); } });
+
+/* ---------- 5 Rätsel ---------- */
+const MYST={
+ drift:{nm:'Genetische Drift',cfg:{p0:.5,Nof:()=>25,f:{},drift:true},why:'Die Linien laufen ungerichtet auseinander. Einige Populationen verlieren ein Allel, andere fixieren es. Im Mittel bleibt p nahe am Startwert. Das ist typisch für Gendrift in einer kleinen Population (N = 25).'},
+ sel:{nm:'Selektion',cfg:{p0:.2,Nof:()=>2000,f:{selOn:true,s:.15,h:.5},drift:true},why:'Alle Linien bewegen sich in dieselbe Richtung, und zwar deutlich stärker, als der Zufall erklärt. Hier benachteiligt Selektion das Allel a (s = 0,15), also steigt die Häufigkeit von A in allen Populationen. Die Population ist groß (N = 2000), der Zufall spielt kaum eine Rolle.'},
+ mut:{nm:'Mutation',cfg:{p0:.9,Nof:()=>2000,f:{mutOn:true,mu:.02},drift:true},why:'Alle Linien nähern sich langsam und gleichmäßig dem Wert 0,5. Bei gleich hohen Mutationsraten in beide Richtungen stellt sich ein Gleichgewicht bei p = 0,5 ein. Der Verlauf ist glatt, weil die Population groß ist (N = 2000).'},
+ mig:{nm:'Migration (Genfluss)',cfg:{p0:.8,Nof:()=>2000,f:{migOn:true,m:.05,pm:.15},drift:true},why:'Alle Linien nähern sich einem Wert, der nicht 0,5 ist, nämlich der Allelhäufigkeit der Quellpopulation (hier p = 0,15). Die Population gleicht sich durch Zuwanderung der Quellpopulation an.'}
+};
+const MTIPS=['Laufen alle Linien in dieselbe Richtung oder streuen sie ungerichtet auseinander?','Verlaufen die Linien glatt und fast gleich? Dann ist der Zufall gering, die Population ist wahrscheinlich groß.','Wohin laufen die Linien am Ende? Zu 0 oder 1, zu 0,5 oder zu einem anderen Wert?'];
+function mystNew(){
+  const keys=Object.keys(MYST), k=keys[Math.floor(Math.random()*keys.length)], m=S.myst; m.type=k; m.tip=0; m.done=false; m.seed=1+Math.floor(Math.random()*9999);
+  m.cfg=Object.assign({R:12,G:80,seed:m.seed},MYST[k].cfg); m.res=simulate(m.cfg); mystRender();
+}
+function mystRender(){
+  const m=S.myst, c=m.cfg;
+  drawTraj($('#plotMyst'),m.res,{G:80,view:'p',showMean:m.mean,showDet:false}); $('#legMyst').innerHTML=legendFor('p',{showMean:m.mean});
+  $('#ctlMyst').innerHTML=`<h2>Welche Kraft wirkt?</h2><p class="lead">Im Diagramm wirkt genau eine evolutionäre Kraft. Der Startwert war p = ${fmt(c.p0,1)}. Untersuche die Verläufe und entscheide dich.</p>
+   <label style="display:flex;gap:8px;align-items:center;cursor:pointer;min-height:44px"><input type="checkbox" id="mMean" style="width:22px;height:22px" ${m.mean?'checked':''}> Mittelwert einblenden</label>
+   <div class="btnrow">${Object.keys(MYST).map(k=>`<button type="button" class="btn" data-ans="${k}" ${m.done?'disabled':''}>${MYST[k].nm}</button>`).join('')}</div>
+   <div class="btnrow"><button type="button" class="btn" id="mTip">Tipp</button><button type="button" class="btn" id="mNew">Neues Rätsel</button></div><div id="mFb" aria-live="polite"></div>`;
+}
+$('#ctlMyst').addEventListener('click',e=>{
+  const m=S.myst, a=e.target.closest('[data-ans]');
+  if(a&&!m.done){ m.done=true; const ok=a.dataset.ans===m.type, w=MYST[m.type]; $$('#ctlMyst [data-ans]').forEach(b=>b.disabled=true); $('#mFb').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'Richtig.':'Nicht ganz.'}</b> Es wirkte: <b>${w.nm}</b>. ${w.why}</div>`; return; }
+  if(e.target.closest('#mTip')){ const t=MTIPS[m.tip%MTIPS.length]; m.tip++; $('#mFb').innerHTML=`<div class="fb tip">${t}</div>`; return; }
+  if(e.target.closest('#mNew')) mystNew();
+});
+$('#ctlMyst').addEventListener('change',e=>{ if(e.target.id==='mMean'){ S.myst.mean=e.target.checked; const fb=$('#mFb').innerHTML, done=S.myst.done; mystRender(); if(done){ $$('#ctlMyst [data-ans]').forEach(b=>b.disabled=true); } $('#mFb').innerHTML=fb; $('#mMean').focus(); } });
+
+/* ---------- Aufgaben ---------- */
+function goSim(o){ Object.assign(S.sim,o); setTab('sim'); runSim(); }
+const TASKS=[
+ {afb:'I',op:'Nenne, beschreibe',t:'Bedingungen des Gleichgewichts',x:'Nenne die fünf Bedingungen des Hardy-Weinberg-Gleichgewichts. Beschreibe, was in der Simulation passiert, wenn alle Bedingungen erfüllt sind.',setup:()=>goSim({drift:false,selOn:false,mutOn:false,migOn:false,view:'p'}),
+  sol:['Bedingungen: sehr große Population, Zufallspaarung, keine Selektion, keine Mutation, keine Migration.','Beobachtung: Alle Linien liegen auf einer waagerechten Geraden. Die Allelhäufigkeiten bleiben konstant, die Genotypen treten mit p², 2pq und q² auf.']},
+ {afb:'II',op:'Berechne',t:'Mukoviszidose',x:'Etwa 1 von 2500 Neugeborenen mit europäischer Abstammung hat Mukoviszidose (rezessiv, aa). Berechne unter der Annahme eines Hardy-Weinberg-Gleichgewichts die Allelhäufigkeiten und die Häufigkeit der gesunden Träger.',setup:()=>{ setTab('hw'); S.hw.X=2500; $('#xIn').value=2500; hwBupd(); $('#hwB').scrollIntoView({behavior:'smooth',block:'start'}); },
+  sol:['q² = 1/2500 = 0,0004, also q = 0,02.','p = 1 − q = 0,98.','Träger: 2pq = 2 · 0,98 · 0,02 ≈ 0,039, das ist etwa 1 von 25 bis 26.','Es gibt etwa 100-mal mehr Träger als Erkrankte. Das rezessive Allel bleibt vor allem in Heterozygoten erhalten.']},
+ {afb:'II',op:'Untersuche, erkläre',t:'Populationsgröße und Drift',x:'Vergleiche die Simulation für N = 10, N = 100 und N = 1000 (Start p = 0,5, nur Drift). Beschreibe die Unterschiede und erkläre sie.',setup:()=>goSim({Ni:3,p0:.5,G:100,R:20,drift:true,selOn:false,mutOn:false,migOn:false,view:'p'}),
+  sol:['N = 10: starke Schwankungen, die meisten Populationen haben nach wenigen Dutzend Generationen ein Allel verloren (Fixierung des anderen).','N = 1000: Die Linien bleiben nahe am Startwert, die Fixierung dauert sehr lange.','Erklärung: Die Allele der nächsten Generation sind eine Zufallsstichprobe aus 2N Allelen. Kleine Stichproben weichen im Mittel stärker vom Erwartungswert ab (Stichprobenfehler).','Die Wahrscheinlichkeit, dass A fixiert wird, entspricht seiner Startfrequenz. Die mittlere Zeit bis zur Fixierung liegt in der Größenordnung von 4N Generationen.']},
+ {afb:'II',op:'Erkläre',t:'Verlust der Heterozygotie',x:'Wechsle zum Diagramm der Heterozygotie. Beschreibe den Verlauf bei N = 10 und N = 100 und erkläre, warum die genetische Vielfalt durch Drift abnimmt.',setup:()=>goSim({Ni:3,p0:.5,G:100,R:30,drift:true,selOn:false,mutOn:false,migOn:false,view:'H'}),
+  sol:['Die mittlere Heterozygotie sinkt, bei kleinem N viel schneller. Die rote Linie zeigt die theoretische Abnahme H(t) = H₀ · (1 − 1/2N)^t.','Mit jeder Generation verlieren einige Populationen ein Allel und werden homozygot. Verlorene Allele kehren ohne Mutation oder Zuwanderung nicht zurück.','Folge: Weniger Variation bedeutet weniger Ausgangsmaterial für Selektion und eine geringere Anpassungsfähigkeit.']},
+ {afb:'III',op:'Vergleiche, beurteile',t:'Flaschenhals und Gründereffekt',x:'Vergleiche Flaschenhals-Effekt und Gründereffekt. Nenne Gemeinsamkeiten und Unterschiede und beurteile die Folgen für den Artenschutz.',setup:()=>{ S.scen.type='bottle'; setTab('scen'); scenRun(); },
+  sol:['Gemeinsamkeit: In beiden Fällen entsteht eine Population aus einer kleinen Zufallsstichprobe des Genpools. Seltene Allele gehen leicht verloren oder werden zufällig häufiger. Die Vielfalt sinkt.','Unterschied: Beim Flaschenhals schrumpft eine bestehende Population (zum Beispiel durch Jagd oder Katastrophe). Beim Gründereffekt wird eine neue Population von wenigen Individuen gegründet (zum Beispiel auf einer Insel), die Ursprungspopulation bleibt bestehen.','Artenschutz: Kleine Populationen verlieren Vielfalt, haben ein höheres Inzuchtrisiko und sind weniger anpassungsfähig. Maßnahmen: Populationen vergrößern, Lebensräume vernetzen, gezielter Austausch von Individuen. Ein Wachstum allein stellt die verlorene Vielfalt nicht wieder her.']},
+ {afb:'III',op:'Analysiere, beurteile',t:'Gleichgewicht prüfen',x:'Prüfe mit dem Test, ob die MN-Blutgruppen-Daten und die Daten mit dem Heterozygotendefizit zum Hardy-Weinberg-Gleichgewicht passen. Nenne mögliche Ursachen für Abweichungen.',setup:()=>{ setTab('hw'); S.hw.c0=45; S.hw.c1=10; S.hw.c2=45; ['c0','c1','c2'].forEach(k=>{ $('#'+k).value=S.hw[k]; }); hwCupd(); $('#hwC').scrollIntoView({behavior:'smooth',block:'start'}); },
+  sol:['MN-Blutgruppen (1787, 3039, 1303): χ² ist sehr klein (unter 0,1), kein Hinweis auf eine Abweichung. Die Daten sind mit Hardy-Weinberg vereinbar.','Daten 45, 10, 45: p = 0,5, erwartet 25, 50, 25. χ² = 64, deutlich über 3,84: signifikante Abweichung, zu wenige Heterozygote (F = 0,8).','Mögliche Ursachen: Inzucht oder bevorzugte Paarung unter Ähnlichen, Aufspaltung in Teilpopulationen, Selektion gegen Heterozygote.','Grenzen: Der Test sagt nicht, welche Bedingung verletzt ist. Ein unauffälliges Ergebnis beweist nicht, dass alle Bedingungen gelten.']},
+ {afb:'III',op:'Beurteile',t:'Drift oder Selektion?',x:'Untersuche, wie sich Selektion (s = 0,05) bei N = 20 und bei N = 500 auswirkt. Beurteile, unter welchen Bedingungen Drift stärker ist als Selektion.',setup:()=>goSim({Ni:5,p0:.5,G:150,R:30,drift:true,selOn:true,s:.05,h:.5,mutOn:false,migOn:false,view:'p'}),
+  sol:['Bei N = 20 ist der Verlauf zufällig: Manche Populationen fixieren sogar das benachteiligte Allel a. Bei N = 500 steigt A in fast allen Populationen deutlich an.','Faustregel: Drift dominiert, wenn der Selektionskoeffizient klein ist im Vergleich zu 1/(2N), also bei s · 2N ≪ 1. Dann verhält sich das Allel praktisch neutral. Ist s · 2N groß, setzt sich Selektion durch.','Selektion ist gerichtet und führt zu Anpassung, Drift ist ungerichtet. Beide wirken immer zugleich.']}
+];
+$('#taskList').innerHTML=TASKS.map((t,i)=>`<details class="task"><summary><span class="badge">AFB ${t.afb}</span><span>Aufgabe ${i+1}: ${t.t}</span></summary><p><b>${t.op}:</b> ${t.x}</p><button type="button" class="btn" data-task="${i}">Versuch einrichten</button><details class="sol"><summary style="cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center">Lösungshinweise (Erwartungshorizont)</summary><ul>${t.sol.map(x=>`<li>${x}</li>`).join('')}</ul></details></details>`).join('');
+$('#taskList').addEventListener('click',e=>{ const b=e.target.closest('[data-task]'); if(b){ TASKS[+b.dataset.task].setup(); if(S.tab!=='hw') window.scrollTo({top:0,behavior:'smooth'}); } });
+
+/* ---------- Ereignisse ---------- */
+function onInput(el){
+  const k=el.dataset.k; set(k,el.type==='checkbox'?el.checked:+el.value);
+  const ns=k.split('.')[0];
+  if(ns==='pool'){ poolInit(); syncInputs($('#poolCtl')); }
+  else if(ns==='sim') runSim();
+  else if(ns==='scen') scenRun();
+  else if(ns==='hw') hwAupd();
+}
+document.addEventListener('input',e=>{ if(e.target.matches&&e.target.matches('input[data-k]:not([type=checkbox])')) onInput(e.target); });
+document.addEventListener('change',e=>{ if(e.target.matches&&e.target.matches('input[type=checkbox][data-k]')) onInput(e.target); });
+$('#seedIn').addEventListener('input',e=>{ S.sim.seed=Math.max(1,Math.floor(+e.target.value||1)); runSim(); });
+$('#ctlSim').addEventListener('click',e=>{
+  if(e.target.closest('#btnDice')){ S.sim.seed=1+Math.floor(Math.random()*9999); runSim(); return; }
+  const b=e.target.closest('[data-pre]'); if(b){ Object.assign(S.sim,PRE[b.dataset.pre]); runSim(); }
+});
+$('#moreSim').addEventListener('click',async e=>{
+  if(!e.target.closest('#btnCopySim')) return; const ta=$('#copyArea'), txt=simProtocol(); ta.value=txt; ta.hidden=false; let ok=false;
+  try{ await navigator.clipboard.writeText(txt); ok=true; }catch(_){ try{ ta.focus(); ta.select(); ok=document.execCommand('copy'); }catch(__){} }
+  $('#copyMsg').textContent=ok?'Kopiert. Du kannst den Text jetzt einfügen.':'Markiere den Text unten und kopiere ihn selbst.';
+});
+document.addEventListener('click',e=>{
+  const v=e.target.closest('.ctab[data-v]'); if(v){ const k=v.closest('.ctabs').dataset.for; S[k].view=v.dataset.v; $$('.ctab',v.parentElement).forEach(x=>x.setAttribute('aria-selected',x===v)); if(k==='sim') renderSim(); else scenRender(); return; }
+  const c=e.target.closest('[data-collapse]'); if(c){ const el=$('#'+c.dataset.collapse); el.classList.toggle('collapsed'); c.setAttribute('aria-label',el.classList.contains('collapsed')?'Diagramm ausklappen':'Diagramm einklappen'); }
+});
+
+/* ---------- Tabs ---------- */
+function setTab(t){
+  S.tab=t; $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['pool','sim','scen','hw','myst','task'].forEach(k=>{ $('#pane-'+k).hidden=k!==t; });
+  if(t!=='pool') stopPool();
+  if(t==='sim'){ if(!S.sim.res) runSim(); else renderSim(); }
+  if(t==='scen'){ if(!S.scen.res) scenRun(); else scenRender(); }
+  if(t==='hw') hwShowAll();
+  if(t==='myst'&&!S.myst.res) mystNew();
+}
+$('#tabs').addEventListener('click',e=>{ const b=e.target.closest('.tab'); if(b){ setTab(b.dataset.tab); window.scrollTo({top:0}); } });
+
+/* ---------- Start ---------- */
+buildViewTabs(); buildHW(); syncInputs($('#poolCtl')); poolInit();
+})();
+</script>
+</body>
+</html>

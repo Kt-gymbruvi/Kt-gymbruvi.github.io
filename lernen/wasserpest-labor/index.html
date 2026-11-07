@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wasserpest-Labor</title>
+<style>
+:root{--paper:#F4F6F9;--panel:#FFFFFF;--ink:#13284A;--muted:#56657C;--line:#D3DCE8;--grid:#E4EAF2;--lamp:#F2C230;--water:#D4E9F4;--glass:#8EA5BD;--plant:#2E7A4C;--warn:#9E3D24;--warn-bg:#FBECE6;--ok:#22673F;--ok-bg:#E5F2EA;--accent:#13284A;--accent-ink:#FFFFFF;--temp:#C2462B;color-scheme:light;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#0C1524;--panel:#122037;--ink:#E6ECF5;--muted:#9BAAC0;--line:#2A3B55;--grid:#1A2943;--water:#1A3A52;--glass:#6F8BA8;--plant:#62C08A;--warn:#F2A28A;--warn-bg:#3A2019;--ok:#86D9A8;--ok-bg:#153227;--accent:#F2C230;--accent-ink:#13284A;--temp:#F07C62;color-scheme:dark;}}
+:root[data-theme="dark"]{--paper:#0C1524;--panel:#122037;--ink:#E6ECF5;--muted:#9BAAC0;--line:#2A3B55;--grid:#1A2943;--water:#1A3A52;--glass:#6F8BA8;--plant:#62C08A;--warn:#F2A28A;--warn-bg:#3A2019;--ok:#86D9A8;--ok-bg:#153227;--accent:#F2C230;--accent-ink:#13284A;--temp:#F07C62;color-scheme:dark;}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:inherit;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5;}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 16px 48px;}
+header h1{font-size:clamp(1.9rem,4.5vw,2.7rem);line-height:1.1;margin:0 0 .35em;letter-spacing:-.01em;}
+header p{margin:0;color:var(--muted);max-width:62ch;}
+.layout{display:grid;gap:20px;margin-top:22px;}
+@media (min-width:980px){.layout{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:start}.bench{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);}}
+.bench{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px 16px;}
+.apparatus{width:100%;height:auto;display:block;}
+.controls{display:grid;gap:14px;margin-top:6px;}
+@media (min-width:600px){.controls{grid-template-columns:1fr 1fr;}}
+.ctl{display:grid;gap:4px;}
+.ctl .lbl{display:flex;justify-content:space-between;gap:8px;}
+.val{font-weight:700;font-variant-numeric:tabular-nums;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer;}
+.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none;}
+select,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%;}
+textarea{min-height:84px;resize:vertical;}
+.btn{font:inherit;font-weight:700;border-radius:999px;padding:10px 18px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn.tap{width:100%;padding:20px;font-size:1.3rem;background:var(--lamp);border-color:var(--lamp);color:#13284A;}
+:focus-visible{outline:3px solid var(--lamp);outline-offset:2px;}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+.status{min-height:1.5em;color:var(--muted);margin-top:10px;}
+.hidden{display:none !important;}
+.heft{background-color:var(--panel);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px;border:1px solid var(--line);border-radius:16px;padding:20px 18px;}
+.step{padding:4px 0 24px;border-bottom:1px dashed var(--line);margin-bottom:20px;}
+.step:last-child{border-bottom:0;margin-bottom:0;padding-bottom:4px;}
+.step h2{display:flex;align-items:center;gap:12px;font-size:1.3rem;margin:0 0 10px;line-height:1.2;}
+.n{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--lamp);color:#13284A;font-weight:700;flex:none;}
+.step p{margin:.4em 0 .8em;max-width:65ch;}
+.step h3{font-size:1.05rem;margin:16px 0 6px;}
+.feedback{border-radius:10px;padding:10px 12px;margin-top:10px;}
+.feedback.ok{background:var(--ok-bg);color:var(--ok);}
+.feedback.warn{background:var(--warn-bg);color:var(--warn);}
+.feedback ul{margin:.3em 0 0;padding-left:1.2em;}
+details{margin-top:10px;}
+summary{cursor:pointer;font-weight:700;}
+details > div{padding:6px 0 0 2px;}
+.options{display:grid;gap:8px;}
+.option{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;}
+.option input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:none;}
+.term{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;}
+.term b{display:block;}
+.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;}
+table{border-collapse:collapse;width:100%;font-size:.95rem;font-variant-numeric:tabular-nums;}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top;}
+tr:last-child td{border-bottom:0;}
+td.hint{color:var(--warn);white-space:normal;min-width:170px;}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--grid);color:var(--ink);font-size:.85rem;margin:0 4px 2px 0;}
+.del{border:0;background:transparent;color:var(--muted);font:inherit;font-size:1.15rem;cursor:pointer;padding:0 6px;border-radius:6px;}
+.empty{color:var(--muted);font-style:italic;white-space:normal;}
+.chart{width:100%;height:auto;display:block;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-top:12px;}
+.small{font-size:.92rem;color:var(--muted);}
+.below{display:grid;gap:16px;margin-top:22px;}
+@media (min-width:980px){.below{grid-template-columns:1fr 1fr;}}
+.info{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--lamp);border-radius:12px;padding:14px 16px;}
+.info h3{margin:0 0 6px;font-size:1.1rem;}
+.info ul{margin:0;padding-left:1.2em;}
+.info li{margin:3px 0;}
+.copybox{margin-top:10px;min-height:180px;font-size:.9rem;}
+/* SVG */
+.s-ink{fill:var(--ink);} .s-muted{fill:var(--muted);} .s-water{fill:var(--water);} .s-plant{fill:var(--plant);}
+.s-glass{fill:none;stroke:var(--glass);stroke-width:3;stroke-linejoin:round;}
+.s-thin{fill:none;stroke:var(--glass);stroke-width:1.2;}
+.s-stem{fill:none;stroke:var(--plant);stroke-width:3;stroke-linecap:round;}
+.s-lamp{fill:var(--lamp);} .s-off{fill:var(--line);}
+.s-bubble{fill:var(--panel);fill-opacity:.9;stroke:var(--glass);stroke-width:1.2;}
+.s-axis{stroke:var(--muted);stroke-width:1.2;fill:none;}
+.s-gridline{stroke:var(--line);stroke-width:1;}
+.s-ruler{fill:var(--grid);stroke:var(--line);}
+.s-text{fill:var(--ink);font-family:inherit;}
+.s-small{fill:var(--muted);font-size:12px;font-family:inherit;}
+.s-temp{fill:var(--temp);}
+.s-panel{fill:var(--panel);stroke:var(--glass);stroke-width:1.5;}
+.s-mean{fill:var(--accent);} .s-meanline{fill:none;stroke:var(--accent);stroke-width:2.5;}
+.s-dot{fill:var(--muted);fill-opacity:.55;}
+.s-bar{fill:var(--lamp);}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <header>
+    <h1>Wasserpest-Labor</h1>
+    <p>Untersuche, wovon die Fotosynthese der Wasserpest abhängt. Bei der Fotosynthese gibt die Pflanze Gasblasen ab. Wir nutzen die Anzahl der Blasen pro Minute als Maß dafür, wie viel Fotosynthese stattfindet.</p>
+  </header>
+
+  <div class="layout">
+    <section class="bench" id="aufbau" aria-label="Versuchsaufbau">
+      <svg id="app" class="apparatus" viewBox="0 0 600 300" role="img" aria-label="Versuchsaufbau: Lampe, Becherglas mit Wasserpest und Thermometer">
+        <defs>
+          <linearGradient id="beamGrad" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" style="stop-color:var(--lamp);stop-opacity:.9"/>
+            <stop offset="1" style="stop-color:var(--lamp);stop-opacity:.15"/>
+          </linearGradient>
+        </defs>
+        <g id="beam"></g>
+        <g id="filterG"></g>
+        <line x1="20" y1="252" x2="590" y2="252" class="s-axis"/>
+        <rect x="458" y="96" width="84" height="153" class="s-water"/>
+        <g id="plantG"></g>
+        <g id="bubbles"></g>
+        <line x1="458" y1="96" x2="542" y2="96" class="s-thin"/>
+        <path d="M455,62 L455,246 Q455,252 461,252 L539,252 Q545,252 545,246 L545,62" class="s-glass"/>
+        <g id="thermo"></g>
+        <g id="ruler"></g>
+        <g id="lampG"></g>
+        <text id="co2Text" x="500" y="270" text-anchor="middle" class="s-small"></text>
+        <text id="cnt" x="20" y="34" class="s-text" font-size="20" font-weight="700"></text>
+        <rect id="timebar" x="20" y="44" height="6" rx="3" width="0" class="s-lamp"/>
+      </svg>
+
+      <div class="controls" id="controls">
+        <div class="ctl">
+          <div class="lbl"><label for="dist">Abstand Lampe – Glas</label><span class="val" id="distVal"></span></div>
+          <input type="range" id="dist" min="10" max="60" step="5">
+        </div>
+        <div class="ctl">
+          <div class="lbl"><label for="temp">Wasserbad (eingestellte Temperatur)</label><span class="val" id="tempVal"></span></div>
+          <input type="range" id="temp" min="5" max="45" step="5">
+        </div>
+        <div class="ctl">
+          <label for="co2">Wasser im Glas</label>
+          <select id="co2"></select>
+        </div>
+        <div class="ctl">
+          <label class="check"><input type="checkbox" id="light"> Lampe an</label>
+          <label class="check"><input type="checkbox" id="filter"> Wärmeschutz (Wasserküvette) zwischen Lampe und Glas</label>
+          <label class="check"><input type="checkbox" id="plant"> Wasserpest im Glas</label>
+        </div>
+      </div>
+
+      <div class="actions" id="measureBtns">
+        <button class="btn" id="btnAuto">Messen: 1 Minute im Zeitraffer</button>
+        <button class="btn ghost" id="btnSelf">Selbst zählen (30 Sekunden)</button>
+      </div>
+      <div class="actions hidden" id="tapPanel">
+        <button class="btn tap" id="btnTap">Blase gezählt!</button>
+        <button class="btn ghost" id="btnCancel">Messung abbrechen</button>
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </section>
+
+    <section class="heft" aria-label="Versuchsprotokoll">
+      <div class="step">
+        <h2><span class="n">1</span>Frage und Hypothese</h2>
+        <p>Wähle eine Frage, die du untersuchen willst.</p>
+        <div class="options" id="qOptions"></div>
+        <h3><label for="hyp">Deine Hypothese</label></h3>
+        <p class="small">Eine Hypothese ist eine begründete Vermutung. Sie wird im Versuch überprüft.</p>
+        <textarea id="hyp" placeholder="Je …, desto …, weil …"></textarea>
+        <div class="actions"><button class="btn ghost" id="btnHyp">Hypothese prüfen</button></div>
+        <div id="hypFb"></div>
+        <details><summary>Hilfe</summary><div>Was braucht eine Pflanze für die Fotosynthese? Denk an die Wortgleichung:<br><b>Kohlenstoffdioxid + Wasser → Traubenzucker + Sauerstoff</b> (mit Lichtenergie).</div></details>
+      </div>
+
+      <div class="step">
+        <h2><span class="n">2</span>Versuch planen</h2>
+        <div class="term"><b>Unabhängige Variable</b>Das veränderst du absichtlich: <span id="indepText"></span></div>
+        <div class="term"><b>Abhängige Variable</b>Das misst du: Anzahl der Gasblasen pro Minute</div>
+        <h3>Was musst du konstant halten (gleich lassen)?</h3>
+        <div class="options" id="konstOptions"></div>
+        <h3>Welcher Kontrollansatz ist sinnvoll?</h3>
+        <p class="small">Ein Kontrollansatz ist ein Vergleichsversuch. Er zeigt, ob das Ergebnis wirklich von dem Faktor abhängt, den du untersuchst.</p>
+        <div class="options" id="kontrOptions"></div>
+        <div class="actions"><button class="btn ghost" id="btnPlan">Planung überprüfen</button></div>
+        <div id="planFb"></div>
+        <p class="small">Tipp: Plane mindestens 4 verschiedene Einstellungen. Miss jede Einstellung 3-mal.</p>
+      </div>
+
+      <div class="step">
+        <h2><span class="n">3</span>Messen</h2>
+        <p>Stelle den Versuchsaufbau ein und starte eine Messung. Jede Messung landet in der Tabelle.</p>
+        <div class="actions" style="margin-top:0"><button class="btn ghost" id="btnToBench">Zum Versuchsaufbau</button></div>
+        <div class="tablewrap" style="margin-top:12px">
+          <table>
+            <thead><tr><th>Nr.</th><th>Abstand</th><th>Lampe</th><th>Wasser</th><th>Temperatur<br>gemessen</th><th>Blasen<br>pro Minute</th><th>Hinweis</th><th><span class="small">löschen</span></th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p class="small" id="tableSummary"></p>
+        <div class="actions"><button class="btn ghost" id="btnCopyData">Messwerte kopieren</button></div>
+        <div class="status" id="copyStatus" aria-live="polite"></div>
+      </div>
+
+      <div class="step">
+        <h2><span class="n">4</span>Diagramm</h2>
+        <p>Zeichne zuerst selbst ein Diagramm ins Heft. Vergleiche danach mit dem Diagramm hier.</p>
+        <div class="actions" style="margin-top:0"><button class="btn ghost" id="btnChart">Diagramm anzeigen</button></div>
+        <div id="chartBox" class="hidden"></div>
+      </div>
+
+      <div class="step">
+        <h2><span class="n">5</span>Auswertung</h2>
+        <h3><label for="beob">Beobachtung</label></h3>
+        <p class="small">Beschreibe nur, was die Messwerte zeigen. Erkläre noch nichts.</p>
+        <textarea id="beob" placeholder="Wenn der Abstand … wird, dann …"></textarea>
+        <h3><label for="deut">Deutung</label></h3>
+        <p class="small">Erkläre deine Beobachtung mit der Fotosynthese.</p>
+        <textarea id="deut" placeholder="Das liegt daran, dass …"></textarea>
+        <h3>Ist deine Hypothese bestätigt?</h3>
+        <div class="options" id="ergOptions"></div>
+        <h3>Mögliche Fehlerquellen</h3>
+        <p class="small">Kreuze an, was bei deinem Versuch eine Rolle spielen könnte. Öffne die Erklärungen.</p>
+        <div class="options" id="fehlerOptions"></div>
+        <div class="actions"><button class="btn" id="btnProt">Protokoll als Text kopieren</button></div>
+        <div class="status" id="protStatus" aria-live="polite"></div>
+        <textarea id="protBox" class="copybox hidden" readonly aria-label="Protokoll als Text"></textarea>
+      </div>
+    </section>
+  </div>
+
+  <div class="below">
+    <div class="info">
+      <h3>Für den echten Versuch</h3>
+      <ul>
+        <li>Die Lampe wird heiß. Fass sie nicht an. Halte Papier und Kabel fern.</li>
+        <li>Wasser und Strom: Kabel und Stecker müssen trocken bleiben. Stell die Lampe sicher auf.</li>
+        <li>Glas kann brechen. Melde Glasbruch sofort.</li>
+        <li>Trag beim Umgang mit Natriumhydrogencarbonat eine Schutzbrille.</li>
+        <li>Vor dem Versuch erstellt die Lehrkraft eine Gefährdungsbeurteilung nach den Vorgaben eurer Schule.</li>
+      </ul>
+    </div>
+    <div class="info">
+      <h3>Hinweise zur Simulation</h3>
+      <ul>
+        <li>Die Werte werden mit einem vereinfachten Modell berechnet. Ein echter Versuch liefert andere Werte.</li>
+        <li>Modell: Die Lichtwirkung nimmt mit dem Quadrat des Abstands ab und erreicht eine Sättigung. Optimum bei etwa 30 °C, ab etwa 40 °C starker Abfall. Zufällige Streuung etwa ±10 %.</li>
+        <li>Ohne Wärmeschutz erwärmt die Lampe das Wasser bei kleinem Abstand (bis etwa +8 °C bei 10 cm). Das ist eine absichtliche Fehlerquelle.</li>
+        <li>Nicht simuliert: Eingewöhnungszeit der Pflanze, Blasengröße, Raumlicht.</li>
+        <li>Eingaben werden nur auf diesem Gerät gespeichert. Bitte keine Namen eingeben.</li>
+      </ul>
+      <div class="actions"><button class="btn ghost" id="btnReset">Alles zurücksetzen</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const KEY='wasserpest-labor-v1';
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString('de-DE');
+
+const VARS={
+  abstand:{label:'Abstand der Lampe',frage:'Wie beeinflusst der Abstand der Lampe die Anzahl der Gasblasen?',axis:'Abstand der Lampe in cm'},
+  temperatur:{label:'Wassertemperatur',frage:'Wie beeinflusst die Wassertemperatur die Anzahl der Gasblasen?',axis:'Wassertemperatur in °C'},
+  co2:{label:'CO₂-Gehalt des Wassers',frage:'Wie beeinflusst der Kohlenstoffdioxid-Gehalt (CO₂) des Wassers die Anzahl der Gasblasen?',axis:'Wasser im Glas'}
+};
+const CO2={
+  abgekocht:{label:'abgekochtes Wasser (kaum CO₂)',short:'abgekocht',f:0.08},
+  leitung:{label:'Leitungswasser (wenig CO₂)',short:'Leitungswasser',f:0.5},
+  hydrogen:{label:'Leitungswasser mit Natriumhydrogencarbonat (viel CO₂)',short:'mit Natriumhydrogencarbonat',f:1}
+};
+const CO2_ORDER=['abgekocht','leitung','hydrogen'];
+const KONST=[
+  {id:'abstand',t:'Abstand der Lampe'},
+  {id:'temperatur',t:'Wassertemperatur'},
+  {id:'co2',t:'CO₂-Gehalt des Wassers'},
+  {id:'pflanze',t:'dieselbe Wasserpest-Pflanze'},
+  {id:'dauer',t:'gleiche Messdauer (1 Minute)'},
+  {id:'blasen',t:'Anzahl der Gasblasen'}
+];
+const KONTR=[
+  {id:'dunkel',t:'Gleicher Aufbau, aber die Lampe ist aus (Glas mit Alufolie abgedeckt).',ok:true,fb:'Richtig: So prüfst du, ob die Blasen wirklich vom Licht abhängen.'},
+  {id:'ohne',t:'Gleicher Aufbau, aber ohne Pflanze im Glas.',ok:true,fb:'Richtig: So prüfst du, ob die Blasen wirklich von der Pflanze kommen.'},
+  {id:'staerker',t:'Eine stärkere Lampe verwenden.',ok:false,fb:'„Stärkere Lampe“ ist kein Kontrollansatz. Das ist nur eine weitere Versuchsbedingung.'},
+  {id:'mehr',t:'Mehr Pflanzen ins Glas geben.',ok:false,fb:'„Mehr Pflanzen“ verändert eine zusätzliche Bedingung. Ein Kontrollansatz lässt genau einen Faktor weg.'}
+];
+const ERG=[{id:'ja',t:'bestätigt'},{id:'nein',t:'widerlegt'},{id:'unklar',t:'nicht eindeutig'}];
+const FEHLER=[
+  {id:'waerme',t:'Die Lampe hat das Wasser erwärmt.',e:'Lampen geben Wärme ab. Dann änderst du ungewollt auch die Temperatur. Abhilfe: Wärmeschutz zwischen Lampe und Glas und die Temperatur bei jeder Messung kontrollieren.'},
+  {id:'groesse',t:'Die Blasen waren unterschiedlich groß.',e:'Eine große Blase enthält mehr Gas als eine kleine. Zählen ist deshalb ungenau. Genauer wäre es, das Gasvolumen zu messen.'},
+  {id:'zaehlen',t:'Ich habe mich verzählt.',e:'Miss jede Einstellung mehrmals und bilde den Mittelwert.'},
+  {id:'warten',t:'Die Pflanze hatte nach einer Änderung zu wenig Zeit.',e:'Nach jeder Änderung einige Minuten warten, bis die Blasen gleichmäßig aufsteigen.'},
+  {id:'raumlicht',t:'Licht aus dem Raum fiel auf die Pflanze.',e:'Tageslicht oder Deckenlicht wirkt zusätzlich. Abhilfe: Raum abdunkeln.'},
+  {id:'gas',t:'Die Blasen enthalten nicht nur Sauerstoff.',e:'Die Blasen bestehen größtenteils, aber nicht nur aus Sauerstoff. Die Blasenzahl ist also nur ein ungefähres Maß für die Fotosynthese.'}
+];
+
+const DEFAULT={q:{variable:'abstand',hyp:''},plan:{konst:[],kontr:[]},setup:{d:20,T:20,co2:'leitung',light:true,filter:true,plant:true},rows:[],ev:{beob:'',deut:'',erg:'',fehler:[]},chart:false};
+let state=JSON.parse(JSON.stringify(DEFAULT));
+try{const raw=localStorage.getItem(KEY);if(raw){const s=JSON.parse(raw);state=Object.assign(JSON.parse(JSON.stringify(DEFAULT)),s);state.setup=Object.assign({},DEFAULT.setup,s.setup||{});}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* ---------- Modell ---------- */
+const lightFactor=d=>{const I=100*Math.pow(10/d,2);return I/(I+15);};
+const tempActual=s=>{const add=(s.light&&!s.filter)?8*Math.pow(10/s.d,2):0;return Math.round((s.T+add)*2)/2;};
+const tempFactor=T=>T<=30?0.15+0.85*Math.pow(Math.max(0,T-5)/25,1.3):Math.max(0,1-Math.pow((T-30)/12,2));
+const rate=s=>(!s.plant||!s.light)?0:60*lightFactor(s.d)*tempFactor(tempActual(s))*CO2[s.co2].f;
+function noisy(n){if(n<=0)return 0;const g=(Math.random()+Math.random()+Math.random()-1.5)/1.5;return Math.max(0,Math.round(n*(1+0.18*g)));}
+
+/* ---------- Aufbau zeichnen ---------- */
+const xFront=d=>455-d*6;
+function drawRuler(){let h=`<rect x="95" y="258" width="360" height="18" class="s-ruler"/>`;for(let d=0;d<=60;d+=10){const x=xFront(d);h+=`<line x1="${x}" y1="258" x2="${x}" y2="268" class="s-axis"/><text x="${x}" y="292" text-anchor="middle" class="s-small">${d}</text>`;}h+=`<text x="470" y="292" class="s-small">cm</text>`;$('ruler').innerHTML=h;}
+function drawPlant(){if(!state.setup.plant){$('plantG').innerHTML='';return;}let h=`<path d="M492,244 C487,220 497,198 491,172" class="s-stem"/><rect x="485" y="238" width="13" height="9" rx="2" class="s-muted"/>`;for(let y=232;y>=180;y-=10){const t=(244-y)/72;const x=492-Math.sin(t*3)*3;h+=`<ellipse cx="${x-7}" cy="${y}" rx="8" ry="2.6" transform="rotate(28 ${x-7} ${y})" class="s-plant"/><ellipse cx="${x+7}" cy="${y}" rx="8" ry="2.6" transform="rotate(-28 ${x+7} ${y})" class="s-plant"/>`;}$('plantG').innerHTML=h;}
+function drawApparatus(){
+  const s=state.setup,xf=xFront(s.d),lf=lightFactor(s.d);
+  $('beam').innerHTML=s.light?`<polygon points="${xf},98 ${xf},162 545,64 545,248" fill="url(#beamGrad)" opacity="${(0.12+0.6*lf).toFixed(2)}"/>`:'';
+  if(s.filter){const cx=(xf+455)/2;$('filterG').innerHTML=`<rect x="${cx-8}" y="92" width="16" height="76" rx="3" class="s-water" style="stroke:var(--glass);stroke-width:1.5"/>`+(s.d>=20?`<text x="${cx}" y="84" text-anchor="middle" class="s-small">Wärmeschutz</text>`:'');}else $('filterG').innerHTML='';
+  $('lampG').innerHTML=`<g transform="translate(${xf},0)"><rect x="-40" y="150" width="7" height="96" class="s-ink"/><rect x="-62" y="244" width="52" height="8" rx="3" class="s-ink"/><polygon points="-72,112 -6,94 -6,166 -72,148" class="s-ink"/><ellipse cx="-6" cy="130" rx="7" ry="31" class="${s.light?'s-lamp':'s-off'}"/><polygon points="0,262 -7,252 7,252" class="s-lamp" transform="translate(0,-4)"/></g>`;
+  const Ta=tempActual(s),h=Math.min(170,Math.max(4,Ta/50*170));
+  $('thermo').innerHTML=`<rect x="526" y="50" width="8" height="178" rx="4" class="s-panel"/><rect x="528" y="${224-h}" width="4" height="${h}" class="s-temp"/><circle cx="530" cy="230" r="7" class="s-temp"/><text x="574" y="118" text-anchor="middle" class="s-small">gemessen</text><text x="574" y="140" text-anchor="middle" class="s-text" font-size="17" font-weight="700">${fmt(Ta)} °C</text>`;
+  $('co2Text').textContent=CO2[s.co2].short;
+  drawPlant();
+}
+
+/* ---------- Blasen ---------- */
+const bubbles=[];let last=performance.now();let measuring=null;
+function spawnBubble(){const c=document.createElementNS(NS,'circle');c.setAttribute('r',(2.2+Math.random()*2.4).toFixed(1));c.setAttribute('class','s-bubble');$('bubbles').appendChild(c);bubbles.push({el:c,x:491+(Math.random()-.5)*3,y:168,vy:50+Math.random()*25,ph:Math.random()*6,t:0});}
+function tick(now){const dt=Math.min(0.1,(now-last)/1000);last=now;
+  if(measuring)measuring.update(now);else{const r=rate(state.setup)/60;if(r>0&&Math.random()<r*dt)spawnBubble();}
+  for(let i=bubbles.length-1;i>=0;i--){const b=bubbles[i];b.t+=dt;b.y-=b.vy*dt;b.el.setAttribute('cx',(b.x+Math.sin(b.ph+b.t*5)*1.5).toFixed(1));b.el.setAttribute('cy',b.y.toFixed(1));if(b.y<99){b.el.remove();bubbles.splice(i,1);}}
+  requestAnimationFrame(tick);}
+requestAnimationFrame(tick);
+
+/* ---------- Bedienelemente ---------- */
+const ctlIds=['dist','temp','co2','light','filter','plant'];
+$('co2').innerHTML=CO2_ORDER.map(k=>`<option value="${k}">${CO2[k].label}</option>`).join('');
+function syncControls(){const s=state.setup;$('dist').value=s.d;$('distVal').textContent=`${s.d} cm`;$('temp').value=s.T;$('tempVal').textContent=`${s.T} °C`;$('co2').value=s.co2;$('light').checked=s.light;$('filter').checked=s.filter;$('plant').checked=s.plant;}
+function onSetup(){const s=state.setup;s.d=+$('dist').value;s.T=+$('temp').value;s.co2=$('co2').value;s.light=$('light').checked;s.filter=$('filter').checked;s.plant=$('plant').checked;syncControls();drawApparatus();save();}
+ctlIds.forEach(id=>$(id).addEventListener('input',onSetup));
+
+function setMeasuring(on,self){ctlIds.forEach(id=>$(id).disabled=on);$('btnAuto').disabled=on;$('btnSelf').disabled=on;$('measureBtns').classList.toggle('hidden',on&&self);$('tapPanel').classList.toggle('hidden',!(on&&self));if(!on){$('cnt').textContent='';$('timebar').setAttribute('width',0);}}
+function clearBubbles(){bubbles.forEach(b=>b.el.remove());bubbles.length=0;}
+
+$('btnAuto').addEventListener('click',()=>{
+  if(measuring)return;const s={...state.setup};const n=noisy(rate(s));const dur=6000;
+  const times=Array.from({length:n},()=>Math.random()*dur).sort((a,b)=>a-b);
+  const t0=performance.now();let i=0;clearBubbles();setMeasuring(true,false);$('status').textContent='Messung läuft …';
+  measuring={update(now){const el=now-t0;while(i<times.length&&times[i]<=el){spawnBubble();i++;}$('cnt').textContent=`Gezählt: ${i}`;$('timebar').setAttribute('width',Math.min(1,el/dur)*200);
+    if(el>=dur){measuring=null;setMeasuring(false);addRow(s,n,'Zeitraffer');$('status').textContent=`Messung fertig: ${n} Gasblasen pro Minute.`;}}};
+});
+let taps=0;
+$('btnSelf').addEventListener('click',()=>{
+  if(measuring)return;const s={...state.setup};const n=noisy(rate(s)/2);const dur=30000;
+  const times=Array.from({length:n},()=>Math.random()*dur).sort((a,b)=>a-b);
+  const t0=performance.now();let i=0;taps=0;clearBubbles();setMeasuring(true,true);$('btnTap').focus();
+  $('status').textContent='Tippe bei jeder Blase, die aufsteigt.';
+  measuring={update(now){const el=now-t0;while(i<times.length&&times[i]<=el){spawnBubble();i++;}$('cnt').textContent=`Noch ${Math.max(0,Math.ceil((dur-el)/1000))} s`;$('timebar').setAttribute('width',Math.min(1,el/dur)*200);
+    if(el>=dur){measuring=null;setMeasuring(false);addRow(s,taps*2,'selbst gezählt',n*2);$('status').textContent=`Du hast ${taps} Blasen in 30 Sekunden gezählt. Das sind ${taps*2} pro Minute. Tatsächlich aufgestiegen sind ${n} Blasen (${n*2} pro Minute).`;}}};
+});
+$('btnTap').addEventListener('click',()=>{if(measuring){taps++;$('btnTap').textContent=`Blase gezählt! (${taps})`;}});
+$('btnCancel').addEventListener('click',()=>{measuring=null;setMeasuring(false);$('btnTap').textContent='Blase gezählt!';$('status').textContent='Messung abgebrochen. Es wurde nichts gespeichert.';});
+const origSet=setMeasuring;
+$('btnToBench').addEventListener('click',()=>$('aufbau').scrollIntoView({behavior:'smooth',block:'start'}));
+
+/* ---------- Messwerte ---------- */
+function addRow(s,wert,mode,actual){state.rows.push({id:Date.now()+Math.random(),d:s.d,light:s.light,T:s.T,Ta:tempActual(s),co2:s.co2,plant:s.plant,filter:s.filter,wert,mode,actual:actual??null});$('btnTap').textContent='Blase gezählt!';save();renderTable();renderChart();}
+const isCtl=r=>!r.light||!r.plant;
+function rowFlags(r,ref){const v=state.q.variable,f=[];if(isCtl(r))return f;
+  if(ref&&r!==ref){if(v!=='abstand'&&r.d!==ref.d)f.push('Abstand wurde verändert.');if(v!=='co2'&&r.co2!==ref.co2)f.push('Wasser (CO₂) wurde verändert.');if(v!=='temperatur'&&Math.abs(r.Ta-ref.Ta)>=2)f.push('Temperatur weicht ab. Woran könnte das liegen?');}
+  if(v==='temperatur'&&Math.abs(r.Ta-r.T)>=2)f.push('Wasser ist wärmer als eingestellt. Woran könnte das liegen?');return f;}
+const keyOf=r=>{const v=state.q.variable;return v==='abstand'?r.d:v==='temperatur'?r.T:r.co2;};
+function renderTable(){
+  const rows=state.rows,tb=$('tbody');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="empty">Noch keine Messungen. Stelle den Versuch ein und starte eine Messung.</td></tr>';$('tableSummary').textContent='';return;}
+  const ref=rows.find(r=>!isCtl(r));
+  tb.innerHTML=rows.map((r,i)=>{const tags=[];if(!r.plant)tags.push('Kontrolle: ohne Pflanze');else if(!r.light)tags.push('Kontrolle: Lampe aus');if(r.mode==='selbst gezählt')tags.push('selbst gezählt');
+    const fl=rowFlags(r,ref);return `<tr><td>${i+1}</td><td>${r.d} cm</td><td>${r.light?'an':'aus'}</td><td>${CO2[r.co2].short}</td><td>${fmt(r.Ta)} °C</td><td><b>${r.wert}</b></td><td class="hint">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}${fl.join('<br>')}</td><td><button class="del" data-id="${r.id}" aria-label="Messung ${i+1} löschen">×</button></td></tr>`;}).join('');
+  const groups={};rows.filter(r=>!isCtl(r)).forEach(r=>{const k=keyOf(r);groups[k]=(groups[k]||0)+1;});
+  const g=Object.keys(groups).length,few=Object.values(groups).filter(c=>c<3).length;
+  $('tableSummary').textContent=`${VARS[state.q.variable].label}: ${g} verschiedene Einstellung${g===1?'':'en'} gemessen.`+(state.q.variable==='co2'?' Ziel: alle 3 Wasserarten.':' Ziel: mindestens 4.')+(few?` Bei ${few} Einstellung${few===1?'':'en'} fehlen noch Wiederholungen (Ziel: 3 Messungen).`:'');
+}
+$('tbody').addEventListener('click',e=>{const b=e.target.closest('.del');if(!b)return;state.rows=state.rows.filter(r=>String(r.id)!==b.dataset.id);save();renderTable();renderChart();});
+$('btnCopyData').addEventListener('click',()=>{
+  if(!state.rows.length){$('copyStatus').textContent='Es gibt noch keine Messwerte zum Kopieren.';return;}
+  const txt=['Nr.\tAbstand (cm)\tLampe\tWasser\tTemperatur gemessen (°C)\tBlasen pro Minute'].concat(state.rows.map((r,i)=>[i+1,r.d,r.light?'an':'aus',CO2[r.co2].short,fmt(r.Ta),r.wert].join('\t'))).join('\n');
+  copyText(txt,$('copyStatus'),'Messwerte kopiert. Du kannst sie in eine Tabelle einfügen.');
+});
+function copyText(txt,statusEl,okMsg,box){
+  const fallback=()=>{if(box){box.classList.remove('hidden');box.value=txt;box.focus();box.select();}statusEl.textContent=box?'Markiere den Text unten und kopiere ihn.':'Kopieren hat nicht geklappt. Bitte erneut versuchen.';};
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(()=>{statusEl.textContent=okMsg;if(box){box.classList.remove('hidden');box.value=txt;}}).catch(fallback);}else fallback();}catch(e){fallback();}
+}
+
+/* ---------- Diagramm ---------- */
+function renderChart(){
+  $('chartBox').classList.toggle('hidden',!state.chart);$('btnChart').textContent=state.chart?'Diagramm ausblenden':'Diagramm anzeigen';
+  if(!state.chart)return;
+  const v=state.q.variable,rows=state.rows.filter(r=>!isCtl(r)),ctl=state.rows.filter(isCtl);
+  if(!rows.length){$('chartBox').innerHTML='<p class="empty">Noch keine passenden Messwerte. Miss zuerst in Schritt 3.</p>';return;}
+  const W=560,H=330,m={l:62,r:18,t:18,b:62},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const maxV=Math.max(10,Math.ceil(Math.max(...rows.map(r=>r.wert))/10)*10);
+  const y=val=>m.t+ih-val/maxV*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Diagramm: ${VARS[v].axis} gegen Gasblasen pro Minute">`;
+  for(let t=0;t<=maxV;t+=maxV/5){s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(t)}" y2="${y(t)}" class="s-gridline"/><text x="${m.l-8}" y="${y(t)+4}" text-anchor="end" class="s-small">${fmt(Math.round(t))}</text>`;}
+  const groups={};rows.forEach(r=>{const k=keyOf(r);(groups[k]=groups[k]||[]).push(r.wert);});
+  const mean=a=>a.reduce((p,c)=>p+c,0)/a.length;
+  if(v==='co2'){
+    const slot=iw/3;CO2_ORDER.forEach((k,i)=>{const cx=m.l+slot*i+slot/2;s+=`<text x="${cx}" y="${H-m.b+20}" text-anchor="middle" class="s-small">${CO2[k].short.replace('mit Natriumhydrogencarbonat','mit NaHCO₃')}</text>`;
+      if(groups[k]){const mv=mean(groups[k]);s+=`<rect x="${cx-30}" y="${y(mv)}" width="60" height="${m.t+ih-y(mv)}" class="s-bar"/>`;groups[k].forEach((val,j)=>{s+=`<circle cx="${cx-12+j%5*6}" cy="${y(val)}" r="3.5" class="s-dot"/>`;});}});
+  }else{
+    const xmax=v==='abstand'?60:50,x=val=>m.l+val/xmax*iw;
+    for(let t=0;t<=xmax;t+=10){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${m.t+ih}" y2="${m.t+ih+6}" class="s-axis"/><text x="${x(t)}" y="${H-m.b+22}" text-anchor="middle" class="s-small">${t}</text>`;}
+    const keys=Object.keys(groups).map(Number).sort((a,b)=>a-b);
+    keys.forEach(k=>groups[k].forEach(val=>{s+=`<circle cx="${x(k)}" cy="${y(val)}" r="3.5" class="s-dot"/>`;}));
+    if(keys.length>1)s+=`<polyline points="${keys.map(k=>`${x(k)},${y(mean(groups[k]))}`).join(' ')}" class="s-meanline"/>`;
+    keys.forEach(k=>{s+=`<circle cx="${x(k)}" cy="${y(mean(groups[k]))}" r="5.5" class="s-mean"/>`;});
+  }
+  s+=`<line x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${m.t+ih}" class="s-axis"/><line x1="${m.l}" y1="${m.t+ih}" x2="${W-m.r}" y2="${m.t+ih}" class="s-axis"/>`;
+  s+=`<text x="${m.l+iw/2}" y="${H-14}" text-anchor="middle" class="s-text" font-size="14">${VARS[v].axis}</text><text transform="translate(18 ${m.t+ih/2}) rotate(-90)" text-anchor="middle" class="s-text" font-size="14">Gasblasen pro Minute</text></svg>`;
+  s+=`<p class="small">Kleine graue Punkte: einzelne Messungen. Große Punkte${v==='co2'?' bzw. Balken':''}: Mittelwert.</p>`;
+  if(ctl.length)s+=`<p class="small">Kontrollansätze: ${ctl.map(r=>`${!r.plant?'ohne Pflanze':'Lampe aus'} = ${r.wert} Blasen pro Minute`).join('; ')}.</p>`;
+  s+=`<p class="small">Beschreibe den Verlauf: Steigt die Kurve, fällt sie oder bleibt sie gleich? Gibt es einen Bereich, in dem sie sich kaum noch ändert?</p>`;
+  $('chartBox').innerHTML=s;
+}
+$('btnChart').addEventListener('click',()=>{state.chart=!state.chart;save();renderChart();});
+
+/* ---------- Schritt 1 und 2 ---------- */
+function renderQ(){
+  $('qOptions').innerHTML=Object.keys(VARS).map(k=>`<label class="option"><input type="radio" name="q" value="${k}" ${state.q.variable===k?'checked':''}><span>${VARS[k].frage}</span></label>`).join('');
+  $('indepText').textContent=VARS[state.q.variable].label;
+  $('beob').placeholder=state.q.variable==='abstand'?'Wenn der Abstand größer wird, dann …':state.q.variable==='temperatur'?'Wenn die Temperatur steigt, dann …':'Im Wasser mit viel CO₂ …';
+}
+$('qOptions').addEventListener('change',e=>{if(e.target.name!=='q')return;state.q.variable=e.target.value;state.plan.konst=[];$('planFb').innerHTML='';save();renderQ();renderKonst();renderTable();renderChart();});
+$('hyp').value=state.q.hyp;$('hyp').addEventListener('input',()=>{state.q.hyp=$('hyp').value;save();});
+$('btnHyp').addEventListener('click',()=>{
+  const t=state.q.hyp.toLowerCase(),ok=[],todo=[];
+  if(!t.trim()){$('hypFb').innerHTML='<div class="feedback warn">Schreib zuerst eine Hypothese.</div>';return;}
+  if(/\bje\b/.test(t)&&/\bdesto\b|\bumso\b/.test(t))ok.push('Du nennst einen Zusammenhang (je …, desto …).');else todo.push('Formuliere einen Zusammenhang: „Je …, desto …“.');
+  if(/\bweil\b|\bda\b|\bdenn\b/.test(t))ok.push('Du begründest deine Vermutung.');else todo.push('Ergänze eine Begründung mit „weil …“.');
+  $('hypFb').innerHTML=`<div class="feedback ${todo.length?'warn':'ok'}"><ul>${ok.concat(todo).map(x=>`<li>${x}</li>`).join('')}</ul>${todo.length?'':'Prüfe selbst: Passt deine Begründung zur Fotosynthese?'}</div>`;
+});
+function renderKonst(){
+  $('konstOptions').innerHTML=KONST.map(k=>`<label class="option"><input type="checkbox" value="${k.id}" ${state.plan.konst.includes(k.id)?'checked':''}><span>${k.t}</span></label>`).join('');
+  $('kontrOptions').innerHTML=KONTR.map(k=>`<label class="option"><input type="checkbox" value="${k.id}" ${state.plan.kontr.includes(k.id)?'checked':''}><span>${k.t}</span></label>`).join('');
+}
+$('konstOptions').addEventListener('change',()=>{state.plan.konst=[...$('konstOptions').querySelectorAll('input:checked')].map(i=>i.value);save();});
+$('kontrOptions').addEventListener('change',()=>{state.plan.kontr=[...$('kontrOptions').querySelectorAll('input:checked')].map(i=>i.value);save();});
+$('btnPlan').addEventListener('click',()=>{
+  const v=state.q.variable,should=KONST.map(k=>k.id).filter(id=>id!==v&&id!=='blasen'),chosen=state.plan.konst,msg=[];let good=true;
+  if(chosen.includes(v)){msg.push(`„${VARS[v].label}“ veränderst du absichtlich. Das ist deine unabhängige Variable.`);good=false;}
+  if(chosen.includes('blasen')){msg.push('„Anzahl der Gasblasen“ misst du. Das ist die abhängige Variable.');good=false;}
+  const miss=should.filter(x=>!chosen.includes(x));
+  if(miss.length){msg.push(`Halte auch konstant: ${miss.map(x=>KONST.find(k=>k.id===x).t).join(', ')}.`);good=false;}
+  else if(good)msg.push('Konstante Bedingungen: alles richtig.');
+  if(!state.plan.kontr.length){msg.push('Wähle mindestens einen Kontrollansatz.');good=false;}
+  state.plan.kontr.forEach(id=>{const k=KONTR.find(x=>x.id===id);msg.push(k.fb);if(!k.ok)good=false;});
+  $('planFb').innerHTML=`<div class="feedback ${good?'ok':'warn'}"><ul>${msg.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+});
+
+/* ---------- Schritt 5 ---------- */
+$('beob').value=state.ev.beob;$('deut').value=state.ev.deut;
+$('beob').addEventListener('input',()=>{state.ev.beob=$('beob').value;save();});
+$('deut').addEventListener('input',()=>{state.ev.deut=$('deut').value;save();});
+$('ergOptions').innerHTML=ERG.map(k=>`<label class="option"><input type="radio" name="erg" value="${k.id}" ${state.ev.erg===k.id?'checked':''}><span>${k.t}</span></label>`).join('');
+$('ergOptions').addEventListener('change',e=>{state.ev.erg=e.target.value;save();});
+$('fehlerOptions').innerHTML=FEHLER.map(f=>`<div class="option" style="display:block"><label class="check"><input type="checkbox" value="${f.id}" ${state.ev.fehler.includes(f.id)?'checked':''}><span>${f.t}</span></label><details><summary>Erklärung</summary><div>${f.e}</div></details></div>`).join('');
+$('fehlerOptions').addEventListener('change',()=>{state.ev.fehler=[...$('fehlerOptions').querySelectorAll('input:checked')].map(i=>i.value);save();});
+$('btnProt').addEventListener('click',()=>{
+  const v=state.q.variable,d=new Date().toLocaleDateString('de-DE');
+  const konst=KONST.filter(k=>k.id!==v&&k.id!=='blasen').map(k=>k.t).join(', ');
+  const rows=state.rows.length?state.rows.map((r,i)=>`${i+1}. Abstand ${r.d} cm | Lampe ${r.light?'an':'aus'} | ${CO2[r.co2].short} | ${fmt(r.Ta)} °C | ${r.wert} Blasen/min${isCtl(r)?' (Kontrolle)':''}`).join('\n'):'(keine Messwerte)';
+  const erg=(ERG.find(e=>e.id===state.ev.erg)||{t:'(nicht angegeben)'}).t;
+  const fehler=state.ev.fehler.length?state.ev.fehler.map(id=>'- '+FEHLER.find(f=>f.id===id).t).join('\n'):'(keine angekreuzt)';
+  const txt=`Versuchsprotokoll: Fotosynthese der Wasserpest (Simulation)\nDatum: ${d}\n\nFrage: ${VARS[v].frage}\nHypothese: ${state.q.hyp||'(fehlt)'}\n\nMaterial: Wasserpest, Becherglas, Lampe, Lineal, Thermometer, Wasserbad, Wärmeschutz (Wasserküvette), Stoppuhr\nUnabhängige Variable: ${VARS[v].label}\nAbhängige Variable: Anzahl der Gasblasen pro Minute\nKonstant gehalten: ${konst}\n\nMesswerte:\n${rows}\n\nBeobachtung: ${state.ev.beob||'(fehlt)'}\nDeutung: ${state.ev.deut||'(fehlt)'}\nHypothese: ${erg}\n\nMögliche Fehlerquellen:\n${fehler}\n\nHinweis: Die Messwerte stammen aus einer Simulation.`;
+  copyText(txt,$('protStatus'),'Protokoll kopiert. Du kannst es jetzt einfügen.',$('protBox'));
+});
+
+$('btnReset').addEventListener('click',()=>{if(!confirm('Alle Eingaben und Messwerte löschen?'))return;state=JSON.parse(JSON.stringify(DEFAULT));save();location.reload();});
+
+/* ---------- Start ---------- */
+drawRuler();syncControls();drawApparatus();renderQ();renderKonst();renderTable();renderChart();
+})();
+</script>
+</body>
+</html>

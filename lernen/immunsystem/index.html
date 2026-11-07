@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Immunsystem und Krankheitserreger – Erklär-Schaubild</title>
+<style>
+:root{
+  --bg:#EDF2F5; --surface:#FFFFFF; --ink:#13232D; --muted:#4A5C68; --line:#C6D2DA;
+  --err:#C2185B; --err-soft:#FBE3EC;
+  --uns:#9A5500; --uns-soft:#FCEAD2;
+  --spz:#00706A; --spz-soft:#D3EFEB;
+  --body:#5A6D7A; --body-soft:#E2E9ED;
+  --zoneA:#E3ECF2; --zoneB:#F7F9FA; --zoneC:#EBF2F0;
+  --focus:#1F5FD1; --primary:#13232D; --on-primary:#FFFFFF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0D1820; --surface:#14222B; --ink:#E5EEF2; --muted:#A3B5C0; --line:#2C3F4B;
+    --err:#FF7DAC; --err-soft:#3A1828;
+    --uns:#FFB54A; --uns-soft:#3A2A12;
+    --spz:#52D3C0; --spz-soft:#103631;
+    --body:#9DB0BC; --body-soft:#22333D;
+    --zoneA:#112029; --zoneB:#182832; --zoneC:#13262A;
+    --focus:#7FB2FF; --primary:#E5EEF2; --on-primary:#0D1820;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0D1820; --surface:#14222B; --ink:#E5EEF2; --muted:#A3B5C0; --line:#2C3F4B;
+  --err:#FF7DAC; --err-soft:#3A1828;
+  --uns:#FFB54A; --uns-soft:#3A2A12;
+  --spz:#52D3C0; --spz-soft:#103631;
+  --body:#9DB0BC; --body-soft:#22333D;
+  --zoneA:#112029; --zoneB:#182832; --zoneC:#13262A;
+  --focus:#7FB2FF; --primary:#E5EEF2; --on-primary:#0D1820;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:1.0625rem;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+header{padding:8px 0 16px}
+h1{font-size:clamp(1.5rem,1.1rem + 2vw,2.25rem);line-height:1.15;margin:0 0 6px;letter-spacing:-.01em}
+.sub{margin:0;color:var(--muted);max-width:62ch}
+.layout{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:900px){
+  .layout{grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);align-items:start}
+  .panel{position:sticky;top:calc(16px + env(safe-area-inset-top,0px))}
+}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.stage{padding:12px}
+.stepbar{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;margin-bottom:10px}
+.counter{flex:1 1 auto;line-height:1.25;text-align:center;font-weight:700;min-width:0}
+.counter{font-size:.95rem}.counter small{display:block;font-weight:400;color:var(--muted);font-size:.85rem}
+.progress{height:6px;border-radius:3px;background:var(--body-soft);overflow:hidden;margin:0 0 10px}
+.progress span{display:block;height:100%;background:var(--spz);width:0;transition:width .3s}
+.btn{white-space:nowrap;min-height:44px;min-width:44px;padding:8px 14px;border-radius:10px;border:1.5px solid var(--line);
+  background:var(--surface);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.chip:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.extra{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:8px}
+.extra #play{margin-right:auto}
+.caption{margin:8px 0 0;min-height:3.2em;padding:8px 12px;border-radius:10px;background:var(--zoneB);border:1px solid var(--line);font-size:1rem;line-height:1.4}
+.flash{animation:flash .9s ease-out}
+@keyframes flash{40%{filter:drop-shadow(0 0 6px var(--focus)) drop-shadow(0 0 2px var(--focus))}}
+.node.killed{opacity:.4}.node.killed .vdot{opacity:0}.node.killed .cellbody{stroke-dasharray:4 3}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}}
+.diagram{display:block;width:100%;height:auto;max-height:calc(100dvh - 290px);margin:0 auto;touch-action:manipulation}
+@media (max-width:899px){.diagram{max-height:none}}
+/* SVG */
+.zone-label{font-size:12.5px;fill:var(--muted)}
+.lbl{font-size:14px;fill:var(--ink);text-anchor:middle;font-weight:700}
+.note{font-size:12.5px;fill:var(--muted);font-style:italic}
+.node{cursor:pointer;outline:none}
+.node .hit{fill:transparent}
+.node .ring{fill:none;stroke:transparent;stroke-width:2.5}
+.node.is-new .ring{stroke:var(--muted);stroke-dasharray:5 4}
+.node.selected .ring{stroke:var(--ink);stroke-dasharray:none;stroke-width:3}
+.node:focus-visible .ring{stroke:var(--focus);stroke-dasharray:none;stroke-width:4}
+.node:hover .ring{stroke:var(--muted)}
+[data-step]{transition:opacity .4s ease}
+.off{opacity:0;visibility:hidden;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){
+  .node.is-new.pulse .ring{animation:pulse 1.1s ease-out 2}
+}
+@keyframes pulse{0%{stroke-width:2.5}50%{stroke-width:7}100%{stroke-width:2.5}}
+@media (prefers-reduced-motion:reduce){[data-step],.progress span{transition:none}}
+/* Legend */
+.legend{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.legend h2{font-size:1rem;margin:0 0 6px}
+.legend ul{list-style:none;margin:0;padding:0;display:grid;gap:6px 16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.legend li{display:flex;align-items:center;gap:10px;font-size:.95rem}
+.legend svg{flex:0 0 auto}
+/* Panel */
+.panel{padding:16px}
+.panel h2{font-size:1.25rem;line-height:1.25;margin:0 0 6px}
+.time{display:inline-block;font-size:.9rem;color:var(--muted);margin-bottom:8px}
+.panel p{margin:0 0 10px;max-width:62ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 4px;padding:0;list-style:none}
+.chip{min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:22px;
+  border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.95rem;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+.divider{border:0;border-top:1px solid var(--line);margin:14px 0}
+.empty{color:var(--muted);border:1.5px dashed var(--line);border-radius:10px;padding:14px}
+.detail h3{font-size:1.15rem;margin:0 0 4px}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);margin-bottom:8px}
+.box{border-radius:10px;padding:10px 12px;margin:10px 0 0;border-left:5px solid var(--line);background:var(--zoneB)}
+.box strong{display:block;margin-bottom:2px}
+.box.myth{border-left-color:var(--err)}
+.box.simple{border-left-color:var(--muted)}
+.detail-actions{margin-top:12px}
+footer{color:var(--muted);font-size:.9rem;padding:16px 0 8px;max-width:80ch}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+<header>
+  <h1>Immunsystem und Krankheitserreger</h1>
+  <p class="sub">Wie sich der Körper gegen Bakterien und Viren wehrt – als Animation in sieben Schritten. Tippe auf die Zellen im Schaubild, um mehr zu erfahren.</p>
+</header>
+
+<main class="layout">
+  <section class="card stage" aria-label="Schaubild mit Schrittsteuerung">
+    <div class="stepbar">
+      <button class="btn" id="prev" type="button" aria-label="Vorheriger Schritt">‹ Zurück</button>
+      <div class="counter" id="counter" aria-hidden="true"></div>
+      <button class="btn primary" id="next" type="button" aria-label="Nächster Schritt">Weiter ›</button>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+
+    <svg class="diagram" id="diagram" viewBox="0 0 400 700" role="group" aria-labelledby="dgTitle">
+      <title id="dgTitle">Schaubild der Immunabwehr: oben die Außenwelt mit Erregern, in der Mitte Körpergewebe und Blut, unten der Lymphknoten mit den Zellen der spezifischen Abwehr.</title>
+      <defs>
+        <marker id="m-err" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--err)"/></marker>
+        <marker id="m-uns" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--uns)"/></marker>
+        <marker id="m-spz" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--spz)"/></marker>
+        <path id="ab" d="M0 7L0 0L-5 -6M0 0L5 -6" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </defs>
+
+      <!-- Zonen -->
+      <rect x="0" y="0" width="400" height="102" style="fill:var(--zoneA)"/>
+      <rect x="0" y="124" width="400" height="228" style="fill:var(--zoneB)"/>
+      <rect x="0" y="352" width="400" height="348" style="fill:var(--zoneC)"/>
+      <line x1="0" y1="352" x2="400" y2="352" style="stroke:var(--line)" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <text class="zone-label" x="12" y="20">Außenwelt</text>
+      <text class="zone-label" x="12" y="146">Körpergewebe und Blut</text>
+      <text class="zone-label" x="40" y="372">Lymphknoten</text>
+
+      <!-- Pfeile -->
+      <path id="a-entB" class="arrow" data-step="2" d="M98 56C160 90 185 100 192 128L196 160" fill="none" style="stroke:var(--err)" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#m-err)"/>
+      <path id="a-entV" class="arrow" data-step="2" d="M298 58C240 100 210 110 214 132S292 150 318 168" fill="none" style="stroke:var(--err)" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#m-err)"/>
+      <path id="a-pres" class="arrow" data-step="4" d="M200 290L200 390" fill="none" style="stroke:var(--uns)" stroke-width="2.5" marker-end="url(#m-uns)"/>
+      <text id="n-pres" data-step="4" class="note" x="208" y="342">präsentiert Antigen</text>
+      <path id="a-thb" class="arrow" data-step="5" d="M182 437L112 501" fill="none" style="stroke:var(--spz)" stroke-width="2.5" marker-end="url(#m-spz)"/>
+      <path id="a-bpl" class="arrow" data-step="5" d="M70 534Q44 562 48 612" fill="none" style="stroke:var(--spz)" stroke-width="2.2" stroke-dasharray="6 5" marker-end="url(#m-spz)"/>
+      <path id="a-ab" class="arrow" data-step="5" d="M32 620Q4 430 52 238" fill="none" style="stroke:var(--spz)" stroke-width="2.5" marker-end="url(#m-spz)"/>
+      <path id="a-fk" class="arrow" data-step="5" d="M158 205L110 205" fill="none" style="stroke:var(--uns)" stroke-width="2.5" marker-end="url(#m-uns)"/>
+      <path id="a-thtk" class="arrow" data-step="6" d="M218 437L302 501" fill="none" style="stroke:var(--spz)" stroke-width="2.5" marker-end="url(#m-spz)"/>
+      <path id="a-tkk" class="arrow" data-step="6" d="M345 498Q398 360 366 230" fill="none" style="stroke:var(--spz)" stroke-width="2.5" marker-end="url(#m-spz)"/>
+      <path id="a-bg" class="arrow" data-step="7" d="M104 574L178 618" fill="none" style="stroke:var(--spz)" stroke-width="2.2" stroke-dasharray="6 5" marker-end="url(#m-spz)"/>
+      <path id="a-tkg" class="arrow" data-step="7" d="M300 574L222 618" fill="none" style="stroke:var(--spz)" stroke-width="2.2" stroke-dasharray="6 5" marker-end="url(#m-spz)"/>
+
+      <!-- Elemente in Lesereihenfolge -->
+      <g class="node" data-id="bakterium" data-step="1" transform="translate(90 42)">
+        <circle class="hit" r="30"/><circle class="ring" r="32"/>
+        <rect x="-26" y="-11" width="52" height="22" rx="11" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="2.2"/>
+        <path d="M26 0q6 -6 12 0t10 0M-26 0q-6 6 -12 0" fill="none" style="stroke:var(--err)" stroke-width="1.6"/>
+        <text class="lbl" y="32">Bakterium</text>
+      </g>
+      <g class="node" data-id="virus" data-step="1" transform="translate(310 42)">
+        <circle class="hit" r="30"/><circle class="ring" r="30"/>
+        <g class="spikes" data-r="13" data-len="7"></g>
+        <circle r="13" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="2.2"/>
+        <text class="lbl" y="32">Virus</text>
+      </g>
+      <g class="node" data-id="haut" data-step="1">
+        <rect class="hit" x="0" y="98" width="168" height="30"/><rect class="hit" x="232" y="80" width="168" height="48"/>
+        <rect class="ring" x="2" y="100" width="396" height="26" rx="4"/>
+        <rect x="0" y="102" width="170" height="22" style="fill:var(--uns-soft);stroke:var(--uns)" stroke-width="2"/>
+        <rect x="230" y="102" width="170" height="22" style="fill:var(--uns-soft);stroke:var(--uns)" stroke-width="2"/>
+        <text class="lbl" x="392" y="95" style="text-anchor:end;font-size:13px">Haut, Schleimhaut</text>
+      </g>
+      <g class="node" data-id="wunde" data-step="2">
+        <rect class="hit" x="170" y="82" width="60" height="48"/>
+        <rect class="ring" x="172" y="84" width="56" height="44" rx="6"/>
+        <path d="M170 102l8 22M230 102l-8 22" style="stroke:var(--body)" stroke-width="2"/>
+        <text class="lbl" x="200" y="96" style="font-size:13px">Wunde</text>
+      </g>
+
+      <g class="node" data-id="komplex" data-step="5" transform="translate(72 205)">
+        <circle class="hit" r="34"/><circle class="ring" r="34"/>
+        <rect x="-26" y="-18" width="24" height="11" rx="5.5" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.8"/>
+        <rect x="4" y="-14" width="24" height="11" rx="5.5" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.8"/>
+        <rect x="-14" y="6" width="24" height="11" rx="5.5" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.8"/>
+        <use href="#ab" transform="translate(-2 -6) rotate(20) scale(.9)" style="stroke:var(--spz)"/>
+        <use href="#ab" transform="translate(12 6) rotate(-35) scale(.9)" style="stroke:var(--spz)"/>
+        <use href="#ab" transform="translate(-20 4) rotate(160) scale(.9)" style="stroke:var(--spz)"/>
+        <use href="#ab" transform="translate(20 -22) rotate(-10) scale(.9)" style="stroke:var(--spz)"/>
+        <text class="lbl" y="53">Verklumpte</text><text class="lbl" y="69">Erreger</text>
+      </g>
+      <g class="node" data-id="fresszelle" data-step="3" transform="translate(200 205)">
+        <circle class="hit" r="44"/><circle class="ring" r="47"/>
+        <path d="M-40 -5C-42 -30 -15 -42 5 -36C30 -40 44 -18 40 2C46 25 20 40 0 36C-22 42 -46 22 -40 -5Z" style="fill:var(--uns-soft);stroke:var(--uns)" stroke-width="2.5"/>
+        <ellipse cx="-15" cy="-10" rx="11" ry="8" style="fill:var(--uns)" opacity=".45"/>
+        <circle cx="12" cy="8" r="13" fill="none" style="stroke:var(--uns)" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <rect x="2" y="3" width="20" height="10" rx="5" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.6"/>
+        <path d="M-6 36l6 -10l6 10z" style="fill:var(--err)"/>
+        <text class="lbl" y="58">Fresszelle</text><text class="lbl" y="74" style="font-weight:400">(Makrophage)</text>
+      </g>
+      <g class="node" data-id="koerperzelle" data-step="2" transform="translate(330 205)">
+        <circle class="hit" r="36"/><circle class="ring" r="38"/>
+        <circle class="cellbody" r="32" style="fill:var(--body-soft);stroke:var(--body)" stroke-width="2.2"/>
+        <circle cx="-8" cy="-6" r="10" style="fill:var(--body)" opacity=".45"/>
+        <circle class="vdot" cx="12" cy="10" r="4" style="fill:var(--err)"/><circle class="vdot" cx="-10" cy="16" r="4" style="fill:var(--err)"/><circle class="vdot" cx="14" cy="-12" r="4" style="fill:var(--err)"/>
+        <path class="vdot" d="M32 -6l-9 6l9 6z" style="fill:var(--err)"/>
+        <text class="lbl" x="-12" y="53" style="font-weight:400">befallene</text><text class="lbl" x="-12" y="69">Körperzelle</text>
+      </g>
+
+      <g class="node" data-id="thelfer" data-step="4" transform="translate(200 420)">
+        <circle class="hit" r="32"/><circle class="ring" r="32"/>
+        <circle r="24" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2.5"/>
+        <text y="5" text-anchor="middle" style="fill:var(--spz);font-size:15px;font-weight:700">TH</text>
+        <text class="lbl" x="58" y="5" style="text-anchor:start">T-Helferzelle</text>
+      </g>
+      <g class="node" data-id="antikoerper" data-step="5" transform="translate(24 440)">
+        <circle class="hit" r="26"/><circle class="ring" r="24"/>
+        <use href="#ab" transform="translate(-4 -12) rotate(-20) scale(1.4)" style="stroke:var(--spz)"/>
+        <use href="#ab" transform="translate(6 2) rotate(15) scale(1.4)" style="stroke:var(--spz)"/>
+        <use href="#ab" transform="translate(-2 16) rotate(-5) scale(1.4)" style="stroke:var(--spz)"/>
+        <text class="lbl" x="22" y="6" style="text-anchor:start">Antikörper</text>
+      </g>
+      <g class="node" data-id="bzelle" data-step="5" transform="translate(90 528)">
+        <circle class="hit" r="32"/><circle class="ring" r="33"/>
+        <g class="receptors" data-r="22"></g>
+        <circle r="22" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2.5"/>
+        <text y="5" text-anchor="middle" style="fill:var(--spz);font-size:15px;font-weight:700">B</text>
+        <text class="lbl" y="50">B-Zelle</text>
+      </g>
+      <g class="node" data-id="tkiller" data-step="6" transform="translate(320 528)">
+        <circle class="hit" r="32"/><circle class="ring" r="32"/>
+        <circle r="24" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2.5"/>
+        <text y="5" text-anchor="middle" style="fill:var(--spz);font-size:15px;font-weight:700">TK</text>
+        <text class="lbl" y="50">T-Killerzelle</text>
+      </g>
+      <g class="node" data-id="plasmazelle" data-step="5" transform="translate(50 642)">
+        <circle class="hit" r="30"/><circle class="ring" r="31"/>
+        <ellipse rx="27" ry="21" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2.5"/>
+        <circle cx="-11" cy="0" r="7" style="fill:var(--spz)" opacity=".5"/>
+        <path d="M2 -10q8 4 16 0M2 -2q8 4 16 0M2 6q8 4 16 0" fill="none" style="stroke:var(--spz)" stroke-width="1.4" opacity=".8"/>
+        <text class="lbl" y="42">Plasmazelle</text>
+      </g>
+      <g class="node" data-id="gedaechtnis" data-step="7" transform="translate(200 640)">
+        <circle class="hit" r="36"/><rect class="ring" x="-40" y="-26" width="80" height="52" rx="26"/>
+        <circle cx="-15" r="18" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2.5"/>
+        <circle cx="15" r="18" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2.5"/>
+        <circle cx="-15" r="12.5" fill="none" style="stroke:var(--spz)" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <circle cx="15" r="12.5" fill="none" style="stroke:var(--spz)" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <text x="-15" y="5" text-anchor="middle" style="fill:var(--spz);font-size:13px;font-weight:700">B</text>
+        <text x="15" y="5" text-anchor="middle" style="fill:var(--spz);font-size:13px;font-weight:700">T</text>
+        <text class="lbl" y="44">Gedächtniszellen</text>
+      </g>
+      <g id="actors" pointer-events="none" aria-hidden="true"></g>
+    </svg>
+    <p id="caption" class="caption"></p>
+
+    <div class="extra">
+      <button class="btn primary" id="play" type="button">Anhalten</button>
+      <button class="btn" id="speed" type="button" aria-pressed="false">Langsamer</button>
+      <button class="btn" id="all" type="button">Alles zeigen</button>
+      <button class="btn" id="reset" type="button">Von vorn</button>
+    </div>
+
+    <section class="legend" aria-labelledby="legTitle">
+      <h2 id="legTitle">Legende</h2>
+      <ul>
+        <li><svg width="28" height="18" aria-hidden="true"><rect x="2" y="3" width="24" height="12" rx="6" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="2"/></svg>Krankheitserreger (Bakterien, Viren) und ihre Antigene</li>
+        <li><svg width="28" height="18" aria-hidden="true"><circle cx="14" cy="9" r="7" style="fill:var(--uns-soft);stroke:var(--uns)" stroke-width="2"/></svg>Unspezifische Abwehr: wirkt gegen alle Erreger gleich</li>
+        <li><svg width="28" height="18" aria-hidden="true"><circle cx="14" cy="9" r="7" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2"/></svg>Spezifische Abwehr: passt nur zu einem bestimmten Erreger</li>
+        <li><svg width="28" height="18" aria-hidden="true"><circle cx="14" cy="9" r="7" style="fill:var(--body-soft);stroke:var(--body)" stroke-width="2"/></svg>Körperzellen und Gewebe</li>
+        <li><svg width="36" height="18" aria-hidden="true"><line x1="2" y1="9" x2="28" y2="9" style="stroke:var(--ink)" stroke-width="2.5"/><path d="M26 4l8 5l-8 5z" style="fill:var(--ink)"/></svg>Durchgezogener Pfeil: aktiviert, bindet oder greift an</li>
+        <li><svg width="36" height="18" aria-hidden="true"><line x1="2" y1="9" x2="28" y2="9" style="stroke:var(--ink)" stroke-width="2" stroke-dasharray="5 4"/><path d="M26 4l8 5l-8 5z" style="fill:var(--ink)"/></svg>Gestrichelter Pfeil: dringt ein oder entwickelt sich zu</li>
+      </ul>
+    </section>
+  </section>
+
+  <aside class="card panel" id="panel" aria-label="Erklärungen">
+    <div id="stepInfo" aria-live="polite"></div>
+    <hr class="divider">
+    <div id="detail"></div>
+  </aside>
+</main>
+
+<footer>
+  Vereinfachtes Unterrichtsmodell nach den Inhalten des Kerncurriculums Biologie (Jg. 9/10). Bewusst weggelassen: dendritische Zellen als wichtigste „Präsentierzellen“, MHC-Moleküle, Komplementsystem, natürliche Killerzellen, Fresszellen anderer Art (z. B. Granulozyten) und die genaue Regulation der Immunantwort. Ist am Gerät „Bewegung reduzieren“ eingestellt, startet die Animation nur auf Knopfdruck. Tastatur: Pfeiltasten links/rechts wechseln die Schritte, Tab springt zu den Elementen, Esc hebt die Auswahl auf.
+</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var GROUPS = {
+  erreger:{name:"Krankheitserreger", color:"var(--err)"},
+  uns:{name:"Unspezifische Abwehr (angeboren)", color:"var(--uns)"},
+  spz:{name:"Spezifische Abwehr (erworben)", color:"var(--spz)"},
+  koerper:{name:"Körper", color:"var(--body)"}
+};
+
+var STEPS = [
+  {title:"Erreger treffen auf die äußeren Barrieren", time:"ständig",
+   text:"Bakterien und Viren sind überall in unserer Umgebung. Die erste Verteidigungslinie sind Haut und Schleimhäute: Sie halten die meisten Erreger draußen, bevor die Abwehrzellen überhaupt eingreifen müssen."},
+  {title:"Erreger dringen in den Körper ein", time:"Beginn der Infektion",
+   text:"Durch eine Wunde oder über die Schleimhäute (zum Beispiel beim Einatmen von Tröpfchen) gelangen Erreger ins Gewebe. Bakterien vermehren sich zwischen den Körperzellen. Viren dringen in Körperzellen ein und lassen sich dort vervielfältigen. Die Zeit bis zu den ersten Krankheitszeichen heißt Inkubationszeit."},
+  {title:"Unspezifische Abwehr: Fresszellen greifen sofort an", time:"innerhalb von Minuten bis Stunden",
+   text:"Fresszellen (Makrophagen) erkennen Eindringlinge als fremd und nehmen sie auf (Phagozytose). Sie reagieren schnell, aber gegen alle Erreger auf die gleiche Weise. Typisch ist eine Entzündung mit Rötung, Schwellung, Wärme und Schmerz, manchmal auch Fieber."},
+  {title:"Alarm: Die Fresszelle präsentiert ein Antigen", time:"nach Stunden bis wenigen Tagen",
+   text:"Die Fresszelle zerlegt den Erreger und zeigt Bruchstücke davon – Antigene – auf ihrer Oberfläche. Im Lymphknoten erkennt eine T-Helferzelle mit genau passendem Rezeptor dieses Antigen (Schlüssel-Schloss-Prinzip). Damit beginnt die spezifische Abwehr."},
+  {title:"Humorale Abwehr: Antikörper werden gebildet", time:"nach mehreren Tagen (bei der ersten Infektion)",
+   text:"Die T-Helferzelle aktiviert eine passende B-Zelle. Diese vermehrt sich und entwickelt sich zu Plasmazellen, die große Mengen Antikörper ins Blut abgeben. Antikörper binden an die Antigene und verklumpen die Erreger. Fresszellen beseitigen die Klumpen."},
+  {title:"Zelluläre Abwehr: Befallene Zellen werden zerstört", time:"nach mehreren Tagen",
+   text:"Viren im Inneren von Körperzellen erreichen die Antikörper nicht. Deshalb aktiviert die T-Helferzelle auch T-Killerzellen. Sie erkennen befallene Körperzellen an Virusbruchstücken auf deren Oberfläche und bringen diese Zellen zum Absterben. So endet die Virusvermehrung."},
+  {title:"Immunität: Der Körper merkt sich den Erreger", time:"Jahre bis lebenslang",
+   text:"Ist der Erreger besiegt, wird die Abwehr wieder heruntergefahren. Gedächtniszellen bleiben aber oft jahrelang erhalten. Bei einer erneuten Infektion mit demselben Erreger reagieren sie schneller und stärker – meist merkt man davon nichts. Darauf beruht auch die Schutzimpfung."}
+];
+
+var EL = {
+  bakterium:{title:"Bakterium", group:"erreger",
+    text:["Bakterien sind einzellige Lebewesen ohne Zellkern. Sie haben einen eigenen Stoffwechsel und vermehren sich durch Zweiteilung – unter guten Bedingungen sehr schnell.","Krankheitserregende Bakterien schädigen den Körper oft durch Giftstoffe (Toxine). Beispiele: Salmonellen (Durchfall), Streptokokken (Mandelentzündung). Gegen Bakterien können Antibiotika helfen."],
+    myth:{wrong:"Bakterien sind grundsätzlich schädlich.", right:"Die meisten Bakterien sind harmlos oder sogar nützlich, etwa im Darm. Nur wenige Arten sind Krankheitserreger."}},
+  virus:{title:"Virus", group:"erreger",
+    text:["Viren bestehen nur aus Erbgut und einer Eiweißhülle. Sie sind keine Zellen und haben keinen eigenen Stoffwechsel.","Vermehren können sie sich nur in einer Wirtszelle: Sie schleusen ihr Erbgut ein, und die Zelle stellt neue Viren her. Beispiele: Grippe (Influenza), Masern, Erkältungsviren."],
+    myth:{wrong:"Bei einer Grippe hilft ein Antibiotikum.", right:"Antibiotika wirken nur gegen Bakterien, nicht gegen Viren. Bei Virusinfektionen helfen sie nicht und fördern unnötig Resistenzen."}},
+  haut:{title:"Haut und Schleimhäute", group:"uns",
+    text:["Die äußeren Barrieren sind Teil der unspezifischen Abwehr: Die verhornte Haut ist für die meisten Erreger undurchdringlich, ihr Säureschutzmantel hemmt Bakterien.","In den Atemwegen fängt Schleim Erreger ein, Flimmerhärchen transportieren ihn ab. Magensäure tötet viele verschluckte Erreger, Tränen und Speichel enthalten bakterienabbauende Enzyme."],
+    simple:"Im Schaubild ist die Barriere als einfache Linie dargestellt. Tatsächlich sind Haut und Schleimhäute sehr unterschiedlich aufgebaut."},
+  wunde:{title:"Eintrittspforte", group:"koerper",
+    text:["Erreger gelangen nur dort in den Körper, wo die Barriere durchbrochen oder dünn ist: über Wunden, über die Schleimhäute von Nase, Mund und Augen oder über den Verdauungstrakt.","Typische Übertragungswege sind Tröpfcheninfektion (Husten, Niesen), Schmierinfektion (Hände, Gegenstände) und verunreinigte Lebensmittel."]},
+  koerperzelle:{title:"Von Viren befallene Körperzelle", group:"koerper",
+    text:["Das Virus hat seine Erbinformation in die Körperzelle eingeschleust. Die Zelle produziert nun neue Viren, die weitere Zellen befallen.","Auf ihrer Oberfläche zeigt die befallene Zelle Virusbruchstücke (rotes Dreieck). Daran können T-Killerzellen sie erkennen. Antikörper erreichen die Viren im Zellinneren dagegen nicht."]},
+  fresszelle:{title:"Fresszelle (Makrophage)", group:"uns",
+    text:["Fresszellen sind weiße Blutzellen, die Fremdkörper und Erreger umfließen und in sich aufnehmen (Phagozytose). Im Inneren werden die Erreger verdaut.","Sie erkennen nur allgemein, dass etwas fremd ist – deshalb heißt diese Abwehr unspezifisch. Sie wirkt sofort, reicht bei vielen Erregern aber nicht aus.","Bruchstücke des Erregers (Antigene) präsentiert die Fresszelle auf ihrer Oberfläche und alarmiert so die spezifische Abwehr."],
+    simple:"In vielen Schulbüchern präsentiert die Fresszelle das Antigen. In Wirklichkeit übernehmen vor allem dendritische Zellen diese Aufgabe.",
+    myth:{wrong:"Fieber und Entzündung sind die Krankheit selbst.", right:"Sie sind Zeichen der Abwehr: Die bessere Durchblutung bringt Abwehrzellen an den Ort der Infektion. Sehr hohes oder langes Fieber muss aber ärztlich abgeklärt werden."}},
+  komplex:{title:"Antigen-Antikörper-Komplex", group:"spz",
+    text:["Jeder Antikörper hat zwei Bindungsstellen. Er kann sich also an zwei Erreger gleichzeitig heften. So entstehen Klumpen aus Erregern und Antikörpern (Verklumpung, Agglutination).","Verklumpte Erreger können sich kaum noch vermehren, Viren können nicht mehr in Körperzellen eindringen. Fresszellen erkennen die Klumpen gut und beseitigen sie."],
+    myth:{wrong:"Antikörper töten die Erreger.", right:"Antikörper markieren und verklumpen Erreger nur. Beseitigt werden sie vor allem von Fresszellen."}},
+  thelfer:{title:"T-Helferzelle", group:"spz",
+    text:["T-Helferzellen gehören zu den Lymphozyten, einer Gruppe weißer Blutzellen. Jede T-Helferzelle hat Rezeptoren, die nur zu einem bestimmten Antigen passen.","Trifft sie auf eine Fresszelle mit passendem Antigen, wird sie aktiviert und vermehrt sich. Über Botenstoffe aktiviert sie dann passende B-Zellen und T-Killerzellen. Sie ist die Schaltzentrale der spezifischen Abwehr."],
+    simple:"Im Körper gibt es Millionen verschiedener T-Helferzellen. Nur die wenigen, die genau passen, werden aktiviert und vermehrt (klonale Selektion)."},
+  antikoerper:{title:"Antikörper", group:"spz",
+    text:["Antikörper sind Y-förmige Eiweißmoleküle, die von Plasmazellen gebildet werden. Ihre beiden Arm-Enden passen nach dem Schlüssel-Schloss-Prinzip zu genau einem Antigen.","Sie werden mit dem Blut und der Lymphe im ganzen Körper verteilt. Weil diese Abwehr in den Körperflüssigkeiten stattfindet, heißt sie humorale Abwehr (lateinisch humor = Flüssigkeit)."],
+    myth:{wrong:"Antigen und Antikörper sind dasselbe.", right:"Das Antigen ist das Merkmal am Erreger, der Antikörper ist das passende Abwehr-Molekül des Körpers."}},
+  bzelle:{title:"B-Zelle (B-Lymphozyt)", group:"spz",
+    text:["B-Zellen tragen auf ihrer Oberfläche Antikörper als Rezeptoren. Jede B-Zelle erkennt nur ein bestimmtes Antigen.","Wird eine passende B-Zelle von einer T-Helferzelle aktiviert, teilt sie sich vielfach. Aus den Tochterzellen werden Plasmazellen und B-Gedächtniszellen."]},
+  tkiller:{title:"T-Killerzelle", group:"spz",
+    text:["T-Killerzellen (zytotoxische T-Zellen) werden durch T-Helferzellen aktiviert. Sie erkennen Körperzellen, die auf ihrer Oberfläche Bruchstücke eines bestimmten Virus zeigen.","Sie bringen diese Zellen zum Absterben. Weil hier Zellen direkt gegen Zellen kämpfen, heißt diese Abwehr zelluläre Abwehr."],
+    myth:{wrong:"T-Killerzellen töten die Viren direkt.", right:"Sie zerstören die befallenen Körperzellen. Damit wird den Viren die Möglichkeit genommen, sich weiter zu vermehren."}},
+  plasmazelle:{title:"Plasmazelle", group:"spz",
+    text:["Plasmazellen entstehen aus aktivierten B-Zellen. Sie sind regelrechte Antikörper-Fabriken: Ihr Zellinneres ist auf die Herstellung von Eiweißen spezialisiert.","Alle Antikörper einer Plasmazelle passen zum selben Antigen. Bei der ersten Infektion dauert es einige Tage, bis genug Plasmazellen und Antikörper vorhanden sind – deshalb fühlt man sich in dieser Zeit krank."]},
+  gedaechtnis:{title:"Gedächtniszellen", group:"spz",
+    text:["Aus aktivierten B- und T-Zellen entstehen auch langlebige Gedächtniszellen. Sie bleiben nach der Infektion oft viele Jahre, teils lebenslang im Körper.","Kommt derselbe Erreger erneut, reagieren sie viel schneller und stärker (sekundäre Immunantwort). Der Erreger wird meist beseitigt, bevor Krankheitszeichen auftreten: Man ist immun.","Bei der aktiven Impfung werden abgeschwächte oder abgetötete Erreger bzw. deren Bestandteile gegeben. Der Körper bildet dann Gedächtniszellen, ohne krank zu werden."],
+    simple:"Das Abschalten der Immunreaktion nach dem Sieg (in älteren Schulbüchern durch T-Unterdrückerzellen, heute regulatorische T-Zellen genannt) ist nicht dargestellt.",
+    myth:{wrong:"Wer einmal Grippe hatte, ist für immer geschützt.", right:"Grippeviren verändern ihre Antigene ständig. Die Gedächtniszellen passen dann nicht mehr – deshalb wird die Grippeimpfung jedes Jahr angepasst."}}
+};
+
+var MAX = STEPS.length;
+var step = 1, selected = null;
+var svg = document.getElementById("diagram");
+var nodes = Array.prototype.slice.call(svg.querySelectorAll(".node"));
+var stepped = Array.prototype.slice.call(svg.querySelectorAll("[data-step]"));
+var arrows = Array.prototype.slice.call(svg.querySelectorAll(".arrow"));
+var vdots = Array.prototype.slice.call(svg.querySelectorAll(".vdot"));
+var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+var NS = "http://www.w3.org/2000/svg";
+function $(id){ return document.getElementById(id); }
+function nodeEl(id){ return svg.querySelector('.node[data-id="'+id+'"]'); }
+
+// Viren-Spikes und B-Zell-Rezeptoren zeichnen
+svg.querySelectorAll(".spikes").forEach(function(g){
+  var r = +g.dataset.r, len = +g.dataset.len;
+  for (var i=0;i<8;i++){
+    var a = i*Math.PI/4, c=Math.cos(a), s=Math.sin(a);
+    var l = document.createElementNS(NS,"line");
+    l.setAttribute("x1",c*r); l.setAttribute("y1",s*r); l.setAttribute("x2",c*(r+len)); l.setAttribute("y2",s*(r+len));
+    l.setAttribute("style","stroke:var(--err)"); l.setAttribute("stroke-width","2");
+    var k = document.createElementNS(NS,"circle");
+    k.setAttribute("cx",c*(r+len+1.5)); k.setAttribute("cy",s*(r+len+1.5)); k.setAttribute("r","2.4");
+    k.setAttribute("style","fill:var(--err)");
+    g.appendChild(l); g.appendChild(k);
+  }
+});
+svg.querySelectorAll(".receptors").forEach(function(g){
+  var r = +g.dataset.r;
+  for (var i=0;i<6;i++){
+    var u = document.createElementNS(NS,"use");
+    u.setAttribute("href","#ab");
+    u.setAttribute("transform","rotate("+(i*60+30)+") translate(0 "+(-r-6)+") scale(.8)");
+    u.setAttribute("style","stroke:var(--spz)");
+    g.appendChild(u);
+  }
+});
+
+nodes.forEach(function(n){
+  var d = EL[n.dataset.id];
+  n.dataset.home = n.getAttribute("transform") || "";
+  n.setAttribute("role","button");
+  n.setAttribute("aria-label", d.title + ", " + GROUPS[d.group].name + ". Details anzeigen");
+  n.setAttribute("aria-pressed","false");
+  n.addEventListener("click", function(){ toggle(n.dataset.id); });
+  n.addEventListener("keydown", function(e){
+    if (e.key==="Enter" || e.key===" "){ e.preventDefault(); toggle(n.dataset.id); }
+  });
+});
+arrows.forEach(function(a){ a.dataset.mk = a.getAttribute("marker-end") || ""; });
+function stepOf(id){ return +nodeEl(id).dataset.step; }
+
+/* ---------- Animations-Engine ---------- */
+var layer = $("actors"), token = 0, tickers = [], clock = 0, last = null;
+var paused = false, speed = 1, state = "idle", forcePlay = false, naCache = {};
+function NEVER(){ return new Promise(function(){}); }
+var EASE = {
+  io:function(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; },
+  lin:function(t){ return t; },
+  out:function(t){ return 1-(1-t)*(1-t); },
+  inq:function(t){ return t*t; }
+};
+function loop(ts){
+  if (last !== null && !paused) clock += Math.min(64, ts-last) * speed;
+  last = ts;
+  if (tickers.length){
+    var cur = tickers; tickers = [];
+    var keep = cur.filter(function(f){ return !f(); });
+    tickers = keep.concat(tickers);
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function Ctx(instant){
+  var my = ++token; tickers = [];
+  var c = {instant:instant};
+  c.alive = function(){ return my === token; };
+  c.wait = function(ms){
+    if (!c.alive()) return NEVER();
+    if (instant) return Promise.resolve();
+    var end = clock + ms;
+    return new Promise(function(r){ tickers.push(function(){ if (clock >= end){ r(); return true; } return false; }); });
+  };
+  c.tween = function(o, to, ms, opt){
+    opt = opt || {};
+    if (!c.alive()) return NEVER();
+    var from = {}, k; for (k in to) from[k] = o[k];
+    var ease = opt.ease || EASE.io, start = clock;
+    function set(t){ var e = ease(t); for (var k in to) o[k] = from[k] + (to[k]-from[k])*e; if (opt.update) opt.update(); if (o.apply) o.apply(); }
+    if (instant){ set(1); return Promise.resolve(); }
+    return new Promise(function(r){ tickers.push(function(){
+      if (!c.alive()) return true;
+      var t = Math.min(1, (clock-start)/ms); set(t);
+      if (t >= 1){ r(); return true; } return false;
+    }); });
+  };
+  c.cap = function(t){ if (c.alive()) $("caption").textContent = t; };
+  return c;
+}
+function actor(markup, x, y, o){
+  o = o || {};
+  var g = document.createElementNS(NS,"g"); g.innerHTML = markup; layer.appendChild(g);
+  var a = {x:x, y:y, s:o.s==null?1:o.s, r:o.r||0, o:o.o==null?1:o.o,
+    apply:function(){ g.setAttribute("transform","translate("+a.x+" "+a.y+") rotate("+a.r+") scale("+a.s+")"); g.setAttribute("opacity", a.o); }};
+  a.apply(); return a;
+}
+function NA(id){
+  if (naCache[id]) return naCache[id];
+  var n = nodeEl(id), m = /translate\(([-\d.]+) ([-\d.]+)\)/.exec(n.dataset.home);
+  var a = {x:m?+m[1]:0, y:m?+m[2]:0, s:1, o:1, apply:function(){
+    if (m) n.setAttribute("transform","translate("+a.x+" "+a.y+") scale("+a.s+")");
+    n.style.opacity = a.o; }};
+  naCache[id] = a; return a;
+}
+function fade(c, el, to, ms){
+  var a = {o:+(el.style.opacity===""?1:el.style.opacity), apply:function(){ el.style.opacity = a.o; }};
+  return c.tween(a, {o:to}, ms||500);
+}
+function showNode(c, id, ms){ var a = NA(id); a.o = 0; a.apply(); return c.tween(a, {o:1}, ms||600); }
+function draw(c, el, ms){
+  if (el.getAttribute("stroke-dasharray")){ el.style.opacity = 0; return fade(c, el, 1, ms); }
+  var L = el.getTotalLength();
+  el.setAttribute("marker-end","none"); el.style.opacity = 1; el.style.strokeDasharray = L;
+  var a = {d:L, apply:function(){ el.style.strokeDashoffset = a.d; }}; a.apply();
+  return c.tween(a, {d:0}, ms||800).then(function(){
+    el.setAttribute("marker-end", el.dataset.mk); el.style.strokeDasharray = ""; el.style.strokeDashoffset = "";
+  });
+}
+function along(c, a, path, ms, opt){
+  opt = opt || {};
+  var L = path.getTotalLength(), p = {t:opt.from||0};
+  return c.tween(p, {t:opt.to==null?1:opt.to}, ms, {ease:opt.ease||EASE.io, update:function(){
+    var pt = path.getPointAtLength(L*p.t); a.x = pt.x; a.y = pt.y; a.apply(); }});
+}
+function pulse(c, a, k){ return c.tween(a, {s:k||1.15}, 260).then(function(){ return c.tween(a, {s:1}, 320); }); }
+function flash(c, el){
+  if (c.instant) return;
+  el.classList.remove("flash"); void el.getBoundingClientRect(); el.classList.add("flash");
+  setTimeout(function(){ el.classList.remove("flash"); }, 950);
+}
+function all(list){ return Promise.all(list); }
+function later(c, ms, fn){ return c.wait(ms).then(fn); }
+
+var BACT = '<rect x="-13" y="-6" width="26" height="12" rx="6" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.8"/>';
+var VIR = (function(){ var s = ''; for (var i=0;i<8;i++){ var a=i*Math.PI/4, c=Math.cos(a), n=Math.sin(a);
+  s += '<line x1="'+(c*7)+'" y1="'+(n*7)+'" x2="'+(c*11)+'" y2="'+(n*11)+'" style="stroke:var(--err)" stroke-width="1.6"/>'; }
+  return s + '<circle r="7" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.8"/>'; })();
+var AB = '<use href="#ab" style="stroke:var(--spz)"/>';
+var SIG = '<circle r="4" style="fill:var(--spz)"/>';
+var ANT = '<path d="M-6 5l6 -10l6 10z" style="fill:var(--err)"/>';
+function LYM(t){ return '<circle r="24" style="fill:var(--spz-soft);stroke:var(--spz)" stroke-width="2.5"/><text y="5" text-anchor="middle" style="fill:var(--spz);font-size:15px;font-weight:700;font-family:inherit">'+t+'</text>'; }
+var CLUMP = '<rect x="-20" y="-12" width="20" height="10" rx="5" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.6"/><rect x="2" y="-8" width="20" height="10" rx="5" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.6"/><rect x="-10" y="5" width="20" height="10" rx="5" style="fill:var(--err-soft);stroke:var(--err)" stroke-width="1.6"/><use href="#ab" transform="translate(0 -4) scale(.8)" style="stroke:var(--spz)"/>';
+var LEFT = [[115,168],[128,240],[258,168]];
+function bacts(list){ return list.map(function(p){ return actor(BACT, p[0], p[1]); }); }
+function signals(c, path){
+  return all([0,1,2].map(function(i){ return later(c, i*220, function(){
+    var s = actor(SIG, 0, 0); return along(c, s, path, 800, {ease:EASE.lin}).then(function(){ return c.tween(s, {o:0, s:1.8}, 300); });
+  }); }));
+}
+
+/* ---------- Szenen ---------- */
+var SCENES = {
+1: async function(c){
+  showNode(c,"bakterium",400); showNode(c,"virus",400); await showNode(c,"haut",400);
+  c.cap("Bakterien und Viren aus der Umgebung treffen auf die Haut.");
+  var e = [actor(BACT,30,28), actor(BACT,150,30), actor(VIR,245,24), actor(VIR,375,30)];
+  var hit = [[60,94],[140,94],[262,90],[352,90]], back = [[42,40],[160,58],[236,40],[380,62]];
+  await all(e.map(function(a,i){ return later(c, i*250, function(){ return c.tween(a, {x:hit[i][0], y:hit[i][1]}, 1500, {ease:EASE.inq}); }); }));
+  flash(c, nodeEl("haut"));
+  c.cap("Haut und Schleimhäute halten sie draußen – die erste Abwehrlinie.");
+  await all(e.map(function(a,i){ return c.tween(a, {x:back[i][0], y:back[i][1]}, 1300, {ease:EASE.out}); }));
+},
+2: async function(c){
+  vdots.forEach(function(d){ d.style.opacity = 0; });
+  showNode(c,"wunde",500); fade(c,$("a-entB"),1,600); fade(c,$("a-entV"),1,600); await showNode(c,"koerperzelle",600);
+  c.cap("Durch eine Wunde gelangen Erreger ins Körpergewebe.");
+  var b = actor(BACT,90,42), v = actor(VIR,310,42);
+  await all([along(c,b,$("a-entB"),2300), along(c,v,$("a-entV"),2700)]);
+  c.cap("Das Virus dringt in eine Körperzelle ein …");
+  await c.tween(v, {x:330, y:205, s:.4, o:0}, 900);
+  c.cap("… und die Zelle muss neue Viren herstellen.");
+  for (var i=0;i<vdots.length;i++){ await fade(c, vdots[i], 1, 350); await c.wait(150); }
+  c.cap("Bakterien vermehren sich durch Zweiteilung – die Inkubationszeit läuft.");
+  await c.tween(b, {y:190}, 500);
+  var b2 = actor(BACT, b.x, b.y);
+  await all([c.tween(b,{x:160,y:172},900), c.tween(b2,{x:232,y:172},900)]);
+  var b3 = actor(BACT, 160, 172), b4 = actor(BACT, 232, 172);
+  await all([c.tween(b3,{x:165,y:238},900), c.tween(b4,{x:235,y:238},900)]);
+},
+3: async function(c){
+  var p = bacts([[160,172],[232,172],[165,238],[235,238]]);
+  var fz = NA("fresszelle"); fz.x = 110; fz.y = 320; fz.s = .9; fz.o = 0; fz.apply();
+  c.cap("Fresszellen wandern aus dem Blut zum Ort der Infektion.");
+  c.tween(fz, {o:1}, 400);
+  await c.tween(fz, {x:200, y:205, s:1}, 2000);
+  c.cap("Sie umfließen Bakterien und verdauen sie (Phagozytose).");
+  for (var i of [1,2]){
+    await c.tween(p[i], {x:206, y:211, s:.5}, 800);
+    c.tween(p[i], {o:0}, 300); await pulse(c, fz, 1.07);
+  }
+  await c.wait(300);
+  c.cap("Die übrigen Bakterien vermehren sich weiter – die unspezifische Abwehr reicht oft nicht aus.");
+  await all([c.tween(p[0],{x:115,y:168},900), c.tween(p[3],{x:258,y:168},900)]);
+  var n = actor(BACT,115,168); await c.tween(n, {x:128, y:240}, 900);
+},
+4: async function(c){
+  bacts(LEFT);
+  c.cap("Die Fresszelle zeigt Bruchstücke des Erregers – Antigene – auf ihrer Oberfläche.");
+  flash(c, nodeEl("fresszelle")); await c.wait(1000);
+  showNode(c,"thelfer",800); fade(c,$("n-pres"),1,600); await draw(c,$("a-pres"),900);
+  c.cap("Das Antigen wird zur T-Helferzelle im Lymphknoten gebracht.");
+  var ant = actor(ANT,200,241);
+  await c.tween(ant, {y:392}, 1600);
+  c.cap("Passt ihr Rezeptor genau (Schlüssel-Schloss-Prinzip), wird die T-Helferzelle aktiviert.");
+  flash(c, nodeEl("thelfer")); await pulse(c, NA("thelfer"), 1.2); await c.wait(600);
+  c.cap("Die aktivierte T-Helferzelle vermehrt sich.");
+  var k1 = actor(LYM("TH"),200,420,{s:.6,o:0}), k2 = actor(LYM("TH"),200,420,{s:.6,o:0});
+  c.tween(ant, {o:0}, 400);
+  await all([c.tween(k1,{x:148,y:398,o:1},900), c.tween(k2,{x:244,y:390,o:1},900)]);
+  await c.wait(900);
+  await all([c.tween(k1,{o:0},600), c.tween(k2,{o:0},600)]);
+},
+5: async function(c){
+  var b = bacts(LEFT), fz = NA("fresszelle");
+  c.cap("Die T-Helferzelle aktiviert mit Botenstoffen die passende B-Zelle.");
+  showNode(c,"bzelle",700); await draw(c,$("a-thb"),700);
+  await signals(c, $("a-thb"));
+  flash(c, nodeEl("bzelle")); await pulse(c, NA("bzelle"), 1.2);
+  c.cap("Die B-Zelle teilt sich und entwickelt sich zur Plasmazelle.");
+  fade(c,$("a-bpl"),1,500);
+  var cl = actor(LYM("B"),90,528,{s:.9});
+  await along(c, cl, $("a-bpl"), 1300);
+  c.tween(cl, {o:0}, 500); await showNode(c,"plasmazelle",600);
+  c.cap("Plasmazellen geben große Mengen Antikörper ins Blut ab.");
+  showNode(c,"antikoerper",700); await draw(c,$("a-ab"),900);
+  var offs = [[-8,-13],[8,-13]], ys = [];
+  await all([0,1,2,3,4,5].map(function(i){ return later(c, i*260, function(){
+    var y = actor(AB,32,620,{s:1.1}), t = b[i%3], o = offs[Math.floor(i/3)];
+    ys.push({a:y, b:i%3});
+    return along(c, y, $("a-ab"), 1600, {ease:EASE.lin}).then(function(){
+      return c.tween(y, {x:t.x+o[0], y:t.y+o[1], r:180}, 800);
+    });
+  }); }));
+  c.cap("Antikörper binden an die Antigene und verklumpen die Bakterien.");
+  var goal = [[58,192],[88,197],[70,217]], moves = [];
+  b.forEach(function(a,i){
+    var dx = goal[i][0]-a.x, dy = goal[i][1]-a.y;
+    moves.push(c.tween(a,{x:goal[i][0],y:goal[i][1]},1300));
+    ys.filter(function(y){ return y.b===i; }).forEach(function(y){ moves.push(c.tween(y.a,{x:y.a.x+dx,y:y.a.y+dy},1300)); });
+  });
+  await all(moves);
+  showNode(c,"komplex",600);
+  await all(b.concat(ys.map(function(y){ return y.a; })).map(function(a){ return c.tween(a,{o:0},600); }));
+  c.cap("Fresszellen beseitigen die verklumpten Erreger.");
+  await draw(c,$("a-fk"),600);
+  var k = actor(CLUMP,72,205,{s:.8});
+  await c.tween(k, {x:196, y:208, s:.3}, 1200);
+  c.tween(k, {o:0}, 300); await pulse(c, fz, 1.07);
+},
+6: async function(c){
+  c.cap("Die T-Helferzelle aktiviert mit Botenstoffen auch T-Killerzellen.");
+  showNode(c,"tkiller",700); await draw(c,$("a-thtk"),700);
+  await signals(c, $("a-thtk"));
+  flash(c, nodeEl("tkiller")); await pulse(c, NA("tkiller"), 1.2);
+  c.cap("Eine T-Killerzelle wandert zur befallenen Körperzelle.");
+  var k = actor(LYM("TK"),320,528,{s:.8});
+  draw(c,$("a-tkk"),1800);
+  await along(c, k, $("a-tkk"), 2000);
+  await c.tween(k, {x:378, y:214, s:.65}, 500);
+  c.cap("Sie erkennt die Zelle an den Virusbruchstücken auf ihrer Oberfläche …");
+  flash(c, nodeEl("koerperzelle")); await c.wait(900);
+  c.cap("… und bringt sie zum Absterben. Die Viren können sich nicht weiter vermehren.");
+  var kz = NA("koerperzelle");
+  await all(vdots.map(function(d){ return fade(c,d,0,700); }).concat([c.tween(kz,{o:.4},1200)]));
+  if (!c.alive()) return;
+  nodeEl("koerperzelle").classList.add("killed"); kz.o = 1; nodeEl("koerperzelle").style.opacity = "";
+  vdots.forEach(function(d){ d.style.opacity = ""; });
+  await c.tween(k, {o:0, x:350, y:300}, 900);
+},
+7: async function(c){
+  c.cap("Aus aktivierten B- und T-Zellen entstehen langlebige Gedächtniszellen.");
+  fade(c,$("a-bg"),1,600); fade(c,$("a-tkg"),1,600);
+  var gb = actor(LYM("B"),90,528,{s:.7}), gt = actor(LYM("T"),320,528,{s:.7});
+  await all([c.tween(gb,{x:185,y:640,s:.6},1700), c.tween(gt,{x:215,y:640,s:.6},1700)]);
+  showNode(c,"gedaechtnis",600); await all([c.tween(gb,{o:0},600), c.tween(gt,{o:0},600)]);
+  await c.wait(900);
+  c.cap("Monate später: derselbe Erreger dringt erneut ein …");
+  var nb = actor(BACT,90,42);
+  await along(c, nb, $("a-entB"), 1800);
+  await c.tween(nb, {x:150, y:172}, 600);
+  c.cap("Die Gedächtniszellen erkennen ihn sofort – sehr schnell entstehen viele Antikörper.");
+  flash(c, nodeEl("gedaechtnis")); await pulse(c, NA("gedaechtnis"), 1.15);
+  var ys = [];
+  await all([0,1,2,3].map(function(i){ return later(c, i*120, function(){
+    var y = actor(AB,32,620,{s:1.1}); ys.push(y);
+    return along(c, y, $("a-ab"), 800, {ease:EASE.lin}).then(function(){
+      return c.tween(y, {x:150+[-12,0,12,0][i], y:172+[-12,-14,-12,13][i], r:[180,180,180,0][i]}, 500);
+    });
+  }); }));
+  await c.wait(300);
+  await all(ys.concat([nb]).map(function(a){ return c.tween(a,{o:0,x:a.x+46,y:a.y+30,s:.5},900); }));
+  c.cap("Der Erreger wird beseitigt, bevor man krank wird: Man ist immun.");
+}
+};
+
+function resetScene(){
+  token++; tickers = []; layer.innerHTML = ""; naCache = {};
+  nodes.forEach(function(n){ n.setAttribute("transform", n.dataset.home); if (!n.dataset.home) n.removeAttribute("transform"); n.style.opacity = ""; n.classList.remove("killed","flash"); });
+  stepped.forEach(function(el){ el.style.opacity = ""; });
+  arrows.forEach(function(a){ a.style.strokeDasharray = ""; a.style.strokeDashoffset = ""; a.setAttribute("marker-end", a.dataset.mk); });
+  vdots.forEach(function(d){ d.style.opacity = ""; });
+  if (step > 6) nodeEl("koerperzelle").classList.add("killed");
+  $("caption").textContent = "";
+}
+function startScene(){
+  resetScene();
+  var instant = reduceMotion.matches && !forcePlay;
+  forcePlay = false; paused = false;
+  stepped.forEach(function(el){ if (+el.dataset.step === step) el.style.opacity = 0; });
+  var c = Ctx(instant);
+  state = instant ? "static" : "playing"; updatePlay();
+  SCENES[step](c).then(function(){
+    if (!c.alive()) return;
+    stepped.forEach(function(el){ if (+el.dataset.step === step && !el.classList.contains("node")) el.style.opacity = ""; });
+    nodes.forEach(function(n){ if (+n.dataset.step === step) n.style.opacity = ""; });
+    state = instant ? "static" : "done"; updatePlay();
+  });
+}
+function updatePlay(){
+  var b = $("play");
+  b.textContent = {playing:"Anhalten", paused:"Fortsetzen", done:"Nochmal abspielen", "static":"Animation abspielen", idle:"Animation abspielen"}[state];
+}
+$("play").addEventListener("click", function(){
+  if (state === "playing"){ paused = true; state = "paused"; updatePlay(); }
+  else if (state === "paused"){ paused = false; state = "playing"; updatePlay(); }
+  else { forcePlay = true; startScene(); }
+});
+$("speed").addEventListener("click", function(){
+  speed = speed === 1 ? .5 : 1;
+  this.setAttribute("aria-pressed", speed !== 1);
+  this.textContent = speed === 1 ? "Langsamer" : "Normales Tempo";
+});
+
+/* ---------- Oberfläche ---------- */
+function render(){
+  stepped.forEach(function(el){
+    var s = +el.dataset.step, vis = s <= step;
+    el.classList.toggle("off", !vis);
+    if (el.classList.contains("node")){
+      el.setAttribute("tabindex", vis ? "0" : "-1");
+      el.setAttribute("aria-hidden", vis ? "false" : "true");
+      el.classList.toggle("is-new", s === step);
+    }
+  });
+  if (selected && stepOf(selected) > step) selected = null;
+
+  $("counter").innerHTML = "Schritt " + step + " von " + MAX + "<small>" + STEPS[step-1].title.split(":")[0] + "</small>";
+  $("bar").style.width = (step/MAX*100) + "%";
+  $("prev").disabled = step === 1;
+  $("next").disabled = step === MAX;
+  $("all").disabled = step === MAX;
+
+  var st = STEPS[step-1];
+  var newIds = nodes.filter(function(n){ return +n.dataset.step === step; }).map(function(n){ return n.dataset.id; });
+  var html = '<h2>Schritt ' + step + ': ' + st.title + '</h2>' +
+    '<span class="time">Zeitraum: ' + st.time + '</span>' +
+    '<p>' + st.text + '</p>';
+  if (newIds.length){
+    html += '<p style="margin-bottom:4px"><strong>Neu in diesem Schritt</strong> (im Schaubild gestrichelt umrandet):</p><ul class="chips">';
+    newIds.forEach(function(id){
+      html += '<li><button type="button" class="chip" data-chip="'+id+'" aria-pressed="'+(selected===id)+'"><span class="dot" style="background:'+GROUPS[EL[id].group].color+'"></span>'+EL[id].title+'</button></li>';
+    });
+    html += '</ul>';
+  }
+  $("stepInfo").innerHTML = html;
+  document.querySelectorAll("[data-chip]").forEach(function(b){
+    b.addEventListener("click", function(){ toggle(b.dataset.chip, true); });
+  });
+  renderDetail();
+}
+
+function renderDetail(){
+  nodes.forEach(function(n){
+    var on = n.dataset.id === selected;
+    n.classList.toggle("selected", on);
+    n.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  document.querySelectorAll("[data-chip]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.chip === selected); });
+  var box = $("detail");
+  if (!selected){
+    box.innerHTML = '<div class="empty">Tippe eine Zelle oder einen Erreger im Schaubild an, um die Details zu sehen. Mit „Weiter“ startet die nächste Animation.</div>';
+    return;
+  }
+  var d = EL[selected], g = GROUPS[d.group];
+  var h = '<div class="detail"><h3 id="detailTitle">' + d.title + '</h3>' +
+    '<span class="tag"><span class="dot" style="background:' + g.color + '"></span>' + g.name + ', ab Schritt ' + stepOf(selected) + '</span>';
+  d.text.forEach(function(t){ h += '<p>' + t + '</p>'; });
+  if (d.simple) h += '<div class="box simple"><strong>Vereinfachung</strong>' + d.simple + '</div>';
+  if (d.myth) h += '<div class="box myth"><strong>Typische Fehlvorstellung</strong>„' + d.myth.wrong + '“<br>Richtig ist: ' + d.myth.right + '</div>';
+  h += '<div class="detail-actions"><button class="btn" type="button" id="close">Auswahl aufheben</button></div></div>';
+  box.innerHTML = h;
+  $("close").addEventListener("click", function(){
+    var id = selected; selected = null; renderDetail();
+    var n = nodeEl(id); if (n) n.focus();
+  });
+}
+
+function toggle(id, fromChip){
+  selected = (selected === id && !fromChip) ? null : id;
+  renderDetail();
+  if (selected && window.innerWidth < 900){
+    var p = $("detail"), r = p.getBoundingClientRect();
+    if (r.top > window.innerHeight - 80 || r.top < 0){
+      p.scrollIntoView({behavior: reduceMotion.matches ? "auto" : "smooth", block:"start"});
+    }
+  }
+}
+
+function go(n){
+  var s = Math.max(1, Math.min(MAX, n));
+  if (s === step) return;
+  step = s; render(); startScene();
+}
+$("prev").addEventListener("click", function(){ go(step-1); });
+$("next").addEventListener("click", function(){ go(step+1); });
+$("all").addEventListener("click", function(){ go(MAX); });
+$("reset").addEventListener("click", function(){ selected = null; step = 1; render(); startScene(); });
+document.addEventListener("keydown", function(e){
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === "ArrowRight"){ e.preventDefault(); go(step+1); }
+  else if (e.key === "ArrowLeft"){ e.preventDefault(); go(step-1); }
+  else if (e.key === "Escape" && selected){ selected = null; renderDetail(); }
+});
+
+render(); startScene();
+
+})();
+</script>
+</body>
+</html>

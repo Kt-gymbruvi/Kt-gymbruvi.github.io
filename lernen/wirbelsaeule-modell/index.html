@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#EEF2F7;--surface:#FFFFFF;--ink:#16202F;--muted:#556070;--line:#D5DCE6;--accent:#13294B;--accent-ink:#FFFFFF;--yellow:#F2C230;--yellow-ink:#13294B;--bone:#F1EAD8;--boneline:#13294B;--ok:#1F7A4D;--okbg:#DDF2E6;--bad:#A3261B;--badbg:#FBE3E0;--focus:#C98F00;--mem:rgba(19,41,75,.10);--c1:#2F6DB5;--c2:#D99A00;--c3:#5E9A35;--c4:#C2475A;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:18px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.12;margin:0}
+h1{font-weight:800;font-size:clamp(28px,6.4vw,42px);letter-spacing:-.01em}
+h2{font-weight:800;font-size:clamp(22px,4.6vw,27px);margin:36px 0 8px}
+h3{font-weight:700;font-size:20px}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:4px 0 16px}
+.lead{max-width:64ch}
+.btn{font:inherit;font-weight:700;border:2px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:10px;padding:9px 16px;cursor:pointer;min-height:46px;touch-action:manipulation}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.okb{background:var(--okbg);border-color:var(--ok);color:var(--ink);opacity:1}
+.btn.badb{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.fb{border-radius:10px;padding:10px 14px;margin-top:12px;border-left:6px solid var(--line);background:var(--surface)}
+.fb.ok{background:var(--okbg);border-left-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-left-color:var(--bad)}
+.muted{color:var(--muted)}
+footer{margin-top:44px;color:var(--muted);font-size:15px;max-width:64ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<title>Modell und Wirklichkeit: die Wirbelsäule – Biologie Klasse 6</title>
+<style>
+.defs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media (max-width:620px){.defs{grid-template-columns:1fr}}
+.defs .panel{border-left:6px solid var(--yellow)}
+.models{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (max-width:620px){.models{grid-template-columns:1fr}}
+.model{font:inherit;text-align:left;cursor:pointer;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;min-height:60px}
+.model[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.model svg{flex:none;width:44px;height:88px}
+.model strong{display:block;font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;font-size:19px}
+.model span{font-size:15px;color:var(--muted)}
+.ico .w{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round}
+.ico .bd{fill:var(--bone);stroke:var(--boneline);stroke-width:1.2}
+.ico .sf{fill:var(--yellow);stroke:none}
+.feat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px}
+.feat p.q{margin:0 0 8px;font-weight:700}
+.tri{display:flex;flex-wrap:wrap;gap:6px}
+.tri button{font:inherit;font-size:16px;min-height:44px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tri button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:700}
+.feat.ok{border-color:var(--ok);background:var(--okbg)}
+.feat.bad{border-color:var(--bad);background:var(--badbg)}
+.feat .ex{margin:8px 0 0;font-size:16px}
+.qs{display:grid;gap:12px;margin-top:10px}
+.qs .tri button{border-radius:10px}
+.qs .tri button.okb{background:var(--okbg);border-color:var(--ok);color:var(--ink)}
+.qs .tri button.badb{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+textarea{width:100%;min-height:110px;font:inherit;padding:10px;border:2px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);margin-top:8px}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <h1>Modell und Wirklichkeit: die Wirbelsäule</h1>
+  <p class="sub">Biologie Klasse 6: Aufbau der Wirbelsäule</p>
+  <p class="lead">Ein Modell ist eine vereinfachte Nachbildung der Wirklichkeit. Es zeigt nur einige Merkmale. Deshalb prüfst du: Was zeigt das Modell richtig, und was zeigt es nicht?</p>
+  <div class="defs">
+    <div class="panel"><h3>Strukturmodell</h3><p>Es zeigt den <strong>Bau</strong>: Welche Teile gibt es, und wie liegen sie zueinander?</p></div>
+    <div class="panel"><h3>Funktionsmodell</h3><p>Es zeigt, <strong>wie etwas funktioniert</strong>, zum Beispiel wie die Wirbelsäule Stöße abfedert.</p></div>
+  </div>
+
+  <h2>1. Wähle das Modell, das du untersuchst</h2>
+  <div class="models" id="models"></div>
+
+  <h2>2. Vergleiche mit der echten Wirbelsäule</h2>
+  <p class="lead">Entscheide bei jedem Merkmal der echten Wirbelsäule: Zeigt dein Modell das?</p>
+  <div id="feats"></div>
+  <div class="row" style="margin-top:12px"><button class="btn primary" id="chk">Prüfen</button><button class="btn" id="rst">Zurücksetzen</button></div>
+  <div id="sum" aria-live="polite"></div>
+
+  <h2>3. Welches Modell passt wozu?</h2>
+  <div class="qs" id="qs"></div>
+
+  <h2>4. Stärke und Grenze</h2>
+  <div class="panel">
+    <p><strong>Aufgabe:</strong> Nenne eine Stärke und eine Grenze des Modells, das du untersucht hast. Begründe jeweils.</p>
+    <label for="own" style="position:absolute;left:-9999px">Deine Antwort</label>
+    <textarea id="own" placeholder="Stärke: Das Modell zeigt … Grenze: Das Modell zeigt nicht …"></textarea>
+    <p class="muted" style="font-size:15px">Dein Text wird nicht gespeichert. Schreibe ihn auch in dein Heft.</p>
+    <button class="btn" id="eh" aria-expanded="false">Lösungsbeispiel zeigen</button>
+    <div class="fb" id="eht" hidden></div>
+  </div>
+  <footer>Die Lösungen beschreiben typische Schulmodelle. Euer Modell kann davon abweichen, zum Beispiel wenn ihr unterschiedlich große Perlen verwendet. Dann zählt eure Begründung.</footer>
+</div>
+<script>
+const MODELS = [
+  {id:"d", n:"Drahtmodell", s:"Ein Draht, doppelt S-förmig gebogen", ico:`<path class="w" d="M22,84 C34,72 34,58 22,46 C10,34 10,20 22,6"/>`,
+   eh:"Stärke: Das Drahtmodell zeigt die doppelte S-Form und dass sie bei Belastung federt. Grenze: Es zeigt keine einzelnen Wirbel, keine Bandscheiben und kein Rückenmark. Es ist ein Funktionsmodell."},
+  {id:"p", n:"Perlenmodell", s:"Holzperlen und Schaumstoffscheiben auf gebogenem Draht", ico:`<path class="w" d="M22,84 C34,72 34,58 22,46 C10,34 10,20 22,6"/>` + [[24,80],[29,70],[29,60],[24,50],[17,40],[15,30],[18,20],[22,10]].map(([x,y],i) => `<rect class="bd" x="${x-7}" y="${y-4}" width="14" height="7" rx="2"/>` + (i < 7 ? `<rect class="sf" x="${x-6}" y="${y-6.5}" width="12" height="2.2" rx="1"/>` : "")).join(""),
+   eh:"Stärke: Das Perlenmodell zeigt, dass die Wirbelsäule aus einzelnen Wirbeln mit Bandscheiben dazwischen besteht. Grenze: Der Draht läuft durch die Mitte der Perlen. Der echte Wirbelkanal mit dem Rückenmark liegt aber hinter den Wirbelkörpern. Muskeln und Bänder fehlen."},
+  {id:"s", n:"Sammlungsmodell", s:"Kunststoffmodell aus der Biologiesammlung", ico:[...Array(11)].map((_, i) => { const y = 6 + i * 7.4, x = 22 + 7 * Math.sin(i / 10 * 3 * Math.PI), w = 9 + i * 0.7; return `<rect class="bd" x="${x - w / 2}" y="${y}" width="${w}" height="5.6" rx="1.5"/><rect class="bd" x="${x + w / 2 - 1}" y="${y + 1.5}" width="6" height="2.6" rx="1"/>`; }).join(""),
+   eh:"Stärke: Das Sammlungsmodell zeigt die Abschnitte der Wirbelsäule, die Form der Wirbel und den Wirbelkanal, oft in echter Größe. Grenze: Es ist meist starr und kann die Federwirkung nicht zeigen. Muskeln und Bänder fehlen. Es ist ein Strukturmodell."}
+];
+/* r: Musterantwort, ok: ebenfalls akzeptierte Antworten, x: Erklärung */
+const FEATS = [
+  {q:"Doppelt S-förmige Form", d:{r:"ja", x:"Der Draht ist wie die Wirbelsäule doppelt S-förmig gebogen."}, p:{r:"ja", x:"Die Perlen sitzen auf einem doppelt S-förmig gebogenen Draht."}, s:{r:"ja", x:"Das Modell ist wie die echte Wirbelsäule geformt."}},
+  {q:"Viele einzelne Wirbel", d:{r:"nein", x:"Der Draht ist ein durchgehendes Stück."}, p:{r:"ja", x:"Jede Holzperle steht für einen Wirbel."}, s:{r:"ja", x:"Jeder Wirbel ist einzeln nachgebildet."}},
+  {q:"Bandscheiben zwischen den Wirbeln", d:{r:"nein", x:"Es gibt keine Teile zwischen einzelnen Wirbeln."}, p:{r:"ja", x:"Die Schaumstoffscheiben stehen für die Bandscheiben."}, s:{r:"ja", ok:["teilweise"], x:"Bei den meisten Sammlungsmodellen sind die Bandscheiben nachgebildet."}},
+  {q:"Federt, wenn man von oben drückt", d:{r:"ja", x:"Der gebogene Draht gibt nach und federt zurück."}, p:{r:"teilweise", ok:["ja"], x:"Draht und Schaumstoff federn etwas."}, s:{r:"nein", ok:["teilweise"], x:"Sammlungsmodelle sind meist starr auf einem Stab befestigt."}},
+  {q:"Wirbelkanal mit Rückenmark", d:{r:"nein", x:"Ein Draht hat keinen Hohlraum."}, p:{r:"nein", ok:["teilweise"], x:"Der Draht läuft durch die Mitte der Perlen. Der echte Wirbelkanal liegt aber hinter den Wirbelkörpern."}, s:{r:"teilweise", ok:["ja"], x:"Den Wirbelkanal zeigt das Modell. Das Rückenmark ist nur bei manchen Modellen dabei."}},
+  {q:"Abschnitte: Hals, Brust, Lenden, Kreuzbein, Steißbein", d:{r:"teilweise", ok:["nein"], x:"Die Biegungen zeigen ungefähr, wo die Abschnitte liegen. Unterscheiden kann man sie nicht."}, p:{r:"teilweise", ok:["nein"], x:"Nur wenn verschieden große Perlen verwendet werden."}, s:{r:"ja", x:"Die Abschnitte sind gut zu erkennen, auch Kreuzbein und Steißbein."}},
+  {q:"Muskeln und Bänder, die die Wirbelsäule halten", d:{r:"nein", x:"Sie fehlen. Dabei halten sie die echte Wirbelsäule aufrecht."}, p:{r:"nein", x:"Sie fehlen. Dabei halten sie die echte Wirbelsäule aufrecht."}, s:{r:"nein", ok:["teilweise"], x:"Sie fehlen meistens. Dabei halten sie die echte Wirbelsäule aufrecht."}},
+  {q:"Lebendes Gewebe, das wächst und heilen kann", d:{r:"nein", x:"Draht ist kein lebendes Material."}, p:{r:"nein", x:"Holz, Schaumstoff und Draht sind kein lebendes Material."}, s:{r:"nein", x:"Kunststoff ist kein lebendes Material. Echter Knochen lebt."}},
+  {q:"Echte Größe", d:{r:"nein", ok:["teilweise"], x:"Das Drahtmodell ist meist viel kleiner."}, p:{r:"nein", x:"Das Perlenmodell ist meist viel kleiner."}, s:{r:"ja", ok:["teilweise"], x:"Viele Sammlungsmodelle sind in Originalgröße."}}
+];
+const OPTS = ["ja","teilweise","nein"];
+let model = "d", picks = {}, checked = false;
+const mEl = document.getElementById("models"), fEl = document.getElementById("feats"), sum = document.getElementById("sum");
+mEl.innerHTML = MODELS.map(m => `<button class="model" data-m="${m.id}" aria-pressed="false"><svg class="ico" viewBox="0 0 44 90" aria-hidden="true">${m.ico}</svg><span><strong>${m.n}</strong><span>${m.s}</span></span></button>`).join("");
+mEl.addEventListener("click", e => { const b = e.target.closest("[data-m]"); if(!b) return; model = b.dataset.m; picks = {}; checked = false; render(); });
+function render(){
+  mEl.querySelectorAll("[data-m]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.m === model)));
+  fEl.innerHTML = FEATS.map((f, i) => {
+    const a = f[model], p = picks[i];
+    let cls = "", ex = "";
+    if(checked && p){ const good = p === a.r || (a.ok || []).includes(p); cls = good ? "ok" : "bad"; ex = `<p class="ex"><strong>${good ? "Passt." : "Eher: " + a.r + "."}</strong> ${a.x}</p>`; }
+    else if(checked) ex = `<p class="ex"><strong>Lösung: ${a.r}.</strong> ${a.x}</p>`;
+    return `<div class="feat ${cls}"><p class="q">${f.q}</p><div class="tri" role="group" aria-label="${f.q}">${OPTS.map(o => `<button data-i="${i}" data-o="${o}" aria-pressed="${p === o}">${o}</button>`).join("")}</div>${ex}</div>`;
+  }).join("");
+  if(!checked) sum.innerHTML = "";
+  const m = MODELS.find(x => x.id === model);
+  document.getElementById("eht").textContent = m.eh;
+}
+fEl.addEventListener("click", e => { const b = e.target.closest("[data-o]"); if(!b) return; picks[b.dataset.i] = b.dataset.o; if(checked){ checked = false; } render(); });
+document.getElementById("chk").addEventListener("click", () => {
+  checked = true; render();
+  let ok = 0, n = 0;
+  FEATS.forEach((f, i) => { const p = picks[i], a = f[model]; if(p){ n++; if(p === a.r || (a.ok || []).includes(p)) ok++; } });
+  sum.innerHTML = `<div class="fb ${ok === FEATS.length ? "ok" : ""}">${ok} von ${FEATS.length} Einschätzungen passen.${n < FEATS.length ? " " + (FEATS.length - n) + " Merkmale hast du noch nicht bewertet." : ""} Kein Modell zeigt alles. Darum ist es wichtig zu wissen, wofür ein Modell gut ist.</div>`;
+});
+document.getElementById("rst").addEventListener("click", () => { picks = {}; checked = false; render(); });
+
+const QS = [
+  {q:"Du willst zeigen, wie die Wirbelsäule Stöße abfedert.", ok:["d"], f:{d:"Richtig. Das Drahtmodell ist ein Funktionsmodell: Es zeigt die Federwirkung der doppelten S-Form.", p:"Das Perlenmodell federt nur ein wenig. Am deutlichsten zeigt es das Drahtmodell.", s:"Das Sammlungsmodell ist meist starr und kann nicht federn."}},
+  {q:"Du willst zeigen, dass die Wirbelsäule aus Wirbeln und Bandscheiben besteht.", ok:["p","s"], f:{d:"Der Draht hat keine einzelnen Wirbel und keine Bandscheiben.", p:"Richtig. Perlen und Schaumstoffscheiben zeigen den Aufbau.", s:"Richtig. Das Sammlungsmodell ist ein Strukturmodell und zeigt den Aufbau genau."}},
+  {q:"Du willst zeigen, wo das Rückenmark verläuft.", ok:["s"], f:{d:"Ein Draht hat keinen Wirbelkanal.", p:"Beim Perlenmodell liegt der Draht in der Mitte der Wirbel. Der echte Wirbelkanal liegt dahinter.", s:"Richtig. Nur am Sammlungsmodell siehst du den Wirbelkanal hinter den Wirbelkörpern."}}
+];
+const qs = document.getElementById("qs"), qa = {};
+function renderQ(){
+  qs.innerHTML = QS.map((q, i) => {
+    const a = qa[i];
+    return `<div class="panel"><p style="margin-top:0"><strong>${q.q}</strong></p><div class="tri" role="group" aria-label="${q.q}">${MODELS.map(m => `<button data-q="${i}" data-m="${m.id}" class="${a === m.id ? (q.ok.includes(m.id) ? "okb" : "badb") : ""}">${m.n}</button>`).join("")}</div>${a ? `<div class="fb ${q.ok.includes(a) ? "ok" : "bad"}">${q.f[a]}</div>` : ""}</div>`;
+  }).join("");
+}
+qs.addEventListener("click", e => { const b = e.target.closest("[data-q]"); if(!b) return; qa[b.dataset.q] = b.dataset.m; renderQ(); });
+renderQ();
+document.getElementById("eh").addEventListener("click", e => { const t = document.getElementById("eht"); t.hidden = !t.hidden; e.currentTarget.setAttribute("aria-expanded", String(!t.hidden)); e.currentTarget.textContent = t.hidden ? "Lösungsbeispiel zeigen" : "Lösungsbeispiel ausblenden"; });
+render();
+</script>
+</body>
+</html>

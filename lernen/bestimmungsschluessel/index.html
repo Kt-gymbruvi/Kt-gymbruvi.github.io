@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bestimmungsschlüssel Niedersachsen</title>
+<meta name="description" content="Digitale dichotome Bestimmungsschlüssel für Niedersachsen: Laubbäume, Nadelbäume, Vögel, Wirbeltierklassen, Pilze und Gewässertiere mit Artenliste, Übungsmodus, Funden und Gewässergüte.">
+<style>
+:root{
+  --bg:#E8EEEA; --panel:#FFFFFF; --panel-2:#F1F5F2; --ink:#14221A; --ink-soft:#4C6055; --line:#C6D4CB;
+  --brand:#1F4D36; --brand-ink:#FFFFFF; --sign:#F4C430; --sign-hi:#FFE27A; --sign-ink:#1B1B14; --focus:#0B57D0; --accent:#E8731A;
+  --g-laub:#3F8F3A; --g-nadel:#1D6B5A; --g-voegel:#2D6CC0; --g-wirbel:#7A4FB5; --g-pilze:#A5502A; --g-wasser:#1B87A8;
+  --good:#17693B; --good-bg:#DCF1E4; --bad:#A3241B; --bad-bg:#FBE0DC; --note:#6B4A00; --note-bg:#FFF2CF;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1612; --panel:#15231C; --panel-2:#1B2D24; --ink:#E6F1EA; --ink-soft:#A5BCAF; --line:#2B4235;
+    --brand:#8CCB9C; --brand-ink:#0D1612; --focus:#8AB4FF;
+    --g-laub:#6FC269; --g-nadel:#4DB9A3; --g-voegel:#6FA3FF; --g-wirbel:#B795F0; --g-pilze:#E58A5E; --g-wasser:#55C2E0;
+    --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1612; --panel:#15231C; --panel-2:#1B2D24; --ink:#E6F1EA; --ink-soft:#A5BCAF; --line:#2B4235;
+  --brand:#8CCB9C; --brand-ink:#0D1612; --focus:#8AB4FF;
+  --g-laub:#6FC269; --g-nadel:#4DB9A3; --g-voegel:#6FA3FF; --g-wirbel:#B795F0; --g-pilze:#E58A5E; --g-wasser:#55C2E0;
+  --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:960px; margin:0 auto; padding:16px clamp(12px,3vw,24px) 6px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.55rem,4.8vw,2.3rem); line-height:1.1; margin:0; letter-spacing:-.015em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:70ch; }
+.tabs{ max-width:960px; margin:6px auto 0; padding:0 clamp(12px,3vw,24px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em .95em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--brand); border-color:var(--brand); color:var(--brand-ink); }
+.wrap{ max-width:960px; margin:0 auto; padding:12px clamp(12px,3vw,24px) 36px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.2rem; margin:0 0 8px; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.02rem; margin:12px 0 4px; }
+.lead{ margin:0 0 10px; max-width:72ch; }
+.note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.45em .95em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--brand); border-color:var(--brand); color:var(--brand-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn[aria-pressed="true"]{ background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
+.linkbtn{ border:0; background:none; font-weight:700; text-decoration:underline; cursor:pointer; padding:4px 2px; min-height:40px; }
+.txtin, select, input[type=search], input[type=text], input[type=number]{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+label.fl{ display:block; font-weight:700; font-size:.9rem; color:var(--ink-soft); margin:8px 0 3px; }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--good-bg); color:var(--good); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--note-bg); color:var(--note); }
+.warn{ background:var(--bad-bg); color:var(--bad); border-radius:12px; padding:10px 14px; margin:8px 0; font-size:.95rem; }
+
+/* Gruppenwahl */
+.groups{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
+@media (min-width:640px){ .groups{ grid-template-columns:repeat(3,1fr); } }
+.grp{ text-align:left; display:flex; flex-direction:column; gap:2px; background:var(--panel); border:2px solid var(--line); border-left:8px solid var(--gc); border-radius:14px; padding:8px 12px; cursor:pointer; min-height:62px; }
+.grp b{ font-family:var(--display); font-size:1.02rem; line-height:1.2; }
+.grp span{ font-size:.8rem; color:var(--ink-soft); line-height:1.25; }
+.grp[aria-pressed="true"]{ border-color:var(--gc); box-shadow:0 0 0 2px var(--gc) inset; }
+
+/* Schlüssel */
+.stepno{ font-size:.85rem; font-weight:700; color:var(--ink-soft); }
+.q{ font-family:var(--display); font-weight:800; font-size:1.25rem; line-height:1.25; margin:2px 0 8px; }
+.signs{ display:grid; gap:10px; margin:10px 0; }
+@media (min-width:720px){ .signs{ grid-template-columns:1fr 1fr; } }
+.signwrap{ border-radius:12px; display:flex; }
+.signwrap:focus-within{ outline:3px solid var(--focus); outline-offset:3px; }
+.sign{ width:100%; height:100%; display:flex; align-items:center; gap:12px; text-align:left; border:0; cursor:pointer; background:var(--sign); color:var(--sign-ink); padding:12px 34px 12px 14px; min-height:84px; clip-path:polygon(0 0,calc(100% - 26px) 0,100% 50%,calc(100% - 26px) 100%,0 100%); font-weight:700; line-height:1.3; }
+.sign:hover{ background:var(--sign-hi); }
+.sign:focus-visible{ outline:none; background:var(--sign-hi); }
+.sign .ab{ flex:none; width:2em; height:2em; border-radius:50%; background:var(--sign-ink); color:var(--sign); display:grid; place-items:center; font-family:var(--display); font-weight:800; }
+.sign svg{ flex:none; color:var(--sign-ink); }
+.hintbox{ background:var(--panel-2); border-radius:10px; padding:8px 12px; font-size:.95rem; margin:6px 0; }
+.path{ list-style:none; padding:0; margin:6px 0; display:flex; flex-wrap:wrap; gap:6px; }
+.path button{ border:2px solid var(--line); background:var(--panel-2); border-radius:99px; padding:.2em .8em; cursor:pointer; font-size:.88rem; font-weight:700; min-height:36px; }
+.path button span{ color:var(--ink-soft); font-weight:400; }
+.myst{ border:2px dashed var(--line); border-radius:12px; padding:10px 12px; margin:8px 0; }
+.myst ul{ margin:4px 0 4px; padding-left:1.2em; }
+
+/* Steckbrief */
+.sheet{ border:2px solid var(--gc); border-radius:14px; overflow:hidden; margin:8px 0; background:var(--panel); }
+.sheet .hd{ background:var(--gc); color:#fff; padding:10px 14px; }
+.sheet .hd b{ font-family:var(--display); font-size:1.3rem; display:block; line-height:1.2; }
+.sheet .hd i{ font-size:.95rem; opacity:.95; }
+.sheet .bd{ padding:10px 14px 12px; }
+.sheet h4{ font-family:var(--display); margin:10px 0 3px; font-size:.95rem; }
+.sheet ul{ margin:2px 0; padding-left:1.2em; }
+.chk{ list-style:none; padding:0; margin:2px 0; display:grid; gap:2px; }
+.chk label{ display:flex; gap:10px; align-items:flex-start; cursor:pointer; min-height:36px; }
+.chk input{ width:22px; height:22px; flex:none; accent-color:var(--brand); margin-top:2px; }
+.tag{ display:inline-block; font-size:.78rem; font-weight:700; border-radius:99px; padding:1px 10px; background:var(--panel-2); border:1px solid var(--line); margin:2px 4px 2px 0; }
+.tag.risk{ background:var(--bad-bg); color:var(--bad); border-color:transparent; }
+
+/* Listen */
+.splist details{ border-top:1px solid var(--line); padding:4px 0; }
+.splist summary{ cursor:pointer; min-height:44px; display:flex; align-items:center; gap:10px; font-weight:700; }
+.splist summary .dot{ width:12px; height:12px; border-radius:50%; background:var(--gc); flex:none; }
+.splist summary small{ font-weight:400; color:var(--ink-soft); }
+.filters{ display:grid; gap:8px; grid-template-columns:1fr; }
+@media (min-width:640px){ .filters{ grid-template-columns:1fr 1fr 1fr; } }
+.find{ border-top:1px solid var(--line); padding:8px 0; display:grid; gap:6px; }
+.find .row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.gtable{ display:grid; gap:6px; margin:6px 0; }
+.gbar{ display:flex; height:30px; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+.gbar i{ flex:1; display:grid; place-items:center; font-style:normal; font-size:.72rem; font-weight:700; color:#fff; }
+.gres{ border-radius:12px; padding:10px 14px; margin:8px 0; color:#fff; font-weight:700; }
+.gloss dt{ font-family:var(--display); font-weight:800; margin-top:10px; }
+.gloss dd{ margin:2px 0 0; display:flex; gap:10px; align-items:flex-start; }
+.gloss dd svg{ flex:none; color:var(--ink); }
+.wk .node{ border-left:4px solid var(--line); padding-left:10px; margin:8px 0 8px 4px; }
+.wk .set{ font-size:.9rem; color:var(--ink-soft); }
+.wk select{ min-height:42px; margin:4px 0; }
+details.task{ border-top:1px solid var(--line); padding:8px 0; }
+details.task summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:10px; }
+details.task .badge{ flex:none; font-size:.8rem; font-weight:700; border-radius:99px; padding:2px 10px; background:var(--panel-2); border:1px solid var(--line); }
+details.task p{ margin:6px 0; max-width:75ch; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+details.task ul, .card ul.plain{ margin:4px 0 0; padding-left:1.2em; }
+details.teacher{ margin-top:14px; }
+details.teacher summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; }
+details.teacher li, details.teacher p{ font-size:.95rem; max-width:80ch; }
+@media print{ .tabs,.top p,.btnrow,.groups{ display:none !important; } body{ background:#fff; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Bestimmungsschlüssel Niedersachsen</h1>
+  <p>Digitale dichotome Schlüssel für Laubbäume, Nadelbäume, Vögel, Wirbeltierklassen, Pilze und Gewässertiere. Mit Artenliste, Übungsmodus, Fundliste und Gewässergüte-Auswertung.</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab" role="tab" data-tab="key" aria-selected="true">Bestimmen</button>
+  <button type="button" class="tab" role="tab" data-tab="list" aria-selected="false">Artenliste</button>
+  <button type="button" class="tab" role="tab" data-tab="train" aria-selected="false">Üben</button>
+  <button type="button" class="tab" role="tab" data-tab="finds" aria-selected="false">Meine Funde</button>
+  <button type="button" class="tab" role="tab" data-tab="gloss" aria-selected="false">Glossar</button>
+  <button type="button" class="tab" role="tab" data-tab="info" aria-selected="false">Hinweise und Aufgaben</button>
+</nav>
+
+<main class="wrap">
+<section id="pane-key">
+  <div class="groups" id="groups" role="group" aria-label="Schlüssel wählen"></div>
+  <div class="card" id="keyCard" aria-live="polite"></div>
+  <div class="card" id="pathCard" hidden></div>
+</section>
+
+<section id="pane-list" hidden>
+  <div class="card">
+    <h2>Artenliste</h2>
+    <p class="note" style="margin-top:0">Alle Arten und Gruppen der Schlüssel mit Steckbrief und dem Weg durch den Schlüssel. Die Naturräume nennen typische Vorkommen, keine vollständige Verbreitung.</p>
+    <div class="filters">
+      <div><label class="fl" for="fG">Gruppe</label><select id="fG"></select></div>
+      <div><label class="fl" for="fR">Naturraum</label><select id="fR"></select></div>
+      <div><label class="fl" for="fQ">Suche</label><input type="search" id="fQ" placeholder="Name oder Merkmal"></div>
+    </div>
+    <p class="note" id="fCount" aria-live="polite"></p>
+    <div class="splist" id="spList"></div>
+  </div>
+</section>
+
+<section id="pane-train" hidden>
+  <div class="card" id="quizCard"></div>
+  <div class="card" id="wkCard"></div>
+</section>
+
+<section id="pane-finds" hidden>
+  <div class="card" id="findsCard"></div>
+  <div class="card" id="gueteCard"></div>
+</section>
+
+<section id="pane-gloss" hidden>
+  <div class="card">
+    <h2>Glossar der Merkmale</h2>
+    <label class="fl" for="gQ">Begriff suchen</label><input type="search" id="gQ" placeholder="zum Beispiel gegenständig">
+    <dl class="gloss" id="glossList"></dl>
+  </div>
+</section>
+
+<section id="pane-info" hidden>
+  <div class="card">
+    <h2>Regeln im Gelände</h2>
+    <ul class="plain">
+      <li>Pflanzen, Pilze und Tiere in der Natur nur beobachten. Nichts ausreißen, abpflücken oder mitnehmen. In Schutzgebieten (zum Beispiel Nationalpark Niedersächsisches Wattenmeer, Naturschutzgebiete) auf den Wegen bleiben.</li>
+      <li>Alle europäischen Vogelarten sind besonders geschützt. Nester und Brutplätze nicht stören. Alle heimischen Amphibien und Reptilien sind ebenfalls besonders geschützt. Nicht fangen.</li>
+      <li>Kreuzottern sind giftig. Abstand halten und nicht anfassen.</li>
+      <li>Pilze nie aufgrund dieser Seite essen. Zum Verzehr bestimmt nur ein Pilzsachverständiger.</li>
+      <li>Bachuntersuchungen: Keine Tiere dauerhaft entnehmen, nach dem Bestimmen zurücksetzen. Vorsicht an Ufern und bei Hochwasser.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>So funktioniert ein dichotomer Schlüssel</h2>
+    <p class="lead">„Dichotom“ bedeutet zweigeteilt: Bei jedem Schritt gibt es genau zwei Aussagen (a und b). Du entscheidest dich für die Aussage, die auf dein Objekt zutrifft, und folgst dem Hinweis zum nächsten Schritt, bis ein Name erscheint.</p>
+    <ul class="plain"><li>Prüfe mehrere Exemplare und gesunde, ausgewachsene Teile (zum Beispiel Blätter aus dem Licht).</li><li>Der Schlüssel funktioniert nur für die enthaltenen Arten. Eine Art, die nicht im Schlüssel steht, wird zu einem falschen Ergebnis führen.</li><li>Prüfe das Ergebnis mit der Gegenprobe im Steckbrief.</li><li>Merkmale schwanken: Jahreszeit, Standort und Alter verändern das Aussehen.</li></ul>
+  </div>
+  <div class="card"><h2>Aufgaben</h2><div id="taskList"></div>
+    <details class="teacher"><summary>Hinweise für die Lehrkraft</summary><div id="teacherBox"></div></details>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=(x,d=1)=>Number(x).toFixed(d).replace('.',',');
+const shuffle=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+/* =============== Daten =============== */
+const NR={kue:'Küste und Watt',mar:'Marsch',gee:'Geest und Heide',moo:'Moor',boe:'Börden',ber:'Bergland (Harz, Solling, Weserbergland)'};
+const GR={
+ laub:{nm:'Laubbäume',sub:'Blattschlüssel, Sommer',c:'--g-laub'},
+ nadel:{nm:'Nadelbäume',sub:'Nadeln und Zapfen',c:'--g-nadel'},
+ voegel:{nm:'Vögel',sub:'24 häufige Arten',c:'--g-voegel'},
+ wirbel:{nm:'Wirbeltierklassen',sub:'Fische bis Säugetiere',c:'--g-wirbel'},
+ pilze:{nm:'Pilze',sub:'18 Arten, nur zum Lernen',c:'--g-pilze'},
+ wasser:{nm:'Gewässertiere',sub:'Bioindikatoren im Bach',c:'--g-wasser'}
+};
+const SPL=[
+/* Laubbäume */
+{id:'rosskastanie',g:'laub',nm:'Rosskastanie',sci:'Aesculus hippocastanum',f:['Blatt fingerförmig aus 5 bis 7 Teilblättern','Blätter gegenständig, Knospen groß und klebrig','Früchte: stachelige Kapseln mit glänzend braunen Samen','Weiße Blütenkerzen im Mai'],v:'Die Edelkastanie (Esskastanie) hat ungeteilte, lang gezähnte Blätter.',h:'Park-, Allee- und Hofbaum, ursprünglich vom Balkan.',r:['gee','boe','mar','ber'],n:'Die Kastanienminiermotte lässt die Blätter im Sommer oft früh braun werden.'},
+{id:'esche',g:'laub',nm:'Gemeine Esche',sci:'Fraxinus excelsior',f:['Blätter gegenständig, unpaarig gefiedert (7 bis 13 Fiedern)','Knospen tiefschwarz','Früchte: geflügelte Nüsschen in Büscheln','Rinde im Alter netzartig gefurcht'],v:'Eberesche und Robinie haben wechselständige Blätter.',h:'Auwälder, Bachufer, feuchte Laubmischwälder und Hecken.',r:['boe','gee','mar','ber'],n:'Das Eschentriebsterben (verursacht durch den Pilz Hymenoscyphus fraxineus) setzt der Art stark zu.'},
+{id:'robinie',g:'laub',nm:'Robinie',sci:'Robinia pseudoacacia',f:['Blätter wechselständig, unpaarig gefiedert mit ganzrandigen Fiedern','Am Zweig sitzen Dornen','Weiße Blütentrauben im Mai und Juni','Früchte: flache Hülsen'],v:'Esche (Blätter gegenständig) und Eberesche (Fiedern gesägt).',h:'Straßenränder, Böschungen, Brachen, Sandböden. Stammt aus Nordamerika.',r:['gee','boe'],n:'Rinde und Samen sind giftig. Die Art breitet sich stark aus und verdrängt Magerrasen.'},
+{id:'eberesche',g:'laub',nm:'Eberesche (Vogelbeere)',sci:'Sorbus aucuparia',f:['Blätter wechselständig, unpaarig gefiedert mit gesägten Fiedern','Weiße Blütendolden im Mai','Orangerote Beeren im Herbst','Glatte graue Rinde'],v:'Robinie (Fiedern ganzrandig, Dornen) und Esche (gegenständig).',h:'Waldränder, Heide, Moorränder, Bergland.',r:['gee','moo','ber','boe'],n:'Beeren roh nicht genießbar. Wichtige Vogelnahrung.'},
+{id:'feldahorn',g:'laub',nm:'Feldahorn',sci:'Acer campestre',f:['Blätter klein (bis etwa 8 cm), 3 bis 5 stumpfe, ganzrandige Lappen','Blätter gegenständig','Zweige oft mit Korkleisten','Flügelfrüchte waagerecht'],v:'Spitzahorn und Bergahorn haben deutlich größere Blätter.',h:'Hecken, Wallhecken, Waldränder.',r:['gee','boe','mar'],n:'Typischer Baum der Wallhecken in Nordwestniedersachsen.'},
+{id:'spitzahorn',g:'laub',nm:'Spitzahorn',sci:'Acer platanoides',f:['Blatt 5-lappig, Lappen lang zugespitzt mit wenigen Zähnen','Beim Abreißen des Blattstiels tritt Milchsaft aus','Flügelfrüchte in fast waagerechter Stellung','Blätter gegenständig'],v:'Bergahorn (Rand gesägt, Flügel spitzwinklig).',h:'Parks, Laubwälder, Straßenbaum.',r:['boe','gee','ber'],n:''},
+{id:'bergahorn',g:'laub',nm:'Bergahorn',sci:'Acer pseudoplatanus',f:['Blatt 5-lappig, Lappen kurz zugespitzt, Rand gleichmäßig gesägt','Flügel der Früchte spitzwinklig','Rinde im Alter in Schuppen abblätternd','Blätter gegenständig'],v:'Spitzahorn (wenige Zähne, Milchsaft, Flügel waagerecht).',h:'Bergwälder, Schluchtwälder, Parks.',r:['ber','boe','gee'],n:''},
+{id:'stieleiche',g:'laub',nm:'Stieleiche',sci:'Quercus robur',f:['Blattstiel sehr kurz, Blattgrund geöhrt','Blattlappen rundlich','Eicheln an langen Stielen','Rinde früh tief gefurcht'],v:'Traubeneiche (Blattstiel länger, Eicheln sitzend).',h:'Eichenmischwälder, Hecken, Hofbäume, Marsch und Geest.',r:['gee','boe','mar','moo'],n:'Eine der häufigsten heimischen Eichen in Niedersachsen. Wichtig für viele Insekten.'},
+{id:'traubeneiche',g:'laub',nm:'Traubeneiche',sci:'Quercus petraea',f:['Blattstiel 1 bis 3 cm lang, Blattgrund keilförmig','Blattlappen rundlich','Eicheln sitzend, gehäuft','Wuchs oft gerader'],v:'Stieleiche (Blattstiel sehr kurz, Eicheln gestielt). Hybride kommen vor.',h:'Trockenere, ärmere Böden, Hügelland und Geest.',r:['ber','gee','boe'],n:''},
+{id:'rotbuche',g:'laub',nm:'Rotbuche',sci:'Fagus sylvatica',f:['Blatt eiförmig, Rand glatt bis leicht wellig, Seitennerven gerade','Glatte graue Rinde','Früchte: Bucheckern im stacheligen Fruchtbecher','Blätter wechselständig'],v:'Hainbuche (Blatt doppelt gesägt, gefaltet).',h:'Buchenwälder im Hügelland, Bergland und auf der Geest.',r:['ber','boe','gee'],n:'Die Buche würde ohne Eingriffe große Teile Niedersachsens bewalden. Bucheckern roh nur in kleinen Mengen genießbar.'},
+{id:'winterlinde',g:'laub',nm:'Winterlinde',sci:'Tilia cordata',f:['Blatt herzförmig, Blattgrund schief','Unterseite blaugrün, rostbraune Haarbüschel in den Nervenwinkeln','Blüten im Juni und Juli, Nüsschen mit Hochblatt','Blätter wechselständig'],v:'Sommerlinde (größeres Blatt, weiße Achselbärtchen, blüht früher).',h:'Hofbäume und Dorflinden, Laubwälder.',r:['gee','boe','ber','mar'],n:''},
+{id:'bergulme',g:'laub',nm:'Bergulme',sci:'Ulmus glabra',f:['Blatt Oberseite rau wie Schmirgelpapier, Blattgrund schief','Rand doppelt gesägt, oft mit drei Spitzen','Früchte: geflügelte Nüsschen','Blätter wechselständig'],v:'Feldulme (kleineres Blatt, glattere Rinde).',h:'Schluchtwälder, Bergland, Auwälder.',r:['ber','boe'],n:'Das Ulmensterben (Pilz Ceratocystis novo-ulmi) hat die Bestände stark dezimiert.'},
+{id:'silberweide',g:'laub',nm:'Silberweide',sci:'Salix alba',f:['Blatt schmal lanzettlich, mindestens dreimal so lang wie breit','Unterseite silbrig behaart','Kätzchen im April','Wuchs oft als Kopfweide'],v:'Andere Weidenarten haben breitere oder unterseits kahle Blätter.',h:'Ufer, Auen, feuchte Wiesen, Marsch.',r:['mar','gee','boe'],n:'Kopfweiden prägen viele Niederungen. Wichtig für Insekten und Höhlenbrüter.'},
+{id:'zitterpappel',g:'laub',nm:'Zitterpappel (Aspe)',sci:'Populus tremula',f:['Blatt fast kreisrund, grob gezähnt','Blattstiel lang und seitlich abgeflacht','Blätter zittern schon im leichten Wind','Glatte graugrüne Rinde bei jungen Bäumen'],v:'Birke (Blatt dreieckig-rautenförmig, Stiel rund).',h:'Waldränder, Heideflächen, Moorränder, Pionierbaum.',r:['gee','moo','ber'],n:''},
+{id:'traubenkirsche',g:'laub',nm:'Spätblühende Traubenkirsche',sci:'Prunus serotina',f:['Blatt derb, glänzend dunkelgrün, Rand fein gesägt','Mittelnerv unterseits mit rotbraunen Härchen','Weiße Blütentrauben im Mai und Juni, schwarze Früchte','Rinde riecht beim Anritzen bitter-mandelartig'],v:'Vogelkirsche (matter, zwei Drüsen am Blattstiel, Ringelborke).',h:'Kiefernforste und Sandböden. Stammt aus Nordamerika.',r:['gee'],n:'Invasive Art, die in Kiefernforsten der Geest die Verjüngung heimischer Bäume behindert. Blätter und Samen enthalten Blausäureglykoside.'},
+{id:'hainbuche',g:'laub',nm:'Hainbuche',sci:'Carpinus betulus',f:['Blatt doppelt gesägt mit 10 bis 15 geraden, tief gefalteten Seitennervenpaaren','Stamm grau, mit Längswülsten (spannrückig)','Früchte: dreilappig geflügelt','Blätter wechselständig'],v:'Rotbuche (Rand glatt, Rinde glatt).',h:'Eichen-Hainbuchen-Wälder, Hecken, Parks.',r:['boe','gee','ber'],n:'Häufig als Heckenpflanze.'},
+{id:'sandbirke',g:'laub',nm:'Sandbirke (Hängebirke)',sci:'Betula pendula',f:['Blatt dreieckig bis rautenförmig, doppelt gesägt, Spitze ausgezogen','Zweige hängend, Rinde weiß mit schwarzen Rissen','Männliche Kätzchen im Winter sichtbar','Blätter wechselständig'],v:'Moorbirke (Zweige nicht hängend, Blatt rundlicher, Zweige behaart).',h:'Heide, Sandböden, Waldränder, Pionierbaum.',r:['gee','moo','boe'],n:'Wächst schnell auf Rohböden und Brachen.'},
+{id:'schwarzerle',g:'laub',nm:'Schwarzerle',sci:'Alnus glutinosa',f:['Blatt verkehrt-eiförmig, vorn abgerundet oder eingebuchtet','Junge Blätter klebrig','Kleine verholzte Zäpfchen bleiben am Zweig','Blätter wechselständig'],v:'Hasel (Blatt zugespitzt, behaart).',h:'Bruchwälder, Bachufer, Marsch und Moor, feuchte Standorte.',r:['mar','moo','gee','ber'],n:'Wurzelknöllchen mit Bakterien (Frankia) binden Luftstickstoff.'},
+{id:'vogelkirsche',g:'laub',nm:'Vogelkirsche',sci:'Prunus avium',f:['Blatt länglich-eiförmig, zugespitzt, Rand gesägt','Zwei rote Drüsen am Blattstiel','Rinde glänzend rotbraun mit waagerechten Korkstreifen (Ringelborke)','Weiße Blüten im April'],v:'Spätblühende Traubenkirsche (derb, glänzend).',h:'Waldränder, Hecken, Streuobst.',r:['gee','boe','ber'],n:'Die Wildform der Süßkirsche.'},
+/* Nadelbäume */
+{id:'waldkiefer',g:'nadel',nm:'Waldkiefer (Gemeine Kiefer)',sci:'Pinus sylvestris',f:['Nadeln paarweise aus einer Scheide, 4 bis 7 cm lang','Nadeln blaugrün und gedreht','Borke im oberen Stamm orangerot und dünn abblätternd','Zapfen hängend, 3 bis 6 cm'],v:'Schwarzkiefer (längere, dunklere, steife Nadeln).',h:'Sandige Geestböden, Heide, Forste.',r:['gee','moo'],n:'Prägt viele Forste der Geest, zum Beispiel in der Lüneburger Heide.'},
+{id:'schwarzkiefer',g:'nadel',nm:'Schwarzkiefer',sci:'Pinus nigra',f:['Nadeln paarweise, 8 bis 15 cm, dunkelgrün, steif','Borke grau bis schwarz, tief gefurcht','Zapfen eiförmig, 5 bis 8 cm','Kronen oft dicht'],v:'Waldkiefer (kürzere, blaugrüne Nadeln, orangerote Borke).',h:'Angepflanzt auf Sandböden und in Küstennähe.',r:['gee','kue'],n:'Nicht heimisch, stammt aus Südeuropa.'},
+{id:'laerche',g:'nadel',nm:'Lärche',sci:'Larix',f:['Nadeln in Büscheln auf Kurztrieben, weich, hellgrün','Im Herbst gelb, dann Nadelabwurf','Kleine aufrechte Zapfen (2 bis 4 cm)','Als einziger heimischer Nadelbaum im Winter kahl'],v:'Im Forst häufig auch die Japanische Lärche (Zapfenschuppen zurückgebogen).',h:'Forste, Parks, Bergland.',r:['gee','ber','boe'],n:''},
+{id:'thuja',g:'nadel',nm:'Abendländischer Lebensbaum',sci:'Thuja occidentalis',f:['Blätter schuppenförmig, dachziegelartig','Zweige flach','Aromatischer Geruch beim Zerreiben','Kleine aufrechte Zapfen'],v:'Zypressenartige Gartengehölze.',h:'Hecken, Friedhöfe, Gärten. Stammt aus Nordamerika.',r:['gee','boe','mar'],n:'Pflanzenteile sind giftig.'},
+{id:'wacholder',g:'nadel',nm:'Gemeiner Wacholder',sci:'Juniperus communis',f:['Nadeln zu dritt im Quirl, sehr stechend','Auf der Oberseite ein weißes Band','Beerenzapfen erst grün, dann blauschwarz','Wuchs als Strauch oder schmale Säule'],v:'Eibe (flache, weiche Nadeln).',h:'Heide, Magerrasen, Wacholderheiden.',r:['gee'],n:'Typisch für beweidete Heiden der Lüneburger Heide.'},
+{id:'eibe',g:'nadel',nm:'Eibe',sci:'Taxus baccata',f:['Nadeln flach, weich, dunkelgrün glänzend','Unterseite hellgrün ohne weiße Streifen','Rote, fleischige Samenmäntel (Scheinbeeren)','Kein Harz'],v:'Tanne (zwei weiße Streifen, Zapfen).',h:'Heimisch selten in kalkreichen Wäldern, oft in Parks und auf Friedhöfen gepflanzt.',r:['ber','gee','boe'],n:'Fast alle Teile sind stark giftig (Taxin), nur der rote Samenmantel nicht.'},
+{id:'weisstanne',g:'nadel',nm:'Weißtanne',sci:'Abies alba',f:['Nadeln flach, Spitze leicht eingekerbt','Unterseite mit zwei weißen Streifen','Zapfen aufrecht, zerfallen am Baum','Rinde glatt silbergrau'],v:'Fichte (Nadeln vierkantig, Zapfen hängend), Douglasie.',h:'Bergwälder, in tieferen Lagen selten.',r:['ber'],n:''},
+{id:'douglasie',g:'nadel',nm:'Douglasie',sci:'Pseudotsuga menziesii',f:['Nadeln weich, zerrieben zitronig duftend','Zapfen hängend, Deckschuppen dreizipflig herausragend','Knospen spitz, rotbraun','Rinde im Alter dick und korkig'],v:'Weißtanne (Spitze eingekerbt, Zapfen aufrecht).',h:'Forstlich angebaut. Stammt aus Nordamerika.',r:['gee','ber','boe'],n:''},
+{id:'sitkafichte',g:'nadel',nm:'Sitka-Fichte',sci:'Picea sitchensis',f:['Nadeln sehr stechend, abgeflacht','Oberseite mit zwei bläulich-weißen Streifen','Zapfen 6 bis 10 cm, papierartige Schuppen','Verträgt Salzwind'],v:'Gemeine Fichte (vierkantige Nadeln, größere Zapfen).',h:'Forstlich angebaut, besonders in Küstennähe. Stammt aus Nordamerika.',r:['kue','gee','moo'],n:''},
+{id:'fichte',g:'nadel',nm:'Gemeine Fichte (Rotfichte)',sci:'Picea abies',f:['Nadeln vierkantig, spitz, zwischen den Fingern rollbar','Zapfen hängend, 10 bis 16 cm, fallen als Ganzes ab','Rinde rotbraun','Flachwurzelnd'],v:'Sitka-Fichte, Weißtanne.',h:'Harz, Forste in vielen Regionen.',r:['ber','gee'],n:'Trockenheit und Borkenkäferbefall haben in den letzten Jahren großflächig Fichtenwälder im Harz geschädigt.'},
+/* Vögel */
+{id:'hoeckerschwan',g:'voegel',nm:'Höckerschwan',sci:'Cygnus olor',f:['Etwa 150 cm lang, ganz weiß','Schnabel orangerot mit schwarzem Höcker','Hals S-förmig gebogen','Schwimmt auf Seen, Flüssen, Küstengewässern'],v:'Singschwan (gelb-schwarzer Schnabel, Wintergast).',h:'Seen, Flüsse, Teiche, Küste.',r:['mar','kue','gee','boe'],n:''},
+{id:'stockente',g:'voegel',nm:'Stockente',sci:'Anas platyrhynchos',f:['Männchen: grüner Kopf, weißer Halsring, gelber Schnabel','Weibchen: braun gesprenkelt, orangefarbener Schnabel','Flacher breiter Schnabel','Blauer Flügelspiegel'],v:'Andere Schwimmenten (zum Beispiel Schnatterente).',h:'Fast alle Gewässer, Teiche, Gräben, Städte.',r:['mar','gee','boe','kue','moo','ber'],n:''},
+{id:'graugans',g:'voegel',nm:'Graugans',sci:'Anser anser',f:['Etwa 80 cm, graubraun','Kräftiger orangeroter Schnabel','Rosa Beine','Gänsetypische Rufe'],v:'Andere Wildgänse (zum Beispiel Saatgans, Blässgans, Weißwangengans).',h:'Feuchtwiesen, Küste, Seen.',r:['kue','mar','gee'],n:'Stammform der Hausgans.'},
+{id:'blesshuhn',g:'voegel',nm:'Blässhuhn',sci:'Fulica atra',f:['Gefieder schwarz','Weißer Schnabel mit weißem Stirnschild','Zehen mit Schwimmlappen','Taucht nach Wasserpflanzen'],v:'Teichhuhn (roter Stirnschild).',h:'Seen, Teiche, Flüsse mit Röhricht.',r:['gee','mar','boe'],n:''},
+{id:'kormoran',g:'voegel',nm:'Kormoran',sci:'Phalacrocorax carbo',f:['Gefieder schwarz glänzend, langer Hals','Hakenspitze am Schnabel, gelb-weißer Kehlfleck','Sitzt oft mit gespreizten Flügeln','Schwimmt tief im Wasser, taucht nach Fischen'],v:'Graureiher (grau, fliegt mit eingezogenem Hals).',h:'Küste, Seen, Flüsse.',r:['kue','mar','gee'],n:''},
+{id:'graureiher',g:'voegel',nm:'Graureiher',sci:'Ardea cinerea',f:['Etwa 90 cm, grau mit weißem Hals','Langer, gelblicher Dolchschnabel','Im Flug Hals S-förmig eingezogen','Steht reglos im Flachwasser oder auf Wiesen'],v:'Kormoran (schwarz).',h:'Ufer, Gräben, Fischteiche, Wiesen.',r:['mar','gee','boe','kue'],n:'Brütet in Kolonien auf Bäumen.'},
+{id:'silbermoewe',g:'voegel',nm:'Silbermöwe',sci:'Larus argentatus',f:['Mantel hellgrau, Kopf und Unterseite weiß','Kräftiger gelber Schnabel mit rotem Fleck','Beine rosa','Rufe „kjau“ und „gagaga“'],v:'Lachmöwe (kleiner, rote Beine, im Sommer dunkelbrauner Kopf).',h:'Küste, Inseln, Watt.',r:['kue','mar'],n:''},
+{id:'austernfischer',g:'voegel',nm:'Austernfischer',sci:'Haematopus ostralegus',f:['Gefieder schwarz-weiß','Langer orangeroter Schnabel, rote Beine','Laute „kliiiip“-Rufe','Sucht im Watt nach Muscheln und Würmern'],v:'Ähnliche Küstenvögel, zum Beispiel Säbelschnäbler.',h:'Watt, Küste, auch Wiesen im Binnenland.',r:['kue','mar'],n:'Charaktervogel des Wattenmeeres.'},
+{id:'maeusebussard',g:'voegel',nm:'Mäusebussard',sci:'Buteo buteo',f:['Etwa 55 cm, breite Flügel','Kreist oft mit leicht angehobenen Flügeln','Ruft katzenartig „hiäh“','Gefieder variabel braun, oft heller Bruststreifen'],v:'Turmfalke (kleiner, spitze Flügel, Rüttelflug).',h:'Feld, Wald, Wiesen, sitzt oft auf Pfählen.',r:['boe','gee','mar','ber'],n:'Häufigster Greifvogel. Greifvögel sind streng geschützt.'},
+{id:'turmfalke',g:'voegel',nm:'Turmfalke',sci:'Falco tinnunculus',f:['Etwa 35 cm, schmale spitze Flügel','Rüttelflug über Feldern','Männchen: grauer Kopf, rotbrauner Rücken mit dunklen Flecken','Brütet in Nischen an Gebäuden'],v:'Mäusebussard.',h:'Felder, Wiesen, Städte.',r:['boe','gee','mar'],n:'Greifvögel sind streng geschützt.'},
+{id:'ringeltaube',g:'voegel',nm:'Ringeltaube',sci:'Columba palumbus',f:['Etwa 40 cm, größte heimische Taube','Weißer Halsfleck, weiße Flügelbinde','Rundlicher Körper, kleiner Kopf','Ruf: „gu-gu-gugu“'],v:'Straßentaube (kleiner, ohne weißen Halsfleck).',h:'Wälder, Parks, Siedlungen.',r:['gee','boe','mar','ber'],n:''},
+{id:'elster',g:'voegel',nm:'Elster',sci:'Pica pica',f:['Gefieder schwarz-weiß, grün-blau schillernd','Sehr langer Schwanz','Kuppelnest aus Zweigen','Ruft laut „schäckschäck“'],v:'Andere Rabenvögel.',h:'Siedlungen, Feldflur, Gehölze.',r:['boe','gee','mar'],n:''},
+{id:'rabenkraehe',g:'voegel',nm:'Rabenkrähe',sci:'Corvus corone',f:['Etwa 47 cm, ganz schwarz','Kräftiger schwarzer Schnabel','Ruft „krah“','Laufen und hüpfen am Boden'],v:'Saatkrähe (grauweißer Schnabelgrund, Koloniebrüter), Kolkrabe (größer).',h:'Felder, Städte, Wiesen.',r:['boe','gee','mar'],n:''},
+{id:'eichelhaeher',g:'voegel',nm:'Eichelhäher',sci:'Garrulus glandarius',f:['Gefieder rosabraun','Blau-schwarz-weiß gebänderte Flügeldecken','Weißer Bürzel','Versteckt Eicheln als Wintervorrat'],v:'Andere Rabenvögel.',h:'Wälder und Parks mit Eichen.',r:['gee','boe','ber'],n:'Trägt zur Verbreitung der Eichen bei.'},
+{id:'buntspecht',g:'voegel',nm:'Buntspecht',sci:'Dendrocopos major',f:['Schwarz-weißes Gefieder','Roter Unterschwanz, Männchen mit rotem Nackenfleck','Klettert am Stamm, trommelt','Etwa 23 cm'],v:'Mittelspecht (rote Kappe).',h:'Wälder, Parks, Gärten.',r:['gee','boe','ber'],n:''},
+{id:'rauchschwalbe',g:'voegel',nm:'Rauchschwalbe',sci:'Hirundo rustica',f:['Oberseite blauschwarz, Kehle und Stirn rotbraun','Langer, tief gegabelter Schwanz','Jagt im schnellen Flug Insekten','Nest aus Lehm in Ställen und Scheunen'],v:'Mehlschwalbe (weißer Bürzel, kurzer Schwanz).',h:'Bauernhöfe, Dörfer, Wiesen.',r:['gee','mar','boe'],n:'Zugvogel, überwintert in Afrika.'},
+{id:'amsel',g:'voegel',nm:'Amsel',sci:'Turdus merula',f:['Männchen matt schwarz, Schnabel und Augenring orangegelb','Weibchen dunkelbraun','Hüpft am Boden, sucht Würmer','Flötender Gesang'],v:'Star (glänzend, punktiert, kurzer Schwanz).',h:'Gärten, Parks, Wälder.',r:['gee','boe','mar','ber'],n:''},
+{id:'star',g:'voegel',nm:'Star',sci:'Sturnus vulgaris',f:['Gefieder schwarz glänzend, im Herbst hell gepunktet','Kurzer Schwanz, langer spitzer Schnabel (im Frühjahr gelb)','Läuft eher als zu hüpfen','Große Schwärme, ahmt Geräusche nach'],v:'Amsel (matt schwarz, langer Schwanz).',h:'Felder, Streuobstwiesen, Siedlungen.',r:['gee','boe','mar'],n:''},
+{id:'rotkehlchen',g:'voegel',nm:'Rotkehlchen',sci:'Erithacus rubecula',f:['Orangerote Brust, Kehle und Stirn','Rücken olivbraun, Bauch hell','Rundliche Gestalt, aufrechte Haltung','Perlender Gesang, auch im Winter'],v:'Junge Rotkehlchen sind braun gefleckt, ohne rote Brust.',h:'Wälder, Hecken, Gärten.',r:['gee','boe','ber','mar'],n:''},
+{id:'kohlmeise',g:'voegel',nm:'Kohlmeise',sci:'Parus major',f:['Kopf schwarz mit weißen Wangen','Unterseite gelb mit schwarzem Längsstreifen','Etwa 14 cm','Ruft „zi-zi-bäh“'],v:'Blaumeise (kleiner, blaue Kappe).',h:'Wälder, Gärten, Parks.',r:['gee','boe','ber','mar'],n:''},
+{id:'blaumeise',g:'voegel',nm:'Blaumeise',sci:'Cyanistes caeruleus',f:['Blaue Kappe, weißer Überaugenstreif','Flügel und Schwanz blau','Unterseite gelb','Etwa 11 cm'],v:'Kohlmeise (größer, schwarzer Kopf).',h:'Laubwälder, Gärten.',r:['gee','boe','ber','mar'],n:''},
+{id:'zaunkoenig',g:'voegel',nm:'Zaunkönig',sci:'Troglodytes troglodytes',f:['Sehr klein und rundlich, braun','Schwanz steil aufgestellt','Heller Überaugenstreif','Sehr laute, langgezogene Strophe'],v:'Heckenbraunelle (grauer Kopf, unauffälliger).',h:'Dichtes Unterholz, Hecken, Gärten.',r:['gee','boe','ber','mar'],n:''},
+{id:'buchfink',g:'voegel',nm:'Buchfink',sci:'Fringilla coelebs',f:['Männchen: blaugrauer Scheitel, rosabraune Brust','Zwei weiße Flügelbinden','Kegelförmiger Schnabel','Ruf „pink pink“, Schlag mit Schlussschnörkel'],v:'Bergfink (orangefarbene Brust, Wintergast).',h:'Wälder, Parks, Gärten.',r:['gee','boe','ber','mar'],n:'Einer der häufigsten Brutvögel Deutschlands.'},
+{id:'haussperling',g:'voegel',nm:'Haussperling (Spatz)',sci:'Passer domesticus',f:['Männchen: grauer Scheitel, schwarzer Kehllatz','Rücken braun gestreift','Weibchen unscheinbar braungrau','Lebt in Trupps in Siedlungen'],v:'Feldsperling (brauner Scheitel, schwarzer Wangenfleck).',h:'Dörfer, Städte, Höfe.',r:['gee','boe','mar','ber'],n:'Bestände sind in vielen Städten rückläufig.'},
+/* Wirbeltierklassen */
+{id:'c_fisch',g:'wirbel',nm:'Fische',sci:'Pisces',f:['Wechselwarm','Kiemenatmung','Haut mit Schuppen, Flossen','Herz mit einer Kammer und einer Vorkammer','Fortpflanzung meist durch Laich im Wasser'],v:'Wale und Robben sind Säugetiere. Der Aal ist schlangenförmig, aber ein Fisch.',h:'Beispiele in Niedersachsen: Hecht, Rotauge, Aal, Stichling, Scholle (Nordsee).',r:['kue','mar','gee','boe'],n:''},
+{id:'c_amph',g:'wirbel',nm:'Amphibien (Lurche)',sci:'Amphibia',f:['Wechselwarm','Larven mit Kiemen, Erwachsene mit Lungen und Hautatmung','Haut nackt, feucht, drüsenreich','Herz mit zwei Vorkammern und einer Kammer','Laich ohne feste Schale, Metamorphose'],v:'Molche sehen wie Eidechsen aus, haben aber eine feuchte Haut. Blindschleichen sind keine Schlangen oder Amphibien.',h:'Beispiele in Niedersachsen: Grasfrosch, Erdkröte, Teichmolch, Kammmolch.',r:['gee','boe','moo','mar'],n:'Alle heimischen Amphibien sind besonders geschützt.'},
+{id:'c_rept',g:'wirbel',nm:'Reptilien (Kriechtiere)',sci:'Reptilia',f:['Wechselwarm','Lungenatmung','Trockene Haut mit Hornschuppen oder Schilden','Herz mit zwei Vorkammern und unvollständig getrennter Kammer','Eier mit pergamentartiger Schale oder lebendgebärend, keine Larven'],v:'Die Blindschleiche ist eine beinlose Echse und kein Wurm oder keine Schlange.',h:'Beispiele in Niedersachsen: Waldeidechse, Zauneidechse, Blindschleiche, Ringelnatter, Kreuzotter.',r:['gee','moo','ber'],n:'Alle heimischen Reptilien sind besonders geschützt. Die Kreuzotter ist giftig: Abstand halten.'},
+{id:'c_voge',g:'wirbel',nm:'Vögel',sci:'Aves',f:['Gleichwarm','Federn, Vorderextremitäten als Flügel','Lunge mit Luftsäcken','Herz mit vier Räumen','Eier mit Kalkschale, Brutpflege'],v:'Fledermäuse fliegen, sind aber Säugetiere.',h:'Siehe Vogelschlüssel.',r:['kue','mar','gee','boe','ber'],n:''},
+{id:'c_saug',g:'wirbel',nm:'Säugetiere',sci:'Mammalia',f:['Gleichwarm','Fell (Haare)','Milchdrüsen: Jungtiere werden gesäugt','Zwerchfell, Lungenatmung, Herz mit vier Räumen','Meist lebendgebärend'],v:'Seehund, Kegelrobbe und Schweinswal leben im Wasser und sind Säugetiere.',h:'Beispiele in Niedersachsen: Feldhase, Reh, Igel, Rotfuchs, Seehund (Wattenmeer), Schweinswal (Nordsee).',r:['kue','mar','gee','boe','ber','moo'],n:''},
+/* Pilze */
+{id:'fliegenpilz',g:'pilze',nm:'Fliegenpilz',sci:'Amanita muscaria',f:['Hut leuchtend rot mit weißen Flocken','Lamellen weiß, Stiel mit Ring','Stielbasis knollig mit Schuppengürteln','Unter Birken und Fichten'],v:'Kaiserling (nicht heimisch). Die Hutfarbe bleicht aus.',h:'Birken- und Nadelwälder, Heide.',r:['gee','ber','moo'],n:'Giftig.'},
+{id:'knollenblaetterpilz',g:'pilze',nm:'Grüner Knollenblätterpilz',sci:'Amanita phalloides',f:['Hut grünlich-oliv, glatt','Lamellen weiß, Stiel mit Ring','Stielbasis in einer häutigen Scheide (Knolle)','Süßlich-fauliger Geruch bei älteren Fruchtkörpern'],v:'Wird mit Champignons, Täublingen und jungen Stäublingen verwechselt.',h:'Laubwälder, besonders unter Eichen und Buchen.',r:['gee','boe','ber'],n:'Tödlich giftig. Verantwortlich für die meisten tödlichen Pilzvergiftungen.'},
+{id:'pantherpilz',g:'pilze',nm:'Pantherpilz',sci:'Amanita pantherina',f:['Hut graubraun mit weißen Flocken','Lamellen weiß, Stiel mit Ring','Stielbasis knollig mit Ringwülsten','Fleisch weiß, verfärbt nicht'],v:'Perlpilz (Fleisch rötend, gerillter Ring).',h:'Nadel- und Mischwälder.',r:['gee','ber'],n:'Giftig.'},
+{id:'perlpilz',g:'pilze',nm:'Perlpilz',sci:'Amanita rubescens',f:['Hut rötlich-braun mit grauen Flocken','Fleisch rötet bei Verletzung, besonders in Madengängen','Ring gerillt','Stielbasis knollig'],v:'Pantherpilz (Fleisch verfärbt nicht).',h:'Laub- und Nadelwälder.',r:['gee','ber','boe'],n:'Hohe Verwechslungsgefahr mit giftigen Wulstlingen. Roh giftig.'},
+{id:'steinpilz',g:'pilze',nm:'Gemeiner Steinpilz',sci:'Boletus edulis',f:['Hut braun, glatt, halbkugelig','Röhren jung weiß, später gelbgrün','Stiel dick, mit hellem Netz','Fleisch weiß, verfärbt nicht'],v:'Gallenröhrling (Stielnetz dunkel, Röhren im Alter rosa, bitter).',h:'Laub- und Nadelwälder, Waldränder.',r:['gee','ber','boe'],n:'Verwechslung mit dem Gallenröhrling ist häufig.'},
+{id:'maronenroehrling',g:'pilze',nm:'Maronenröhrling',sci:'Imleria badia',f:['Hut kastanienbraun, im Regen schmierig','Röhren blassgelb, bei Druck blaugrün anlaufend','Stiel ohne Netz','Meist unter Kiefern und Fichten'],v:'Gallenröhrling (bitter).',h:'Nadelwälder, Heide, Kiefernforste.',r:['gee','ber'],n:''},
+{id:'birkenpilz',g:'pilze',nm:'Birkenpilz (Raustielröhrling)',sci:'Leccinum scabrum',f:['Hut graubraun bis braun, glatt','Stiel schlank mit dunklen Schüppchen','Röhren grauweiß','Wächst bei Birken'],v:'Pappelrauhfuß und andere Raustiele.',h:'Birkenwälder, Moorränder, Heide.',r:['gee','moo'],n:''},
+{id:'butterpilz',g:'pilze',nm:'Butterpilz',sci:'Suillus luteus',f:['Hut schleimig-glänzend, gelblich-braun','Stiel mit häutigem Ring','Röhren gelb','Unter Kiefern'],v:'Sandröhrling (kein Ring, Röhren rötlich).',h:'Kiefernwälder auf Sandboden, Heide.',r:['gee'],n:''},
+{id:'pfifferling',g:'pilze',nm:'Pfifferling',sci:'Cantharellus cibarius',f:['Hut und Stiel dottergelb, trichterförmig','Unterseite mit Leisten, die am Stiel herablaufen','Fruchtiger Geruch (Aprikose)','Fleisch weißlich, fest'],v:'Falscher Pfifferling (orange, echte Lamellen, weiches Fleisch), Ölbaumpilz (giftig).',h:'Laub- und Nadelwälder, bemooste Böden.',r:['gee','ber','boe'],n:'Der Pfifferling ist selten geworden und teils geschützt.'},
+{id:'parasol',g:'pilze',nm:'Riesenschirmling (Parasol)',sci:'Macrolepiota procera',f:['Hut 15 bis 30 cm, schuppig, schirmartig','Stiel mit schlangenhautartiger Musterung','Ring verschiebbar','Lamellen weiß'],v:'Giftige Schirmlinge (kleiner, Fleisch rötlich).',h:'Waldränder, Wiesen, Lichtungen.',r:['gee','boe','mar'],n:'Verwechslungsgefahr mit giftigen Schirmlingen.'},
+{id:'krempling',g:'pilze',nm:'Kahler Krempling',sci:'Paxillus involutus',f:['Hut gelbbraun mit eingerolltem Rand','Lamellen bräunen bei Druck, laufen herab','Stiel ohne Ring','Unter Birken, Kiefern, Eichen'],v:'Wird mit essbaren Pilzen verwechselt.',h:'Wälder, Parks, Wegränder.',r:['gee','boe','ber'],n:'Giftig. Kann bei wiederholtem Verzehr lebensbedrohliche Reaktionen auslösen.'},
+{id:'hallimasch',g:'pilze',nm:'Hallimasch',sci:'Armillaria',f:['Fruchtkörper büschelig an Holz und Stümpfen','Hut honiggelb mit dunklen Schüppchen','Stiel mit Ring, Lamellen weiß','Bildet schwarze Rhizomorphen'],v:'Grünblättriger Schwefelkopf (Lamellen später grünlich, bitter).',h:'Laub- und Nadelwald, an Stämmen und Stümpfen.',r:['gee','ber','boe'],n:'Roh und ungenügend gegart giftig. Parasitisch.'},
+{id:'schwefelkopf',g:'pilze',nm:'Grünblättriger Schwefelkopf',sci:'Hypholoma fasciculare',f:['Fruchtkörper büschelig an Holz','Hut und Lamellen schwefelgelb, Lamellen später grünlich','Schmeckt bitter','Dunkles Sporenpulver'],v:'Hallimasch (Hut honiggelb, Ring).',h:'Laub- und Nadelwald, an Stümpfen und Stämmen.',r:['gee','ber','boe'],n:'Giftig.'},
+{id:'austernseitling',g:'pilze',nm:'Austernseitling',sci:'Pleurotus ostreatus',f:['Hut muschelförmig, graubraun','Lamellen laufen am kurzen, seitlichen Stiel herab','Wächst dachziegelartig an Holz, oft im Herbst','Weiß-weißliches Fleisch'],v:'Giftige Seitlinge sind selten, andere Holzpilze.',h:'Laubholz, besonders Buche und Weide.',r:['gee','ber','boe'],n:''},
+{id:'zunderschwamm',g:'pilze',nm:'Zunderschwamm',sci:'Fomes fomentarius',f:['Fruchtkörper hufförmig, sehr hart','Oberseite grau bis braun, mehrschichtig','Unterseite mit Poren','An Buche und Birke'],v:'Birkenporling (kissenförmig, nur an Birke).',h:'Laubwälder, an Stämmen.',r:['gee','ber','boe'],n:'Ungenießbar.'},
+{id:'birkenporling',g:'pilze',nm:'Birkenporling',sci:'Fomitopsis betulina',f:['Fruchtkörper kissenförmig, glatt','Oberseite weißlich bis hellbraun, Unterseite weiß mit Poren','Wächst nur an Birken','Fruchtkörper einjährig'],v:'Zunderschwamm.',h:'Birkenwälder, Moorränder, Heide.',r:['gee','moo'],n:'Ungenießbar.'},
+{id:'tramete',g:'pilze',nm:'Schmetterlingstramete',sci:'Trametes versicolor',f:['Fruchtkörper dünn, fächerförmig, zäh','Oberseite mit bunten, konzentrischen Zonen','Wächst dachziegelartig an Totholz','Unterseite weiß mit feinen Poren'],v:'Ähnliche dünne Porlinge.',h:'Totholz von Laubbäumen.',r:['gee','ber','boe'],n:'Ungenießbar.'},
+{id:'staeubling',g:'pilze',nm:'Flaschenstäubling',sci:'Lycoperdon perlatum',f:['Fruchtkörper birnen- bis kugelförmig, mit Stacheln','Im Alter Öffnung am Scheitel, Sporenstaub','Innen jung einheitlich weiß','Wächst am Boden'],v:'Junge Knollenblätterpilze im „Hexenei“-Stadium: Aufschneiden! Stäublinge sind innen einheitlich weiß ohne Hutanlage.',h:'Wälder, Waldwege, Heide.',r:['gee','ber','boe'],n:'Nur junge, innen rein weiße Exemplare sind essbar. Prüfung durch Sachverständige.'},
+/* Gewässertiere */
+{id:'napfschnecke',g:'wasser',nm:'Flussnapfschnecke',sci:'Ancylus fluviatilis',f:['Gehäuse mützen- oder napfförmig (3 bis 8 mm)','Haftet fest an Steinen','Lebt in schnell fließenden Bächen'],v:'Teichnapfschnecke (in Stillwasser).',h:'Sauerstoffreiche, kühle Bäche, vor allem im Bergland.',r:['ber'],n:'Zeigerwert: geringe Belastung (I bis II).',s:1.5},
+{id:'steinfliege',g:'wasser',nm:'Steinfliegenlarve',sci:'Plecoptera',f:['Sechs Beine, zwei Schwanzfäden','Zwei Krallen an jedem Fuß','Keine Kiemenblättchen am Hinterleib','Lebt unter Steinen in kalten, sauerstoffreichen Bächen'],v:'Eintagsfliegenlarve (drei Schwanzfäden).',h:'Naturnahe, kühle Bäche.',r:['ber','gee'],n:'Zeigerwert: sehr saubere Gewässer (I bis II).',s:1.2},
+{id:'eintagsfliege',g:'wasser',nm:'Eintagsfliegenlarve',sci:'Ephemeroptera',f:['Sechs Beine, meist drei Schwanzfäden','Kiemenblättchen seitlich am Hinterleib','Eine Kralle an jedem Fuß','Lebt auf Steinen und Pflanzen'],v:'Steinfliegenlarve (zwei Schwanzfäden).',h:'Bäche und Flüsse mit guter Wasserqualität.',r:['ber','gee','boe'],n:'Zeigerwert: geringe bis mäßige Belastung (die Werte sind je nach Art unterschiedlich).',s:1.6},
+{id:'koecherfliege',g:'wasser',nm:'Köcherfliegenlarve',sci:'Trichoptera',f:['Larve lebt in einem Köcher aus Steinchen, Sand oder Pflanzenteilen','Sechs Beine, Kopf und Vorderkörper ragen heraus','Lebt am Boden von Bächen und Seen'],v:'Schmetterlings- und Zuckmückenlarven bauen keine Köcher aus Sand.',h:'Bäche, Gräben, Seen.',r:['ber','gee','boe','mar'],n:'Zeigerwert: je nach Art von sauber bis mäßig belastet.',s:1.9},
+{id:'bachflohkrebs',g:'wasser',nm:'Bachflohkrebs',sci:'Gammarus pulex',f:['Körper seitlich zusammengedrückt, 1 bis 2 cm','Schwimmt oft auf der Seite','Mehr als sechs Beine','Frisst Falllaub'],v:'Wasserassel (von oben flach).',h:'Bäche und Gräben mit Falllaub.',r:['gee','boe','ber'],n:'Zeigerwert: mäßig belastet (II).',s:2.0},
+{id:'wasserassel',g:'wasser',nm:'Wasserassel',sci:'Asellus aquaticus',f:['Körper von oben nach unten abgeflacht, graubraun','Mehr als sechs Beine','Kriecht langsam, schwimmt nicht auf der Seite','1 bis 2 cm lang'],v:'Bachflohkrebs (seitlich abgeflacht).',h:'Langsam fließende Gewässer, Gräben, Teiche.',r:['mar','gee','boe'],n:'Zeigerwert: kritisch belastet (II bis III).',s:2.4},
+{id:'egel',g:'wasser',nm:'Hundeegel',sci:'Erpobdella octoculata',f:['Körper geringelt, langgestreckt','Saugnapf am Hinterende','Schwimmt wellenförmig','Räuber'],v:'Medizinischer Blutegel (selten, geschützt).',h:'Gräben, Teiche, langsame Bäche.',r:['mar','gee','boe'],n:'Zeigerwert: stark belastet (etwa II bis III).',s:2.6},
+{id:'strudelwurm',g:'wasser',nm:'Strudelwurm (Planarie)',sci:'Dugesia',f:['Körper flach, wurmförmig','Kopf dreieckig mit zwei Augenflecken','Gleitet über Steine','Lebt unter Steinen in Bächen'],v:'Egel (geringelt, Saugnapf).',h:'Kühle, saubere Bäche und Quellen.',r:['ber','gee'],n:'Zeigerwert: geringe Belastung (I bis II).',s:1.5},
+{id:'zuckmuecke',g:'wasser',nm:'Rote Zuckmückenlarve',sci:'Chironomus',f:['Körper blutrot und gegliedert','Mit zwei Paar Stummelfüßen','Lebt in Röhren im Schlamm','Kann bei Sauerstoffmangel überleben'],v:'Schlammröhrenwurm (viel dünner).',h:'Schlammige Böden in belasteten Gewässern.',r:['mar','gee','boe'],n:'Zeigerwert: stark belastet (III bis IV).',s:3.3},
+{id:'tubifex',g:'wasser',nm:'Schlammröhrenwurm',sci:'Tubifex tubifex',f:['Körper dünn, fadenförmig und rot','Steckt in Schlammröhren, Hinterende wedelt','Meist als dichter Rasen','Toleriert sehr geringen Sauerstoffgehalt'],v:'Rote Zuckmückenlarve (kräftiger, mit Stummelfüßen).',h:'Faulschlamm in stark belasteten Gewässern.',r:['mar','gee','boe'],n:'Zeigerwert: sehr stark belastet (III bis IV).',s:3.5},
+{id:'rattenschwanz',g:'wasser',nm:'Rattenschwanzlarve',sci:'Eristalis tenax',f:['Larve einer Schwebfliege, weißlich, madenförmig','Langes, ausziehbares Atemrohr am Hinterende','Lebt in Jauche und Faulschlamm','Atmet Luft von der Wasseroberfläche'],v:'Keine ähnliche Art im Schlüssel.',h:'Jauchegruben, Faulschlamm, verschmutzte Gräben.',r:['mar','gee','boe'],n:'Zeigerwert: übermäßig verschmutzt (IV).',s:3.7}
+];
+const SP={}; SPL.forEach(s=>{ SP[s.id]=s; });
+
+/* =============== Icons =============== */
+const IC={
+ compound:'<path d="M24 5V44"/><ellipse cx="14" cy="15" rx="8" ry="3.4" transform="rotate(-28 14 15)"/><ellipse cx="34" cy="15" rx="8" ry="3.4" transform="rotate(28 34 15)"/><ellipse cx="14" cy="27" rx="8" ry="3.4" transform="rotate(-28 14 27)"/><ellipse cx="34" cy="27" rx="8" ry="3.4" transform="rotate(28 34 27)"/><ellipse cx="14" cy="38" rx="8" ry="3.4" transform="rotate(-28 14 38)"/><ellipse cx="34" cy="38" rx="8" ry="3.4" transform="rotate(28 34 38)"/>',
+ palmate:'<g transform="rotate(-62 24 40)"><ellipse cx="24" cy="24" rx="3.6" ry="12"/></g><g transform="rotate(-31 24 40)"><ellipse cx="24" cy="24" rx="3.6" ry="13"/></g><ellipse cx="24" cy="23" rx="3.6" ry="14"/><g transform="rotate(31 24 40)"><ellipse cx="24" cy="24" rx="3.6" ry="13"/></g><g transform="rotate(62 24 40)"><ellipse cx="24" cy="24" rx="3.6" ry="12"/></g><path d="M24 38V45"/>',
+ simple:'<path d="M24 5C37 14 37 33 24 43C11 33 11 14 24 5Z"/><path d="M24 8V45M24 20L32 15M24 28L33 23M24 20L16 15M24 28L15 23"/>',
+ lobedRound:'<path d="M24 4Q30 7 28 11Q36 10 35 16Q41 18 36 23Q40 28 34 30Q36 36 29 35Q27 41 24 42Q21 41 19 35Q12 36 14 30Q8 28 12 23Q7 18 13 16Q12 10 20 11Q18 7 24 4Z"/><path d="M24 6V46"/>',
+ lobedPointed:'<path d="M24 3L28 13L38 11L33 20L43 25L32 28L30 36L26 32V45H22V32L18 36L16 28L5 25L15 20L10 11L20 13Z"/>',
+ opposite:'<path d="M24 4V45"/><ellipse cx="12" cy="14" rx="9" ry="4" transform="rotate(-22 12 14)"/><ellipse cx="36" cy="14" rx="9" ry="4" transform="rotate(22 36 14)"/><ellipse cx="12" cy="33" rx="9" ry="4" transform="rotate(-22 12 33)"/><ellipse cx="36" cy="33" rx="9" ry="4" transform="rotate(22 36 33)"/>',
+ alternate:'<path d="M24 4V45"/><ellipse cx="12" cy="13" rx="9" ry="4" transform="rotate(-22 12 13)"/><ellipse cx="36" cy="25" rx="9" ry="4" transform="rotate(22 36 25)"/><ellipse cx="12" cy="37" rx="9" ry="4" transform="rotate(-22 12 37)"/>',
+ heart:'<path d="M24 41C8 31 6 18 14 14C19 11 23 14 24 18C25 14 29 11 34 14C42 18 40 31 24 41Z"/><path d="M24 18V44"/>',
+ round:'<circle cx="24" cy="21" r="15"/><path d="M24 36V46M24 21V7"/>',
+ rhomb:'<path d="M24 4L41 25L24 42L7 25Z"/><path d="M24 4V46"/>',
+ narrow:'<path d="M24 3C29 14 29 32 24 43C19 32 19 14 24 3Z"/><path d="M24 4V46"/>',
+ serrated:'<path d="M4 34L9 24L14 34L19 24L24 34L29 24L34 34L39 24L44 34"/><path d="M4 40H44"/>',
+ smooth:'<path d="M4 34Q14 22 24 30T44 26"/><path d="M4 40H44"/>',
+ needlePair:'<rect x="21" y="34" width="6" height="7" rx="2"/><path d="M23 34L12 5M25 34L36 5"/>',
+ needleTuft:'<path d="M24 38L8 8M24 38L14 5M24 38L20 4M24 38L24 3M24 38L28 4M24 38L34 5M24 38L40 8"/><circle cx="24" cy="40" r="3"/>',
+ needleSingle:'<path d="M3 26H45"/><path d="M10 26L6 14M10 26L6 38M20 26L16 13M20 26L16 39M30 26L26 13M30 26L26 39M40 26L36 14M40 26L36 38"/>',
+ scale:'<path d="M24 3L30 11L24 19L18 11Z"/><path d="M24 17L30 25L24 33L18 25Z"/><path d="M24 31L30 39L24 47L18 39Z"/>',
+ pores:'<path d="M5 22C5 10 15 5 24 5C33 5 43 10 43 22Z"/><path d="M24 22V44"/><circle cx="11" cy="27" r="1.4"/><circle cx="17" cy="27" r="1.4"/><circle cx="23" cy="27" r="1.4"/><circle cx="29" cy="27" r="1.4"/><circle cx="35" cy="27" r="1.4"/>',
+ gills:'<path d="M5 22C5 10 15 5 24 5C33 5 43 10 43 22Z"/><path d="M24 22V44"/><path d="M11 22V28M17 22V30M23 22V30M29 22V30M35 22V28"/>',
+ ridges:'<path d="M4 11C12 24 18 28 24 28C30 28 36 24 44 11"/><path d="M24 28V45"/><path d="M12 17L19 27M24 14V27M36 17L29 27"/>',
+ volva:'<path d="M5 18C5 8 15 4 24 4C33 4 43 8 43 18Z"/><path d="M22 18V34M26 18V34"/><ellipse cx="24" cy="39" rx="9" ry="6"/><path d="M17 24H31"/>',
+ puffball:'<circle cx="24" cy="26" r="15"/><circle cx="24" cy="13" r="2"/><path d="M24 41V46"/>',
+ bracket:'<path d="M4 5V43"/><path d="M4 15C16 13 32 17 43 25C30 34 14 34 4 31"/>',
+ feather:'<path d="M9 41L39 7"/><path d="M39 7C26 7 18 15 15 29C28 29 37 21 39 7Z"/>',
+ fur:'<path d="M5 12Q11 6 17 12T29 12T41 12"/><path d="M5 22Q11 16 17 22T29 22T41 22"/><path d="M5 32Q11 26 17 32T29 32T41 32"/><path d="M5 42Q11 36 17 42T29 42T41 42"/>',
+ fishScale:'<path d="M5 14a6 6 0 0 1 12 0M17 14a6 6 0 0 1 12 0M29 14a6 6 0 0 1 12 0"/><path d="M11 24a6 6 0 0 1 12 0M23 24a6 6 0 0 1 12 0M35 24a6 6 0 0 1 8 0"/><path d="M5 34a6 6 0 0 1 12 0M17 34a6 6 0 0 1 12 0M29 34a6 6 0 0 1 12 0"/>',
+ hornScale:'<path d="M24 5L40 24L24 43L8 24Z"/><path d="M8 24H40M24 5V43M16 14L32 34M32 14L16 34"/>',
+ smoothSkin:'<path d="M24 5C32 17 37 24 37 30A13 13 0 0 1 11 30C11 24 16 17 24 5Z"/>',
+ longLeg:'<path d="M8 17C16 9 30 11 38 17L30 21C22 21 14 21 8 17Z"/><path d="M26 21V44M31 21V44"/><path d="M8 17L3 14"/>',
+ webFoot:'<path d="M24 5V28"/><path d="M24 28L9 42M24 28V42M24 28L39 42"/><path d="M9 42Q24 34 39 42"/>'
+};
+const icon=k=>k&&IC[k]?`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`:'';
+
+/* =============== Schlüssel =============== */
+const o=(t,x)=>Object.assign({t},x);
+const KEYS={
+ laub:{root:'L1',n:{
+  L1:{q:'Aufbau des Blattes',h:'Teilblättchen haben eigene Stielchen. Die Knospe sitzt nur am Ansatz des ganzen Blattes, nicht an den Teilblättchen.',a:o('Blatt aus mehreren Teilblättchen zusammengesetzt',{ic:'compound',go:'L2'}),b:o('Blatt ungeteilt (einfaches Blatt)',{ic:'simple',go:'L5'})},
+  L2:{q:'Anordnung der Teilblättchen',a:o('Teilblättchen fingerförmig von einem Punkt aus (5 bis 7)',{ic:'palmate',res:'rosskastanie'}),b:o('Teilblättchen gefiedert, beidseits an einer gemeinsamen Spindel',{ic:'compound',go:'L3'})},
+  L3:{q:'Stellung der Blätter am Zweig',h:'Gegenständig: Zwei Blätter sitzen am selben Knoten. Wechselständig: Pro Knoten ein Blatt.',a:o('Blätter gegenständig, Knospen schwarz',{ic:'opposite',res:'esche'}),b:o('Blätter wechselständig',{ic:'alternate',go:'L4'})},
+  L4:{q:'Fiederblättchen und Zweige',a:o('Fiederblättchen ganzrandig, am Zweig Dornen, weiße Blütentrauben',{res:'robinie'}),b:o('Fiederblättchen gesägt, keine Dornen, orangerote Beeren im Herbst',{ic:'serrated',res:'eberesche'})},
+  L5:{q:'Blattrand: gelappt oder nicht',a:o('Blatt mit tiefen Einschnitten (gelappt)',{ic:'lobedRound',go:'L6'}),b:o('Blatt ohne tiefe Einschnitte (ungelappt)',{ic:'simple',go:'L8'})},
+  L6:{q:'Blattstellung und Lappenform',a:o('Blätter gegenständig, Lappen spitz, handförmig (Ahorn)',{ic:'lobedPointed',go:'L7'}),b:o('Blätter wechselständig, Lappen rundlich (Eiche)',{ic:'lobedRound',go:'L6b'})},
+  L6b:{q:'Eichen unterscheiden',h:'Prüfe, wie lang der Blattstiel ist und ob die Eicheln gestielt sind (Herbst).',a:o('Blattstiel sehr kurz (unter 1 cm), Blattgrund geöhrt, Eicheln lang gestielt',{res:'stieleiche'}),b:o('Blattstiel 1 bis 3 cm, Blattgrund keilförmig, Eicheln sitzend',{res:'traubeneiche'})},
+  L7:{q:'Ahornarten: Größe',a:o('Blatt klein (bis etwa 8 cm), Lappen stumpf, ganzrandig',{res:'feldahorn'}),b:o('Blatt größer (10 bis 20 cm)',{go:'L7b'})},
+  L7b:{q:'Ahornarten: Lappen und Rand',h:'Reiße den Blattstiel ab: Spitzahorn zeigt Milchsaft.',a:o('Lappen lang zugespitzt, wenige Zähne, Milchsaft im Blattstiel',{res:'spitzahorn'}),b:o('Lappen kurz zugespitzt, Rand gleichmäßig gesägt, Früchte spitzwinklig',{res:'bergahorn'})},
+  L8:{q:'Blattrand',a:o('Blattrand glatt oder leicht wellig',{ic:'smooth',res:'rotbuche'}),b:o('Blattrand gesägt oder gezähnt',{ic:'serrated',go:'L9'})},
+  L9:{q:'Blattgrund',a:o('Blattgrund auffällig schief (asymmetrisch)',{go:'L10'}),b:o('Blattgrund symmetrisch',{go:'L11'})},
+  L10:{q:'Schiefes Blatt',a:o('Blatt herzförmig, glatt, rostbraune Haarbüschel unterseits in den Nervenwinkeln',{ic:'heart',res:'winterlinde'}),b:o('Blatt oval, Oberseite rau wie Schmirgelpapier, doppelt gesägt',{res:'bergulme'})},
+  L11:{q:'Blattlänge im Verhältnis zur Breite',a:o('Blatt mindestens dreimal so lang wie breit (schmal lanzettlich)',{ic:'narrow',res:'silberweide'}),b:o('Blatt deutlich breiter',{go:'L12'})},
+  L12:{q:'Blattstiel',h:'Drücke den Blattstiel zwischen den Fingern: Bei der Zitterpappel ist er seitlich flach.',a:o('Blatt fast kreisrund, Blattstiel lang und seitlich abgeflacht, Blätter zittern im Wind',{ic:'round',res:'zitterpappel'}),b:o('Blattstiel rundlich, nicht abgeflacht',{go:'L13'})},
+  L13:{q:'Blattoberfläche',a:o('Blatt derb und glänzend dunkelgrün, Mittelnerv unterseits mit rotbraunen Härchen',{res:'traubenkirsche'}),b:o('Blatt weniger derb, nicht ledrig glänzend',{go:'L14'})},
+  L14:{q:'Seitennerven',a:o('10 bis 15 gerade Seitennervenpaare, Blatt wie gefaltet, doppelt gesägt',{res:'hainbuche'}),b:o('Weniger Seitennerven, nicht auffällig parallel gefaltet',{go:'L15'})},
+  L15:{q:'Blattform',a:o('Blatt dreieckig bis rautenförmig mit ausgezogener Spitze, Zweige hängend',{ic:'rhomb',res:'sandbirke'}),b:o('Blatt rundlich bis länglich-eiförmig',{go:'L16'})},
+  L16:{q:'Blattspitze und Blattstiel',a:o('Blatt verkehrt-eiförmig, vorn abgerundet oder eingebuchtet, jung klebrig, kleine verholzte Zäpfchen',{res:'schwarzerle'}),b:o('Blatt länglich-eiförmig, zugespitzt, zwei rote Drüsen am Blattstiel, Rinde mit waagerechten Korkstreifen',{res:'vogelkirsche'})}
+ }},
+ nadel:{root:'N1',n:{
+  N1:{q:'Stellung der Nadeln',a:o('Nadeln zu zweit aus einer gemeinsamen Scheide',{ic:'needlePair',go:'N2'}),b:o('Nadeln nicht paarweise',{go:'N3'})},
+  N2:{q:'Kiefern',a:o('Nadeln 4 bis 7 cm, blaugrün, gedreht, Borke oben orangerot und dünn',{res:'waldkiefer'}),b:o('Nadeln 8 bis 15 cm, dunkelgrün, steif, Borke grau-schwarz',{res:'schwarzkiefer'})},
+  N3:{q:'Büschel oder einzeln',a:o('Nadeln in Büscheln auf Kurztrieben, weich, im Herbst gelb und abgeworfen',{ic:'needleTuft',res:'laerche'}),b:o('Nadeln einzeln am Zweig oder schuppenförmig',{ic:'needleSingle',go:'N4'})},
+  N4:{q:'Nadeln oder Schuppen',a:o('Blätter schuppenförmig und dachziegelartig, Zweige flach, aromatischer Geruch',{ic:'scale',res:'thuja'}),b:o('Nadeln deutlich ausgebildet',{go:'N5'})},
+  N5:{q:'Dreierquirle',a:o('Nadeln zu dritt im Quirl, sehr stechend, Oberseite mit weißem Band, blauschwarze Beerenzapfen',{res:'wacholder'}),b:o('Nadeln einzeln am Zweig, nicht in Quirlen',{go:'N6'})},
+  N6:{q:'Querschnitt der Nadeln',h:'Rolle eine Nadel zwischen den Fingern: Vierkantige Nadeln lassen sich rollen, flache nicht.',a:o('Nadeln flach und weich',{go:'N7'}),b:o('Nadeln vierkantig oder stark abgeflacht, stechend, Zapfen hängend',{go:'N9'})},
+  N7:{q:'Nadelunterseite',a:o('Unterseite hellgrün ohne weiße Streifen, rote Scheinbeeren, dunkelgrün glänzend',{res:'eibe'}),b:o('Unterseite mit zwei weißen Streifen',{go:'N8'})},
+  N8:{q:'Nadelspitze und Zapfen',a:o('Spitze leicht eingekerbt, Zapfen aufrecht, Rinde glatt silbergrau',{res:'weisstanne'}),b:o('Spitze spitz, zerrieben zitronig duftend, Zapfen hängend mit dreizipfligen Deckschuppen',{res:'douglasie'})},
+  N9:{q:'Fichten',a:o('Nadeln sehr stechend und abgeflacht, Oberseite mit zwei bläulich-weißen Streifen, Zapfen 6 bis 10 cm',{res:'sitkafichte'}),b:o('Nadeln vierkantig und rollbar, Zapfen 10 bis 16 cm, fallen als Ganzes ab',{res:'fichte'})}
+ }},
+ voegel:{root:'B1',n:{
+  B1:{q:'Lebensraum',a:o('Am oder auf Wasser, im Watt oder am Ufer',{go:'B2'}),b:o('An Land (Wald, Feld, Siedlung, Garten)',{go:'B8'})},
+  B2:{q:'Beine und Körperhaltung',a:o('Beine auffallend lang, Vogel watet oder steht im Flachen',{ic:'longLeg',go:'B3'}),b:o('Vogel schwimmt oder sitzt auf dem Wasser, Beine kurz',{ic:'webFoot',go:'B4'})},
+  B3:{q:'Watvögel',a:o('Grau mit langem gelblichem Dolchschnabel, Hals S-förmig, etwa 90 cm',{res:'graureiher'}),b:o('Schwarz-weiß, kräftiger orangeroter Schnabel, rote Beine',{res:'austernfischer'})},
+  B4:{q:'Größe und Farbe',a:o('Fast ganz weiß, sehr groß, Hals S-förmig gebogen',{res:'hoeckerschwan'}),b:o('Nicht ganz weiß',{go:'B5'})},
+  B5:{q:'Gefiederfarbe',a:o('Überwiegend weiß und hellgrau, gelber Schnabel mit rotem Fleck',{res:'silbermoewe'}),b:o('Überwiegend dunkel oder braun',{go:'B6'})},
+  B6:{q:'Dunkel oder braun',a:o('Gefieder schwarz',{go:'B7'}),b:o('Gefieder braun oder graubraun',{go:'B7b'})},
+  B7:{q:'Schwarze Wasservögel',a:o('Weißer Stirnschild und weißer Schnabel, Schwimmlappen an den Zehen',{res:'blesshuhn'}),b:o('Langer Hals, Hakenschnabel, sitzt oft mit ausgebreiteten Flügeln',{res:'kormoran'})},
+  B7b:{q:'Braune Wasservögel',a:o('Breiter flacher Schnabel, Männchen mit grünem Kopf und weißem Halsring',{res:'stockente'}),b:o('Kräftiger orangeroter Schnabel, rosa Beine, gänseartig',{res:'graugans'})},
+  B8:{q:'Schnabel und Krallen',a:o('Hakenschnabel und kräftige Krallen: Greifvogel',{go:'B9'}),b:o('Kein Greifvogel',{go:'B10'})},
+  B9:{q:'Greifvögel',a:o('Breite Flügel, kreist, katzenartiges „hiäh“, braun mit hellem Bruststreifen',{res:'maeusebussard'}),b:o('Schmale spitze Flügel, Rüttelflug, rotbrauner Rücken beim Männchen',{res:'turmfalke'})},
+  B10:{q:'Größe im Vergleich zur Amsel',a:o('Größer als eine Amsel (über 30 cm)',{go:'B11'}),b:o('Amselgroß oder kleiner',{go:'B14'})},
+  B11:{q:'Große Landvögel',a:o('Rundlicher Körper, kleiner Kopf, grau mit weißem Halsfleck',{res:'ringeltaube'}),b:o('Kräftiger Schnabel, rabenartig',{go:'B12'})},
+  B12:{q:'Farbe der Rabenvögel',a:o('Schwarz-weiß mit sehr langem Schwanz',{res:'elster'}),b:o('Nicht schwarz-weiß',{go:'B13'})},
+  B13:{q:'Schwarz oder bunt',a:o('Ganz schwarz, kräftiger schwarzer Schnabel',{res:'rabenkraehe'}),b:o('Rosabraun, blau-schwarz-weiß gebänderte Flügel, weißer Bürzel',{res:'eichelhaeher'})},
+  B14:{q:'Verhalten am Stamm',a:o('Klettert am Stamm, schwarz-weiß mit rotem Unterschwanz',{res:'buntspecht'}),b:o('Klettert nicht am Stamm',{go:'B15'})},
+  B15:{q:'Schwanzform',a:o('Schlank, tief gegabelter Schwanz, rote Kehle, Flug schwalbenartig',{res:'rauchschwalbe'}),b:o('Kein Gabelschwanz',{go:'B16'})},
+  B16:{q:'Gefiederfarbe (Männchen)',a:o('Überwiegend schwarz',{go:'B17'}),b:o('Nicht überwiegend schwarz',{go:'B18'})},
+  B17:{q:'Schwarze Singvögel',a:o('Matt schwarz, orangegelber Schnabel und Augenring, langer Schwanz, hüpft',{res:'amsel'}),b:o('Glänzend schwarz mit hellen Punkten, kurzer Schwanz, spitzer Schnabel',{res:'star'})},
+  B18:{q:'Brustfarbe',a:o('Orangerote Brust und Stirn, olivbrauner Rücken',{res:'rotkehlchen'}),b:o('Keine orangerote Brust',{go:'B19'})},
+  B19:{q:'Unterseite',a:o('Unterseite gelb (Meise)',{go:'B20'}),b:o('Unterseite nicht gelb',{go:'B21'})},
+  B20:{q:'Meisen',a:o('Kopf schwarz mit weißen Wangen, schwarzer Längsstreifen auf der Brust',{res:'kohlmeise'}),b:o('Blaue Kappe, Flügel und Schwanz blau, kleiner',{res:'blaumeise'})},
+  B21:{q:'Gestalt',a:o('Sehr klein und rundlich, braun, Schwanz steil aufgestellt',{res:'zaunkoenig'}),b:o('Kegelförmiger Körnerfresser-Schnabel',{go:'B22'})},
+  B22:{q:'Finken und Sperlinge',a:o('Männchen: blaugrauer Scheitel, rosabraune Brust, zwei weiße Flügelbinden',{res:'buchfink'}),b:o('Männchen: grauer Scheitel, schwarzer Kehllatz, braun gestreifter Rücken',{res:'haussperling'})}
+ }},
+ wirbel:{root:'K1',n:{
+  K1:{q:'Körperbedeckung 1',a:o('Körper mit Federn bedeckt, Vorderextremitäten als Flügel',{ic:'feather',res:'c_voge'}),b:o('Körper ohne Federn',{go:'K2'})},
+  K2:{q:'Körperbedeckung 2',a:o('Körper behaart (Fell), Jungtiere werden gesäugt',{ic:'fur',res:'c_saug'}),b:o('Keine Haare',{go:'K3'})},
+  K3:{q:'Lebensweise und Atmung',a:o('Haut mit Schuppen, Flossen, Kiemenatmung, lebt dauerhaft im Wasser',{ic:'fishScale',res:'c_fisch'}),b:o('Lungenatmung (auch wenn Larven im Wasser leben)',{go:'K4'})},
+  K4:{q:'Haut und Entwicklung',a:o('Haut trocken mit Hornschuppen oder Schilden, Eier mit Schale oder Lebendgeburt, keine Larven',{ic:'hornScale',res:'c_rept'}),b:o('Haut nackt, feucht, drüsenreich, Laich ohne feste Schale, Larven mit Kiemen',{ic:'smoothSkin',res:'c_amph'})}
+ }},
+ pilze:{root:'P1',n:{
+  P1:{q:'Gestalt des Fruchtkörpers',a:o('Fruchtkörper mit Hut und Stiel',{go:'P2'}),b:o('Ohne Stiel: konsolenförmig am Holz oder kugelig am Boden',{go:'P10'})},
+  P2:{q:'Hutunterseite',h:'Drehe den Pilz um und schau auf die Unterseite des Hutes. Schneide nichts ab, wenn der Pilz geschützt ist.',a:o('Hutunterseite mit Röhren (feine Poren, schwammartig)',{ic:'pores',go:'P3'}),b:o('Hutunterseite mit Lamellen oder Leisten',{ic:'gills',go:'P6'})},
+  P3:{q:'Röhrlinge: Stiel',a:o('Stiel mit häutigem Ring, Hut schleimig-glänzend, bei Kiefern',{res:'butterpilz'}),b:o('Stiel ohne Ring',{go:'P4'})},
+  P4:{q:'Röhrlinge: Stielschuppen',a:o('Stiel mit dunklen Schüppchen, bei Birken',{res:'birkenpilz'}),b:o('Stiel ohne dunkle Schüppchen',{go:'P5'})},
+  P5:{q:'Röhrlinge: Röhren und Stiel',a:o('Röhren blassgelb, bei Druck blaugrün anlaufend, Hut kastanienbraun',{res:'maronenroehrling'}),b:o('Röhren erst weiß, Stiel mit hellem Netz, Fleisch weiß und unverfärbt',{res:'steinpilz'})},
+  P6:{q:'Lamellen oder Leisten',a:o('Hut dottergelb, trichterförmig, Leisten laufen am Stiel herab, fruchtiger Geruch',{ic:'ridges',res:'pfifferling'}),b:o('Echte Lamellen, anderer Hut',{go:'P7'})},
+  P7:{q:'Wuchsort',a:o('Büschelig an Holz oder Baumstümpfen',{go:'P8'}),b:o('Einzeln oder in Gruppen am Boden',{go:'P9'})},
+  P8:{q:'Holzbewohner',a:o('Hut muschelförmig, seitlich kurz gestielt, Lamellen laufen herab, graubraun',{res:'austernseitling'}),b:o('Hut rund, Stiel mittig',{go:'P8b'})},
+  P8b:{q:'Büschelige Hutpilze',a:o('Hut und Lamellen schwefelgelb, Lamellen später grünlich, bitter',{res:'schwefelkopf'}),b:o('Hut honiggelb mit Schüppchen, Stiel mit Ring, Lamellen weiß',{res:'hallimasch'})},
+  P9:{q:'Stielbasis',h:'Grabe den Pilz vorsichtig ganz aus. Die Scheide oder Knolle sitzt im Boden.',a:o('Stielbasis knollig oder in einer Scheide, Stiel mit Ring, Lamellen weiß',{ic:'volva',go:'P11'}),b:o('Keine Scheide am Stielgrund',{go:'P12'})},
+  P11:{q:'Wulstlinge: Hutfarbe',a:o('Hut leuchtend rot mit weißen Flocken',{res:'fliegenpilz'}),b:o('Hut nicht leuchtend rot',{go:'P11b'})},
+  P11b:{q:'Wulstlinge: grün oder braun',a:o('Hut grünlich-oliv, glatt, Stiel mit häutiger Scheide',{res:'knollenblaetterpilz'}),b:o('Hut braun oder rötlich',{go:'P11c'})},
+  P11c:{q:'Wulstlinge: Fleischfarbe',a:o('Hut graubraun mit weißen Flocken, Fleisch verfärbt nicht',{res:'pantherpilz'}),b:o('Hut rötlich-braun, Fleisch rötet bei Verletzung',{res:'perlpilz'})},
+  P12:{q:'Pilze ohne Scheide',a:o('Hut sehr groß (15 bis 30 cm), schuppig, Stiel schlangenhautartig, Ring verschiebbar',{res:'parasol'}),b:o('Hut gelbbraun mit eingerolltem Rand, Lamellen bräunen bei Druck, kein Ring',{res:'krempling'})},
+  P10:{q:'Fruchtkörper ohne Stiel',a:o('Kugelig bis birnenförmig, am Boden, im Alter mit Öffnung am Scheitel',{ic:'puffball',res:'staeubling'}),b:o('Hart oder zäh, am Holz',{ic:'bracket',go:'P13'})},
+  P13:{q:'Konsolen am Holz',a:o('Dünn, fächerförmig, dachziegelartig, Oberseite bunt gezont',{res:'tramete'}),b:o('Dick, hufförmig oder kissenförmig',{go:'P14'})},
+  P14:{q:'Dicke Konsolen',a:o('Sehr hart, hufförmig, graubraun, an Buche oder Birke',{res:'zunderschwamm'}),b:o('Kissenförmig, glatt, weißlich bis hellbraun, nur an Birken',{res:'birkenporling'})}
+ }},
+ wasser:{root:'G1',n:{
+  G1:{q:'Gehäuse',a:o('Tier mit napf- oder mützenförmigem Gehäuse',{res:'napfschnecke'}),b:o('Ohne Gehäuse',{go:'G2'})},
+  G2:{q:'Beine',a:o('Körper mit Beinen',{go:'G3'}),b:o('Körper ohne Beine (wurmförmig)',{go:'G7'})},
+  G3:{q:'Zahl der Beine',a:o('Mehr als sechs Beine (Krebstier)',{go:'G4'}),b:o('Sechs Beine (Insektenlarve)',{go:'G5'})},
+  G4:{q:'Körperform der Krebse',a:o('Körper seitlich zusammengedrückt, schwimmt auf der Seite',{res:'bachflohkrebs'}),b:o('Körper von oben nach unten abgeflacht, kriecht, graubraun',{res:'wasserassel'})},
+  G5:{q:'Insektenlarven: Köcher',a:o('Larve lebt in einem Köcher aus Steinchen oder Pflanzenteilen',{res:'koecherfliege'}),b:o('Ohne Köcher',{go:'G6'})},
+  G6:{q:'Insektenlarven: Schwanzfäden',h:'Zähle die Fäden am Hinterende. Setze das Tier vorsichtig in eine weiße Schale mit Wasser.',a:o('Drei Schwanzfäden, Kiemenblättchen seitlich am Hinterleib',{res:'eintagsfliege'}),b:o('Zwei Schwanzfäden, keine Kiemenblättchen am Hinterleib',{res:'steinfliege'})},
+  G7:{q:'Wurmförmige Tiere: Atemrohr',a:o('Hinterende mit langem, ausziehbarem Atemrohr',{res:'rattenschwanz'}),b:o('Ohne Atemrohr',{go:'G8'})},
+  G8:{q:'Wurmförmige Tiere: Kopf',a:o('Körper flach, Kopf dreieckig mit Augenflecken, gleitet über Steine',{res:'strudelwurm'}),b:o('Kopf nicht dreieckig',{go:'G9'})},
+  G9:{q:'Wurmförmige Tiere: Saugnapf und Farbe',a:o('Saugnapf am Hinterende, geringelt, schwimmt wellenförmig',{res:'egel'}),b:o('Körper rot',{go:'G10'})},
+  G10:{q:'Rote Würmer und Larven',a:o('Sehr dünn und fadenförmig, in Schlammröhren, Hinterende wedelt',{res:'tubifex'}),b:o('Kräftig, gegliedert, mit Stummelfüßen',{res:'zuckmuecke'})}
+ }}
+};
+const KINTRO={
+ laub:'Der Schlüssel gilt für 19 häufige Laubbaumarten Niedersachsens und benutzt Sommerblätter. Nimm Blätter aus der Mitte gesunder Zweige.',
+ nadel:'Der Schlüssel gilt für 10 Nadelbaumarten, die in Niedersachsen häufig sind (heimisch und forstlich angebaut).',
+ voegel:'Der Schlüssel gilt für 24 häufige Vogelarten. Er beschreibt vor allem Männchen im Brutkleid. Achte auf Größe, Schnabel, Farbe und Verhalten.',
+ wirbel:'Dieser Schlüssel führt zu den fünf Wirbeltierklassen. Beispiele aus Niedersachsen stehen im Steckbrief.',
+ pilze:'Dieser Schlüssel dient nur zum Lernen. Er enthält 18 Arten und kann viele andere Arten nicht erfassen.',
+ wasser:'Der Schlüssel führt zu 11 häufigen Kleintieren in Bächen und Gräben, die als Zeigerorganismen für die Wasserqualität dienen.'
+};
+function nodeNo(g,id){ return Object.keys(KEYS[g].n).indexOf(id)+1; }
+function findPath(g,target){
+  const K=KEYS[g];
+  const dfs=(id,acc)=>{ const n=K.n[id]; for(const ch of ['a','b']){ const op=n[ch], step=acc.concat([{id,ch}]); if(op.res===target) return step; if(op.go){ const r=dfs(op.go,step); if(r) return r; } } return null; };
+  return dfs(K.root,[]);
+}
+
+/* =============== Zustand =============== */
+const S={tab:'key',g:'laub',ks:{},myst:{on:false,t:null,shown:false},finds:[],uid:0,quiz:null,flt:{g:'all',r:'all',q:''},wk:null};
+function ks(){ return S.ks[S.g]||(S.ks[S.g]={node:KEYS[S.g].root,path:[],res:null}); }
+
+/* =============== Bestimmen =============== */
+function renderGroups(){
+  $('#groups').innerHTML=Object.keys(GR).map(k=>`<button type="button" class="grp" data-g="${k}" aria-pressed="${k===S.g}" style="--gc:var(${GR[k].c})"><b>${GR[k].nm}</b><span>${GR[k].sub}</span></button>`).join('');
+}
+const optHTML=(ch,op)=>`<div class="signwrap"><button type="button" class="sign" data-ch="${ch}"><span class="ab" aria-hidden="true">${ch}</span><span style="flex:1">${esc(op.t)}</span>${icon(op.ic)}</button></div>`;
+function sheetHTML(id,withCheck){
+  const s=SP[id], gc=`--gc:var(${GR[s.g].c})`;
+  const risky=s.g==='pilze';
+  let h=`<div class="sheet" style="${gc}"><div class="hd"><b>${esc(s.nm)}</b><i>${esc(s.sci)}</i></div><div class="bd">`;
+  h+=`<h4>Merkmale</h4>${withCheck?`<p class="note" style="margin:0 0 2px">Gegenprobe: Hake an, was du am Objekt bestätigen kannst.</p><ul class="chk">${s.f.map((x,i)=>`<li><label><input type="checkbox" data-chk="${i}"><span>${esc(x)}</span></label></li>`).join('')}</ul><div id="chkRes" aria-live="polite"></div>`:`<ul>${s.f.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`}`;
+  h+=`<h4>Verwechslung</h4><p style="margin:0">${esc(s.v)}</p>`;
+  h+=`<h4>Vorkommen in Niedersachsen</h4><p style="margin:0">${esc(s.h)}</p><p style="margin:4px 0 0">${s.r.map(r=>`<span class="tag">${NR[r]}</span>`).join('')}</p>`;
+  if(s.n) h+=`<h4>Besonderheit</h4><p style="margin:0">${esc(s.n)}</p>`;
+  if(s.s) h+=`<p class="note">Vereinfachter Zeigerwert für die Gewässergüte: ${fmt(s.s,1)}</p>`;
+  if(risky) h+=`<div class="warn" style="margin-top:8px"><b>Sicherheit:</b> Verzehre niemals Pilze aufgrund einer App. Lass Pilze von einem Pilzsachverständigen prüfen.</div>`;
+  return h+'</div></div>';
+}
+function mystTarget(){ const ids=SPL.filter(s=>s.g===S.g).map(s=>s.id); return ids[Math.floor(Math.random()*ids.length)]; }
+function renderKey(){
+  const g=S.g, st=ks(), K=KEYS[g], card=$('#keyCard');
+  let h=`<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><h2 style="margin:0">${GR[g].nm}</h2><div class="btnrow" style="margin:0"><button type="button" class="btn" id="btnMyst" aria-pressed="${S.myst.on}">Übungsmodus</button><button type="button" class="btn" id="btnRestart">Neu beginnen</button></div></div><p class="note">${KINTRO[g]}</p>`;
+  if(g==='pilze') h+='<div class="warn"><b>Wichtig:</b> Dieser Schlüssel ersetzt keine Pilzberatung. Er darf nicht zur Entscheidung über den Verzehr genutzt werden. Tödlich giftige Pilze (zum Beispiel der Grüne Knollenblätterpilz) sehen essbaren Pilzen ähnlich.</div>';
+  if(S.myst.on){
+    if(!S.myst.t) S.myst.t=mystTarget(); const t=SP[S.myst.t], feats=t.f.slice(0,3);
+    h+=`<div class="myst"><b>Übungsmodus: Geheimart</b><p style="margin:2px 0">Bestimme die Art mit dem Schlüssel. Gesucht ist eine Art mit diesen Merkmalen:</p><ul>${feats.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${S.myst.shown?`<p>Gesucht war: <b>${esc(t.nm)}</b></p>`:''}<div class="btnrow" style="margin:4px 0 0"><button type="button" class="btn" id="mystNew">Neue Geheimart</button><button type="button" class="btn" id="mystShow">Auflösung zeigen</button></div></div>`;
+  }
+  if(st.res){
+    const ok=S.myst.on&&S.myst.t===st.res;
+    if(S.myst.on) h+=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'Richtig bestimmt.':'Nicht die Geheimart.'}</b> ${ok?'Der Schlüssel hat dich zur gesuchten Art geführt.':'Gesucht war '+esc(SP[S.myst.t].nm)+'. Gehe die Schritte zurück und prüfe, wo du anders entschieden hättest.'}</div>`;
+    h+=`<h3 style="margin-top:12px">Ergebnis</h3>${sheetHTML(st.res,true)}<div class="btnrow"><button type="button" class="btn primary" id="btnAddFind">Zu meinen Funden</button><button type="button" class="btn" id="btnBack">Einen Schritt zurück</button><button type="button" class="btn" id="btnRestart2">Neu bestimmen</button></div><p class="note" id="addMsg" aria-live="polite"></p>`;
+  } else {
+    const n=K.n[st.node];
+    h+=`<div class="stepno">Schritt ${st.path.length+1}</div><div class="q">${esc(n.q)}</div>`;
+    if(n.h) h+=`<details class="hintbox"><summary style="cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center">So prüfst du das</summary><p style="margin:2px 0">${esc(n.h)}</p></details>`;
+    h+=`<div class="signs">${optHTML('a',n.a)}${optHTML('b',n.b)}</div><div class="btnrow"><button type="button" class="btn" id="btnBack" ${st.path.length?'':'disabled'}>Einen Schritt zurück</button></div>`;
+  }
+  card.innerHTML=h;
+  // Pfad
+  const pc=$('#pathCard'); pc.hidden=!st.path.length;
+  if(st.path.length){ pc.innerHTML=`<h3 style="margin:0 0 4px">Dein Weg durch den Schlüssel</h3><p class="note" style="margin-top:0">Tippe auf einen Schritt, um dorthin zurückzukehren.</p><ul class="path">${st.path.map((p,i)=>`<li><button type="button" data-jump="${i}">${i+1}${p.ch}: <span>${esc(K.n[p.id].q)}</span></button></li>`).join('')}</ul>`; }
+}
+function choose(ch){
+  const st=ks(), n=KEYS[S.g].n[st.node], op=n[ch];
+  st.path.push({id:st.node,ch}); if(op.res) st.res=op.res; else st.node=op.go;
+  renderKey(); $('#keyCard').scrollIntoView({block:'start',behavior:'smooth'});
+}
+function back(){ const st=ks(); if(!st.path.length) return; const p=st.path.pop(); st.node=p.id; st.res=null; renderKey(); }
+function restart(){ delete S.ks[S.g]; S.myst.shown=false; renderKey(); }
+$('#groups').addEventListener('click',e=>{ const b=e.target.closest('.grp'); if(!b) return; S.g=b.dataset.g; S.myst.t=null; S.myst.shown=false; renderGroups(); renderKey(); });
+$('#keyCard').addEventListener('click',e=>{
+  const sg=e.target.closest('.sign'); if(sg){ choose(sg.dataset.ch); return; }
+  if(e.target.closest('#btnBack')){ back(); return; }
+  if(e.target.closest('#btnRestart')||e.target.closest('#btnRestart2')){ restart(); return; }
+  if(e.target.closest('#btnMyst')){ S.myst.on=!S.myst.on; S.myst.t=null; S.myst.shown=false; renderKey(); return; }
+  if(e.target.closest('#mystNew')){ S.myst.t=mystTarget(); S.myst.shown=false; delete S.ks[S.g]; renderKey(); return; }
+  if(e.target.closest('#mystShow')){ S.myst.shown=true; renderKey(); return; }
+  if(e.target.closest('#btnAddFind')){ addFind(ks().res); $('#addMsg').textContent='Zu deinen Funden hinzugefügt.'; return; }
+});
+$('#keyCard').addEventListener('change',e=>{
+  if(!e.target.dataset.chk&&e.target.dataset.chk!=='0') return;
+  const boxes=$$('#keyCard [data-chk]'), n=boxes.filter(b=>b.checked).length, tot=boxes.length;
+  const msg=n===tot?['ok','Alle Merkmale passen. Die Bestimmung ist sehr wahrscheinlich richtig.']:(n>=Math.ceil(tot*.6)?['tip',`${n} von ${tot} Merkmalen passen. Prüfe die Verwechslungsart.`]:['no',`Nur ${n} von ${tot} Merkmalen passen. Gehe im Schlüssel zurück und prüfe die Entscheidungen noch einmal.`]);
+  $('#chkRes').innerHTML=n?`<div class="fb ${msg[0]}">${msg[1]}</div>`:'';
+});
+$('#pathCard').addEventListener('click',e=>{
+  const b=e.target.closest('[data-jump]'); if(!b) return; const st=ks(), i=+b.dataset.jump; const p=st.path[i]; st.path=st.path.slice(0,i); st.node=p.id; st.res=null; renderKey();
+});
+
+/* =============== Artenliste =============== */
+function initList(){
+  $('#fG').innerHTML='<option value="all">Alle Gruppen</option>'+Object.keys(GR).map(k=>`<option value="${k}">${GR[k].nm}</option>`).join('');
+  $('#fR').innerHTML='<option value="all">Alle Naturräume</option>'+Object.keys(NR).map(k=>`<option value="${k}">${NR[k]}</option>`).join('');
+}
+function renderList(){
+  const f=S.flt, q=f.q.trim().toLowerCase();
+  const arr=SPL.filter(s=>(f.g==='all'||s.g===f.g)&&(f.r==='all'||s.r.includes(f.r))&&(!q||(s.nm+' '+s.sci+' '+s.f.join(' ')+' '+s.h).toLowerCase().includes(q)));
+  $('#fCount').textContent=`${arr.length} von ${SPL.length} Einträgen`;
+  $('#spList').innerHTML=arr.map(s=>{
+    const p=findPath(s.g,s.id);
+    const pathTxt=p?p.map((x,i)=>`${i+1}${x.ch}`).join(' → '):'';
+    return `<details style="--gc:var(${GR[s.g].c})"><summary><span class="dot"></span><span>${esc(s.nm)} <small>${esc(GR[s.g].nm)}</small></span></summary>${sheetHTML(s.id,false)}<p class="note">Weg im Schlüssel (${esc(GR[s.g].nm)}): ${esc(pathTxt)}</p><div class="btnrow" style="margin-top:0"><button type="button" class="btn" data-addf="${s.id}">Zu meinen Funden</button></div></details>`;
+  }).join('')||'<p class="note">Keine Treffer.</p>';
+}
+$('#fG').addEventListener('change',e=>{ S.flt.g=e.target.value; renderList(); });
+$('#fR').addEventListener('change',e=>{ S.flt.r=e.target.value; renderList(); });
+$('#fQ').addEventListener('input',e=>{ S.flt.q=e.target.value; renderList(); });
+$('#spList').addEventListener('click',e=>{ const b=e.target.closest('[data-addf]'); if(b){ addFind(b.dataset.addf); b.textContent='Hinzugefügt'; } });
+
+/* =============== Funde und Gewässergüte =============== */
+function addFind(id){ S.finds.push({uid:++S.uid,id,place:'',cnt:3}); }
+const GK=[
+ {max:1.5,k:'I',nm:'unbelastet bis sehr gering belastet',c:'#2E5FD1'},
+ {max:1.8,k:'I–II',nm:'gering belastet',c:'#4FA3E8'},
+ {max:2.3,k:'II',nm:'mäßig belastet',c:'#3FA34D'},
+ {max:2.7,k:'II–III',nm:'kritisch belastet',c:'#8DB92E'},
+ {max:3.2,k:'III',nm:'stark verschmutzt',c:'#D9A91E'},
+ {max:3.5,k:'III–IV',nm:'sehr stark verschmutzt',c:'#E07B22'},
+ {max:9,k:'IV',nm:'übermäßig verschmutzt',c:'#C93C3C'}
+];
+function renderFinds(){
+  const fi=S.finds;
+  $('#findsCard').innerHTML=`<h2>Meine Funde</h2><p class="note" style="margin-top:0">Deine Fundliste für die Exkursion. Sie wird nicht gespeichert und geht beim Schließen der Seite verloren. Kopiere sie vorher. Schreibe keine Namen in die Notizen.</p>${fi.length?fi.map(f=>{ const s=SP[f.id]; return `<div class="find" data-uid="${f.uid}" style="--gc:var(${GR[s.g].c})"><div class="row"><b>${esc(s.nm)}</b><span class="tag">${esc(GR[s.g].nm)}</span><button type="button" class="linkbtn" data-del="${f.uid}">Entfernen</button></div><div class="row"><label style="flex:1;min-width:150px"><span class="note">Fundort (zum Beispiel Schulhof, Bachabschnitt)</span><input type="text" data-place="${f.uid}" value="${esc(f.place)}" maxlength="60"></label>${s.g==='wasser'?`<label><span class="note">Häufigkeit</span><select data-cnt="${f.uid}"><option value="1" ${f.cnt===1?'selected':''}>einzeln</option><option value="3" ${f.cnt===3?'selected':''}>mehrere</option><option value="5" ${f.cnt===5?'selected':''}>massenhaft</option></select></label>`:''}</div></div>`; }).join(''):'<p class="note">Noch keine Funde. Bestimme eine Art und wähle „Zu meinen Funden“.</p>'}${fi.length?'<div class="btnrow"><button type="button" class="btn primary" id="btnCopyF">Als Text kopieren</button><button type="button" class="btn" id="btnClearF">Liste leeren</button></div><textarea id="copyF" class="txtin" style="min-height:120px" readonly hidden aria-label="Fundliste als Text"></textarea><p class="note" id="copyFMsg" aria-live="polite"></p>':''}`;
+  renderGuete();
+}
+function renderGuete(){
+  const w=S.finds.filter(f=>SP[f.id].g==='wasser');
+  if(!w.length){ $('#gueteCard').innerHTML=`<h2>Gewässergüte</h2><p class="lead">Wenn du bei einer Bachuntersuchung Gewässertiere bestimmst und zu deinen Funden hinzufügst, schätzt die Seite hier die Gewässergüteklasse. Trage die Häufigkeit ein.</p>`; return; }
+  let sh=0,h=0; w.forEach(f=>{ sh+=SP[f.id].s*f.cnt; h+=f.cnt; });
+  const idx=sh/h, gk=GK.find(x=>idx<x.max);
+  $('#gueteCard').innerHTML=`<h2>Gewässergüte</h2><div class="gres" style="background:${gk.c};${gk.k==='III'||gk.k==='II–III'?'color:#1B1B14':''}">Gewässergüteklasse ${gk.k}: ${gk.nm}<br><span style="font-weight:400">Mittlerer Zeigerwert (Saprobienindex, vereinfacht): ${fmt(idx,2)}</span></div>
+   <div class="gbar" aria-hidden="true">${GK.map(x=>`<i style="background:${x.c};${x===gk?'outline:3px solid #000;outline-offset:-3px':''}${x.k==='III'||x.k==='II–III'?';color:#1B1B14':''}">${x.k}</i>`).join('')}</div>
+   <p class="note">Rechnung: Summe aus Zeigerwert mal Häufigkeit geteilt durch die Summe der Häufigkeiten (Häufigkeit: 1 einzeln, 3 mehrere, 5 massenhaft). Die Zeigerwerte sind für den Unterricht vereinfacht. Amtliche Verfahren (Saprobienindex nach DIN 38410) nutzen artspezifische Werte und mehr Arten. Für eine belastbare Aussage braucht man viele Arten und mehrere Probenahmen.</p>`;
+}
+$('#findsCard').addEventListener('input',e=>{ const u=e.target.dataset.place; if(u){ const f=S.finds.find(x=>x.uid==u); if(f) f.place=e.target.value; } });
+$('#findsCard').addEventListener('change',e=>{ const u=e.target.dataset.cnt; if(u){ const f=S.finds.find(x=>x.uid==u); if(f){ f.cnt=+e.target.value; renderGuete(); } } });
+$('#findsCard').addEventListener('click',async e=>{
+  const d=e.target.closest('[data-del]'); if(d){ S.finds=S.finds.filter(x=>x.uid!=d.dataset.del); renderFinds(); return; }
+  if(e.target.closest('#btnClearF')){ S.finds=[]; renderFinds(); return; }
+  if(e.target.closest('#btnCopyF')){
+    const txt='Fundliste\n'+S.finds.map((f,i)=>{ const s=SP[f.id]; return `${i+1}. ${s.nm} (${s.sci}), ${GR[s.g].nm}${f.place?', Fundort: '+f.place:''}${s.g==='wasser'?', Häufigkeit: '+({1:'einzeln',3:'mehrere',5:'massenhaft'}[f.cnt]):''}`; }).join('\n');
+    const ta=$('#copyF'); ta.value=txt; ta.hidden=false; let ok=false;
+    try{ await navigator.clipboard.writeText(txt); ok=true; }catch(_){ try{ ta.focus(); ta.select(); ok=document.execCommand('copy'); }catch(__){} }
+    $('#copyFMsg').textContent=ok?'Kopiert.':'Markiere den Text und kopiere ihn selbst.';
+  }
+});
+
+/* =============== Üben =============== */
+function newQuiz(g){
+  const pool=SPL.filter(s=>s.g===g); const qs=shuffle(pool).slice(0,5).map(t=>{ const opts=shuffle([t].concat(shuffle(pool.filter(x=>x.id!==t.id)).slice(0,3))); return {t:t.id,feats:shuffle(t.f).slice(0,3),opts:opts.map(x=>x.id)}; });
+  S.quiz={g,qs,i:0,score:0,done:false,ans:null};
+}
+function renderQuiz(){
+  if(!S.quiz) newQuiz('laub'); const q=S.quiz;
+  let h=`<h2>Quiz: Welche Art ist das?</h2><label class="fl" for="qG">Gruppe</label><select id="qG">${Object.keys(GR).filter(k=>k!=='wirbel').map(k=>`<option value="${k}" ${k===q.g?'selected':''}>${GR[k].nm}</option>`).join('')}</select>`;
+  if(q.done){ h+=`<div class="fb ${q.score>=4?'ok':'tip'}" style="margin-top:10px"><b>${q.score} von ${q.qs.length} richtig.</b> ${q.score>=4?'Sehr gut.':'Übe weiter mit der Artenliste und dem Schlüssel.'}</div><div class="btnrow"><button type="button" class="btn primary" id="qAgain">Noch einmal</button></div>`; }
+  else {
+    const c=q.qs[q.i];
+    h+=`<p class="note">Frage ${q.i+1} von ${q.qs.length}</p><p style="font-weight:700;margin:2px 0">Welche Art hat diese Merkmale?</p><ul>${c.feats.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><div class="signs" style="grid-template-columns:1fr">${c.opts.map(id=>{ let cls=''; return `<div class="signwrap"><button type="button" class="sign" data-qa="${id}" ${q.ans?'disabled':''} style="${q.ans&&id===c.t?'background:#9ADFA8':(q.ans===id&&id!==c.t?'background:#F3A6A0':'')}"><span style="flex:1">${esc(SP[id].nm)}</span></button></div>`; }).join('')}</div>`;
+    if(q.ans){ h+=`<div class="fb ${q.ans===c.t?'ok':'no'}"><b>${q.ans===c.t?'Richtig.':'Nicht ganz.'}</b> Es ist: ${esc(SP[c.t].nm)} (${esc(SP[c.t].sci)}). Verwechslung: ${esc(SP[c.t].v)}</div><div class="btnrow"><button type="button" class="btn primary" id="qNext">${q.i===q.qs.length-1?'Ergebnis':'Weiter'}</button></div>`; }
+  }
+  $('#quizCard').innerHTML=h;
+}
+$('#quizCard').addEventListener('change',e=>{ if(e.target.id==='qG'){ newQuiz(e.target.value); renderQuiz(); } });
+$('#quizCard').addEventListener('click',e=>{
+  const a=e.target.closest('[data-qa]'); if(a&&!S.quiz.ans){ S.quiz.ans=a.dataset.qa; if(S.quiz.ans===S.quiz.qs[S.quiz.i].t) S.quiz.score++; renderQuiz(); return; }
+  if(e.target.closest('#qNext')){ const q=S.quiz; q.ans=null; if(q.i===q.qs.length-1) q.done=true; else q.i++; renderQuiz(); return; }
+  if(e.target.closest('#qAgain')){ newQuiz(S.quiz.g); renderQuiz(); }
+});
+/* Schlüssel-Werkstatt */
+const WSP=['stieleiche','rotbuche','sandbirke','bergahorn','esche','winterlinde'];
+const WF=[
+ {k:'gef',nm:'Blatt gefiedert (zusammengesetzt)',v:{esche:1}},
+ {k:'lap',nm:'Blatt gelappt',v:{stieleiche:1,bergahorn:1}},
+ {k:'geg',nm:'Blätter gegenständig',v:{bergahorn:1,esche:1}},
+ {k:'her',nm:'Blatt herzförmig',v:{winterlinde:1}},
+ {k:'rau',nm:'Blatt dreieckig-rautenförmig',v:{sandbirke:1}},
+ {k:'wei',nm:'Rinde weiß',v:{sandbirke:1}},
+ {k:'nus',nm:'Frucht eine Nuss ohne Flügel (Eichel, Buchecker)',v:{stieleiche:1,rotbuche:1}},
+ {k:'flu',nm:'Frucht oder Nüsschen mit Flügel',v:{sandbirke:1,bergahorn:1,esche:1,winterlinde:1}}
+];
+const wfVal=(sp,k)=>(WF.find(f=>f.k===k).v[sp]?1:0);
+function wkInit(){ S.wk={root:{set:WSP.slice(),feat:'',yes:null,no:null}}; }
+function wkRender(){
+  if(!S.wk) wkInit();
+  const rec=(n,depth,label)=>{
+    const names=n.set.map(id=>SP[id].nm.replace(/ \(.*\)/,'')).join(', ');
+    let h=`<div class="node"><div class="set">${label?label+': ':''}${n.set.length} Art${n.set.length===1?'':'en'}: ${esc(names)}</div>`;
+    if(n.set.length===1){ h+=`<div class="fb ok" style="margin-top:4px">Fertig: ${esc(SP[n.set[0]].nm)} steht allein.</div></div>`; return h; }
+    h+=`<select data-wkn="${depth}" aria-label="Merkmal wählen"><option value="">Merkmal wählen …</option>${WF.map(f=>`<option value="${f.k}" ${n.feat===f.k?'selected':''}>${esc(f.nm)}</option>`).join('')}</select>`;
+    if(n.feat){
+      const yes=n.set.filter(id=>wfVal(id,n.feat)), no=n.set.filter(id=>!wfVal(id,n.feat));
+      if(!yes.length||!no.length) h+=`<div class="fb tip">Dieses Merkmal trennt die Arten nicht: Alle haben es oder keine. Wähle ein anderes.</div>`;
+      else { if(!n.yes||n.yes.set.join()!==yes.join()) n.yes={set:yes,feat:'',yes:null,no:null}; if(!n.no||n.no.set.join()!==no.join()) n.no={set:no,feat:'',yes:null,no:null}; h+=rec(n.yes,depth+'y','a (trifft zu)')+rec(n.no,depth+'n','b (trifft nicht zu)'); }
+    }
+    return h+'</div>';
+  };
+  const done=(n)=>n.set.length===1||(n.feat&&n.yes&&n.no&&done(n.yes)&&done(n.no));
+  const depth=(n)=>n.set.length===1?0:(n.yes&&n.no&&n.feat?1+Math.max(depth(n.yes),depth(n.no)):99);
+  const body=rec(S.wk.root,'r','');
+  const ok=done(S.wk.root);
+  $('#wkCard').innerHTML=`<h2>Schlüssel selbst bauen</h2><p class="lead">Baue einen dichotomen Schlüssel für sechs Laubbäume. Wähle bei jedem Schritt ein Merkmal, das die Arten in zwei Gruppen teilt (trifft zu oder trifft nicht zu). Ziel: Jede Art steht am Ende allein.</p><div class="wk">${body}</div>${ok?`<div class="fb ok"><b>Geschafft.</b> Dein Schlüssel hat höchstens ${depth(S.wk.root)} Schritte bis zur Art. Das Minimum für 6 Arten sind 3 Schritte.</div>`:''}<div class="btnrow"><button type="button" class="btn" id="wkReset">Neu beginnen</button></div><details class="hintbox"><summary style="cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center">Tabelle der Merkmale</summary><div style="overflow-x:auto;max-width:100%"><table style="border-collapse:collapse;font-size:.85rem;min-width:520px"><tr><th></th>${WSP.map(id=>`<th style="padding:3px 6px">${esc(SP[id].nm.replace(/ \(.*\)/,''))}</th>`).join('')}</tr>${WF.map(f=>`<tr><td style="padding:3px 6px">${esc(f.nm)}</td>${WSP.map(id=>`<td style="text-align:center;border-top:1px solid var(--line)">${wfVal(id,f.k)?'ja':'nein'}</td>`).join('')}</tr>`).join('')}</table></div></details>`;
+}
+$('#wkCard').addEventListener('change',e=>{
+  const sel=e.target.closest('[data-wkn]'); if(!sel) return; const path=sel.dataset.wkn; let n=S.wk.root;
+  for(const ch of path.slice(1)) n=ch==='y'?n.yes:n.no;
+  n.feat=sel.value; if(!sel.value){ n.yes=null; n.no=null; } wkRender();
+});
+$('#wkCard').addEventListener('click',e=>{ if(e.target.closest('#wkReset')){ wkInit(); wkRender(); } });
+
+/* =============== Glossar =============== */
+const GL=[
+ ['wechselständig','Pro Knoten sitzt ein Blatt. Die Blätter stehen abwechselnd links und rechts am Zweig.','alternate','laub'],
+ ['gegenständig','Zwei Blätter sitzen gleichzeitig am selben Knoten, einander gegenüber.','opposite','laub'],
+ ['einfaches Blatt','Die Blattspreite ist ungeteilt, auch wenn sie gelappt oder gezähnt ist.','simple','laub'],
+ ['zusammengesetztes Blatt','Das Blatt besteht aus mehreren Teilblättchen, die eigene Stielchen haben.','compound','laub'],
+ ['gefiedert','Teilblättchen sitzen beidseits an einer gemeinsamen Spindel. Unpaarig: am Ende sitzt ein einzelnes Blättchen.','compound','laub'],
+ ['gefingert','Die Teilblättchen entspringen fingerförmig an einem Punkt.','palmate','laub'],
+ ['gelappt','Der Blattrand hat tiefe Einschnitte, die Lappen sind rund oder spitz.','lobedRound','laub'],
+ ['ganzrandig','Der Blattrand ist glatt, ohne Zähne.','smooth','laub'],
+ ['gesägt','Der Blattrand trägt Zähne wie eine Säge. Doppelt gesägt: kleine Zähne an größeren Zähnen.','serrated','laub'],
+ ['Blattgrund','Der Teil des Blattes, der am Blattstiel ansetzt. Er kann herzförmig, keilförmig oder schief sein.',null,'laub'],
+ ['Kurztrieb','Stark gestauchter Seitentrieb, aus dem Nadelbüschel wachsen (zum Beispiel bei der Lärche).','needleTuft','nadel'],
+ ['Nadelscheide','Hautartige Hülle am Grund von Nadelpaaren bei Kiefern.','needlePair','nadel'],
+ ['Schuppenblatt','Kleines, schuppenförmiges Blatt, das dachziegelartig am Zweig anliegt (Lebensbaum).','scale','nadel'],
+ ['Scheinbeere','Fleischiger Samenmantel (Arillus), zum Beispiel bei der Eibe. Es ist keine echte Beere.',null,'nadel'],
+ ['Spiegel','Farblich abgesetztes Feld im Flügel, zum Beispiel der blaue Spiegel der Stockente.',null,'vögel'],
+ ['Bürzel','Bereich am Rücken über dem Schwanzansatz.',null,'vögel'],
+ ['Rüttelflug','Der Vogel steht flatternd in der Luft, zum Beispiel der Turmfalke.',null,'vögel'],
+ ['Schlichtkleid und Prachtkleid','Vögel haben außerhalb und innerhalb der Brutzeit oft unterschiedliches Gefieder.',null,'vögel'],
+ ['wechselwarm','Die Körpertemperatur hängt von der Umgebung ab (Fische, Amphibien, Reptilien).','hornScale','wirbeltiere'],
+ ['gleichwarm','Die Körpertemperatur wird weitgehend konstant gehalten (Vögel, Säugetiere).','fur','wirbeltiere'],
+ ['Metamorphose','Umwandlung von der Larve zum erwachsenen Tier, zum Beispiel von der Kaulquappe zum Frosch.',null,'wirbeltiere'],
+ ['Laich','Eier von Amphibien und Fischen, die im Wasser abgelegt werden.','smoothSkin','wirbeltiere'],
+ ['Hymenophor','Fruchtschicht auf der Hutunterseite: Röhren, Lamellen oder Leisten.','pores','pilze'],
+ ['Lamellen','Blätterartige Streifen auf der Hutunterseite.','gills','pilze'],
+ ['Röhren','Dicht stehende Röhrchen auf der Hutunterseite, von unten als Poren sichtbar.','pores','pilze'],
+ ['Leisten','Dicke, gabelige Falten auf der Hutunterseite (Pfifferling).','ridges','pilze'],
+ ['Manschette (Ring)','Hautring am Stiel, Rest der Hülle des jungen Pilzes.','volva','pilze'],
+ ['Scheide (Volva)','Häutiger Becher am Stielgrund, zum Beispiel beim Knollenblätterpilz. Sie steckt im Boden.','volva','pilze'],
+ ['Porling','Zäher oder holziger Pilz mit Poren, meist als Konsole am Holz.','bracket','pilze'],
+ ['Stäubling','Pilz, der im Alter Sporenstaub durch eine Öffnung entlässt.','puffball','pilze'],
+ ['Myzel','Unterirdisches Geflecht aus Pilzfäden. Der Pilz, den wir sehen, ist nur der Fruchtkörper.',null,'pilze'],
+ ['Mykorrhiza','Lebensgemeinschaft zwischen Pilz und Baumwurzel zum gegenseitigen Nutzen.',null,'pilze'],
+ ['Zeigerorganismus (Bioindikator)','Art, die bestimmte Umweltbedingungen anzeigt, zum Beispiel Wasserqualität.',null,'gewässer'],
+ ['Saprobienindex','Maß für die organische Belastung eines Gewässers, berechnet aus Zeigerorganismen und ihrer Häufigkeit.',null,'gewässer'],
+ ['Gewässergüteklasse','Einteilung der Gewässerbelastung von I (unbelastet) bis IV (übermäßig verschmutzt).',null,'gewässer'],
+ ['Köcher','Röhrenförmiges Gehäuse der Köcherfliegenlarven aus Sand, Steinchen oder Pflanzenteilen.','scale','gewässer'],
+ ['Dichotomer Schlüssel','Bestimmungsschlüssel, bei dem man immer zwischen zwei Aussagen wählt.',null,'allgemein']
+];
+function renderGloss(){
+  const q=($('#gQ').value||'').trim().toLowerCase();
+  const arr=GL.filter(x=>!q||(x[0]+' '+x[1]).toLowerCase().includes(q));
+  $('#glossList').innerHTML=arr.map(x=>`<dt>${esc(x[0])} <span class="tag">${esc(x[3])}</span></dt><dd>${icon(x[2])}<span>${esc(x[1])}</span></dd>`).join('')||'<p class="note">Keine Treffer.</p>';
+}
+$('#gQ').addEventListener('input',renderGloss);
+
+/* =============== Aufgaben und Hinweise =============== */
+const TASKS=[
+ {afb:'I',op:'Bestimme',t:'Laubbäume auf dem Schulgelände',x:'Bestimme mit dem Laubbaumschlüssel drei Bäume auf dem Schulgelände oder in der Nähe. Notiere für jeden Baum den Weg durch den Schlüssel und führe die Gegenprobe durch.',setup:()=>{ S.g='laub'; setTab('key'); },
+  sol:['Zu jedem Baum gehört eine Schrittfolge (zum Beispiel 1b, 5b, 8b für die Rotbuche) und das Ergebnis mit Gegenprobe.','Typische Ergebnisse auf Schulhöfen in Niedersachsen: Spitzahorn, Rosskastanie, Winterlinde, Birke, Stieleiche.','Gegenprobe: Mindestens drei von vier Merkmalen im Steckbrief müssen passen.']},
+ {afb:'II',op:'Vergleiche',t:'Stieleiche und Traubeneiche',x:'Vergleiche Stieleiche und Traubeneiche. Nenne drei Unterschiede und erkläre, warum ein einziges Merkmal oft nicht ausreicht.',setup:()=>{ S.g='laub'; S.ks.laub={node:'L6b',path:[],res:null}; setTab('key'); renderKey(); },
+  sol:['Blattstiel: Stieleiche sehr kurz, Traubeneiche 1 bis 3 cm. Blattgrund: Stieleiche geöhrt, Traubeneiche keilförmig. Eicheln: Stieleiche lang gestielt, Traubeneiche sitzend.','Merkmale schwanken und können sich überschneiden. Hybride zwischen beiden Arten kommen vor. Darum werden mehrere Merkmale und mehrere Blätter geprüft.']},
+ {afb:'II',op:'Erstelle',t:'Eigenen Schlüssel entwickeln',x:'Baue in der Werkstatt einen Schlüssel für die sechs Laubbäume. Begründe die Wahl deiner Merkmale und gib die Zahl der Schritte an.',setup:()=>{ setTab('train'); wkInit(); wkRender(); },
+  sol:['Ein günstiger Schlüssel teilt die Arten möglichst gleichmäßig. Beispiel: erst „gefiedert“ (Esche allein), dann „gelappt“ (Stieleiche, Bergahorn), dann „herzförmig“ oder „Nuss ohne Flügel“.','Mit drei Schritten lassen sich sechs Arten trennen. Gut sind klare, leicht prüfbare Merkmale.','Regeln: genau zwei Alternativen je Schritt, die sich ausschließen, und Merkmale, die man beobachten kann.']},
+ {afb:'II',op:'Ordne zu',t:'Wirbeltierklassen',x:'Ordne Feldhase, Ringelnatter, Grasfrosch, Hecht, Seehund und Mäusebussard den Wirbeltierklassen zu. Begründe mit zwei Merkmalen je Tier.',setup:()=>{ S.g='wirbel'; setTab('key'); },
+  sol:['Feldhase: Säugetier (Fell, Säugen). Ringelnatter: Reptil (Hornschuppen, trockene Haut). Grasfrosch: Amphibium (feuchte Haut, Laich, Metamorphose). Hecht: Fisch (Schuppen, Flossen, Kiemen). Seehund: Säugetier (Fell, Säugen, Lungenatmung). Mäusebussard: Vogel (Federn, Flügel).','Der Seehund lebt im Wasser, ist aber ein Säugetier.']},
+ {afb:'II',op:'Bestimme',t:'Pilze: Sicherheit',x:'Nenne vier Gründe, warum man Pilze nicht mit einer App oder einem Schlüssel allein auf Essbarkeit bestimmen darf. Nenne die Merkmale, die Grünen Knollenblätterpilz und Steinpilz unterscheiden.',setup:()=>{ S.g='pilze'; setTab('key'); },
+  sol:['Gründe: Viele Merkmale sind zu prüfen (auch Geruch, Verfärbung, Standort). Merkmale schwanken. Der Schlüssel enthält nur wenige Arten. Tödlich giftige Arten sehen essbaren ähnlich. Fotos und Beschreibungen ersetzen keine Pilzberatung.','Knollenblätterpilz: Lamellen weiß, Ring, Stielbasis in einer Scheide, Hut grünlich. Steinpilz: Röhren statt Lamellen, Stielnetz, kein Ring.','Verzehr nur nach Prüfung durch einen Pilzsachverständigen.']},
+ {afb:'III',op:'Werte aus, beurteile',t:'Gewässergüte eines Bachs',x:'Ihr habt an einem Bach folgende Tiere gefunden: Bachflohkrebse (mehrere), Eintagsfliegenlarven (einzeln), Köcherfliegenlarven (mehrere), Wasserasseln (einzeln). Bestimme die Gewässergüteklasse und beurteile die Aussagekraft.',setup:()=>{ S.finds=[]; [['bachflohkrebs',3],['eintagsfliege',1],['koecherfliege',3],['wasserassel',1]].forEach(a=>{ addFind(a[0]); S.finds[S.finds.length-1].cnt=a[1]; }); setTab('finds'); },
+  sol:['Mittelwert: (2,0·3 + 1,6·1 + 1,9·3 + 2,4·1) / 8 = 15,7 / 8 ≈ 1,96. Das entspricht Gewässergüteklasse II (mäßig belastet).','Aussagekraft: Nur vier Arten, vereinfachte Zeigerwerte, eine Probe, Jahreszeit und Strömung beeinflussen das Ergebnis. Für verlässliche Aussagen braucht man mehr Arten, mehrere Probenahmen und die chemischen Messwerte.','Weitere Maßnahmen: Wiederholung zu anderen Jahreszeiten, Strukturgüte des Ufers beschreiben, Temperatur und Sauerstoff messen.']},
+ {afb:'III',op:'Beurteile',t:'Grenzen eines Bestimmungsschlüssels',x:'Beurteile, welche Fehler bei der Arbeit mit einem Bestimmungsschlüssel auftreten können, und nenne Maßnahmen, um sie zu verringern.',setup:()=>{ setTab('key'); },
+  sol:['Fehlerquellen: Art nicht im Schlüssel enthalten, Merkmal falsch gedeutet, untypisches oder beschädigtes Exemplar, Jahreszeit, Hybride, Variabilität innerhalb der Art.','Maßnahmen: mehrere Exemplare und Merkmale prüfen, Gegenprobe nutzen, Verwechslungsarten vergleichen, Fachliteratur oder Fachpersonen hinzuziehen, Fotos dokumentieren.','Ein Schlüssel liefert eine begründete Hypothese, die man prüft, kein sicheres Urteil.']}
+];
+function renderTasks(){
+  $('#taskList').innerHTML=TASKS.map((t,i)=>`<details class="task"><summary><span class="badge">AFB ${t.afb}</span><span>Aufgabe ${i+1}: ${t.t}</span></summary><p><b>${t.op}:</b> ${t.x}</p><button type="button" class="btn" data-task="${i}">Versuch einrichten</button><details class="sol"><summary style="cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center">Lösungshinweise (Erwartungshorizont)</summary><ul>${t.sol.map(x=>`<li>${x}</li>`).join('')}</ul></details></details>`).join('');
+  $('#teacherBox').innerHTML=`<h3>Inhalt und Grenzen</h3><ul><li>Die Schlüssel sind für den Unterricht entwickelt und enthalten bewusst nur eine Auswahl häufiger Arten Niedersachsens: 19 Laubbäume, 10 Nadelbäume, 24 Vögel, 5 Wirbeltierklassen, 18 Pilze und 11 Gewässertiere. Arten außerhalb der Auswahl führen zu falschen Ergebnissen.</li><li>Merkmale und Verwechslungsarten sind gerundete Lehrbuchangaben. Bitte vor dem Einsatz mit eurem Bestimmungsbuch abgleichen (zum Beispiel Rothmaler, Kosmos-Naturführer, NLWKN-Materialien).</li><li>Naturräume (Küste und Watt, Marsch, Geest, Moor, Börden, Bergland) nennen typische, keine vollständigen Vorkommen.</li><li>Die Zeigerwerte der Gewässertiere sind vereinfacht und für den Unterricht gedacht. Die Klassengrenzen der Gewässergüte (I bis IV) folgen der üblichen Einteilung des Saprobienindex. Für amtliche Bewertungen gelten die Verfahren der Wasserwirtschaft.</li><li>Pilze: Der Schlüssel dient ausschließlich dem Lernen. Der Verzehr darf nicht darauf beruhen.</li><li>Rechtlicher Hinweis: Besonders und streng geschützte Arten nicht entnehmen. Für Exkursionen in Schutzgebieten gelten die jeweiligen Schutzgebietsverordnungen.</li></ul><h3>Einsatz und Anforderungsbereiche</h3><ul><li>Aufgaben mit Anforderungsbereichen (I bis III) und Operatoren. Die Lösungshinweise können als Erwartungshorizont dienen. Punktezuteilung und Notengebung liegen in deiner Verantwortung und folgen den Fachkonferenzbeschlüssen.</li><li>Differenzierung: Unterstützung mit dem Übungsmodus und der Artenliste. Erweiterung mit der Werkstatt (eigenen Schlüssel bauen) und der Gewässergüte-Auswertung.</li></ul><h3>Typische Fehlvorstellungen</h3><ul><li>„Ein Merkmal reicht zur Bestimmung.“ Meist braucht man mehrere.</li><li>„Alle Pilze mit Lamellen sind giftig oder essbar.“ Die Hutunterseite sagt nichts über die Giftigkeit.</li><li>„Eine Bestimmung ist erst fertig, wenn ein Name erscheint.“ Das Ergebnis muss geprüft werden.</li><li>„Fische sind alle Tiere, die im Wasser leben.“ Robben und Wale sind Säugetiere.</li></ul><h3>Hinweise</h3><p>Die Zuordnung zum Kerncurriculum Niedersachsen und zu den Zentralabitur-Vorgaben bitte auf nibis.de prüfen. Die Seite speichert keine Daten.</p>`;
+}
+$('#taskList').addEventListener('click',e=>{ const b=e.target.closest('[data-task]'); if(b){ TASKS[+b.dataset.task].setup(); window.scrollTo({top:0,behavior:'smooth'}); } });
+
+/* =============== Tabs =============== */
+function setTab(t){
+  S.tab=t; $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['key','list','train','finds','gloss','info'].forEach(k=>{ $('#pane-'+k).hidden=k!==t; });
+  if(t==='key'){ renderGroups(); renderKey(); }
+  if(t==='list') renderList();
+  if(t==='train'){ renderQuiz(); wkRender(); }
+  if(t==='finds') renderFinds();
+  if(t==='gloss') renderGloss();
+}
+$('#tabs').addEventListener('click',e=>{ const b=e.target.closest('.tab'); if(b){ setTab(b.dataset.tab); window.scrollTo({top:0}); } });
+
+/* Start */
+initList(); renderTasks(); renderGroups(); renderKey();
+})();
+</script>
+</body>
+</html>

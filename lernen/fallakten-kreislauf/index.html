@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fallakten Kreislauf</title>
+<style>
+:root{
+  --desk:#d9dfe5; --folder:#f3e4b5; --folder2:#ead69a; --sheet:#fffdf6; --ink:#1d2733; --muted:#5b6672;
+  --line:#cdb979; --red:#b3241c; --navy:#22406b; --green:#2c6a3a; --okbg:#e3f1e3; --badbg:#f8e1de;
+  --teach:#fff1a8; --muscle:#cf6f62; --vessel:#e7a99c; --plaque:#e2b94a; --blood:#c0392b; --dead:#8b8478;
+  --shadow:0 2px 0 rgba(29,39,51,.08), 0 10px 24px rgba(29,39,51,.12);
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --desk:#151a20; --folder:#2f2b1f; --folder2:#3b3524; --sheet:#22252a; --ink:#ece6d3; --muted:#a8a294;
+    --line:#5a5136; --red:#ef6a5e; --navy:#9dbde8; --green:#7fcb8c; --okbg:#1f3424; --badbg:#3d2321;
+    --teach:#4a4320; --muscle:#9c4a40; --vessel:#7a463e; --plaque:#b8922f; --blood:#e0584a; --dead:#5f5a52;
+    --shadow:0 2px 0 rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --desk:#151a20; --folder:#2f2b1f; --folder2:#3b3524; --sheet:#22252a; --ink:#ece6d3; --muted:#a8a294;
+  --line:#5a5136; --red:#ef6a5e; --navy:#9dbde8; --green:#7fcb8c; --okbg:#1f3424; --badbg:#3d2321;
+  --teach:#4a4320; --muscle:#9c4a40; --vessel:#7a463e; --plaque:#b8922f; --blood:#e0584a; --dead:#5f5a52;
+  --shadow:0 2px 0 rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--desk)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--desk);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:18px 16px 56px}
+.type{font-family:"Special Elite","Courier New",Courier,monospace;font-weight:400}
+h1,h2,h3,h4{margin:0;line-height:1.2}
+p{margin:0 0 .7em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--navy);outline-offset:2px}
+
+.topbar{display:flex;justify-content:flex-end;min-height:8px}
+.modebtn{background:var(--teach);border:1.5px solid var(--ink);border-radius:999px;padding:6px 14px;font-size:.85rem;cursor:pointer}
+
+.intro{padding:12px 4px 8px}
+.intro h1{font-family:"Special Elite","Courier New",monospace;font-weight:400;font-size:clamp(2.1rem,7vw,3.1rem);letter-spacing:-.01em;margin-bottom:10px}
+.intro .lead{font-size:1.08rem;max-width:36em}
+.how{margin-top:10px;background:var(--sheet);border-radius:10px;padding:10px 14px;border:1px solid var(--line)}
+.how summary{cursor:pointer;font-weight:700}
+.how ol{margin:8px 0 2px;padding-left:1.3em}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:40px 18px;margin-top:40px}
+.folder{position:relative;background:var(--folder);border:1px solid var(--line);border-radius:2px 12px 12px 12px;box-shadow:var(--shadow)}
+.tab{position:absolute;top:-27px;left:-1px;height:28px;padding:4px 16px 0;background:var(--folder);border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;font-size:.95rem}
+.cover{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:18px 16px 16px;min-height:200px;cursor:pointer;width:100%;font:inherit}
+.cover:hover{background:var(--folder2)}
+.cover .who{font-family:"Special Elite","Courier New",monospace;font-size:1.25rem}
+.cover .kurz{color:var(--muted);font-size:.95rem;flex:1}
+.cover .dx{font-size:.95rem}
+.cover.final{background:var(--sheet)}
+.cover.final .tab{background:var(--sheet)}
+
+.stamp{display:inline-block;font-family:"Special Elite","Courier New",monospace;color:var(--red);border:3px double var(--red);border-radius:4px;padding:1px 10px;transform:rotate(-7deg);letter-spacing:.12em;font-size:.95rem;opacity:.9}
+.stamp.ok{color:var(--green);border-color:var(--green)}
+.cover .stamp{align-self:flex-end;margin-top:4px}
+
+.back{background:none;border:none;padding:8px 0;margin:0 0 30px;cursor:pointer;font-weight:700;color:var(--navy)}
+.case{margin-top:10px}
+.sec{padding:18px 18px 14px;border-top:1px dashed var(--line)}
+.head{border-top:none;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.head h2{font-family:"Special Elite","Courier New",monospace;font-weight:400;font-size:1.6rem}
+.small{font-size:.88rem;color:var(--muted)}
+.sec h3{font-family:"Special Elite","Courier New",monospace;font-weight:400;font-size:1.2rem;color:var(--navy);margin-bottom:10px}
+.paper{background:var(--sheet);border-radius:6px;padding:14px 16px;border:1px solid var(--line)}
+.befund{margin:0;padding-left:1.2em}
+.befund li{margin:.25em 0}
+.dx-big{font-family:"Special Elite","Courier New",monospace;font-size:1.8rem;color:var(--red);margin-bottom:6px}
+.gate{color:var(--muted);font-style:italic}
+
+.ufv{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.box{background:var(--sheet);border-radius:8px;padding:12px 14px;border:1px solid var(--line)}
+.box h4{font-size:1rem;margin-bottom:6px}
+.box ul{margin:0;padding-left:1.15em}
+.box li{margin:.2em 0}
+
+.task{background:var(--sheet);border-left:5px solid var(--navy);border-radius:0 8px 8px 0;padding:12px 14px;margin:0 0 12px}
+.lvl{color:var(--navy);font-size:.9rem;letter-spacing:.1em}
+.afb{font-size:.8rem;background:var(--teach);border-radius:4px;padding:1px 6px;margin-left:8px}
+.task p{margin:.35em 0}
+details.tipp summary{cursor:pointer;color:var(--navy);font-weight:700;font-size:.95rem}
+details.tipp p{margin-top:6px}
+.teach{background:var(--teach);border-radius:6px;padding:10px 12px;margin-top:10px;font-size:.95rem}
+.teach b{display:block;margin-bottom:2px}
+
+.q{margin-bottom:16px}
+.opt{display:block;width:100%;text-align:left;background:var(--sheet);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0;cursor:pointer;min-height:44px}
+.opt:hover{border-color:var(--ink)}
+.opt.right{border-color:var(--green);background:var(--okbg)}
+.opt.wrong{border-color:var(--red);background:var(--badbg)}
+.fb{font-size:.95rem;margin-top:4px}
+.fb.ok{color:var(--green)} .fb.no{color:var(--red)}
+.solvedmsg{display:flex;align-items:center;gap:16px;margin-top:6px}
+
+.btn{background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--ink);color:var(--sheet)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+.term{background:none;border:none;padding:0;color:var(--navy);text-decoration:underline dotted 2px;text-underline-offset:3px;cursor:help;font:inherit}
+
+.alarm{border:2.5px solid var(--red);border-radius:10px;padding:14px 16px;background:var(--sheet)}
+.alarm h4{color:var(--red);font-size:1.05rem;margin-bottom:8px}
+.alarm .num{font-family:"Special Elite","Courier New",monospace;font-size:2.4rem;color:var(--red);line-height:1;float:right;margin:0 0 8px 12px}
+.alarm ul{margin:0 0 10px;padding-left:1.15em}
+
+.viz{background:var(--sheet);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-top:6px}
+.viz-t{font-weight:700;margin-bottom:10px}
+.g-row{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center;margin:10px 0}
+.g-lab{font-size:.9rem}
+.g-bar{height:22px;border-radius:0 4px 4px 0;margin:3px 0;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:.8rem;font-weight:700;color:#fff}
+.g-bar.sys{background:var(--navy)} .g-bar.dia{background:var(--muted)}
+.g-row.hi .g-bar.sys{background:var(--red)} .g-row.hi .g-bar.dia{background:var(--blood);opacity:.75}
+:root[data-theme="dark"] .g-bar, .g-bar{color:var(--sheet)}
+.legend{font-size:.85rem;color:var(--muted)}
+.vessel-wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.vessel-wrap svg{width:170px;height:170px;flex:none}
+.vessel-ctrl{flex:1;min-width:180px}
+input[type=range]{width:100%;accent-color:var(--red);min-height:32px}
+.meter{height:14px;background:var(--desk);border-radius:7px;overflow:hidden;margin:4px 0 8px}
+.meter span{display:block;height:100%;background:var(--blood);transition:width .2s}
+.heart svg{width:100%;max-width:300px;display:block;margin:0 auto}
+#hz .clot,#hz .zone,#hz .lbl-v{opacity:0;transition:opacity .4s}
+#hz.blocked .clot,#hz.blocked .zone,#hz.blocked .lbl-v{opacity:1}
+#hz .down{transition:stroke .4s}
+#hz.blocked .down{stroke:var(--dead)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+.fast{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
+.fcard{background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:12px;text-align:left;cursor:pointer;min-height:96px}
+.fcard .L{font-family:"Special Elite","Courier New",monospace;font-size:2rem;color:var(--red);line-height:1}
+.fcard .w{font-weight:700;display:block;margin-top:2px}
+.fcard .d{display:block;font-size:.92rem;margin-top:6px}
+.fcard.open{border-color:var(--red)}
+
+.chain{list-style:none;margin:12px 0;padding:0}
+.slot{display:block;width:100%;text-align:left;min-height:56px;border:2px dashed var(--line);border-radius:8px;padding:10px 12px;background:transparent;cursor:pointer}
+.slot.filled{border-style:solid;border-color:var(--ink);background:var(--sheet)}
+.slot .n{font-family:"Special Elite","Courier New",monospace;color:var(--muted);margin-right:8px}
+.arrow{display:block;text-align:center;font-size:1.4rem;color:var(--red);line-height:1.4}
+.pool{display:grid;gap:8px;margin-top:6px}
+.card{text-align:left;background:var(--folder2);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;min-height:48px}
+.result{margin-top:14px}
+
+.sheetback{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:19}
+.sheetback.open{opacity:1;pointer-events:auto}
+.gsheet{position:fixed;left:0;right:0;bottom:0;max-width:760px;margin:0 auto;background:var(--sheet);border-top:3px solid var(--ink);border-radius:16px 16px 0 0;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px));transform:translateY(110%);transition:transform .22s;z-index:20}
+.gsheet.open{transform:none}
+.gsheet h4{font-family:"Special Elite","Courier New",monospace;font-weight:400;font-size:1.4rem;margin-bottom:6px}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+.tpanel{margin-top:22px;background:var(--teach);border-radius:10px;padding:14px 16px;font-size:.95rem}
+.tpanel h3{font-size:1.1rem;margin-bottom:8px}
+.tpanel table{border-collapse:collapse;width:100%;margin:6px 0 10px}
+.tpanel td{border-top:1px solid var(--line);padding:5px 6px 5px 0;vertical-align:top}
+.tpanel ul{margin:4px 0 10px;padding-left:1.15em}
+.tscroll{overflow-x:auto}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <div class="topbar" id="topbar"></div>
+  <main id="app"></main>
+</div>
+<div class="sheetback" id="sheetback" data-act="closesheet"></div>
+<div class="gsheet" id="gsheet" role="dialog" aria-modal="true" aria-labelledby="gs-t">
+  <h4 id="gs-t"></h4>
+  <p id="gs-d"></p>
+  <button class="btn" data-act="closesheet">Schließen</button>
+</div>
+
+<script>
+const GLOSSAR = {
+  "Blutdruck": "Der Druck, den das Blut auf die Wände der Blutgefäße ausübt. Man misst zwei Werte: Der obere Wert entsteht, wenn das Herz pumpt. Der untere Wert entsteht, wenn das Herz sich entspannt.",
+  "mmHg": "Die Einheit für den Blutdruck. Sprich: „Millimeter Quecksilbersäule“.",
+  "Arterie": "Ein Blutgefäß, das Blut vom Herzen wegführt. Arterien haben dicke, elastische Wände.",
+  "Risikofaktor": "Etwas, das die Wahrscheinlichkeit für eine Krankheit erhöht. Ein Risikofaktor macht aber nicht sicher krank.",
+  "Arteriosklerose": "Eine Krankheit der Arterien. In der Gefäßwand bilden sich Ablagerungen. Die Arterie wird eng und starr. Umgangssprachlich: „Arterienverkalkung“.",
+  "Plaque": "Sprich: „Plack“. Eine Ablagerung aus Fett, Kalk und anderen Stoffen in der Wand einer Arterie.",
+  "elastisch": "Dehnbar. Eine elastische Arterie gibt nach, wenn das Herz Blut hineinpumpt – wie ein Gummischlauch.",
+  "Herzkranzgefäße": "Arterien, die wie ein Kranz außen auf dem Herzen liegen. Sie versorgen den Herzmuskel selbst mit Blut. Fachwort: Koronararterien.",
+  "Blutgerinnsel": "Ein Klumpen aus Blutplättchen und anderen Blutbestandteilen. Er kann ein Blutgefäß verstopfen.",
+  "Zellatmung": "So gewinnen Zellen Energie: Traubenzucker + Sauerstoff → Kohlenstoffdioxid + Wasser + Energie.",
+  "Lähmung": "Ein Körperteil kann nicht mehr oder nur noch schlecht bewegt werden.",
+  "Diabetes": "Zuckerkrankheit. Der Zuckergehalt im Blut ist dauerhaft zu hoch.",
+  "Blutfette": "Fette, die mit dem Blut transportiert werden, zum Beispiel Cholesterin."
+};
+
+const CASES = [
+{
+  nr:"01", person:"Herr Kaya, 52 Jahre",
+  kurz:"Busfahrer. Fühlt sich fit – aber das Messgerät schlägt Alarm.",
+  situation:[
+    "Herr Kaya ist Busfahrer. Er sitzt jeden Tag acht Stunden am Steuer. Im Stadtverkehr hat er oft Stress.",
+    "Mittags isst er meistens Pommes, Döner oder Currywurst. Sport macht er seit Jahren nicht mehr. Er ist übergewichtig.",
+    "Beim Betriebsarzt wird sein [[Blutdruck]] gemessen. Der Arzt runzelt die Stirn. Herr Kaya lacht: „Aber ich fühle mich doch gesund!“"
+  ],
+  befunde:["Blutdruck: 165/100 [[mmHg]]","Zum Vergleich: Bei Erwachsenen spricht man ab 140/90 mmHg von Bluthochdruck.","Übergewicht","Keine Beschwerden, keine Schmerzen"],
+  diagnose:"Bluthochdruck",
+  diagnoseText:"Der Druck in den Blutgefäßen ist dauerhaft zu hoch. Fachwort: Hypertonie.",
+  koerper:[
+    "Das Herz pumpt Blut in die [[Arterien|Arterie]]. Dabei drückt das Blut auf die Gefäßwände. Das ist normal und wichtig: Nur so erreicht das Blut jede Zelle.",
+    "Bei Bluthochdruck ist dieser Druck immer zu hoch – auch in Ruhe. Das Herz muss gegen den hohen Druck anpumpen. Es arbeitet dauerhaft schwerer.",
+    "Die Gefäßwände werden ständig stark belastet. Mit der Zeit bekommen sie Schäden. Das Gemeine daran: Man spürt lange nichts. Deshalb nennt man Bluthochdruck auch die „stille Gefahr“."
+  ],
+  viz:"druck",
+  ursachen:["Bewegungsmangel","Übergewicht","viel Salz im Essen","Stress","Rauchen","viel Alkohol","Veranlagung in der Familie"],
+  folgen:["Schäden an den Gefäßwänden","[[Arteriosklerose]]","Herzinfarkt","Schlaganfall","Herzschwäche","Nierenschäden"],
+  vorbeugung:["regelmäßige Bewegung, z. B. Radfahren, Schwimmen, Laufen","weniger Salz","Normalgewicht","Stress abbauen","nicht rauchen","Blutdruck regelmäßig messen lassen"],
+  aufgaben:[
+    {afb:"I",op:"Nenne",text:"drei [[Risikofaktoren|Risikofaktor]] für Bluthochdruck, die bei Herrn Kaya vorliegen.",
+     tipp:"Lies die Situation noch einmal. Achte auf seinen Beruf, sein Essen und seine Freizeit.",
+     eh:"Bewegungsmangel (sitzt viel, kein Sport); salz- und fettreiche Ernährung (Fast Food); Übergewicht; Stress im Straßenverkehr. Drei Faktoren genügen."},
+    {afb:"II",op:"Erkläre",text:"warum das Herz bei Bluthochdruck mehr arbeiten muss.",
+     tipp:"Stell dir eine Pumpe vor, die Wasser in einen schon prall gefüllten Schlauch drücken soll.",
+     eh:"In den Arterien herrscht ein höherer Druck. Das Herz muss gegen diesen Druck pumpen und dafür mehr Kraft aufwenden. Der Herzmuskel wird dauerhaft stärker belastet; langfristig kann eine Herzschwäche entstehen."},
+    {afb:"III",op:"Beurteile",text:"die Aussage von Herrn Kaya: „Ich fühle mich gesund, also ist alles in Ordnung.“",
+     tipp:"Unterscheide: Was merkt Herr Kaya jetzt? Was kann in vielen Jahren passieren?",
+     eh:"Die Aussage trifft nicht zu. Bluthochdruck verursacht lange keine Beschwerden, schädigt die Gefäße aber trotzdem: kurzfristig nichts spürbar, langfristig Arteriosklerose, Herzinfarkt oder Schlaganfall möglich. Begründetes Urteil, z. B.: Er sollte den Blutdruck ärztlich abklären lassen und seinen Lebensstil ändern. Anknüpfung BW 2."}
+  ],
+  quiz:[
+    {q:"Ab welchem Wert spricht man bei Erwachsenen von Bluthochdruck?",o:["ab 120/80 mmHg","ab 140/90 mmHg","ab 200/120 mmHg"],c:1,w:"Werte ab 140/90 mmHg gelten bei Erwachsenen als Bluthochdruck."},
+    {q:"Warum bemerken viele Menschen ihren Bluthochdruck nicht?",o:["Er tut lange Zeit nicht weh.","Er tritt nur im Schlaf auf.","Er verschwindet immer von selbst."],c:0,w:"Bluthochdruck macht oft jahrelang keine Beschwerden. Nur Messen hilft."}
+  ],
+  lehrkraft:"Der Grenzwert 140/90 mmHg bezieht sich auf die Praxismessung bei Erwachsenen; Leitlinien unterscheiden weitere Stufen. Für Kinder und Jugendliche gelten andere Referenzwerte – wichtig, falls SuS eigene Werte vergleichen wollen."
+},
+{
+  nr:"02", person:"Frau Lenz, 64 Jahre",
+  kurz:"Bleibt beim Spazierengehen ständig vor Schaufenstern stehen. Aber nicht zum Einkaufen.",
+  situation:[
+    "Frau Lenz raucht seit über 40 Jahren, jeden Tag eine Schachtel. Bewegung mag sie nicht besonders.",
+    "Seit einigen Monaten passiert beim Spazierengehen immer dasselbe: Nach etwa 200 Metern bekommt sie starke Schmerzen in der linken Wade.",
+    "Dann bleibt sie stehen und tut so, als würde sie ein Schaufenster ansehen. Nach ein bis zwei Minuten ist der Schmerz weg. Sie geht weiter – bis er wiederkommt. Im Sitzen hat sie keine Schmerzen."
+  ],
+  befunde:["Ultraschall: Die Arterie im linken Oberschenkel ist stark verengt.","In der Gefäßwand liegen Ablagerungen.","Der Puls am linken Fuß ist kaum zu fühlen.","Blutdruck leicht erhöht"],
+  diagnose:"Arteriosklerose",
+  diagnoseText:"Ablagerungen verengen die Arterien. Umgangssprachlich: „Arterienverkalkung“. Im Bein nennt man die Krankheit auch „Schaufensterkrankheit“.",
+  koerper:[
+    "Gesunde [[Arterien|Arterie]] haben eine glatte Innenwand. Ihre Wand ist [[elastisch]]: Sie dehnt sich, wenn das Herz Blut hineinpumpt.",
+    "Bei Arteriosklerose lagern sich Fett, Kalk und andere Stoffe in der Gefäßwand ab. Diese Ablagerung heißt [[Plaque]]. Die Arterie wird immer enger und starrer.",
+    "Durch die Engstelle fließt weniger Blut. Beim Gehen brauchen die Beinmuskeln viel Sauerstoff für die [[Zellatmung]]. Das Blut reicht nicht aus, die Muskeln schmerzen. In Ruhe brauchen sie weniger – dann reicht es wieder.",
+    "Probiere es aus: Bewege den Regler und beobachte die Arterie."
+  ],
+  viz:"gefaess",
+  ursachen:["Rauchen","Bluthochdruck","zu viele [[Blutfette]]","[[Diabetes]]","Bewegungsmangel","Übergewicht","höheres Alter"],
+  folgen:["Schmerzen beim Gehen (Schaufensterkrankheit)","An der Engstelle kann sich ein [[Blutgerinnsel]] bilden.","Herzinfarkt, wenn die Herzkranzgefäße betroffen sind","Schlaganfall, wenn Gefäße im Gehirn betroffen sind"],
+  vorbeugung:["nicht rauchen – oder damit aufhören","regelmäßige Bewegung","Ernährung mit wenig tierischem Fett","Blutdruck und Blutfette kontrollieren lassen"],
+  aufgaben:[
+    {afb:"I",op:"Beschreibe",text:"wie sich die Beinarterie von Frau Lenz verändert hat. Nutze die Abbildung.",
+     tipp:"Vergleiche die Arterie, wenn der Regler ganz links steht und wenn er ganz rechts steht.",
+     eh:"In der Gefäßwand haben sich Ablagerungen (Plaque aus Fett, Kalk u. a.) gebildet. Der Innenraum ist enger geworden, die Wand starrer und weniger elastisch. Es fließt weniger Blut hindurch."},
+    {afb:"II",op:"Erkläre",text:"warum Frau Lenz nur beim Gehen Schmerzen hat und nicht im Sitzen.",
+     tipp:"Denke an die Zellatmung: Was brauchen Muskelzellen, wenn sie arbeiten?",
+     eh:"Beim Gehen arbeiten die Beinmuskeln und brauchen mehr Energie. Diese gewinnen sie durch Zellatmung, dafür ist mehr Sauerstoff nötig. Durch die verengte Arterie kommt nicht genug sauerstoffreiches Blut an → Sauerstoffmangel → Schmerz. Im Sitzen ist der Bedarf gering, die Blutmenge reicht. Bezug FW (SF) 1.1, FW (SE) 4.2."},
+    {afb:"III",op:"Beurteile",text:"die Aussage von Frau Lenz: „Mit 64 lohnt es sich nicht mehr, mit dem Rauchen aufzuhören.“",
+     tipp:"Überlege: Was passiert mit ihren Gefäßen, wenn sie weiterraucht? Und was, wenn sie aufhört?",
+     eh:"Die Aussage ist nicht haltbar. Bestehende Ablagerungen verschwinden meist nicht, aber nach einem Rauchstopp schreiten die Schäden langsamer fort und das Risiko für Herzinfarkt und Schlaganfall sinkt – in jedem Alter. Mit Gehtraining kann die schmerzfreie Gehstrecke länger werden. Urteil mit Abwägung kurz- und langfristiger Folgen (Anknüpfung BW 2)."}
+  ],
+  quiz:[
+    {q:"Was lagert sich bei Arteriosklerose in der Gefäßwand ab?",o:["Fett, Kalk und andere Stoffe","Luftbläschen","Wasser"],c:0,w:"Diese Ablagerung heißt Plaque."},
+    {q:"Warum heißt die Krankheit im Bein auch „Schaufensterkrankheit“?",o:["Betroffene bleiben wegen der Schmerzen oft stehen – zum Beispiel vor Schaufenstern.","Sie entsteht durch zu viel Einkaufen.","Man erkennt sie an Spiegelungen im Schaufenster."],c:0,w:"In der Pause verschwindet der Schmerz. Viele tarnen das als Schaufensterbummel."}
+  ],
+  lehrkraft:"„Schaufensterkrankheit“ = periphere arterielle Verschlusskrankheit (pAVK). Plaques bestehen u. a. aus Lipiden, Bindegewebe, Kalk und Entzündungszellen; „Verkalkung“ ist eine Vereinfachung. Der Regler zeigt den Blutfluss nur qualitativ (Modellkritik möglich, EG 3.2)."
+},
+{
+  nr:"03", person:"Herr Brandt, 58 Jahre",
+  kurz:"Plötzlich auf der Treppe: ein Druck in der Brust, als säße ein Elefant darauf.",
+  situation:[
+    "Herr Brandt arbeitet im Büro. Er raucht und hat seit Jahren Bluthochdruck. Seine Tabletten vergisst er oft.",
+    "Heute ist der Aufzug kaputt. Herr Brandt nimmt die Treppe in den vierten Stock. Im dritten Stock bleibt er stehen.",
+    "Er spürt einen starken Druck in der Brust. Der Schmerz zieht in den linken Arm und in den Kiefer. Er schwitzt kalt, ihm ist übel und er hat große Angst. Eine Kollegin sieht ihn und ruft sofort den Notruf 112."
+  ],
+  befunde:["Im Krankenhaus: Ein [[Herzkranzgefäß|Herzkranzgefäße]] ist komplett verschlossen.","An der Verschlussstelle: eine Ablagerung (Arteriosklerose) und ein [[Blutgerinnsel]]","Ein Teil des Herzmuskels bekommt kein Blut mehr."],
+  diagnose:"Herzinfarkt",
+  diagnoseText:"Ein Teil des Herzmuskels stirbt ab, weil er kein Blut mehr bekommt. Fachwort: Myokardinfarkt.",
+  koerper:[
+    "Das Herz pumpt Tag und Nacht. Dafür braucht der Herzmuskel selbst viel Energie – also Sauerstoff und Traubenzucker für die [[Zellatmung]].",
+    "Diese Stoffe bekommt er nicht aus dem Blut in den Herzkammern. Er hat eigene Arterien: die [[Herzkranzgefäße]]. Sie liegen wie ein Kranz außen auf dem Herzen.",
+    "Bei Herrn Brandt waren diese Gefäße durch [[Arteriosklerose]] schon verengt. An einer Ablagerung hat sich ein [[Blutgerinnsel]] gebildet. Es verstopft das Gefäß komplett.",
+    "Hinter dem Verschluss bekommt der Herzmuskel kein Blut mehr. Ohne Sauerstoff keine Zellatmung, ohne Zellatmung keine Energie: Die Zellen sterben ab. Je schneller Ärzte das Gefäß wieder öffnen, desto mehr Herzmuskel wird gerettet."
+  ],
+  viz:"herz",
+  extra:"herzalarm",
+  ursachen:["[[Arteriosklerose]] in den Herzkranzgefäßen","Rauchen","Bluthochdruck","Bewegungsmangel","Übergewicht","zu viele [[Blutfette]]","[[Diabetes]]","Veranlagung"],
+  folgen:["Abgestorbener Herzmuskel wird zu Narbengewebe.","Das Herz pumpt schwächer (Herzschwäche).","Herzrhythmusstörungen","Lebensgefahr"],
+  vorbeugung:["nicht rauchen","Bewegung","gesunde Ernährung","Bluthochdruck behandeln lassen und Medikamente regelmäßig nehmen"],
+  aufgaben:[
+    {afb:"I",op:"Nenne",text:"vier Warnzeichen eines Herzinfarkts.",
+     tipp:"Lies noch einmal, was Herr Brandt spürt. Schau auch in den roten Kasten.",
+     eh:"Starker Druck oder Schmerz in der Brust; Ausstrahlung in Arm, Kiefer, Hals, Rücken oder Oberbauch; kalter Schweiß; Übelkeit; Atemnot; Angst. Vier genügen."},
+    {afb:"II",op:"Erkläre",text:"mithilfe der Zellatmung, warum Herzmuskelzellen hinter dem Verschluss absterben.",
+     tipp:"Schreibe zuerst die Wortgleichung der Zellatmung auf. Welcher Stoff fehlt?",
+     eh:"Zellatmung: Traubenzucker + Sauerstoff → Kohlenstoffdioxid + Wasser + Energie. Hinter dem Verschluss kommt kein Blut an, also kein Sauerstoff (und kein Traubenzucker). Die Zellatmung kann nicht ablaufen, die Zellen erhalten keine Energie und sterben ab. Bezug FW (SE) 4.2, FW (KP) 2.1."},
+    {afb:"III",op:"Beurteile",text:"das Verhalten eines Kollegen, der sagt: „Lass uns erst mal abwarten. Vielleicht geht es gleich vorbei.“",
+     tipp:"Was passiert mit dem Herzmuskel, während man wartet?",
+     eh:"Das Verhalten ist falsch und gefährlich. Solange das Gefäß verschlossen ist, sterben weiter Herzmuskelzellen ab; je länger man wartet, desto größer der Schaden und die Lebensgefahr („Zeit ist Herzmuskel“). Richtig: sofort 112 rufen. Urteil mit Begründung."}
+  ],
+  quiz:[
+    {q:"Welche Gefäße versorgen den Herzmuskel selbst mit Blut?",o:["die Lungenvenen","die Herzkranzgefäße","die Hohlvenen"],c:1,w:"Die Herzkranzgefäße liegen wie ein Kranz außen auf dem Herzen."},
+    {q:"Welche Nummer rufst du in Deutschland bei Verdacht auf einen Herzinfarkt an?",o:["110","112","115"],c:1,w:"112 ist der Notruf für Rettungsdienst und Feuerwehr. 110 ist die Polizei."}
+  ],
+  lehrkraft:"Das Gerinnsel entsteht meist, wenn eine Plaque aufbricht (Ruptur). Die Abbildung ist stark schematisiert. Die Erste-Hilfe-Hinweise sind auf Erkennen und Notruf reduziert; für Wiederbelebung ggf. auf Erste-Hilfe-Kurs oder Schulsanitätsdienst verweisen."
+},
+{
+  nr:"04", person:"Frau Schulte, 71 Jahre",
+  kurz:"Beim Frühstück fällt ihr die Tasse aus der Hand. Ihre Enkelin reagiert blitzschnell.",
+  situation:[
+    "Frau Schulte frühstückt mit ihrer Enkelin Mia. Mia ist 13 Jahre alt. Frau Schulte hat seit Jahren Bluthochdruck.",
+    "Plötzlich fällt ihr die Tasse aus der rechten Hand. Ihr rechter Mundwinkel hängt herab. Sie will etwas sagen, aber die Wörter klingen verwaschen.",
+    "Mia erinnert sich an den Biologieunterricht. Sie macht schnell einen Test mit ihrer Oma. Dann ruft sie den Notruf 112 und schaut auf die Uhr: 8:14 Uhr."
+  ],
+  befunde:["Im Krankenhaus: Ein Blutgefäß im Gehirn ist durch ein [[Blutgerinnsel]] verstopft.","Rechter Arm und rechte Gesichtshälfte sind teilweise gelähmt ([[Lähmung]]).","Sprachstörung"],
+  diagnose:"Schlaganfall",
+  diagnoseText:"Ein Teil des Gehirns bekommt plötzlich kein Blut mehr. Fachwort: Hirninfarkt.",
+  koerper:[
+    "Das Gehirn braucht ständig sehr viel Sauerstoff und Traubenzucker. Es hat kaum Vorräte. Schon nach wenigen Minuten ohne Blut sterben Gehirnzellen ab.",
+    "Bei den meisten Schlaganfällen verstopft ein [[Blutgerinnsel]] ein Gefäß im Gehirn. Seltener platzt ein Gefäß, und es blutet ins Gehirn.",
+    "Jeder Teil des Gehirns hat eine Aufgabe, zum Beispiel Bewegung oder Sprache. Fällt ein Teil aus, fallen auch seine Aufgaben aus. Deshalb kann Frau Schulte ihren Arm nicht bewegen und nicht richtig sprechen.",
+    "Ein Schlaganfall ist ein Notfall. Ärzte können das Gerinnsel auflösen oder entfernen – aber nur in den ersten Stunden. Deshalb zählt jede Minute."
+  ],
+  viz:"fast",
+  ursachen:["Bluthochdruck (wichtigster Risikofaktor)","[[Arteriosklerose]]","Rauchen","bestimmte Herzrhythmusstörungen: Im Herzen bilden sich Gerinnsel, die ins Gehirn wandern","[[Diabetes]]","Bewegungsmangel"],
+  folgen:["[[Lähmung]] von Arm, Bein oder Gesicht","Sprachstörungen","Sehstörungen","oft lange Behandlung und Training (Reha)","Lebensgefahr"],
+  vorbeugung:["Blutdruck kontrollieren und behandeln lassen","nicht rauchen","Bewegung","gesunde Ernährung"],
+  aufgaben:[
+    {afb:"I",op:"Beschreibe",text:"wie Mia mit dem FAST-Test prüft, ob ihre Oma einen Schlaganfall hat.",
+     tipp:"Tippe die vier Buchstaben-Karten an.",
+     eh:"F (Face/Gesicht): lächeln lassen – hängt ein Mundwinkel? A (Arms/Arme): beide Arme heben lassen – sinkt einer ab? S (Speech/Sprache): Satz nachsprechen lassen – verwaschen? T (Time/Zeit): bei Auffälligkeit sofort 112, Uhrzeit merken."},
+    {afb:"II",op:"Erkläre",text:"warum ein Schlaganfall zu den Erkrankungen des Kreislaufsystems zählt, obwohl die Beschwerden im Gehirn auftreten.",
+     tipp:"Wo genau liegt die Ursache: in den Nervenzellen oder in den Blutgefäßen?",
+     eh:"Die Ursache liegt im Blutgefäß (Verschluss durch ein Gerinnsel oder Riss). Der Blutkreislauf kann diesen Teil des Gehirns nicht mehr mit Sauerstoff und Traubenzucker versorgen, deshalb sterben Nervenzellen ab. Die Ausfälle sind die Folge, die Ursache ist eine Kreislaufstörung. Bezug FW (KP) 2.1."},
+    {afb:"III",op:"Beurteile",text:"den Vorschlag des Opas: „Leg dich erst mal hin. Morgen gehen wir zum Hausarzt.“",
+     tipp:"Lies noch einmal den letzten Absatz bei „Was passiert im Körper?“.",
+     eh:"Der Vorschlag ist falsch und gefährlich. Gehirnzellen sterben ohne Blut innerhalb von Minuten ab; das Gerinnsel kann nur in den ersten Stunden aufgelöst oder entfernt werden. Bis morgen zu warten, kann bleibende Schäden oder den Tod bedeuten. Richtig: sofort 112. Mias Verhalten (FAST-Test, 112, Uhrzeit) ist vorbildlich."}
+  ],
+  quiz:[
+    {q:"Wofür steht das T im FAST-Test?",o:["Time: sofort 112 anrufen","Tablette geben","Temperatur messen"],c:0,w:"Beim Schlaganfall zählt jede Minute."},
+    {q:"Was passiert bei den meisten Schlaganfällen?",o:["Das Herz bleibt stehen.","Ein Blutgerinnsel verstopft ein Gefäß im Gehirn.","Die Lunge füllt sich mit Wasser."],c:1,w:"Seltener platzt ein Gefäß im Gehirn."}
+  ],
+  lehrkraft:"Rund 80 % der Schlaganfälle sind durch einen Gefäßverschluss bedingt, der Rest durch Blutungen. Zeitfenster für Lyse/Thrombektomie sind bewusst nur als „erste Stunden“ angegeben. Zusatzimpuls für Leistungsstarke: Warum ist bei Frau Schulte die rechte Körperseite betroffen? (linke Hirnhälfte steuert rechte Körperseite)"
+}
+];
+
+const FAST = [
+  {L:"F",w:"Face – Gesicht",d:"Bitte die Person zu lächeln. Hängt ein Mundwinkel herab?"},
+  {L:"A",w:"Arms – Arme",d:"Bitte die Person, beide Arme nach vorn zu strecken und die Handflächen nach oben zu drehen. Sinkt ein Arm ab?"},
+  {L:"S",w:"Speech – Sprache",d:"Lass die Person einen einfachen Satz nachsprechen. Klingt die Sprache verwaschen oder fehlen Wörter?"},
+  {L:"T",w:"Time – Zeit",d:"Ist auch nur ein Test auffällig: sofort 112 anrufen! Merke dir die Uhrzeit, wann die Beschwerden begonnen haben."}
+];
+
+const CHAIN = [
+  {id:"a",t:"Ungesunder Lebensstil: Rauchen, wenig Bewegung, viel Salz und Fett"},
+  {id:"b",t:"Bluthochdruck belastet und schädigt die Gefäßwände."},
+  {id:"c",t:"Ablagerungen machen die Arterien eng und starr (Arteriosklerose)."},
+  {id:"d",t:"Ein Blutgerinnsel verschließt ein Gefäß: Herzinfarkt oder Schlaganfall"}
+];
+const POOL_ORDER = ["c","a","d","b"];
+
+// ---------- state ----------
+let teacher = false;
+let view = {name:"home"};
+const revealed = new Set();
+const answers = {};          // caseIdx -> {qIdx: optIdx}
+let solved = new Set();
+const fastOpen = new Set();
+let heartBlocked = false;
+let plaque = 0;
+let chainPick = [];
+let chainChecked = null;
+
+function load(){
+  try{ if(localStorage.getItem("fk-teacher")==="1") teacher = true; }catch(e){}
+  try{ const s = JSON.parse(localStorage.getItem("fk-solved")||"[]"); if(Array.isArray(s)) solved = new Set(s); }catch(e){}
+  if(location.hash === "#lehrkraft"){ teacher = true; try{ localStorage.setItem("fk-teacher","1"); }catch(e){} }
+}
+function saveSolved(){ try{ localStorage.setItem("fk-solved", JSON.stringify([...solved])); }catch(e){} }
+
+// ---------- helpers ----------
+function T(s){
+  return s.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, txt, key) =>
+    `<button class="term" data-act="term" data-k="${key||txt}">${txt}</button>`);
+}
+const paras = arr => arr.map(p => `<p>${T(p)}</p>`).join("");
+const li = arr => arr.map(x => `<li>${T(x)}</li>`).join("");
+const stars = afb => ({I:"★☆☆",II:"★★☆",III:"★★★"})[afb];
+const isRevealed = i => teacher || solved.has(i) || revealed.has(i);
+const stamp = ok => ok ? `<span class="stamp ok">GELÖST</span>` : `<span class="stamp">OFFEN</span>`;
+
+// ---------- views ----------
+function topbar(){
+  document.getElementById("topbar").innerHTML = teacher
+    ? `<button class="modebtn" data-act="teacheroff">Lehrkraft-Ansicht aktiv · zur Schüleransicht wechseln</button>` : "";
+}
+
+function homeView(){
+  const covers = CASES.map((c,i) => `
+    <button class="folder cover" data-go="case" data-i="${i}">
+      <span class="tab type">Akte ${c.nr}</span>
+      <span class="who">${c.person}</span>
+      <span class="kurz">${c.kurz}</span>
+      <span class="dx">Diagnose: <b>${isRevealed(i) ? c.diagnose : "???"}</b></span>
+      ${stamp(solved.has(i))}
+    </button>`).join("");
+  return `
+  <section class="intro">
+    <h1>Fallakten Kreislauf</h1>
+    <p class="lead">Vier Menschen, vier Notfälle im Kreislaufsystem. Ermittle wie eine Ärztin oder ein Arzt: Was ist im Körper passiert – und wie hätte man es verhindern können?</p>
+    <details class="how"><summary>So gehst du vor</summary>
+      <ol>
+        <li>Öffne eine Akte. Lies die Situation und die Befunde.</li>
+        <li>Überlege, was los ist. Dann deckst du die Diagnose auf.</li>
+        <li>Bearbeite die Ermittlungsaufträge in deinem Heft. ★ ist leicht, ★★★ ist knifflig.</li>
+        <li>Löse den Schnell-Check. Dann bekommt die Akte den Stempel „Gelöst“.</li>
+        <li>Unterstrichene Wörter kannst du antippen. Dann erscheint eine Erklärung.</li>
+      </ol>
+    </details>
+  </section>
+  ${teacher ? teacherPanel() : ""}
+  <div class="grid">
+    ${covers}
+    <button class="folder cover final" data-go="kette">
+      <span class="tab type">Abschluss</span>
+      <span class="who">Die Ermittlungskette</span>
+      <span class="kurz">Wie hängen alle vier Fälle zusammen? Am besten, wenn du mehrere Akten gelöst hast.</span>
+      ${chainChecked === true ? `<span class="stamp ok">GELÖST</span>` : ""}
+    </button>
+  </div>`;
+}
+
+function teacherPanel(){
+  return `
+  <section class="tpanel">
+    <h3>Hinweise für die Lehrkraft</h3>
+    <p><b>Kompetenzbezug</b> (schuleigenes Curriculum, Themenbereich „Herz und Kreislauf“ – Erkrankungen des Kreislaufsystems):</p>
+    <ul>
+      <li>FW (SF) 1.1 Struktur und Funktion: elastische Arterie, Herzkranzgefäße</li>
+      <li>FW (KP) 2.1 Zusammenspiel der Organe: Kreislauf versorgt Herz, Gehirn, Muskeln</li>
+      <li>FW (SE) 4.2 Zellatmung: Akten 02 und 03</li>
+      <li>KK 2 Wirkungspfeile: Ermittlungskette</li>
+      <li>BW 2 kurz- und langfristige Folgen: im Curriculum bei „Ernährung“ verortet, hier als Anknüpfung in den ★★★-Aufträgen</li>
+    </ul>
+    <p><b>Ablaufvorschlag 45 Min.</b> (Annahme: arbeitsteilige Gruppenarbeit mit Tablets)</p>
+    <div class="tscroll"><table>
+      <tr><td>5′</td><td>Einstieg: Notruf-Szenario vorlesen, Vermutungen sammeln</td></tr>
+      <tr><td>18′</td><td>Erarbeitung: 4 Gruppen, je eine Akte (Akte 01 ist sprachlich und inhaltlich am leichtesten)</td></tr>
+      <tr><td>12′</td><td>Expertenrunde: Jede Gruppe stellt ihren Fall vor (Diagnose, Ursache, Vorbeugung)</td></tr>
+      <tr><td>10′</td><td>Sicherung: Ermittlungskette gemeinsam am Smartboard, Übertrag ins Heft</td></tr>
+    </table></div>
+    <p><b>Sensibler Umgang:</b> Manche SuS haben Angehörige mit Herzinfarkt oder Schlaganfall. Die Fälle sind erfunden. Keine Diagnosen über reale Personen stellen lassen. Die Inhalte sind fachlich vereinfacht und keine medizinische Beratung.</p>
+    <p><b>Ansicht:</b> Die Lehrkraft-Ansicht öffnet sich über den Link mit <code>#lehrkraft</code> am Ende und bleibt auf diesem Gerät aktiv, bis du oben zur Schüleransicht wechselst. Erwartungshorizonte sind nur hier sichtbar. Sie sind nicht geschützt: Wer den Link kennt, sieht sie.</p>
+  </section>`;
+}
+
+function vizHtml(c){
+  if(c.viz === "druck"){
+    const row = (lab, s, d, hi) => `
+      <div class="g-row ${hi?"hi":""}"><span class="g-lab">${lab}</span>
+        <div><div class="g-bar sys" style="width:${s/2}%">${s}</div><div class="g-bar dia" style="width:${d/2}%">${d}</div></div></div>`;
+    return `<div class="viz"><p class="viz-t">Blutdruck im Vergleich (in mmHg)</p>
+      ${row("Grenze für Bluthochdruck",140,90,false)}
+      ${row("Herr Kaya",165,100,true)}
+      <p class="legend">Oberer Balken: Herz pumpt. Unterer Balken: Herz entspannt sich.</p></div>`;
+  }
+  if(c.viz === "gefaess"){
+    return `<div class="viz"><p class="viz-t">Querschnitt durch eine Arterie</p>
+      <div class="vessel-wrap">
+        <svg viewBox="0 0 200 200" role="img" aria-label="Querschnitt einer Arterie mit Ablagerungen">
+          <circle cx="100" cy="100" r="86" fill="var(--vessel)" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="100" cy="100" r="62" fill="var(--plaque)"/>
+          <circle id="lumen" cx="100" cy="100" r="62" fill="var(--blood)"/>
+          <g id="cells" fill="#f6c1b8" opacity=".85">
+            <circle cx="85" cy="90" r="6"/><circle cx="112" cy="108" r="6"/><circle cx="104" cy="84" r="5"/>
+          </g>
+        </svg>
+        <div class="vessel-ctrl">
+          <label for="pl"><b>Ablagerung (Plaque)</b></label>
+          <input id="pl" type="range" min="0" max="100" value="${plaque}" data-act="plaque">
+          <p class="small" style="margin:0">Blutfluss (vereinfacht)</p>
+          <div class="meter"><span id="flow"></span></div>
+          <p id="vstat" style="margin:0"></p>
+          <p class="legend" style="margin-top:8px">Rosa: Gefäßwand · Gelb: Ablagerung · Rot: Blut</p>
+        </div>
+      </div></div>`;
+  }
+  if(c.viz === "herz"){
+    return `<div class="viz heart"><p class="viz-t">Das Herz von außen (stark vereinfacht)</p>
+      <svg id="hz" class="${heartBlocked?"blocked":""}" viewBox="0 0 240 250" role="img" aria-label="Herz mit Herzkranzgefäßen">
+        <path d="M108 70 C108 40 114 22 140 18 L182 18 L182 38 L146 38 C134 38 130 50 130 70" fill="var(--vessel)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M78 66 C44 86 38 150 76 192 C104 222 152 236 174 210 C204 176 206 116 182 80 C160 48 108 44 78 66 Z" fill="var(--muscle)" stroke="var(--ink)" stroke-width="2"/>
+        <path class="zone" d="M128 118 C150 118 176 140 176 176 C172 204 150 216 132 210 C118 196 116 150 128 118 Z" fill="var(--dead)"/>
+        <path d="M120 70 C112 80 76 96 72 150" fill="none" stroke="#f3d1c8" stroke-width="5" stroke-linecap="round"/>
+        <path d="M120 70 C124 86 124 100 124 112" fill="none" stroke="#f3d1c8" stroke-width="5" stroke-linecap="round"/>
+        <path class="down" d="M124 112 C126 140 136 170 150 200" fill="none" stroke="#f3d1c8" stroke-width="5" stroke-linecap="round"/>
+        <circle class="clot" cx="124" cy="112" r="8" fill="#5a1610" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="8" y="235" font-size="12" fill="var(--ink)">Helle Linien: Herzkranzgefäße</text>
+        <text class="lbl-v" x="138" y="104" font-size="12" fill="var(--ink)">Verschluss</text>
+        <text class="lbl-v" x="150" y="232" font-size="12" fill="var(--ink)">ohne Sauerstoff</text>
+      </svg>
+      <div class="row" style="justify-content:center">
+        <button class="btn primary" data-act="heart">${heartBlocked ? "Gefäß wieder öffnen" : "Blutgerinnsel einsetzen"}</button>
+      </div>
+      <p class="small" style="text-align:center;margin-top:8px">${heartBlocked ? "Grau: Dieser Teil des Herzmuskels bekommt kein Blut mehr." : "Tippe, um zu sehen, was beim Verschluss passiert."}</p>
+    </div>`;
+  }
+  if(c.viz === "fast"){
+    return `<div class="alarm" style="margin-top:6px"><span class="num">112</span>
+      <h4>Der FAST-Test – so hat Mia geprüft</h4>
+      <p class="small" style="margin-bottom:4px">Tippe die Karten an.</p>
+      <div class="fast" style="clear:both">${FAST.map((f,k) => `
+        <button class="fcard ${fastOpen.has(k)?"open":""}" data-act="fast" data-k="${k}" aria-expanded="${fastOpen.has(k)}">
+          <span class="L">${f.L}</span><span class="w">${f.w}</span>
+          ${fastOpen.has(k) ? `<span class="d">${f.d}</span>` : ""}
+        </button>`).join("")}</div></div>`;
+  }
+  return "";
+}
+
+function extraHtml(c){
+  if(c.extra !== "herzalarm") return "";
+  return `<section class="sec"><div class="alarm"><span class="num">112</span>
+    <h4>Herzinfarkt: Warnzeichen erkennen</h4>
+    <ul>
+      <li>starker Druck, Enge oder Brennen in der Brust, länger als 5 Minuten</li>
+      <li>Schmerz zieht in Arme, Hals, Kiefer, Rücken oder Oberbauch</li>
+      <li>Atemnot, Übelkeit, kalter Schweiß, Angst</li>
+      <li>Bei Frauen oft weniger typisch: eher Übelkeit, Atemnot oder Rückenschmerzen</li>
+    </ul>
+    <h4>Sofort handeln</h4>
+    <ul style="margin-bottom:0">
+      <li>112 anrufen – sofort!</li>
+      <li>Person beruhigen, nicht allein lassen</li>
+      <li>Oberkörper hoch lagern, enge Kleidung öffnen</li>
+      <li>Ist die Person bewusstlos und atmet nicht normal: Herzdruckmassage beginnen</li>
+    </ul></div></section>`;
+}
+
+function caseView(i){
+  const c = CASES[i];
+  const rev = isRevealed(i);
+  const a = answers[i] || {};
+  const tasks = c.aufgaben.map(t => `
+    <div class="task">
+      <span class="lvl" aria-label="Schwierigkeit">${stars(t.afb)}</span>${teacher ? `<span class="afb">AFB ${t.afb}</span>` : ""}
+      <p><b>${t.op}</b> ${T(t.text)}</p>
+      <details class="tipp"><summary>Tipp</summary><p>${t.tipp}</p></details>
+      ${teacher ? `<div class="teach"><b>Erwartungshorizont</b>${t.eh}</div>` : ""}
+    </div>`).join("");
+  const quiz = c.quiz.map((q,qi) => {
+    const sel = a[qi];
+    const opts = q.o.map((o,oi) => {
+      let cls = "";
+      if(sel === oi) cls = oi === q.c ? "right" : "wrong";
+      return `<button class="opt ${cls}" data-act="ans" data-i="${i}" data-q="${qi}" data-o="${oi}">${o}</button>`;
+    }).join("");
+    const fb = sel === undefined ? "" :
+      (sel === q.c ? `<p class="fb ok">Richtig! ${q.w}</p>` : `<p class="fb no">Noch nicht. Lies noch einmal nach und versuch es erneut.</p>`);
+    return `<div class="q"><p><b>${qi+1}.</b> ${q.q}</p>${opts}${fb}</div>`;
+  }).join("");
+
+  const rest = rev ? `
+    <section class="sec"><h3>Was passiert im Körper?</h3>${paras(c.koerper)}${vizHtml(c)}</section>
+    ${extraHtml(c)}
+    <section class="sec"><h3>Ursachen, Folgen, Vorbeugung</h3>
+      <div class="ufv">
+        <div class="box"><h4>Risikofaktoren</h4><ul>${li(c.ursachen)}</ul></div>
+        <div class="box"><h4>Mögliche Folgen</h4><ul>${li(c.folgen)}</ul></div>
+        <div class="box"><h4>Vorbeugung</h4><ul>${li(c.vorbeugung)}</ul></div>
+      </div></section>
+    <section class="sec"><h3>Ermittlungsaufträge</h3><p class="small">Bearbeite die Aufträge in deinem Heft.</p>${tasks}</section>
+    <section class="sec"><h3>Schnell-Check</h3>${quiz}
+      ${solved.has(i) ? `<div class="solvedmsg">${stamp(true)}<span>Akte gelöst. Stark ermittelt!</span></div>` : ""}
+    </section>
+    ${teacher ? `<section class="sec"><div class="teach"><b>Fachlicher Hinweis</b>${c.lehrkraft}</div></section>` : ""}
+  ` : `<section class="sec"><p class="gate">Die weiteren Seiten der Akte öffnen sich, wenn du die Diagnose aufdeckst.</p></section>`;
+
+  const prev = i > 0 ? `<button class="btn" data-go="case" data-i="${i-1}">← Akte ${CASES[i-1].nr}</button>` : `<span></span>`;
+  const next = i < CASES.length-1 ? `<button class="btn" data-go="case" data-i="${i+1}">Akte ${CASES[i+1].nr} →</button>` : `<button class="btn" data-go="kette">Zur Ermittlungskette →</button>`;
+
+  return `
+  <button class="back" data-go="home">← Alle Akten</button>
+  <article class="folder case">
+    <span class="tab type">Akte ${c.nr}</span>
+    <header class="sec head"><h2>${c.person}</h2>${stamp(solved.has(i))}</header>
+    <section class="sec"><h3>Die Situation</h3>${paras(c.situation)}</section>
+    <section class="sec"><h3>Befunde</h3><div class="paper"><ul class="befund">${li(c.befunde)}</ul></div></section>
+    <section class="sec"><h3>Diagnose</h3>
+      ${rev ? `<p class="dx-big">${c.diagnose}</p><p>${c.diagnoseText}</p>`
+            : `<p>Was vermutest du? Besprich es kurz mit deiner Nachbarin oder deinem Nachbarn.</p>
+               <button class="btn primary" data-act="reveal" data-i="${i}">Diagnose aufdecken</button>`}
+    </section>
+    ${rest}
+  </article>
+  <nav class="pager">${prev}${next}</nav>`;
+}
+
+function chainView(){
+  const pool = POOL_ORDER.filter(id => !chainPick.includes(id)).map(id => CHAIN.find(x => x.id === id));
+  const slots = [0,1,2,3].map(k => {
+    const id = chainPick[k];
+    const item = id ? CHAIN.find(x => x.id === id) : null;
+    const s = item
+      ? `<button class="slot filled" data-act="unpick" data-k="${k}"><span class="n">${k+1}</span>${item.t}</button>`
+      : `<div class="slot"><span class="n">${k+1}</span><span class="small">frei</span></div>`;
+    return `<li>${s}</li>${k<3 ? `<li class="arrow" aria-hidden="true">↓</li>` : ""}`;
+  }).join("");
+  let result = "";
+  if(chainChecked === true){
+    result = `<div class="result paper">
+      <p><span class="stamp ok">GELÖST</span></p>
+      <p><b>Richtig ermittelt!</b> So hängen die vier Fälle zusammen. Die gute Nachricht: Die Kette lässt sich an jeder Stelle unterbrechen – mit Bewegung, gesunder Ernährung und Nichtrauchen.</p>
+      <p class="small">Vereinfacht: In Wirklichkeit schaden Rauchen und Co. den Gefäßen auch direkt. Und Bluthochdruck und Arteriosklerose verstärken sich gegenseitig.</p>
+      <p><b>Auftrag ★★:</b> Zeichne die Kette mit Pfeilen in dein Heft. Markiere mit einem roten Strich, wo man sie unterbrechen kann. Schreibe dazu, wie.</p>
+      ${teacher ? `<div class="teach"><b>Erwartungshorizont</b>Kette mit Wirkungspfeilen (KK 2). Unterbrechungspunkte z. B.: Bewegung und salzarme Ernährung senken den Blutdruck; Nichtrauchen und fettarme Ernährung bremsen Ablagerungen; Blutdruck behandeln lassen. Erweiterung: Rückkopplungspfeil zwischen Bluthochdruck und Arteriosklerose diskutieren.</div>` : ""}
+    </div>`;
+  } else if(chainChecked === false){
+    result = `<p class="fb no result">Noch nicht ganz. Tipp: Was kommt zuerst – die Ursache im Alltag oder der Schaden im Gefäß? Tippe eine Karte an, um sie zurückzulegen.</p>`;
+  }
+  return `
+  <button class="back" data-go="home">← Alle Akten</button>
+  <article class="folder case">
+    <span class="tab type">Abschluss</span>
+    <header class="sec head"><h2>Die Ermittlungskette</h2></header>
+    <section class="sec">
+      <p>Alle vier Fälle hängen zusammen. Bringe die Karten in die richtige Reihenfolge: Tippe sie nacheinander an. Tippe auf ein belegtes Feld, um die Karte zurückzulegen.</p>
+      <ol class="chain">${slots}</ol>
+      ${pool.length ? `<div class="pool">${pool.map(x => `<button class="card" data-act="pick" data-id="${x.id}">${x.t}</button>`).join("")}</div>` : ""}
+      <div class="row">
+        <button class="btn primary" data-act="check" ${chainPick.length<4?"disabled":""}>Reihenfolge prüfen</button>
+        <button class="btn" data-act="reset">Neu beginnen</button>
+      </div>
+      ${result}
+    </section>
+  </article>
+  <nav class="pager"><button class="btn" data-go="case" data-i="${CASES.length-1}">← Akte ${CASES[CASES.length-1].nr}</button><button class="btn" data-go="home">Alle Akten</button></nav>`;
+}
+
+// ---------- render ----------
+function render(scrollTop){
+  topbar();
+  const app = document.getElementById("app");
+  if(view.name === "case") app.innerHTML = caseView(view.i);
+  else if(view.name === "kette") app.innerHTML = chainView();
+  else app.innerHTML = homeView();
+  updateVessel();
+  if(scrollTop) window.scrollTo(0,0);
+}
+
+function updateVessel(){
+  const lumen = document.getElementById("lumen");
+  if(!lumen) return;
+  const p = plaque/100;
+  const r = 62 - 50*p;
+  lumen.setAttribute("r", r.toFixed(1));
+  const cells = document.getElementById("cells");
+  if(cells) cells.setAttribute("transform", `translate(100 100) scale(${(r/62).toFixed(3)}) translate(-100 -100)`);
+  const flow = document.getElementById("flow");
+  if(flow) flow.style.width = (Math.pow(r/62,2)*100).toFixed(0) + "%";
+  const st = document.getElementById("vstat");
+  if(st){
+    st.textContent = p < .2 ? "Gesund: Das Blut fließt ungehindert."
+      : p < .5 ? "Leicht verengt: Es fließt etwas weniger Blut."
+      : p < .8 ? "Stark verengt: In Ruhe reicht das Blut noch – beim Gehen nicht mehr."
+      : "Fast verschlossen: Selbst in Ruhe kommt zu wenig Blut an.";
+  }
+}
+
+// ---------- glossary sheet ----------
+function openSheet(k){
+  document.getElementById("gs-t").textContent = k;
+  document.getElementById("gs-d").textContent = GLOSSAR[k] || "";
+  document.getElementById("gsheet").classList.add("open");
+  document.getElementById("sheetback").classList.add("open");
+}
+function closeSheet(){
+  document.getElementById("gsheet").classList.remove("open");
+  document.getElementById("sheetback").classList.remove("open");
+}
+
+// ---------- events ----------
+document.addEventListener("click", e => {
+  const go = e.target.closest("[data-go]");
+  if(go){
+    const name = go.dataset.go;
+    view = name === "case" ? {name, i:+go.dataset.i} : {name};
+    render(true); return;
+  }
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act;
+  if(act === "term"){ openSheet(el.dataset.k); return; }
+  if(act === "closesheet"){ closeSheet(); return; }
+  if(act === "teacheroff"){
+    teacher = false;
+    try{ localStorage.removeItem("fk-teacher"); }catch(err){}
+    if(location.hash === "#lehrkraft") history.replaceState(null, "", location.pathname + location.search);
+    render(false); return;
+  }
+  if(act === "reveal"){ revealed.add(+el.dataset.i); render(false); return; }
+  if(act === "ans"){
+    const i = +el.dataset.i, q = +el.dataset.q, o = +el.dataset.o;
+    answers[i] = answers[i] || {};
+    answers[i][q] = o;
+    if(CASES[i].quiz.every((qq,qi) => answers[i][qi] === qq.c)){ solved.add(i); saveSolved(); }
+    render(false); return;
+  }
+  if(act === "fast"){ const k = +el.dataset.k; fastOpen.has(k) ? fastOpen.delete(k) : fastOpen.add(k); render(false); return; }
+  if(act === "heart"){ heartBlocked = !heartBlocked; render(false); return; }
+  if(act === "pick"){ if(chainPick.length < 4){ chainPick.push(el.dataset.id); chainChecked = null; } render(false); return; }
+  if(act === "unpick"){ chainPick.splice(+el.dataset.k, 1); chainChecked = null; render(false); return; }
+  if(act === "check"){ chainChecked = chainPick.join("") === "abcd"; render(false); return; }
+  if(act === "reset"){ chainPick = []; chainChecked = null; render(false); return; }
+});
+document.addEventListener("input", e => {
+  if(e.target.dataset && e.target.dataset.act === "plaque"){ plaque = +e.target.value; updateVessel(); }
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet(); });
+window.addEventListener("hashchange", () => {
+  if(location.hash === "#lehrkraft"){ teacher = true; try{ localStorage.setItem("fk-teacher","1"); }catch(e){} render(false); }
+});
+
+load();
+render(false);
+</script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#EEF2F7;--surface:#FFFFFF;--ink:#16202F;--muted:#556070;--line:#D5DCE6;--accent:#13294B;--accent-ink:#FFFFFF;--yellow:#F2C230;--yellow-ink:#13294B;--bone:#F1EAD8;--boneline:#13294B;--ok:#1F7A4D;--okbg:#DDF2E6;--bad:#A3261B;--badbg:#FBE3E0;--focus:#C98F00;--mem:rgba(19,41,75,.10);--c1:#2F6DB5;--c2:#D99A00;--c3:#5E9A35;--c4:#C2475A;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:18px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.12;margin:0}
+h1{font-weight:800;font-size:clamp(28px,6.4vw,42px);letter-spacing:-.01em}
+h2{font-weight:800;font-size:clamp(22px,4.6vw,27px);margin:36px 0 8px}
+h3{font-weight:700;font-size:20px}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:4px 0 16px}
+.lead{max-width:64ch}
+.btn{font:inherit;font-weight:700;border:2px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:10px;padding:9px 16px;cursor:pointer;min-height:46px;touch-action:manipulation}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.okb{background:var(--okbg);border-color:var(--ok);color:var(--ink);opacity:1}
+.btn.badb{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.fb{border-radius:10px;padding:10px 14px;margin-top:12px;border-left:6px solid var(--line);background:var(--surface)}
+.fb.ok{background:var(--okbg);border-left-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-left-color:var(--bad)}
+.muted{color:var(--muted)}
+footer{margin-top:44px;color:var(--muted);font-size:15px;max-width:64ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<title>Skelettvergleich Mensch und Säugetiere – Biologie Klasse 6</title>
+<style>
+.tabs{margin:14px 0 12px}
+.limb{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:680px){.limb{grid-template-columns:minmax(0,1fr)}}
+.figbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px}
+#limb{width:100%;height:auto;max-height:62vh;display:block;touch-action:manipulation}
+#limb .p{stroke:var(--boneline);stroke-width:1.4;cursor:pointer}
+#limb .p1{fill:var(--c1)} #limb .p2{fill:var(--c2)} #limb .p3{fill:var(--c3)} #limb .p4{fill:var(--c4)}
+#limb .mem{fill:var(--mem);stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3}
+#limb .hit{fill:transparent;stroke:none;pointer-events:all}
+#limb g.on .p{stroke:var(--focus);stroke-width:3}
+.legend{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px}
+.legend button{font:inherit;width:100%;text-align:left;display:flex;gap:10px;align-items:center;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;min-height:44px}
+.legend button[aria-pressed="true"]{border:2px solid var(--focus);font-weight:700}
+.sw{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--boneline);flex:none}
+.use{font-size:20px;font-weight:700;margin:0}
+table.k{border-collapse:collapse;width:100%;min-width:560px}
+.tw{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+table.k th,table.k td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.k thead th{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;font-size:18px}
+table.k tr:last-child td,table.k tr:last-child th{border-bottom:0}
+table.k select{font:inherit;font-size:16px;width:100%;padding:8px;border:2px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+table.k select.ok{border-color:var(--ok);background:var(--okbg)}
+table.k select.bad{border-color:var(--bad);background:var(--badbg)}
+.sr{position:absolute;left:-9999px}
+.choice{display:grid;gap:8px;margin-top:10px}
+.choice .btn{text-align:left;font-weight:400}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <h1>Gleiche Knochen, andere Aufgaben</h1>
+  <p class="sub">Biologie Klasse 6: Der Mensch, ein Wirbeltier</p>
+  <p class="lead">Mensch, Hund, Pferd, Fledermaus und Delfin sind Säugetiere. Vergleiche die Knochen ihrer Vordergliedmaßen. Gleiche Farbe bedeutet: gleicher Knochenabschnitt.</p>
+
+  <div class="row tabs" role="group" aria-label="Lebewesen wählen" id="tabs"></div>
+  <div class="limb">
+    <div class="figbox"><svg id="limb" viewBox="0 0 360 400" role="img" aria-labelledby="limb-t"><title id="limb-t">Vordergliedmaße</title></svg></div>
+    <div>
+      <p class="use" id="use"></p>
+      <p id="txt"></p>
+      <ul class="legend" id="legend"></ul>
+      <p class="muted" id="tapinfo" aria-live="polite">Tippe auf einen farbigen Knochen oder auf die Legende.</p>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>Aufgabe 1</h3>
+    <p>Sieh dir alle fünf Lebewesen an. Beschreibe, was bei allen gleich ist und was sich unterscheidet.</p>
+    <button class="btn" id="eh1" aria-expanded="false">Lösung zeigen</button>
+    <div class="fb" id="eh1t" hidden>Gleich: Alle haben einen Oberarmknochen, zwei Unterarmknochen (Elle und Speiche), Handwurzelknochen sowie Mittelhand- und Fingerknochen, immer in dieser Reihenfolge. Unterschiedlich: Länge, Dicke und Anzahl der Knochen. Beim Pferd sind die Elle und mehrere Finger zurückgebildet, bei der Fledermaus sind die Finger sehr lang.</div>
+  </div>
+
+  <h2>Mensch, Hund und Pferd im Vergleich</h2>
+  <p class="lead">Ordne nach den vorgegebenen Kriterien. Wähle in jeder Zelle die passende Antwort aus und prüfe dann.</p>
+  <div class="tw"><table class="k" id="tab"></table></div>
+  <div class="row" style="margin-top:12px"><button class="btn primary" id="chk">Prüfen</button><button class="btn" id="rst">Zurücksetzen</button></div>
+  <div id="tabfb" aria-live="polite"></div>
+
+  <h2>Wie lässt sich die Ähnlichkeit erklären?</h2>
+  <p class="lead">Die Tiere nutzen ihre Vordergliedmaßen für ganz verschiedene Aufgaben: greifen, laufen, rennen, fliegen, schwimmen. Trotzdem haben alle die gleichen Knochen in der gleichen Reihenfolge. Welche Erklärung passt?</p>
+  <div class="choice" id="why"></div>
+  <div id="whyfb" aria-live="polite"></div>
+
+  <footer>Schematische Zeichnungen, nicht maßstabsgetreu. Die Gliedmaßen sind unterschiedlich stark vergrößert, damit alle gleich groß erscheinen.</footer>
+</div>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("limb");
+const PARTS = {1:"Oberarmknochen", 2:"Elle und Speiche", 3:"Handwurzelknochen", 4:"Mittelhand- und Fingerknochen"};
+function mk(tag, at, par){ const e = document.createElementNS(NS, tag); for(const k in at) e.setAttribute(k, at[k]); par.appendChild(e); return e; }
+function seg(g, x1, y1, x2, y2, w){
+  const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
+  mk("rect", {x:-len / 2, y:-w / 2, width:len, height:w, rx:Math.min(w / 2, 6), class:"p", transform:`translate(${(x1 + x2) / 2} ${(y1 + y2) / 2}) rotate(${ang})`}, g);
+}
+function dot(g, x, y, r){ mk("circle", {cx:x, cy:y, r, class:"p"}, g); }
+function chain(g, x, y, dx, dy, n, w, shrink){ for(let i = 0; i < n; i++){ const x2 = x + dx, y2 = y + dy; seg(g, x, y, x2, y2, w); x = x2 + dx * 0.18; y = y2 + dy * 0.18; w = w * (shrink || 1); } }
+let parts = {};
+function P(n){ if(!parts[n]){ parts[n] = mk("g", {class:"part", "data-p":n}, svg); } return parts[n]; }
+
+const SPECIES = [
+  {id:"mensch", n:"Mensch", use:"Arm: greifen, tragen, werfen", t:"Der Daumen kann den anderen Fingern gegenübergestellt werden. So kann der Mensch gut greifen.", draw(){
+    const g1 = P(1), g2 = P(2), g3 = P(3), g4 = P(4);
+    seg(g1, 180, 24, 180, 140, 15);
+    seg(g2, 168, 150, 164, 250, 9); seg(g2, 192, 148, 190, 252, 9);
+    for(let r = 0; r < 2; r++) for(let c = 0; c < 4; c++) dot(g3, 160 + c * 13, 266 + r * 12, 6);
+    const off = [0, 6, 3, -6];
+    [162, 174, 186, 198].forEach((x, j) => { seg(g4, x, 288, x + (j - 1.5) * 2, 330, 5.5); chain(g4, x + (j - 1.5) * 2.4, 336, (j - 1.5) * 0.8, 15 + off[j] / 3, 3, 5, 0.9); });
+    seg(g4, 152, 282, 136, 312, 6); seg(g4, 134, 317, 125, 335, 5); seg(g4, 123, 340, 117, 353, 4.5);
+  }},
+  {id:"hund", n:"Hund", use:"Vorderbein: laufen", t:"Der Hund läuft auf den Zehen. Er ist ein Zehengänger. Die erste Zehe ist klein und berührt den Boden nicht.", draw(){
+    const g1 = P(1), g2 = P(2), g3 = P(3), g4 = P(4);
+    seg(g1, 180, 24, 186, 120, 16);
+    seg(g2, 176, 130, 176, 250, 10); seg(g2, 193, 124, 190, 250, 8);
+    for(let r = 0; r < 2; r++) for(let c = 0; c < 4; c++) dot(g3, 165 + c * 12, 263 + r * 12, 5.5);
+    [168, 178, 188, 198].forEach(x => { seg(g4, x, 288, x, 338, 6); seg(g4, x, 344, x - 10, 356, 5.5); seg(g4, x - 13, 359, x - 23, 364, 5); seg(g4, x - 26, 366, x - 33, 370, 3.5); });
+    seg(g4, 160, 286, 152, 304, 5); seg(g4, 150, 308, 145, 320, 4);
+  }},
+  {id:"pferd", n:"Pferd", use:"Vorderbein: schnell rennen", t:"Das Pferd läuft auf der Spitze einer einzigen Zehe. Es ist ein Zehenspitzengänger. Der Huf umschließt das letzte Zehenglied. Die Elle und zwei Mittelhandknochen (Griffelbeine) sind stark zurückgebildet.", draw(){
+    mk("path", {d:"M158,368 L206,368 L216,396 L148,396 Z", class:"mem"}, svg);
+    const g1 = P(1), g2 = P(2), g3 = P(3), g4 = P(4);
+    seg(g1, 180, 20, 184, 88, 18);
+    seg(g2, 180, 98, 180, 212, 13); seg(g2, 198, 96, 194, 140, 6);
+    for(let r = 0; r < 2; r++) for(let c = 0; c < 4; c++) dot(g3, 166 + c * 9.5, 224 + r * 12, 6);
+    seg(g4, 180, 252, 180, 330, 12); seg(g4, 166, 252, 168, 300, 4); seg(g4, 194, 252, 192, 300, 4);
+    seg(g4, 180, 336, 182, 356, 11); seg(g4, 182, 360, 183, 372, 11);
+    mk("path", {d:"M168,377 L198,377 L205,392 L162,392 Z", class:"p"}, g4);
+  }},
+  {id:"fledermaus", n:"Fledermaus", use:"Flügel: fliegen", t:"Mittelhand- und Fingerknochen sind sehr lang. Zwischen ihnen ist die Flughaut gespannt. Der Daumen ist kurz und hat eine Kralle.", draw(){
+    mk("path", {d:"M30,90 L110,140 L222,108 L334,72 L342,150 L318,240 L252,298 Q150,262 36,286 Z", class:"mem"}, svg);
+    const g1 = P(1), g2 = P(2), g3 = P(3), g4 = P(4);
+    seg(g1, 30, 90, 110, 140, 9);
+    seg(g2, 116, 140, 222, 108, 7); seg(g2, 120, 150, 152, 141, 3.5);
+    dot(g3, 226, 101, 5); dot(g3, 235, 108, 5); dot(g3, 238, 98, 5);
+    seg(g4, 239, 94, 248, 78, 4); seg(g4, 249, 74, 254, 65, 2.5);
+    [[300,84,334,72],[300,124,342,150],[284,178,318,240],[262,200,252,298]].forEach(([mx, my, tx, ty]) => {
+      seg(g4, 240, 107, mx, my, 4);
+      const hx = (mx + tx) / 2, hy = (my + ty) / 2;
+      seg(g4, mx, my, hx, hy, 3); seg(g4, hx, hy, tx, ty, 2.6);
+    });
+  }},
+  {id:"delfin", n:"Delfin", use:"Brustflosse: steuern beim Schwimmen", t:"Die Knochen sind kurz und flach. Einige Finger haben besonders viele Glieder. Alles liegt in einer festen Flosse.", draw(){
+    mk("path", {d:"M142,30 C118,120 126,250 160,352 C168,366 180,364 186,344 C206,270 220,170 216,30 Z", class:"mem"}, svg);
+    const g1 = P(1), g2 = P(2), g3 = P(3), g4 = P(4);
+    seg(g1, 178, 40, 178, 92, 26);
+    seg(g2, 164, 104, 162, 150, 16); seg(g2, 192, 104, 194, 150, 16);
+    for(let r = 0; r < 2; r++) for(let c = 0; c < 3; c++) dot(g3, 160 + c * 17, 168 + r * 16, 7.5);
+    chain(g4, 150, 196, -1.5, 13, 2, 8, 0.9);
+    chain(g4, 163, 196, -0.5, 14, 8, 8, 0.93);
+    chain(g4, 178, 196, 0.3, 14, 7, 8, 0.93);
+    chain(g4, 192, 196, 1, 13, 4, 7.5, 0.9);
+    chain(g4, 205, 196, 1.6, 12, 2, 7, 0.9);
+  }}
+];
+
+const tabs = document.getElementById("tabs"), legend = document.getElementById("legend"), info = document.getElementById("tapinfo");
+let cur = "mensch", hl = null;
+tabs.innerHTML = SPECIES.map(s => `<button class="btn" data-s="${s.id}" aria-pressed="false">${s.n}</button>`).join("");
+legend.innerHTML = [1,2,3,4].map(n => `<li><button data-l="${n}" aria-pressed="false"><span class="sw" style="background:var(--c${n})"></span>${PARTS[n]}</button></li>`).join("");
+function show(id){
+  cur = id; hl = null;
+  const s = SPECIES.find(x => x.id === id);
+  [...svg.querySelectorAll(":scope > :not(title)")].forEach(e => e.remove());
+  parts = {}; s.draw();
+  for(const n in parts){ parts[n].querySelectorAll(".p").forEach(e => e.classList.add("p" + n)); }
+  document.getElementById("limb-t").textContent = "Vordergliedmaße: " + s.n;
+  document.getElementById("use").textContent = s.n + " – " + s.use;
+  document.getElementById("txt").textContent = s.t;
+  tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.s === id)));
+  highlight(null);
+}
+function highlight(n){
+  hl = n;
+  for(const k in parts) parts[k].classList.toggle("on", String(k) === String(n));
+  legend.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.l === String(n))));
+  const s = SPECIES.find(x => x.id === cur);
+  info.textContent = n ? s.n + ": " + PARTS[n] : "Tippe auf einen farbigen Knochen oder auf die Legende.";
+}
+tabs.addEventListener("click", e => { const b = e.target.closest("button"); if(b) show(b.dataset.s); });
+legend.addEventListener("click", e => { const b = e.target.closest("button"); if(b) highlight(hl === b.dataset.l ? null : b.dataset.l); });
+svg.addEventListener("click", e => { const g = e.target.closest(".part"); if(g) highlight(g.dataset.p); });
+show("mensch");
+
+document.getElementById("eh1").addEventListener("click", e => { const t = document.getElementById("eh1t"); t.hidden = !t.hidden; e.currentTarget.setAttribute("aria-expanded", String(!t.hidden)); e.currentTarget.textContent = t.hidden ? "Lösung zeigen" : "Lösung ausblenden"; });
+
+/* Tabelle */
+const ROWS = [
+  {k:"Fußhaltung beim Gehen", o:["Sohlengänger","Zehengänger","Zehenspitzengänger"], a:["Sohlengänger","Zehengänger","Zehenspitzengänger"]},
+  {k:"Form der Wirbelsäule", o:["doppelt S-förmig","bogenförmig wie eine Brücke"], a:["doppelt S-förmig","bogenförmig wie eine Brücke","bogenförmig wie eine Brücke"]},
+  {k:"Form des Beckens", o:["breit und schüsselförmig","schmal und länglich"], a:["breit und schüsselförmig","schmal und länglich","schmal und länglich"]},
+  {k:"Fortbewegung", o:["auf zwei Beinen, aufrecht","auf vier Beinen"], a:["auf zwei Beinen, aufrecht","auf vier Beinen","auf vier Beinen"]},
+  {k:"Schwanz", o:["nur Steißbein aus wenigen kleinen Wirbeln","Schwanz mit vielen Wirbeln"], a:["nur Steißbein aus wenigen kleinen Wirbeln","Schwanz mit vielen Wirbeln","Schwanz mit vielen Wirbeln"]}
+];
+const TIERE = ["Mensch","Hund","Pferd"];
+const tab = document.getElementById("tab");
+function buildTable(){
+  tab.innerHTML = `<thead><tr><th scope="col">Kriterium</th>` + TIERE.map(t => `<th scope="col">${t}</th>`).join("") + `</tr></thead><tbody>` +
+    ROWS.map((r, i) => `<tr><th scope="row">${r.k}</th>` + TIERE.map((t, j) => `<td><label class="sr" for="s${i}${j}">${r.k}, ${t}</label><select id="s${i}${j}" data-i="${i}" data-j="${j}"><option value="">bitte wählen</option>${r.o.map(o => `<option>${o}</option>`).join("")}</select></td>`).join("") + `</tr>`).join("") + `</tbody>`;
+  document.getElementById("tabfb").innerHTML = "";
+}
+buildTable();
+tab.addEventListener("change", e => e.target.classList.remove("ok","bad"));
+document.getElementById("chk").addEventListener("click", () => {
+  let ok = 0, empty = 0;
+  tab.querySelectorAll("select").forEach(s => {
+    s.classList.remove("ok","bad");
+    if(!s.value){ empty++; return; }
+    const right = ROWS[s.dataset.i].a[s.dataset.j] === s.value;
+    s.classList.add(right ? "ok" : "bad"); if(right) ok++;
+  });
+  const total = ROWS.length * TIERE.length;
+  const box = document.getElementById("tabfb");
+  box.innerHTML = `<div class="fb ${ok === total ? "ok" : "bad"}">${ok} von ${total} richtig.${empty ? " " + empty + " Zellen sind noch leer." : ""}${ok === total ? " Der Mensch unterscheidet sich vor allem durch den aufrechten Gang auf zwei Beinen." : " Rot markierte Zellen noch einmal prüfen."}</div>`;
+});
+document.getElementById("rst").addEventListener("click", buildTable);
+
+/* Deutung */
+const WHY = [
+  {t:"Die Tiere stammen von gemeinsamen Vorfahren ab. Sie sind miteinander verwandt.", ok:true, f:"Richtig. Man spricht von stammesgeschichtlicher Verwandtschaft. Im Laufe sehr langer Zeit haben sich die gleichen Knochen an verschiedene Aufgaben angepasst."},
+  {t:"Die Tiere brauchen ihre Vordergliedmaßen für die gleiche Aufgabe.", ok:false, f:"Nein. Die Aufgaben sind ganz verschieden: greifen, laufen, rennen, fliegen und schwimmen. Trotzdem sind die Knochen gleich aufgebaut."},
+  {t:"Die Ähnlichkeit ist zufällig entstanden.", ok:false, f:"Unwahrscheinlich. Bei so vielen gleichen Knochen in der gleichen Reihenfolge ist Zufall keine gute Erklärung."}
+];
+const why = document.getElementById("why");
+why.innerHTML = WHY.map((w, i) => `<button class="btn" data-w="${i}">${w.t}</button>`).join("");
+why.addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  const w = WHY[b.dataset.w];
+  why.querySelectorAll("button").forEach(x => x.classList.remove("okb","badb"));
+  b.classList.add(w.ok ? "okb" : "badb");
+  document.getElementById("whyfb").innerHTML = `<div class="fb ${w.ok ? "ok" : "bad"}">${w.f}</div>`;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gentechnik: Pro und Contra abwägen</title>
+<meta name="description" content="Bewertungsmatrix zur Gentechnik: Argumente sortieren, gewichten und ein begründetes Urteil schreiben. Biologie.">
+<style>
+:root{
+  --bg:#EDF0F6; --surface:#FFFFFF; --surface-2:#F3F5FA; --ink:#151B2B; --ink-soft:#505B75; --line:#C8D0E0;
+  --pro:#1D4ED8; --pro-bg:#E4ECFF; --con:#B93C0C; --con-bg:#FFEADC;
+  --good:#17693B; --good-bg:#DCF1E4; --near:#7A4F00; --near-bg:#FFEFC7; --bad:#A3241B; --bad-bg:#FBE0DC;
+  --focus:#0B57D0;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1420; --surface:#181F30; --surface-2:#1F273B; --ink:#E8ECF6; --ink-soft:#A3AEC8; --line:#2D3753;
+    --pro:#8FB2FF; --pro-bg:#1B2A55; --con:#FFA47A; --con-bg:#47241A;
+    --good:#66D394; --good-bg:#173A26; --near:#F2C25B; --near-bg:#3A2F12; --bad:#FF938A; --bad-bg:#421C19; --focus:#8AB4FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1420; --surface:#181F30; --surface-2:#1F273B; --ink:#E8ECF6; --ink-soft:#A3AEC8; --line:#2D3753;
+  --pro:#8FB2FF; --pro-bg:#1B2A55; --con:#FFA47A; --con-bg:#47241A;
+  --good:#66D394; --good-bg:#173A26; --near:#F2C25B; --near-bg:#3A2F12; --bad:#FF938A; --bad-bg:#421C19; --focus:#8AB4FF;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.wrap{ max-width:1040px; margin:0 auto; padding:0 clamp(12px,3vw,28px) 48px; }
+.top{ max-width:1040px; margin:0 auto; padding:18px clamp(12px,3vw,28px) 6px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.55rem,4.6vw,2.4rem); line-height:1.1; margin:0; letter-spacing:-.015em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); }
+
+/* Fallauswahl */
+.cases{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:14px 0 14px; }
+@media (min-width:760px){ .cases{ grid-template-columns:repeat(4,1fr); } }
+.case{ text-align:left; background:var(--surface); border:2px solid var(--line); border-radius:14px; padding:10px 12px; cursor:pointer; min-height:56px; display:flex; flex-direction:column; gap:2px; }
+.case b{ font-family:var(--display); font-weight:800; font-size:1.02rem; line-height:1.2; }
+.case span{ font-size:.85rem; color:var(--ink-soft); }
+.case[aria-pressed="true"]{ border-color:var(--ink); box-shadow:0 0 0 2px var(--ink) inset; }
+
+.info{ background:var(--surface); border:1px solid var(--line); border-left:6px solid var(--ink); border-radius:14px; padding:12px 14px; margin-bottom:12px; }
+.info p{ font-size:.98rem; }
+.info h2{ font-family:var(--display); font-weight:800; font-size:1.25rem; line-height:1.2; margin:0 0 6px; }
+.info p{ margin:0; max-width:68ch; }
+
+.steps{ display:flex; gap:6px; margin:0 0 14px; }
+.step{ flex:1; background:var(--surface); border:2px solid var(--line); border-radius:12px; padding:8px 6px; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.step[aria-current="step"]{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
+.step[aria-disabled="true"]{ opacity:.55; cursor:not-allowed; }
+.shake{ animation:shake .4s; }
+@keyframes shake{ 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+
+.task{ margin:0 0 12px; max-width:70ch; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:10px; margin:12px 0; }
+.btn{ font-weight:700; border-radius:12px; border:2px solid var(--line); background:var(--surface); padding:.55em 1em; cursor:pointer; min-height:46px; }
+.btn:hover:not(:disabled){ border-color:var(--ink); }
+.btn.primary{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
+.btn[aria-disabled="true"], .btn:disabled{ opacity:.5; cursor:not-allowed; }
+.linkbtn{ background:none; border:0; padding:4px 0; font-weight:700; text-decoration:underline; cursor:pointer; color:var(--ink); min-height:36px; }
+.note{ font-size:.92rem; color:var(--ink-soft); }
+
+/* Handkarte */
+#handBox{ display:contents; }
+.hand{ position:sticky; top:calc(env(safe-area-inset-top,0px) + 8px); z-index:30; background:var(--surface); border:2px solid var(--ink); border-radius:16px; padding:10px 14px 12px; margin-bottom:14px; box-shadow:0 8px 22px rgba(10,20,50,.18); max-height:46vh; overflow:auto; }
+.hand.done{ position:static; box-shadow:none; border-style:dashed; border-color:var(--line); }
+.hand.done p{ margin:4px 0 0; }
+.hand-head{ display:flex; justify-content:space-between; align-items:center; font-size:.9rem; color:var(--ink-soft); font-weight:700; }
+.held{ background:var(--surface-2); border-radius:12px; padding:10px 12px; margin:6px 0; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; border:2px solid var(--line); }
+.held b{ font-family:var(--display); font-size:1.1rem; display:block; margin-bottom:2px; }
+.held p{ margin:0; font-size:.98rem; }
+.handtip{ margin:2px 0 0; font-size:.88rem; color:var(--ink-soft); }
+
+/* Matrix */
+.matrix{ display:grid; grid-template-columns:1fr 1fr; gap:8px 10px; }
+.mh{ font-family:var(--display); font-weight:800; font-size:1.15rem; padding:8px 12px; border-radius:12px; text-align:center; }
+.mh.pro{ background:var(--pro-bg); color:var(--pro); } .mh.con{ background:var(--con-bg); color:var(--con); }
+.dim{ grid-column:1/-1; font-weight:700; margin-top:8px; padding-bottom:2px; border-bottom:2px solid var(--line); }
+.cell{ min-height:72px; border:2px dashed var(--line); border-radius:12px; padding:6px; display:flex; flex-direction:column; gap:6px; background:var(--surface); cursor:default; }
+.matrix.armed .cell{ cursor:pointer; }
+.matrix.armed .cell.pro{ border-color:var(--pro); background:color-mix(in srgb, var(--pro-bg) 55%, var(--surface)); }
+.matrix.armed .cell.con{ border-color:var(--con); background:color-mix(in srgb, var(--con-bg) 55%, var(--surface)); }
+.matrix.armed .cell:empty::before{ content:'hier ablegen'; color:var(--ink-soft); font-size:.88rem; margin:auto; }
+.cell.hot{ outline:3px solid var(--ink); outline-offset:1px; }
+.chip{ display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; text-align:left; border:0; border-left:6px solid; border-radius:8px; padding:8px 10px; font-weight:700; font-size:.93rem; line-height:1.25; min-height:44px; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; color:var(--ink); }
+.chip.pro{ background:var(--pro-bg); border-left-color:var(--pro); }
+.chip.con{ background:var(--con-bg); border-left-color:var(--con); }
+.chip.static{ cursor:default; touch-action:auto; }
+.chip .mk{ flex:none; font-weight:800; min-width:1.4em; text-align:center; border-radius:6px; padding:0 4px; }
+.chip.ok .mk{ background:var(--good-bg); color:var(--good); }
+.chip.near .mk{ background:var(--near-bg); color:var(--near); }
+.chip.bad .mk{ background:var(--bad-bg); color:var(--bad); }
+.chip .own{ font-weight:400; font-size:.78rem; color:var(--ink-soft); display:block; }
+.ghost{ position:fixed; z-index:1000; pointer-events:none; transform:translate(-50%,-50%) scale(1.05); box-shadow:0 10px 24px rgba(0,0,0,.35); width:auto !important; max-width:260px; background:var(--surface); border:2px solid var(--ink); border-radius:10px; padding:8px 12px; font-weight:700; }
+
+.result{ margin-top:8px; }
+.score{ padding:12px 14px; border-radius:12px; background:var(--surface-2); }
+.score.all{ background:var(--good-bg); color:var(--good); }
+.score strong{ font-size:1.2rem; }
+.tips{ list-style:none; padding:0; margin:10px 0 0; display:grid; gap:8px; }
+.tips li{ padding:9px 12px; border-radius:10px; font-size:.96rem; }
+.tips li.bad{ background:var(--bad-bg); color:var(--bad); }
+.tips li.near{ background:var(--near-bg); color:var(--near); }
+
+details.own{ margin:14px 0; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 14px; }
+details.own summary{ font-weight:700; cursor:pointer; min-height:36px; display:flex; align-items:center; }
+.form{ display:grid; gap:10px; margin-top:10px; }
+.form label{ display:grid; gap:4px; font-weight:700; font-size:.92rem; }
+.form textarea, .form select{ border:2px solid var(--line); border-radius:10px; padding:.55em .7em; background:var(--surface); min-height:46px; }
+.formrow{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+
+/* Waage */
+.waage{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:10px 14px 12px; margin-bottom:12px; display:grid; justify-items:center; }
+.waage svg{ width:min(100%,420px); height:auto; display:block; }
+.waage p{ margin:0; text-align:center; font-weight:700; }
+.waage .sub{ font-weight:400; font-size:.9rem; color:var(--ink-soft); margin-top:2px; }
+#beam{ transition:transform .6s cubic-bezier(.3,1.4,.5,1); }
+.pan{ transition:transform .6s cubic-bezier(.3,1.4,.5,1); }
+.scorebar{ position:sticky; top:calc(env(safe-area-inset-top,0px) + 6px); z-index:25; display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--ink); border-radius:999px; padding:6px 14px; margin-bottom:12px; font-weight:700; box-shadow:0 6px 16px rgba(10,20,50,.15); }
+.scorebar .s{ flex:none; }
+.scorebar .s.pro{ color:var(--pro); } .scorebar .s.con{ color:var(--con); }
+.scorebar .bar{ flex:1; height:12px; border-radius:99px; overflow:hidden; display:flex; background:var(--surface-2); }
+.scorebar .bar i{ display:block; height:100%; transition:width .4s; }
+.scorebar .bar .p{ background:var(--pro); } .scorebar .bar .c{ background:var(--con); }
+
+/* Gewichten */
+.cols{ display:grid; grid-template-columns:1fr; gap:16px; }
+@media (min-width:860px){ .cols{ grid-template-columns:1fr 1fr; align-items:start; } }
+.cols h3{ font-family:var(--display); font-weight:800; font-size:1.15rem; margin:0 0 8px; padding:6px 12px; border-radius:10px; }
+.cols .pro h3{ background:var(--pro-bg); color:var(--pro); } .cols .con h3{ background:var(--con-bg); color:var(--con); }
+.arg{ background:var(--surface); border:1px solid var(--line); border-left:6px solid; border-radius:12px; padding:10px 12px 12px; margin-bottom:10px; }
+.pro .arg{ border-left-color:var(--pro); } .con .arg{ border-left-color:var(--con); }
+.arg h4{ font-family:var(--display); font-weight:800; font-size:1.05rem; margin:0; }
+.arg .dimtag{ font-size:.82rem; color:var(--ink-soft); margin:0 0 4px; }
+.arg p{ margin:2px 0 8px; font-size:.98rem; }
+.ctl{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; margin-top:6px; }
+.ctl .lab{ font-size:.88rem; font-weight:700; color:var(--ink-soft); min-width:4.6em; }
+.seg{ display:inline-flex; border:2px solid var(--line); border-radius:10px; overflow:hidden; }
+.seg button{ border:0; background:var(--surface); padding:.4em .75em; font-weight:700; font-size:.92rem; cursor:pointer; min-height:44px; }
+.seg button+button{ border-left:2px solid var(--line); }
+.seg button[aria-pressed="true"]{ background:var(--ink); color:var(--bg); }
+.fbk{ margin-top:8px; padding:8px 10px; border-radius:8px; font-size:.92rem; }
+.fbk.ok{ background:var(--good-bg); color:var(--good); } .fbk.bad{ background:var(--near-bg); color:var(--near); }
+
+/* Urteilen */
+.card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:14px; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.15rem; margin:0 0 8px; }
+.srow{ margin:8px 0; padding:6px 8px; border-radius:10px; }
+.srow.hl{ background:var(--surface-2); box-shadow:0 0 0 2px var(--ink) inset; }
+.srow .sl{ font-weight:700; font-size:.95rem; display:flex; justify-content:space-between; gap:8px; }
+.srow .sl em{ font-style:normal; font-weight:400; color:var(--ink-soft); font-size:.85rem; }
+.sb{ display:grid; grid-template-columns:1fr 1fr; gap:3px; margin-top:4px; }
+.half{ display:flex; align-items:center; gap:6px; height:22px; }
+.half.l{ flex-direction:row-reverse; } 
+.half i{ display:block; height:100%; border-radius:4px; min-width:0; transition:width .4s; }
+.half.l i{ background:var(--pro); } .half.r i{ background:var(--con); }
+.half b{ font-size:.85rem; }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.rolebtn, .tplbtn{ border:2px solid var(--line); background:var(--surface); border-radius:999px; padding:.35em .9em; font-weight:700; font-size:.92rem; cursor:pointer; min-height:44px; text-align:left; }
+.rolebtn[aria-pressed="true"]{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.tplbtn{ border-style:dashed; font-weight:400; }
+textarea.fazit{ width:100%; min-height:180px; border:2px solid var(--line); border-radius:12px; padding:.7em .8em; background:var(--surface); resize:vertical; line-height:1.5; }
+.checklist{ list-style:none; padding:0; margin:0; display:grid; gap:6px; }
+.checklist label{ display:flex; gap:10px; align-items:flex-start; cursor:pointer; min-height:36px; }
+.checklist input{ width:22px; height:22px; flex:none; margin-top:2px; accent-color:var(--ink); }
+textarea.export{ width:100%; min-height:140px; border:2px dashed var(--line); border-radius:12px; padding:.6em .8em; background:var(--surface-2); font-size:.9rem; }
+details.teacher{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:12px 16px; margin-top:18px; }
+details.teacher summary{ font-weight:700; cursor:pointer; min-height:36px; display:flex; align-items:center; }
+details.teacher h3{ font-family:var(--display); font-size:1.05rem; margin:14px 0 4px; }
+details.teacher p, details.teacher li{ font-size:.96rem; max-width:72ch; }
+details.teacher ul, details.teacher ol{ margin:4px 0 0; padding-left:1.3em; }
+.printout{ display:none; white-space:pre-wrap; font-size:12pt; line-height:1.4; color:#000; }
+@media (prefers-reduced-motion:reduce){ #beam, .pan, .scorebar .bar i, .half i{ transition:none; } .shake{ animation:none; } }
+@media print{
+  body{ background:#fff; }
+  .top, .wrap > *:not(.printout){ display:none !important; }
+  .printout{ display:block; }
+}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Gentechnik: Pro und Contra abwägen</h1>
+  <p>Bewertungsmatrix für den Biologieunterricht</p>
+</header>
+
+<main class="wrap">
+  <nav class="cases" id="cases" aria-label="Anwendungsbeispiel wählen"></nav>
+  <section class="info" id="info" aria-live="polite"></section>
+
+  <nav class="steps" id="steps" aria-label="Arbeitsschritte">
+    <button type="button" class="step" data-go="1">1 Sortieren</button>
+    <button type="button" class="step" data-go="2">2 Gewichten</button>
+    <button type="button" class="step" data-go="3">3 Urteilen</button>
+  </nav>
+
+  <!-- Waage (Phase 2 und 3) -->
+  <div class="scorebar" id="scoreBar" hidden aria-live="polite"></div>
+  <section class="waage" id="waageCard" hidden aria-label="Waage">
+    <svg id="waageSvg" viewBox="0 0 360 172" role="img" aria-label="Waage mit Pro und Contra">
+      <rect x="128" y="154" width="104" height="10" rx="5" fill="var(--ink)"/>
+      <path d="M180 40 V154" stroke="var(--ink)" stroke-width="6" stroke-linecap="round"/>
+      <g id="beam" style="transform-origin:180px 40px"><path d="M60 40 H300" stroke="var(--ink)" stroke-width="8" stroke-linecap="round"/></g>
+      <circle cx="180" cy="40" r="9" fill="var(--ink)"/>
+      <g id="panL" class="pan" style="transform:translate(60px,40px)">
+        <path d="M0 0 L-42 62 M0 0 L42 62" stroke="var(--ink)" stroke-width="2" fill="none"/>
+        <path d="M-54 62 H54 Q48 88 0 88 Q-48 88 -54 62 Z" fill="var(--pro-bg)" stroke="var(--pro)" stroke-width="3"/>
+        <text id="panLT" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="var(--pro)" style="font-family:var(--body)">Pro 0</text>
+      </g>
+      <g id="panR" class="pan" style="transform:translate(300px,40px)">
+        <path d="M0 0 L-42 62 M0 0 L42 62" stroke="var(--ink)" stroke-width="2" fill="none"/>
+        <path d="M-54 62 H54 Q48 88 0 88 Q-48 88 -54 62 Z" fill="var(--con-bg)" stroke="var(--con)" stroke-width="3"/>
+        <text id="panRT" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="var(--con)" style="font-family:var(--body)">Contra 0</text>
+      </g>
+    </svg>
+    <p id="waageText"></p>
+    <p class="sub">Die Waage zeigt nur deine Gewichtung. Das Urteil begründest du selbst.</p>
+  </section>
+
+  <!-- 1 Sortieren -->
+  <section id="p1">
+    <p class="task">Ordne jede Karte ein: Spricht sie <b>für</b> (Pro) oder <b>gegen</b> (Contra) den Einsatz, und welchen Bereich betrifft sie hauptsächlich? Leere Felder sind erlaubt.</p>
+    <div id="handBox"></div>
+    <div id="matrixBox"></div>
+    <div class="btnrow">
+      <button type="button" class="btn primary" id="btnCheck">Prüfen</button>
+      <button type="button" class="btn" id="btnSol">Lösung zeigen</button>
+      <button type="button" class="btn" id="btnReset">Neu beginnen</button>
+    </div>
+    <div class="result" id="resultBox" aria-live="polite"></div>
+    <details class="own" id="ownBox">
+      <summary>Eigenes Argument ergänzen</summary>
+      <div class="form">
+        <label>Dein Argument (ein bis zwei Sätze)<textarea id="ownText" rows="3" maxlength="240"></textarea></label>
+        <div class="formrow">
+          <label>Seite<select id="ownSide"><option value="pro">Pro</option><option value="con">Contra</option></select></label>
+          <label>Bereich<select id="ownDim"></select></label>
+          <label>Art<select id="ownKind"><option value="sach">Sachargument</option><option value="wert">Werturteil</option></select></label>
+        </div>
+        <div><button type="button" class="btn" id="btnOwn">Argument hinzufügen</button></div>
+      </div>
+    </details>
+    <div class="btnrow">
+      <button type="button" class="btn primary" id="btnTo2" aria-disabled="true">Weiter zum Gewichten</button>
+    </div>
+    <p class="note" id="gateMsg"></p>
+  </section>
+
+  <!-- 2 Gewichten -->
+  <section id="p2" hidden>
+    <p class="task">Wie wichtig ist jedes Argument für <b>dein</b> Urteil? Vergib ein Gewicht (gering, mittel, hoch). Entscheide außerdem, ob es ein <b>Sachargument</b> ist (lässt sich prüfen oder messen) oder ein <b>Werturteil</b> (hängt davon ab, was man für wichtig hält).</p>
+    <div class="cols" id="argsBox"></div>
+    <div class="btnrow">
+      <button type="button" class="btn" id="btnKind">Art der Argumente prüfen</button>
+      <button type="button" class="btn primary" id="btnTo3">Weiter zum Urteilen</button>
+    </div>
+    <p class="note" id="kindMsg" aria-live="polite"></p>
+  </section>
+
+  <!-- 3 Urteilen -->
+  <section id="p3" hidden>
+    <div class="card">
+      <h3>Deine Matrix im Überblick</h3>
+      <p class="note" style="margin-top:0">Summe der Gewichte pro Bereich. Links Pro, rechts Contra.</p>
+      <div id="sumBox"></div>
+    </div>
+    <div class="card">
+      <h3>Perspektive wechseln</h3>
+      <p class="note" style="margin-top:0">Wähle eine Rolle. Die Bereiche, die dieser Rolle oft besonders wichtig sind, werden in der Übersicht markiert. Das sind Beispiele und keine festen Regeln.</p>
+      <div class="chips" id="roleBox"></div>
+      <p id="roleHint" class="note" aria-live="polite"></p>
+    </div>
+    <div class="card">
+      <h3>Mein Urteil</h3>
+      <p class="task" style="margin-bottom:8px">Beurteile den Einsatz. Nenne die wichtigsten Argumente beider Seiten, begründe deine Gewichtung und sage, unter welcher Bedingung dein Urteil anders ausfallen würde.</p>
+      <div class="chips" id="tplBox" style="margin-bottom:10px"></div>
+      <textarea class="fazit" id="fazit" aria-label="Mein Urteil" placeholder="Schreibe hier dein begründetes Urteil."></textarea>
+      <p class="note" id="wordCount" style="margin:4px 0 12px">0 Wörter</p>
+      <h3 style="font-size:1rem">Selbstcheck</h3>
+      <ul class="checklist" id="checkBox"></ul>
+    </div>
+    <div class="card">
+      <h3>Sichern</h3>
+      <div class="btnrow" style="margin-top:0">
+        <button type="button" class="btn primary" id="btnCopy">Matrix und Urteil als Text kopieren</button>
+        <button type="button" class="btn" id="btnPrint">Drucken</button>
+      </div>
+      <p class="note" id="copyMsg" aria-live="polite">Hinweis: Beim Schließen der Seite sind deine Eingaben weg. Kopiere oder drucke sie vorher. Schreibe keine Namen in den Text.</p>
+      <textarea class="export" id="exportText" readonly aria-label="Exportierter Text" hidden></textarea>
+    </div>
+
+    <details class="teacher">
+      <summary>Hinweise für die Lehrkraft</summary>
+      <h3>Einsatz in 45 Minuten (Vorschlag)</h3>
+      <ol>
+        <li>5 Minuten: Sachinformation lesen, Vorwissen sammeln.</li>
+        <li>15 Minuten: Argumente sortieren (Einzel- oder Partnerarbeit), mit „Prüfen“ selbst kontrollieren.</li>
+        <li>10 Minuten: Gewichten und Art der Argumente bestimmen, Ergebnisse mit der Nachbargruppe vergleichen.</li>
+        <li>10 Minuten: Urteil schreiben, Selbstcheck.</li>
+        <li>5 Minuten: Sicherung im Plenum: Warum kommen Gruppen trotz gleicher Argumente zu verschiedenen Urteilen?</li>
+      </ol>
+      <h3>Anforderungsbereiche</h3>
+      <ul>
+        <li>I: Argumente Pro und Contra zuordnen, Bereiche benennen.</li>
+        <li>II: Argumente gewichten, Sach- und Werturteile unterscheiden, eigene Argumente ergänzen.</li>
+        <li>III: Begründetes Urteil mit Perspektive und Bedingung (Operator „beurteilen“).</li>
+      </ul>
+      <h3>Bewertungsvorschlag für ein Arbeitsergebnis (12 Punkte, nicht verbindlich)</h3>
+      <ul>
+        <li>3 Punkte: Einordnung der Argumente (I).</li>
+        <li>3 Punkte: Gewichtung und Unterscheidung Sach- und Werturteil (II).</li>
+        <li>6 Punkte: Urteil: beide Seiten, begründete Gewichtung, Bedingung oder Alternative, Fachsprache (III).</li>
+      </ul>
+      <h3>Differenzierung</h3>
+      <ul>
+        <li>Unterstützung: Nur die Argumente einer Bereichsspalte bearbeiten, Satzbausteine nutzen.</li>
+        <li>Erweiterung: Eigene Argumente ergänzen, Perspektive wechseln und Urteil neu schreiben, zwei Fälle vergleichen.</li>
+      </ul>
+      <h3>Typische Fehlvorstellungen</h3>
+      <ul>
+        <li>„Normale Lebensmittel enthalten keine Gene.“ Alle Lebewesen enthalten DNA. Die Frage ist, ob Gene gezielt übertragen wurden.</li>
+        <li>„Gentechnik und Klonen sind dasselbe.“ Klonen erzeugt genetisch identische Kopien. Gentechnik verändert Erbinformation gezielt.</li>
+        <li>„Mehr Argumente auf einer Seite entscheiden.“ Entscheidend sind Gewichtung und Werte, nicht die Anzahl.</li>
+      </ul>
+      <h3>Hinweise</h3>
+      <p>Die Zuordnung zum Kerncurriculum Niedersachsen und zum Jahrgang bitte auf nibis.de prüfen. Die Argumente sind vereinfacht und fachlich knapp gehalten; Rechtslagen und Studienlagen können sich ändern. Notengebung liegt in deiner Verantwortung und folgt den Fachkonferenzbeschlüssen. Die Seite speichert keine Daten.</p>
+    </details>
+  </section>
+
+  <div class="printout" id="printOut"></div>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+/* ---------- Daten ---------- */
+const DIMS=[{id:'um',nm:'Umwelt'},{id:'ge',nm:'Gesundheit'},{id:'wi',nm:'Wirtschaft'},{id:'so',nm:'Gesellschaft und Recht'},{id:'et',nm:'Ethik'}];
+const DN=Object.fromEntries(DIMS.map(d=>[d.id,d.nm]));
+
+/* s = richtige Seite, d = Hauptbereich, alt = ebenfalls akzeptierte Bereiche, k = Art, t = Kurztitel, x = Text, h = Begründung */
+const CASES=[
+{id:'bt',nm:'Bt-Mais',tag:'Grüne Gentechnik',title:'Insektenresistenter Mais (Bt-Mais)',
+ info:'Bt-Mais enthält ein Gen aus dem Bodenbakterium Bacillus thuringiensis. Damit bildet die Pflanze selbst ein Eiweiß, das für Larven des Maiszünslers giftig ist. Nach den bisherigen Zulassungsprüfungen gilt es für Menschen als unbedenklich.',
+ cards:[
+ {id:'bt1',s:'pro',d:'um',alt:[],k:'sach',t:'Weniger Insektizide',x:'Die Pflanze schützt sich selbst vor dem Maiszünsler. Dadurch kann weniger Insektengift gespritzt werden.',h:'Weniger Gift auf dem Acker ist ein Vorteil für die Umwelt.'},
+ {id:'bt2',s:'pro',d:'wi',alt:[],k:'sach',t:'Sicherere Ernten',x:'Bei starkem Befall gehen weniger Maiskörner verloren. Landwirte können ihre Erträge besser planen.',h:'Weniger Ernteverlust nützt den Betrieben.'},
+ {id:'bt3',s:'pro',d:'ge',alt:[],k:'sach',t:'Weniger Pilzgifte',x:'Fraßstellen der Larven begünstigen Pilzbefall. Weniger Fraß kann den Gehalt an Pilzgiften (Mykotoxinen) im Mais senken.',h:'Weniger Pilzgifte in Lebens- und Futtermitteln nützen der Gesundheit.'},
+ {id:'bt4',s:'pro',d:'et',alt:['wi'],k:'wert',t:'Nahrung sichern',x:'Es ist ein wichtiges Ziel, Ernteverluste zu verringern, damit genug Nahrung für alle Menschen vorhanden ist.',h:'Ernteverluste zu senken hilft bei der Ernährung der Menschen.'},
+ {id:'bt5',s:'con',d:'um',alt:[],k:'sach',t:'Resistente Schädlinge',x:'Wenn viele Felder das Gift bilden, überleben vor allem unempfindliche Schädlinge. Mit der Zeit kann die Wirkung nachlassen.',h:'Auslese (Selektion) macht das Verfahren auf Dauer weniger wirksam.'},
+ {id:'bt6',s:'con',d:'um',alt:[],k:'sach',t:'Folgen für andere Insekten',x:'Das Bt-Eiweiß kann über Pollen oder Pflanzenreste auch auf andere Insekten treffen, zum Beispiel auf Schmetterlingsraupen. Langzeitfolgen sind schwer zu überblicken.',h:'Mögliche Schäden an anderen Arten sprechen gegen den Einsatz.'},
+ {id:'bt7',s:'con',d:'wi',alt:['so','um'],k:'sach',t:'Nachbarn und Öko-Landbau',x:'Pollen kann auf Nachbarfelder gelangen. Öko-Betriebe müssen ihre Ernte schützen und prüfen. Das kostet Geld und kann Streit auslösen.',h:'Kosten und Konflikte für andere Betriebe sind ein Nachteil.'},
+ {id:'bt8',s:'con',d:'so',alt:['wi'],k:'sach',t:'Abhängigkeit von Konzernen',x:'Das Saatgut ist oft patentiert. Landwirte zahlen Lizenzgebühren und sind von wenigen großen Firmen abhängig.',h:'Macht und Abhängigkeit sind ein gesellschaftliches Problem.'},
+ {id:'bt9',s:'con',d:'et',alt:['um'],k:'wert',t:'Vorsicht bei Eingriffen',x:'Weil wir die Folgen im Ökosystem nicht sicher kennen, sollten wir vorsichtig sein (Vorsorgeprinzip).',h:'Vorsicht bei unsicheren Folgen ist eine Wertentscheidung gegen den Einsatz.'}
+ ]},
+{id:'ins',nm:'Insulin',tag:'Rote Gentechnik',title:'Gentechnisch hergestelltes Insulin',
+ info:'Das Gen für menschliches Insulin wird in Bakterien oder Hefezellen eingebracht. Diese Mikroorganismen wachsen in geschlossenen Fermentern und bilden das Hormon. Es wird gereinigt und als Medikament für Menschen mit Diabetes eingesetzt.',
+ cards:[
+ {id:'in1',s:'pro',d:'ge',alt:[],k:'sach',t:'Menschliches Insulin',x:'Das Insulin entspricht dem menschlichen Insulin und lässt sich in gleichbleibender Qualität herstellen.',h:'Gleichbleibende, passende Qualität hilft den Patienten.'},
+ {id:'in2',s:'pro',d:'ge',alt:[],k:'sach',t:'Besser verträglich',x:'Früher gewonnenes Insulin aus der Bauchspeicheldrüse von Schweinen und Rindern löste häufiger Unverträglichkeiten aus.',h:'Weniger Unverträglichkeiten sind ein Vorteil.'},
+ {id:'in3',s:'pro',d:'wi',alt:['ge'],k:'sach',t:'Große Mengen möglich',x:'Die Herstellung hängt nicht mehr von Schlachtmengen ab. Bakterien lassen sich im Fermenter stark vermehren.',h:'Eine gesicherte Menge ist ein Vorteil für die Versorgung.'},
+ {id:'in4',s:'pro',d:'um',alt:[],k:'sach',t:'Geschlossene Anlagen',x:'Die veränderten Mikroorganismen wachsen in geschlossenen Fermentern. Dadurch gelangen kaum veränderte Organismen in die Umwelt.',h:'Ein geringes Risiko für die Umwelt spricht für das Verfahren.'},
+ {id:'in5',s:'pro',d:'et',alt:[],k:'wert',t:'Keine Schlachttiere',x:'Für viele Menschen ist es ethisch besser, wenn für ein Medikament keine Tiere geschlachtet werden müssen.',h:'Tierschutz ist hier ein Argument für das Verfahren.'},
+ {id:'in6',s:'con',d:'so',alt:['wi','et'],k:'sach',t:'Teuer, ungleicher Zugang',x:'Wenige große Firmen stellen Insulin her. In manchen Ländern ist es teuer, und nicht alle Betroffenen können es bezahlen.',h:'Ungleicher Zugang zu Medikamenten ist ein gesellschaftliches Problem.'},
+ {id:'in7',s:'con',d:'wi',alt:['so'],k:'sach',t:'Wenige Hersteller',x:'Fällt ein großer Hersteller aus, können Lieferengpässe entstehen.',h:'Abhängigkeit von wenigen Firmen ist ein wirtschaftliches Risiko.'},
+ {id:'in8',s:'con',d:'um',alt:[],k:'sach',t:'Sichere Entsorgung nötig',x:'Reste aus der Produktion mit gentechnisch veränderten Mikroorganismen müssen zuverlässig unschädlich gemacht werden.',h:'Hier besteht ein Umweltrisiko, falls etwas schiefgeht.'},
+ {id:'in9',s:'con',d:'ge',alt:[],k:'sach',t:'Aufwendige Reinheitsprüfung',x:'Das Medikament muss streng auf Reste aus den Bakterien geprüft werden, damit nichts davon in den Körper gelangt.',h:'Verunreinigungen wären ein Gesundheitsrisiko.'},
+ {id:'in10',s:'con',d:'et',alt:[],k:'wert',t:'Lebewesen als Produktionsmittel',x:'Manche Menschen lehnen es grundsätzlich ab, Lebewesen gezielt zu verändern, um Produkte herzustellen.',h:'Eine grundsätzliche Ablehnung ist eine Wertentscheidung.'}
+ ]},
+{id:'rice',nm:'Golden Rice',tag:'Grüne Gentechnik',title:'Golden Rice',
+ info:'Golden Rice wurde gentechnisch so verändert, dass die Reiskörner Beta-Carotin enthalten, eine Vorstufe von Vitamin A. Das Ziel ist, Vitamin-A-Mangel in Regionen zu verringern, in denen sich viele Menschen überwiegend von Reis ernähren. Der Mangel kann zu Erblindung führen und die Abwehr schwächen.',
+ cards:[
+ {id:'ri1',s:'pro',d:'ge',alt:[],k:'sach',t:'Vitamin-A-Mangel verringern',x:'Beta-Carotin im Reiskorn kann den Mangel an Vitamin A mindern. Der Mangel kann bei Kindern zu Erblindung und schweren Krankheiten führen.',h:'Bessere Gesundheit von Kindern spricht für den Einsatz.'},
+ {id:'ri2',s:'pro',d:'so',alt:['ge'],k:'sach',t:'Erreicht Reis-Esser direkt',x:'Reis ist dort das Grundnahrungsmittel. Die Menschen müssen ihre Essgewohnheiten kaum ändern.',h:'Einfach umzusetzen: ein Vorteil.'},
+ {id:'ri3',s:'pro',d:'wi',alt:['so'],k:'sach',t:'Saatgut darf weitergegeben werden',x:'Golden Rice wird in einem humanitären Projekt entwickelt. Kleinbauern dürfen einen Teil der Ernte wieder aussäen.',h:'Keine laufenden Saatgutkosten sind ein Vorteil für die Bauern.'},
+ {id:'ri4',s:'pro',d:'um',alt:['wi'],k:'sach',t:'Keine zusätzliche Fläche',x:'Der Reis wird wie normaler Reis angebaut. Für zusätzliche Vitamin-A-Quellen wird keine neue Anbaufläche gebraucht.',h:'Kein Mehrverbrauch an Fläche ist gut für die Umwelt.'},
+ {id:'ri5',s:'pro',d:'et',alt:[],k:'wert',t:'Leid bei Kindern verringern',x:'Wenn eine Technik schweres Leid bei Kindern verringern kann, sollte man sie ernsthaft prüfen.',h:'Leid zu vermeiden ist ein starkes Argument für den Einsatz.'},
+ {id:'ri6',s:'con',d:'ge',alt:[],k:'sach',t:'Reicht die Menge?',x:'Wie viel Vitamin A Menschen aus dem Reis gewinnen, hängt von Gehalt, Zubereitung und übriger Ernährung ab. Ob das allein reicht, ist umstritten.',h:'Zweifel an der Wirkung sprechen gegen den Einsatz.'},
+ {id:'ri7',s:'con',d:'so',alt:['ge','wi'],k:'sach',t:'Andere Wege sind möglich',x:'Abwechslungsreiche Ernährung, Gemüsegärten oder Vitaminpräparate können den Mangel ebenfalls verringern.',h:'Alternativen schwächen das Argument für den Einsatz.'},
+ {id:'ri8',s:'con',d:'um',alt:[],k:'sach',t:'Auskreuzung und Sortenvielfalt',x:'Gene könnten auf verwandte Reissorten übergehen. Manche fürchten außerdem, dass traditionelle Sorten verdrängt werden.',h:'Ein Risiko für Natur und Vielfalt spricht dagegen.'},
+ {id:'ri9',s:'con',d:'wi',alt:[],k:'sach',t:'Lange Entwicklung, hohe Kosten',x:'Entwicklung und Zulassung dauerten viele Jahre und kosteten viel Geld. Das Geld könnte an anderer Stelle fehlen.',h:'Hohe Kosten sind ein wirtschaftlicher Nachteil.'},
+ {id:'ri10',s:'con',d:'et',alt:['so'],k:'wert',t:'Technik statt Ursachen',x:'Mangel entsteht oft durch Armut und einseitige Ernährung. Manche meinen, man sollte zuerst diese Ursachen bekämpfen.',h:'Was zuerst getan werden soll, ist eine Wertfrage.'}
+ ]},
+{id:'cr',nm:'CRISPR am Embryo',tag:'Keimbahn-Eingriff',title:'Genschere CRISPR/Cas9 am menschlichen Embryo',
+ info:'Mit der Genschere CRISPR/Cas9 lässt sich Erbgut gezielt schneiden und verändern. Bei einem Eingriff in die Keimbahn würde man das Erbgut von Eizellen, Spermien oder Embryonen verändern. Die Veränderung würde dann an alle Nachkommen weitergegeben. 2018 wurde in China bekannt, dass Kinder aus genomeditierten Embryonen geboren wurden. Das löste weltweit scharfe Kritik aus.',
+ cards:[
+ {id:'cr1',s:'pro',d:'ge',alt:[],k:'sach',t:'Erbkrankheiten verhindern',x:'Schwere Erbkrankheiten könnten schon vor der Geburt verhindert werden, auch bei allen späteren Nachkommen.',h:'Krankheiten zu verhindern ist ein Vorteil.'},
+ {id:'cr2',s:'pro',d:'ge',alt:[],k:'sach',t:'Wenn andere Verfahren nicht reichen',x:'Die Untersuchung von Embryonen (Präimplantationsdiagnostik) hilft nicht immer, zum Beispiel wenn alle Embryonen die Krankheit tragen würden.',h:'Eine Lösung für Fälle ohne Alternative spricht dafür.'},
+ {id:'cr3',s:'pro',d:'wi',alt:['ge','so'],k:'sach',t:'Treibt die Forschung voran',x:'Die Technik bringt die medizinische Forschung voran. Erkenntnisse können auch anderen Therapien nützen.',h:'Fortschritt in der Forschung ist ein Vorteil.'},
+ {id:'cr4',s:'pro',d:'et',alt:[],k:'wert',t:'Leid vermeiden',x:'Wenn man schweres Leid verhindern kann, spricht viel dafür, es auch zu tun.',h:'Leid zu vermeiden ist ein Argument für den Eingriff.'},
+ {id:'cr5',s:'con',d:'ge',alt:[],k:'sach',t:'Ungewollte Veränderungen',x:'CRISPR kann auch an falschen Stellen schneiden. Folgen für das Kind und seine Nachkommen sind schwer vorherzusehen.',h:'Ein Gesundheitsrisiko spricht gegen den Eingriff.'},
+ {id:'cr6',s:'con',d:'et',alt:[],k:'wert',t:'Keine Einwilligung',x:'Künftige Generationen können nicht gefragt werden, ob sie eine Veränderung ihres Erbguts wollen.',h:'Selbstbestimmung ist eine Wertfrage und spricht gegen den Eingriff.'},
+ {id:'cr7',s:'con',d:'et',alt:['so'],k:'wert',t:'Vom Heilen zum Optimieren',x:'Man könnte dazu übergehen, nicht nur Krankheiten zu verhindern, sondern auch Merkmale wie das Aussehen auszuwählen. Wo liegt die Grenze?',h:'Die Sorge vor einer schiefen Ebene ist eine Wertentscheidung.'},
+ {id:'cr8',s:'con',d:'so',alt:[],k:'sach',t:'In Deutschland verboten',x:'Nach dem Embryonenschutzgesetz ist die gezielte Veränderung der Keimbahn beim Menschen in Deutschland verboten.',h:'Eine rechtliche Vorgabe spricht gegen die Anwendung.'},
+ {id:'cr9',s:'con',d:'so',alt:['et','wi'],k:'wert',t:'Ungleiche Chancen',x:'Wenn sich nur wohlhabende Menschen solche Eingriffe leisten können, könnten soziale Unterschiede wachsen.',h:'Gerechtigkeit ist eine gesellschaftliche Frage.'}
+ ]}
+];
+const ROLES=[
+ {id:'lw',nm:'Landwirtin oder Landwirt',dims:['wi','um']},
+ {id:'vb',nm:'Verbraucherin oder Verbraucher',dims:['ge','so']},
+ {id:'us',nm:'Umweltschützerin oder Umweltschützer',dims:['um','et']},
+ {id:'fo',nm:'Forschende',dims:['ge','wi']},
+ {id:'be',nm:'Betroffene, zum Beispiel Erkrankte',dims:['ge','et']},
+ {id:'po',nm:'Politik',dims:['so','wi']}
+];
+const TPL=[
+ 'Ich beurteile den Einsatz insgesamt als … , weil …',
+ 'Besonders schwer wiegt für mich … , denn …',
+ 'Dagegen spricht vor allem … ',
+ 'Ein Werturteil dabei ist: …',
+ 'Ich würde zustimmen, wenn …',
+ 'Eine Alternative wäre …'
+];
+const CHECKS=[
+ 'Ich nenne mindestens zwei Bereiche (zum Beispiel Umwelt und Wirtschaft).',
+ 'Ich wäge Pro und Contra gegeneinander ab und beschreibe nicht nur eine Seite.',
+ 'Ich begründe, warum mir bestimmte Argumente wichtiger sind (Gewichtung).',
+ 'Ich unterscheide Sachargumente und Werturteile.',
+ 'Ich nenne eine Bedingung oder Alternative, bei der mein Urteil anders ausfallen würde.'
+];
+
+/* ---------- Zustand ---------- */
+let curCase='bt', phase=1, drag=null, suppressClick=false;
+const STORE={};
+const CASE=()=>CASES.find(c=>c.id===curCase);
+/* Zufällige Reihenfolge, aber nie mehr als zwei Karten derselben Seite hintereinander */
+function mixedOrder(cards){
+  const pools={pro:shuffle(cards.filter(c=>c.s==='pro')),con:shuffle(cards.filter(c=>c.s==='con'))};
+  const out=[]; let last='', run=0;
+  while(pools.pro.length||pools.con.length){
+    let side=Math.random()<pools.pro.length/(pools.pro.length+pools.con.length)?'pro':'con';
+    if(!pools[side].length) side=side==='pro'?'con':'pro';
+    const other=side==='pro'?'con':'pro';
+    if(side===last&&run>=2&&pools[other].length) side=other;
+    run=(side===last)?run+1:1; last=side; out.push(pools[side].pop().id);
+  }
+  return out;
+}
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function cs(){
+  let s=STORE[curCase];
+  if(!s){ s=STORE[curCase]={queue:mixedOrder(CASE().cards),pl:{},w:{},k:{},custom:[],uid:0,fazit:'',checks:CHECKS.map(()=>false),role:'',checked:false,res:{},showSol:false}; }
+  return s;
+}
+const allCards=()=>CASE().cards.concat(cs().custom);
+const card=id=>allCards().find(c=>c.id===id);
+function placement(c){ const s=cs(); if(s.showSol&&!c.custom) return {col:c.s,dim:c.d}; return s.pl[c.id]||null; }
+function heldId(){ const s=cs(); if(s.showSol) return null; return s.queue.find(id=>!s.pl[id]&&card(id))||null; }
+function evalCard(c){
+  const p=cs().pl[c.id]; if(!p) return {st:'open'};
+  if(c.custom) return {st:'custom'};
+  if(p.col!==c.s) return {st:'bad'};
+  if(p.dim===c.d||c.alt.includes(p.dim)) return {st:'ok'};
+  return {st:'near'};
+}
+function stats(){
+  const cards=allCards().filter(c=>!c.custom); let open=0,wrongSide=0;
+  cards.forEach(c=>{ const e=evalCard(c); if(e.st==='open') open++; else if(e.st==='bad') wrongSide++; });
+  return {open,wrongSide};
+}
+const canAdvance=()=>{ const st=stats(); return st.open===0&&st.wrongSide===0; };
+
+/* ---------- Kopf: Fälle, Info, Schritte ---------- */
+function renderCases(){
+  $('#cases').innerHTML=CASES.map(c=>`<button type="button" class="case" data-case="${c.id}" aria-pressed="${c.id===curCase}"><b>${c.nm}</b><span>${c.tag}</span></button>`).join('');
+}
+function renderInfo(){ const c=CASE(); $('#info').innerHTML=`<h2>${c.title}</h2><p>${c.info}</p>`; }
+function refreshSteps(){
+  const ok=canAdvance();
+  $$('.step').forEach(b=>{ const g=+b.dataset.go; if(g===phase) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current'); b.setAttribute('aria-disabled',(g>1&&!ok)?'true':'false'); });
+  const btn=$('#btnTo2'); btn.setAttribute('aria-disabled',ok?'false':'true');
+  const st=stats(); let m='';
+  if(!ok){ m=st.open?`Noch ${st.open} ${st.open===1?'Karte':'Karten'} offen.`:''; if(st.wrongSide) m+=(m?' ':'')+'Bei mindestens einer Karte stimmt Pro oder Contra noch nicht. Tipp: Nutze „Prüfen“.'; }
+  $('#gateMsg').textContent=m;
+}
+function setPhase(n){
+  if(n>1&&!canAdvance()){ const b=$(`.step[data-go="${n}"]`); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); return; }
+  phase=n;
+  $('#p1').hidden=n!==1; $('#p2').hidden=n!==2; $('#p3').hidden=n!==3;
+  $('#waageCard').hidden=n===1; $('#scoreBar').hidden=n!==2;
+  if(n===2) renderP2();
+  if(n===3) renderP3();
+  updateWaage(); refreshSteps();
+  $('#steps').scrollIntoView({block:'start'});
+}
+function setCase(id){
+  curCase=id; phase=1; renderCases(); renderInfo();
+  $('#p1').hidden=false; $('#p2').hidden=true; $('#p3').hidden=true; $('#waageCard').hidden=true; $('#scoreBar').hidden=true;
+  refreshP1(); refreshSteps();
+}
+
+/* ---------- Phase 1: Sortieren ---------- */
+function renderHand(){
+  const s=cs(), box=$('#handBox'), h=heldId();
+  if(s.showSol){ box.innerHTML='<div class="hand done"><b>Musterlösung (Vorschlag)</b><p>Manche Argumente passen zu mehreren Bereichen. Wichtig ist, dass Pro und Contra stimmen und du deine Zuordnung begründen kannst.</p></div>'; return; }
+  const left=s.queue.filter(id=>!s.pl[id]&&card(id)).length;
+  if(!h){ box.innerHTML='<div class="hand done"><b>Alle Karten sind eingeordnet.</b><p>Prüfe jetzt deine Matrix. Tippe auf ein Argument, um es wieder aufzunehmen.</p></div>'; return; }
+  const c=card(h);
+  box.innerHTML=`<div class="hand"><div class="hand-head"><span>Noch ${left} ${left===1?'Karte':'Karten'}</span>${left>1?'<button type="button" class="linkbtn" id="btnLater">Später ablegen</button>':''}${c.custom?'<button type="button" class="linkbtn" id="btnDel">Löschen</button>':''}</div><div class="held" data-card="${c.id}" data-label="${esc(c.t)}"><b>${esc(c.t)}</b><p>${esc(c.x)}</p></div><p class="handtip">Ziehe die Karte in ein Feld oder tippe auf ein Feld. Abgelegte Karten kannst du ziehen, um sie zu verschieben.</p></div>`;
+}
+function chipHTML(c){
+  const s=cs(), p=placement(c), res=(s.checked&&!s.showSol)?evalCard(c).st:'';
+  const mark=res==='ok'?'<span class="mk" aria-label="richtig">✓</span>':res==='near'?'<span class="mk" aria-label="Seite richtig, anderer Bereich passt besser">≈</span>':res==='bad'?'<span class="mk" aria-label="falsche Seite">✗</span>':'';
+  const stat=s.showSol?' static':'';
+  const attrs=s.showSol?'':` data-card="${c.id}" data-label="${esc(c.t)}"`;
+  const tag=s.showSol?'span':'button';
+  return `<${tag}${tag==='button'?' type="button"':''} class="chip ${p.col}${stat}${res?' '+res:''}"${attrs}><span>${esc(c.t)}${c.custom?'<span class="own">eigenes Argument</span>':''}</span>${mark}</${tag}>`;
+}
+function renderMatrix(){
+  const held=heldId(); let h=`<div class="matrix${held?' armed':''}"><div class="mh pro"><span aria-hidden="true">+</span> Pro</div><div class="mh con"><span aria-hidden="true">&minus;</span> Contra</div>`;
+  DIMS.forEach(d=>{
+    h+=`<div class="dim">${d.nm}</div>`;
+    ['pro','con'].forEach(col=>{
+      const items=allCards().filter(c=>{ const p=placement(c); return p&&p.col===col&&p.dim===d.id; });
+      h+=`<div class="cell ${col}" data-col="${col}" data-dim="${d.id}" role="button" tabindex="0" aria-label="${d.nm}, ${col==='pro'?'Pro':'Contra'}">${items.map(chipHTML).join('')}</div>`;
+    });
+  });
+  $('#matrixBox').innerHTML=h+'</div>';
+}
+function renderResult(){
+  const s=cs(), box=$('#resultBox');
+  if(!s.checked||s.showSol){ box.innerHTML=''; return; }
+  const cards=allCards().filter(c=>!c.custom); let ok=0,near=0,bad=0,open=0,tips='';
+  cards.forEach(c=>{ const e=evalCard(c);
+    if(e.st==='ok') ok++;
+    else if(e.st==='near'){ near++; tips+=`<li class="near"><b>${esc(c.t)}:</b> Pro oder Contra stimmt. Besser passt der Bereich „${DN[c.d]}“. Überlege, welchen Bereich das Argument hauptsächlich betrifft.</li>`; }
+    else if(e.st==='bad'){ bad++; tips+=`<li class="bad"><b>${esc(c.t)}:</b> Das gehört auf die ${c.s==='pro'?'Pro':'Contra'}-Seite. ${esc(c.h)}</li>`; }
+    else open++; });
+  const total=cards.length;
+  let h=(ok===total)?`<div class="score all"><strong>Alles richtig.</strong> Alle ${total} Karten sind passend eingeordnet. Weiter geht es mit dem Gewichten.</div>`
+    :`<div class="score"><strong>${ok} von ${total}</strong> Karten richtig eingeordnet${(near||bad||open)?'<br><span class="note">'+[near?near+' mit anderem Bereich':'',bad?bad+' auf der falschen Seite':'',open?open+' noch offen':''].filter(Boolean).join(', ')+'</span>':''}</div>`;
+  if(tips) h+=`<ul class="tips">${tips}</ul>`;
+  box.innerHTML=h;
+}
+function refreshP1(){ renderHand(); renderMatrix(); renderResult(); refreshSteps(); }
+function invalidate(){ const s=cs(); s.checked=false; s.res={}; }
+function placeCard(id,col,dim){ const s=cs(); s.pl[id]={col,dim}; invalidate(); refreshP1(); }
+function pickUp(id){ const s=cs(); delete s.pl[id]; s.queue=[id].concat(s.queue.filter(x=>x!==id)); invalidate(); refreshP1(); }
+
+/* Ziehen mit Zeiger (Maus, Finger, Stift) */
+document.addEventListener('pointerdown',e=>{
+  if(phase!==1||cs().showSol) return;
+  if(e.pointerType==='mouse'&&e.button!==0) return;
+  const el=e.target.closest('#p1 [data-card]'); if(!el) return;
+  drag={id:el.dataset.card,label:el.dataset.label||'Karte',x0:e.clientX,y0:e.clientY,moved:false,ghost:null,fromChip:el.classList.contains('chip')};
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  if(!drag.moved){
+    if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)<8) return;
+    drag.moved=true; const g=document.createElement('div'); g.className='ghost'; g.textContent=drag.label; document.body.appendChild(g); drag.ghost=g;
+  }
+  drag.ghost.style.left=e.clientX+'px'; drag.ghost.style.top=e.clientY+'px';
+  if(e.clientY>innerHeight-70) scrollBy(0,14); else if(e.clientY<50) scrollBy(0,-14);
+  $$('.cell.hot').forEach(x=>x.classList.remove('hot')); const c=cellAt(e.clientX,e.clientY); if(c) c.classList.add('hot');
+  e.preventDefault();
+},{passive:false});
+function cellAt(x,y){ const l=document.elementsFromPoint(x,y); for(const el of l){ if(el.classList&&el.classList.contains('cell')) return el; } return null; }
+document.addEventListener('pointerup',e=>{
+  if(!drag) return; const d=drag; drag=null;
+  if(d.ghost) d.ghost.remove(); $$('.cell.hot').forEach(x=>x.classList.remove('hot'));
+  if(!d.moved) return;
+  suppressClick=true; setTimeout(()=>{suppressClick=false;},0);
+  const c=cellAt(e.clientX,e.clientY); if(c) placeCard(d.id,c.dataset.col,c.dataset.dim);
+});
+document.addEventListener('pointercancel',()=>{ if(drag){ if(drag.ghost) drag.ghost.remove(); drag=null; $$('.cell.hot').forEach(x=>x.classList.remove('hot')); } });
+
+/* Antippen und Tastatur */
+$('#p1').addEventListener('click',e=>{
+  if(suppressClick) return;
+  const s=cs();
+  if(e.target.closest('#btnLater')){ const h=heldId(); if(h){ s.queue=s.queue.filter(x=>x!==h).concat([h]); refreshP1(); } return; }
+  if(e.target.closest('#btnDel')){ const h=heldId(); if(h){ s.custom=s.custom.filter(c=>c.id!==h); s.queue=s.queue.filter(x=>x!==h); delete s.w[h]; delete s.k[h]; refreshP1(); } return; }
+  if(s.showSol) return;
+  const chip=e.target.closest('.chip[data-card]'); if(chip){ const h=heldId(), cl=chip.closest('.cell'); if(h&&cl) placeCard(h,cl.dataset.col,cl.dataset.dim); else pickUp(chip.dataset.card); return; }
+  const cell=e.target.closest('.cell'); if(cell){ const h=heldId(); if(h) placeCard(h,cell.dataset.col,cell.dataset.dim); }
+});
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('cell')){ e.preventDefault(); e.target.click(); }
+});
+
+$('#btnCheck').addEventListener('click',()=>{ const s=cs(); s.showSol=false; $('#btnSol').textContent='Lösung zeigen'; s.checked=true; refreshP1(); });
+$('#btnSol').addEventListener('click',function(){ const s=cs(); s.showSol=!s.showSol; s.checked=false; this.textContent=s.showSol?'Lösung verbergen':'Lösung zeigen'; refreshP1(); });
+$('#btnReset').addEventListener('click',()=>{ delete STORE[curCase]; $('#btnSol').textContent='Lösung zeigen'; refreshP1(); });
+$('#btnTo2').addEventListener('click',()=>setPhase(2));
+$('#steps').addEventListener('click',e=>{ const b=e.target.closest('.step'); if(b) setPhase(+b.dataset.go); });
+$('#cases').addEventListener('click',e=>{ const b=e.target.closest('.case'); if(b&&b.dataset.case!==curCase){ $('#btnSol').textContent=cs().showSol?'Lösung verbergen':'Lösung zeigen'; setCase(b.dataset.case); $('#btnSol').textContent=cs().showSol?'Lösung verbergen':'Lösung zeigen'; } });
+
+/* Eigenes Argument */
+$('#ownDim').innerHTML=DIMS.map(d=>`<option value="${d.id}">${d.nm}</option>`).join('');
+$('#btnOwn').addEventListener('click',()=>{
+  const txt=$('#ownText').value.trim(); if(!txt){ $('#ownText').focus(); return; }
+  const s=cs(); s.showSol=false; $('#btnSol').textContent='Lösung zeigen';
+  const side=$('#ownSide').value, dim=$('#ownDim').value, kind=$('#ownKind').value; s.uid++;
+  const id='u'+s.uid; const short=txt.length>46?txt.slice(0,44).trim()+'…':txt;
+  s.custom.push({id,custom:true,s:side,d:dim,alt:[],k:kind,t:short,x:txt});
+  s.pl[id]={col:side,dim}; s.k[id]=kind; invalidate(); $('#ownText').value=''; refreshP1();
+});
+
+/* ---------- Waage ---------- */
+function totals(){
+  const s=cs(); let pro=0,con=0; const by={}; DIMS.forEach(d=>by[d.id]={pro:0,con:0});
+  allCards().forEach(c=>{ const p=s.pl[c.id]; if(!p) return; const w=s.w[c.id]||2; if(p.col==='pro') pro+=w; else con+=w; by[p.dim][p.col]+=w; });
+  return {pro,con,by};
+}
+function updateWaage(){
+  const t=totals(), sum=t.pro+t.con, r=sum?(t.pro-t.con)/sum:0, a=-r*16, rad=a*Math.PI/180, L=120;
+  $('#beam').style.transform=`rotate(${a}deg)`;
+  const lx=180-L*Math.cos(rad), ly=40-L*Math.sin(rad), rx=180+L*Math.cos(rad), ry=40+L*Math.sin(rad);
+  $('#panL').style.transform=`translate(${lx}px,${ly}px)`; $('#panR').style.transform=`translate(${rx}px,${ry}px)`;
+  $('#panLT').textContent='Pro '+t.pro; $('#panRT').textContent='Contra '+t.con;
+  $('#waageText').textContent=sum===0?'Noch nichts gewichtet.':(t.pro===t.con?'Gleichgewicht: Pro und Contra wiegen gleich.':(t.pro>t.con?'Die Pro-Seite wiegt schwerer.':'Die Contra-Seite wiegt schwerer.'));
+  const pp=sum?Math.round(t.pro/sum*100):50;
+  $('#scoreBar').innerHTML=`<span class="s pro">Pro ${t.pro}</span><span class="bar" aria-hidden="true"><i class="p" style="width:${pp}%"></i><i class="c" style="width:${100-pp}%"></i></span><span class="s con">Contra ${t.con}</span>`;
+}
+
+/* ---------- Phase 2: Gewichten ---------- */
+function renderP2(){
+  const s=cs(); $('#kindMsg').textContent='';
+  const col=side=>{
+    const cards=allCards().filter(c=>s.pl[c.id]&&s.pl[c.id].col===side);
+    return `<div class="${side}"><h3>${side==='pro'?'+ Pro':'&minus; Contra'}</h3>${cards.map(c=>{
+      const w=s.w[c.id]||2, k=s.k[c.id]||'';
+      return `<article class="arg" data-id="${c.id}"><p class="dimtag">${DN[s.pl[c.id].dim]}${c.custom?', eigenes Argument':''}</p><h4>${esc(c.t)}</h4>${c.custom&&c.t!==c.x?`<p>${esc(c.x)}</p>`:(c.custom?'':`<p>${esc(c.x)}</p>`)}
+      <div class="ctl"><span class="lab">Gewicht</span><div class="seg" role="group" aria-label="Gewicht">${[1,2,3].map((n,i)=>`<button type="button" data-w="${n}" aria-pressed="${w===n}">${['gering','mittel','hoch'][i]}</button>`).join('')}</div></div>
+      <div class="ctl"><span class="lab">Art</span><div class="seg" role="group" aria-label="Art des Arguments"><button type="button" data-k="sach" aria-pressed="${k==='sach'}">Sachargument</button><button type="button" data-k="wert" aria-pressed="${k==='wert'}">Werturteil</button></div></div></article>`;}).join('')||'<p class="note">Keine Argumente auf dieser Seite.</p>'}</div>`;
+  };
+  $('#argsBox').innerHTML=col('pro')+col('con');
+}
+$('#argsBox').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-w],button[data-k]'); if(!b) return;
+  const art=b.closest('.arg'), id=art.dataset.id, s=cs();
+  if(b.dataset.w){ s.w[id]=+b.dataset.w; $$('button[data-w]',art).forEach(x=>x.setAttribute('aria-pressed',x===b)); updateWaage(); }
+  else { s.k[id]=b.dataset.k; $$('button[data-k]',art).forEach(x=>x.setAttribute('aria-pressed',x===b)); const f=$('.fbk',art); if(f) f.remove(); }
+});
+$('#btnKind').addEventListener('click',()=>{
+  const s=cs(); let miss=0,good=0,tot=0;
+  $$('#argsBox .arg').forEach(art=>{
+    const id=art.dataset.id, c=card(id), f=$('.fbk',art); if(f) f.remove();
+    if(!c||c.custom) return; tot++;
+    const k=s.k[id]; if(!k){ miss++; return; }
+    const ok=k===c.k; if(ok) good++;
+    const msg=ok?(c.k==='sach'?'Passt: Das lässt sich prüfen oder messen.':'Passt: Hier entscheidet, was man für wichtig hält.')
+                :(c.k==='sach'?'Überlege noch einmal: Dieses Argument beschreibt etwas, das sich prüfen oder messen lässt.':'Überlege noch einmal: Hier hängt es davon ab, was man für wichtig hält.');
+    art.insertAdjacentHTML('beforeend',`<div class="fbk ${ok?'ok':'bad'}">${msg}</div>`);
+  });
+  $('#kindMsg').textContent=miss?`Bei ${miss} ${miss===1?'Argument':'Argumenten'} fehlt noch die Art.`:`${good} von ${tot} Argumenten passend eingeordnet.`;
+});
+$('#btnTo3').addEventListener('click',()=>setPhase(3));
+
+/* ---------- Phase 3: Urteilen ---------- */
+function renderSummary(){
+  const t=totals(), s=cs(), role=ROLES.find(r=>r.id===s.role); const max=Math.max(1,...DIMS.map(d=>Math.max(t.by[d.id].pro,t.by[d.id].con)));
+  $('#sumBox').innerHTML=DIMS.map(d=>{
+    const p=t.by[d.id].pro, c=t.by[d.id].con, hl=role&&role.dims.includes(d.id);
+    return `<div class="srow${hl?' hl':''}"><div class="sl"><span>${d.nm}${hl?' (Schwerpunkt der Rolle)':''}</span><em>${(p+c)?'':'noch kein Argument'}</em></div><div class="sb"><div class="half l"><i style="width:${p/max*88}%"></i><b>${p}</b></div><div class="half r"><i style="width:${c/max*88}%"></i><b>${c}</b></div></div></div>`;
+  }).join('')+`<p class="note">Gesamt: Pro ${t.pro}, Contra ${t.con}. Zahlen ersetzen keine Begründung.</p>`;
+}
+function renderRoles(){
+  const s=cs();
+  $('#roleBox').innerHTML=ROLES.map(r=>`<button type="button" class="rolebtn" data-role="${r.id}" aria-pressed="${s.role===r.id}">${r.nm}</button>`).join('');
+  const role=ROLES.find(r=>r.id===s.role);
+  $('#roleHint').textContent=role?`Mögliche Schwerpunkte: ${role.dims.map(d=>DN[d]).join(' und ')}. Satzanfang: „Aus Sicht von ${role.nm} ist mir vor allem ${role.dims.map(d=>DN[d]).join(' und ')} wichtig, weil …“`:'';
+}
+function wc(){ const v=$('#fazit').value.trim(); $('#wordCount').textContent=(v?v.split(/\s+/).length:0)+' Wörter'; }
+function renderP3(){
+  const s=cs();
+  renderSummary(); renderRoles();
+  $('#tplBox').innerHTML=TPL.map((t,i)=>`<button type="button" class="tplbtn" data-tpl="${i}">${t}</button>`).join('');
+  $('#fazit').value=s.fazit; wc();
+  $('#checkBox').innerHTML=CHECKS.map((t,i)=>`<li><label><input type="checkbox" data-chk="${i}" ${s.checks[i]?'checked':''}><span>${t}</span></label></li>`).join('');
+  $('#exportText').hidden=true; $('#copyMsg').textContent='Hinweis: Beim Schließen der Seite sind deine Eingaben weg. Kopiere oder drucke sie vorher. Schreibe keine Namen in den Text.';
+}
+$('#roleBox').addEventListener('click',e=>{ const b=e.target.closest('.rolebtn'); if(!b) return; const s=cs(); s.role=(s.role===b.dataset.role)?'':b.dataset.role; renderRoles(); renderSummary(); });
+$('#tplBox').addEventListener('click',e=>{
+  const b=e.target.closest('.tplbtn'); if(!b) return;
+  const ta=$('#fazit'), s=cs(), txt=TPL[+b.dataset.tpl], pos=ta.selectionStart==null?ta.value.length:ta.selectionStart;
+  const before=ta.value.slice(0,pos), after=ta.value.slice(ta.selectionEnd==null?pos:ta.selectionEnd);
+  const sep=(before&&!/\s$/.test(before))?' ':''; ta.value=before+sep+txt+' '+after; s.fazit=ta.value; ta.focus(); const np=(before+sep+txt+' ').length; ta.setSelectionRange(np,np); wc();
+});
+$('#fazit').addEventListener('input',function(){ cs().fazit=this.value; wc(); });
+$('#checkBox').addEventListener('change',e=>{ const i=e.target.dataset.chk; if(i!==undefined) cs().checks[+i]=e.target.checked; });
+
+function exportText(){
+  const s=cs(), c=CASE(), t=totals(), role=ROLES.find(r=>r.id===s.role); let out=`Gentechnik: Pro und Contra abwägen\nFall: ${c.title}\n\n`;
+  ['pro','con'].forEach(side=>{
+    out+=(side==='pro'?'PRO':'CONTRA')+'\n';
+    DIMS.forEach(d=>{
+      const list=allCards().filter(x=>s.pl[x.id]&&s.pl[x.id].col===side&&s.pl[x.id].dim===d.id);
+      list.forEach(x=>{ const w=['','gering','mittel','hoch'][s.w[x.id]||2], k=s.k[x.id]==='sach'?'Sachargument':(s.k[x.id]==='wert'?'Werturteil':'Art offen');
+        out+=`- ${d.nm}: ${x.custom?x.x:x.t} (Gewicht: ${w}; ${k})\n`; });
+    });
+    out+='\n';
+  });
+  out+=`Summe der Gewichte: Pro ${t.pro}, Contra ${t.con}\n`;
+  if(role) out+=`Gewählte Perspektive: ${role.nm}\n`;
+  out+=`\nMein Urteil:\n${s.fazit||'(noch nicht geschrieben)'}\n`;
+  return out;
+}
+$('#btnCopy').addEventListener('click',async()=>{
+  const ta=$('#exportText'), txt=exportText(); ta.value=txt; ta.hidden=false;
+  let ok=false; try{ await navigator.clipboard.writeText(txt); ok=true; }catch(_){ try{ ta.focus(); ta.select(); ok=document.execCommand('copy'); }catch(__){} }
+  $('#copyMsg').textContent=ok?'Kopiert. Du kannst den Text jetzt einfügen.':'Markiere den Text unten und kopiere ihn selbst.';
+});
+function fillPrint(){ $('#printOut').textContent=exportText(); }
+window.addEventListener('beforeprint',fillPrint);
+$('#btnPrint').addEventListener('click',()=>{ fillPrint(); window.print(); });
+
+/* ---------- Start ---------- */
+renderCases(); renderInfo(); refreshP1(); refreshSteps(); updateWaage();
+})();
+</script>
+</body>
+</html>

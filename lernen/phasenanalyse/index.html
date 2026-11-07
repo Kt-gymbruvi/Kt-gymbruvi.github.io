@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Phasenanalyse – Meinel/Schnabel und Göhner</title>
+<style>
+:root{
+  --bg:#f5f7fb; --surface:#ffffff; --ink:#14213d; --muted:#53607a; --line:#d6dceb;
+  --navy:#17305f; --navy-ink:#ffffff; --yellow:#f2c230; --yellow-ink:#1b1b1b;
+  --v:#c9d8f2; --h:#f2c230; --e:#d9dde5; --z:#b9e3dc;
+  --g1:#3c5d9e; --g2:#7f97c6; --g3:#b8c6e3; --gu:#9fd3a8; --gue:#d1b8ea; --gnone:#eceef3;
+  --ok:#1f7a3a; --bad:#b3261e;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1830; --surface:#17223f; --ink:#e8ecf6; --muted:#a6b0c8; --line:#2c3a5f;
+    --navy:#0a1226; --navy-ink:#f2f4fa; --yellow:#f2c230; --yellow-ink:#1b1b1b;
+    --v:#34508a; --h:#c99e1c; --e:#3a4258; --z:#2c6b62;
+    --g1:#5a7cc2; --g2:#40598e; --g3:#2f4370; --gu:#2f6e3c; --gue:#5d4782; --gnone:#232d48;
+    --ok:#7fd69a; --bad:#ff8a80;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1830; --surface:#17223f; --ink:#e8ecf6; --muted:#a6b0c8; --line:#2c3a5f;
+  --navy:#0a1226; --navy-ink:#f2f4fa; --yellow:#f2c230; --yellow-ink:#1b1b1b;
+  --v:#34508a; --h:#c99e1c; --e:#3a4258; --z:#2c6b62;
+  --g1:#5a7cc2; --g2:#40598e; --g3:#2f4370; --gu:#2f6e3c; --gue:#5d4782; --gnone:#232d48;
+  --ok:#7fd69a; --bad:#ff8a80;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.55 "Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;line-height:1.1;margin:0}
+.wrap{max-width:62rem;margin:0 auto;padding:0 1.1rem}
+
+header.hero{background:var(--navy);color:var(--navy-ink);padding:2rem 0 0}
+.hero h1{font-size:clamp(2.2rem,6vw,3.6rem);font-weight:700;letter-spacing:.01em}
+.hero p{max-width:40rem;margin:.6rem 0 1.4rem;opacity:.88}
+.track{display:flex;height:.75rem}
+.track span{flex:1}
+.track .a{background:#c9d8f2;flex:2.2}.track .b{background:var(--yellow);flex:1.3}.track .c{background:#8fa1c6;flex:.9}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:.25rem;overflow-x:auto}
+nav.tabs button{font:600 1.05rem "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.02em;background:none;border:0;color:var(--muted);padding:.85rem .9rem;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--yellow)}
+button:focus-visible,select:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+main{padding:1.8rem 0 3rem}
+section[hidden]{display:none}
+h2{font-size:2rem;font-weight:700;margin-bottom:.6rem}
+h3{font-size:1.35rem;font-weight:600;margin:1.4rem 0 .4rem}
+p{margin:.5rem 0;max-width:42rem}
+.lead{color:var(--muted)}
+
+.cols{display:grid;grid-template-columns:1fr;gap:1.4rem;margin-top:1rem}
+@media (min-width:760px){.cols{grid-template-columns:1fr 1fr}}
+.model{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.2rem 1.2rem 1.4rem;border-top:6px solid var(--navy)}
+.model.goehner{border-top-color:var(--yellow)}
+.model h2{font-size:1.7rem}
+.model .q{font-weight:700;margin:.2rem 0 .8rem}
+dl{margin:.4rem 0}
+dt{font-weight:700;margin-top:.7rem}
+dd{margin:.15rem 0 0}
+.chip{display:inline-block;padding:.08rem .55rem;border-radius:3px;font-weight:600;font-size:.95rem;color:var(--ink)}
+.c-V{background:var(--v)}.c-H{background:var(--h);color:var(--yellow-ink)}.c-E{background:var(--e)}.c-Z{background:var(--z)}
+.c-gH{background:var(--h);color:var(--yellow-ink)}.c-v1{background:var(--g1);color:#fff}.c-v2{background:var(--g2)}.c-v3{background:var(--g3)}.c-u{background:var(--gu)}.c-ü{background:var(--gue)}.c-none{background:var(--gnone);color:var(--muted)}
+ol.steps{padding-left:1.3rem;margin:.4rem 0}
+ol.steps li{margin:.35rem 0}
+
+.tbl{overflow-x:auto;margin-top:1rem;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:40rem}
+th,td{text-align:left;vertical-align:top;padding:.7rem .8rem;border-bottom:1px solid var(--line)}
+thead th{font:700 1.15rem "Barlow Condensed","Arial Narrow",sans-serif;background:var(--navy);color:var(--navy-ink)}
+tbody th{font-weight:700;width:22%}
+tr:last-child td,tr:last-child th{border-bottom:0}
+
+.picker{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
+.picker button{font:600 1rem "Source Sans 3",sans-serif;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:.45rem .8rem;border-radius:4px;cursor:pointer}
+.picker button[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:var(--navy-ink)}
+.goal{background:var(--surface);border-left:5px solid var(--yellow);padding:.7rem 1rem;margin:.6rem 0 1.2rem;max-width:none}
+.goal b{display:block}
+
+.strip{margin:1rem 0 1.6rem}
+.strip .row{display:grid;grid-template-columns:7.5rem 1fr;gap:.6rem;align-items:stretch;margin:.35rem 0}
+.strip .lab{font:600 1rem "Barlow Condensed","Arial Narrow",sans-serif;align-self:center;color:var(--muted)}
+.strip .bar{display:flex;gap:2px;min-height:2.4rem}
+.strip .bar div{flex:1;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;text-align:center;padding:.2rem;line-height:1.15;border-radius:2px}
+.strip .names{display:flex;gap:2px}
+.strip .names div{flex:1;font-size:.78rem;color:var(--muted);text-align:center;line-height:1.2}
+@media (max-width:560px){.strip .row{grid-template-columns:1fr}.strip .bar div{font-size:.7rem}}
+
+.seglist{display:grid;gap:.8rem}
+.seg{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.9rem 1rem}
+.seg h3{margin:0 0 .25rem;font-size:1.3rem}
+.seg .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}
+.seg .why{color:var(--muted);margin:.2rem 0 0}
+
+.quiz .seg label{display:block;font-weight:600;font-size:.95rem;margin-top:.5rem}
+.quiz select{width:100%;max-width:22rem;font:inherit;padding:.35rem;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
+.res{font-weight:700;margin-left:.4rem}
+.res.ok{color:var(--ok)}.res.bad{color:var(--bad)}
+.actions{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.2rem 0}
+.btn{font:700 1rem "Source Sans 3",sans-serif;padding:.6rem 1.1rem;border-radius:4px;border:0;cursor:pointer}
+.btn.primary{background:var(--yellow);color:var(--yellow-ink)}
+.btn.sec{background:var(--surface);color:var(--ink);border:2px solid var(--line)}
+.score{font:700 1.4rem "Barlow Condensed","Arial Narrow",sans-serif}
+.note{font-size:.95rem;color:var(--muted)}
+
+/* Bildreihen */
+.strip .bar div,.strip .figs div,.strip .names div{flex:1 1 0;min-width:0;hyphens:manual;-webkit-hyphens:manual}
+.strip .figs{display:flex;gap:2px}
+.strip .figs div{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:2px}
+.strip .figs svg,.segfig svg{display:block;width:100%;height:auto}
+.seg{display:flow-root}
+.segfig{float:right;width:120px;margin:0 0 .5rem .9rem;background:var(--bg);border-radius:4px;padding:3px}
+@media (max-width:480px){.segfig{width:92px}}
+.blind .txt{display:none}
+.blind .segfig{float:none;width:min(220px,100%);margin:0 0 .5rem}
+.toggle{display:flex;align-items:center;gap:.6rem;font-weight:600;margin:.4rem 0 1rem;min-height:44px;cursor:pointer}
+.toggle input{width:22px;height:22px;accent-color:var(--navy)}
+.figlegend{font-size:.9rem;color:var(--muted);margin:.2rem 0 0}
+.figlegend i{display:inline-block;width:1.4rem;height:.55rem;border-radius:3px;background:var(--yellow);opacity:.75;vertical-align:middle;margin-right:.3rem}
+
+/* iPad / Touch */
+html{-webkit-text-size-adjust:100%}
+button,select{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+nav.tabs button{min-height:48px;padding:.85rem 1.1rem;font-size:1.15rem}
+.picker button{min-height:44px;padding:.55rem 1rem}
+.btn{min-height:48px;padding:.7rem 1.3rem}
+.quiz select{font-size:16px;min-height:44px;max-width:none}
+.strip{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.3rem}
+.strip .row{min-width:40rem}
+@media (max-width:560px){.strip .row{grid-template-columns:7.5rem 1fr}.strip .bar div{font-size:.75rem}}
+@media (min-width:700px){.quiz .pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem}}
+@media (min-width:1000px){.seglist{grid-template-columns:1fr 1fr}}
+@media (hover:hover){.picker button:hover{border-color:var(--navy)}}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="hero">
+  <div class="wrap">
+    <h1>Phasenanalyse sportlicher Bewegungen</h1>
+    <p>Zwei Modelle, eine Bewegung: Meinel/Schnabel beschreiben, wie eine Bewegung abläuft. Göhner erklärt, wozu jeder Teil gebraucht wird.</p>
+  </div>
+  <div class="track" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+</header>
+
+<nav class="tabs" aria-label="Bereiche">
+  <div class="wrap" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="grundlagen">Grundlagen</button>
+    <button role="tab" aria-selected="false" data-tab="vergleich">Vergleich</button>
+    <button role="tab" aria-selected="false" data-tab="beispiele">Beispiele</button>
+    <button role="tab" aria-selected="false" data-tab="ueben">Üben</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- GRUNDLAGEN -->
+<section id="grundlagen">
+  <div class="cols">
+    <article class="model">
+      <h2>Meinel/Schnabel</h2>
+      <p class="q">Morphologische Betrachtungsweise: Wie sieht die Bewegung von außen aus?</p>
+      <p>Die Bewegung wird nach ihrer äußeren Gestalt in zeitlich aufeinanderfolgende Phasen gegliedert. Jede Phase hat eine allgemeine Funktion, die für alle Bewegungen gleich ist.</p>
+      <h3>Azyklische Bewegungen (Dreiphasenstruktur)</h3>
+      <dl>
+        <dt><span class="chip c-V">Vorbereitungsphase</span></dt>
+        <dd>Schafft optimale Voraussetzungen für die Hauptphase: Ausholen, Vordehnen der Muskulatur, Beschleunigungsweg verlängern, Anlauf.</dd>
+        <dt><span class="chip c-H">Hauptphase</span></dt>
+        <dd>Löst die Bewegungsaufgabe unmittelbar, z. B. Abwurf, Absprung, Stoß.</dd>
+        <dt><span class="chip c-E">Endphase</span></dt>
+        <dd>Abbremsen, Gleichgewicht wiederherstellen, Übergang in Ruhe oder in eine Folgebewegung.</dd>
+      </dl>
+      <h3>Zyklische Bewegungen (Zweiphasenstruktur)</h3>
+      <dl>
+        <dt><span class="chip c-H">Hauptphase</span> + <span class="chip c-Z">Zwischenphase</span></dt>
+        <dd>Bei Wiederholungen verschmelzen Endphase und folgende Vorbereitungsphase zur Zwischenphase (z. B. Rückholphase beim Kraularm). Nur der erste Zyklus hat eine eigene Vorbereitungsphase, nur der letzte eine eigene Endphase.</dd>
+      </dl>
+      <h3>Bewegungskombinationen</h3>
+      <p><b>Sukzessiv:</b> Endphase der ersten und Vorbereitungsphase der zweiten Bewegung verschmelzen (Ballannahme und Abspiel).<br><b>Simultan:</b> Bewegungen laufen gleichzeitig ab (Laufen und Dribbeln).</p>
+      <h3>Vorgehen</h3>
+      <ol class="steps">
+        <li>Bewegungsart bestimmen: azyklisch, zyklisch oder Kombination.</li>
+        <li>Hauptphase bestimmen: Wo wird die Aufgabe unmittelbar gelöst?</li>
+        <li>Vorbereitungs- und Endphase (bzw. Zwischenphase) abgrenzen.</li>
+        <li>Phasen beschreiben und ihre allgemeine Funktion angeben.</li>
+      </ol>
+    </article>
+
+    <article class="model goehner">
+      <h2>Göhner</h2>
+      <p class="q">Funktionale Bewegungsanalyse: Wozu dient welcher Bewegungsteil?</p>
+      <p>Eine Bewegung ist die Lösung eines Bewegungsproblems. Welche Funktion ein Teil hat, ergibt sich erst aus dem Bewegungsziel und den Bedingungen, unter denen es erreicht werden muss.</p>
+      <h3>Bezugsgrundlagen</h3>
+      <dl>
+        <dt>Bewegungsziel</dt><dd>Was soll erreicht werden (Weite, Treffer, Zeit)?</dd>
+        <dt>Bewegermerkmale</dt><dd>Körperbau, Kraft, Beweglichkeit der Person.</dd>
+        <dt>Umgebungsbedingungen</dt><dd>Gerät, Untergrund, Medium (Wasser, Luft), Gegner.</dd>
+        <dt>Regelbedingungen</dt><dd>Wettkampfregeln, z. B. Schrittregel, Stoßkreis, Torraum.</dd>
+      </dl>
+      <h3>Funktionsphasen</h3>
+      <dl>
+        <dt><span class="chip c-gH">Hauptfunktionsphase</span></dt>
+        <dd>Erreicht das Bewegungsziel unmittelbar. Fehlt sie, ist das Ziel nicht erreichbar. Hat eine Bewegung mehrere Teilziele, kann es mehrere Hauptfunktionsphasen geben (z. B. Hochsprung: Höhe gewinnen und Latte überqueren).</dd>
+        <dt><span class="chip c-v1">vorbereitend</span></dt>
+        <dd>Geht der Hauptfunktion voraus und schafft ihre Voraussetzungen. Gestuft nach Ordnung: 1. Ordnung bereitet die Hauptfunktion direkt vor, 2. Ordnung bereitet die Phase 1. Ordnung vor usw.</dd>
+        <dt><span class="chip c-u">unterstützend</span></dt>
+        <dd>Läuft gleichzeitig mit einer anderen Phase ab und verbessert sie.</dd>
+        <dt><span class="chip c-ü">überleitend</span></dt>
+        <dd>Verbindet zwei Hauptfunktionsphasen, typisch bei zyklischen Bewegungen.</dd>
+      </dl>
+      <h3>Vorgehen</h3>
+      <ol class="steps">
+        <li>Bewegungsziel und Bezugsgrundlagen klären.</li>
+        <li>Bewegung in Teilaktionen gliedern.</li>
+        <li>Hauptfunktionsphase bestimmen.</li>
+        <li>Hilfsfunktionen mit der Weglass- bzw. Variationsprobe ermitteln: Was ändert sich, wenn dieser Teil fehlt oder anders ausgeführt wird?</li>
+        <li>Hilfsfunktionen ordnen (vorbereitend, unterstützend, überleitend; Ordnung).</li>
+        <li>Funktionen begründen, möglichst biomechanisch.</li>
+      </ol>
+    </article>
+  </div>
+</section>
+
+<!-- VERGLEICH -->
+<section id="vergleich" hidden>
+  <h2>Die Modelle im Vergleich</h2>
+  <p class="lead">Die Modelle schließen sich nicht aus: Meinel/Schnabel liefern die zeitliche Gliederung, Göhner die Begründung.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th></th><th>Meinel/Schnabel</th><th>Göhner</th></tr></thead>
+      <tbody>
+        <tr><th>Betrachtungsweise</th><td>morphologisch, Außensicht</td><td>funktional, Zweck-Mittel-Beziehung</td></tr>
+        <tr><th>Leitfrage</th><td>Wie läuft die Bewegung ab?</td><td>Wozu dient ein Bewegungsteil?</td></tr>
+        <tr><th>Bezugspunkt</th><td>der sichtbare Bewegungsablauf</td><td>Bewegungsziel und Bezugsgrundlagen (Beweger, Umgebung, Regeln)</td></tr>
+        <tr><th>Gliederung</th><td>zeitlich nacheinander: 3 Phasen (azyklisch) bzw. 2 Phasen (zyklisch)</td><td>hierarchisch: Hauptfunktionsphase und Hilfsfunktionsphasen verschiedener Ordnung</td></tr>
+        <tr><th>Gleichzeitige Teilbewegungen</th><td>nur über „simultane Kombination“ erfasst</td><td>als unterstützende Hilfsfunktionen direkt erfasst</td></tr>
+        <tr><th>Phasenanzahl</th><td>fest</td><td>abhängig von der Bewegung, beliebig viele Hilfsfunktionsphasen</td></tr>
+        <tr><th>Erkenntnis</th><td>beschreibend</td><td>erklärend und begründend</td></tr>
+        <tr><th>Stärken</th><td>einfach, schnell, auf fast alle Bewegungen anwendbar; gute Grundlage für Bewegungsbeobachtung</td><td>begründet, warum ein Teil nötig ist; hilft bei Fehlerkorrektur und methodischen Reihen; erfasst Regeln und Umgebung</td></tr>
+        <tr><th>Grenzen</th><td>erklärt nicht, warum eine Phase so aussieht; Phasengrenzen bei komplexen Bewegungen unscharf; Funktionen sehr allgemein</td><td>aufwendiger; Einordnung (z. B. Ordnung, Phasen nach der Hauptfunktion) teils interpretationsabhängig; Ergebnis ändert sich mit dem Ziel</td></tr>
+        <tr><th>Typischer Einsatz</th><td>Bewegungsbeschreibung, Beobachtungsbögen, Einstieg</td><td>Technikbegründung, Fehleranalyse, Vergleich von Techniken</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Merksatz für die Klausur</h3>
+  <p>Eine Phase kann bei Meinel/Schnabel zur Vorbereitungsphase gehören und bei Göhner trotzdem in mehrere Funktionsphasen unterschiedlicher Ordnung zerfallen. Entscheidend bei Göhner ist immer die Begründung über das Ziel, nicht die Reihenfolge.</p>
+</section>
+
+<!-- BEISPIELE -->
+<section id="beispiele" hidden>
+  <h2>Beispiele</h2>
+  <p class="lead">Wähle eine Bewegung. Das Band zeigt beide Gliederungen untereinander, darunter stehen die Begründungen.</p>
+  <div class="picker" id="pick-ex"></div>
+  <div id="ex-out"></div>
+</section>
+
+<!-- ÜBEN -->
+<section id="ueben" hidden>
+  <h2>Üben</h2>
+  <p class="lead">Ordne jede Teilbewegung in beiden Modellen zu und prüfe dann.</p>
+  <div class="picker" id="pick-quiz"></div>
+  <div id="quiz-out" class="quiz"></div>
+  <p class="note">Die Ordnung vorbereitender Hilfsfunktionen ist in der Literatur nicht immer einheitlich. In Klausuren zählt die schlüssige Begründung über Bewegungsziel und Bezugsgrundlagen.</p>
+</section>
+
+</main>
+
+<script>
+/* Strichfiguren: Vorwärtskinematik. Winkel in Grad.
+   Rumpf t: 0 = aufrecht, + = Vorlage (Bewegungsrichtung +x).
+   Gliedmaßen: 0 = senkrecht nach unten, +90 = waagerecht nach vorn, -90 = nach hinten, 180 = nach oben. */
+const FIG = (function(){
+  const L={tr:30,nk:4,hd:6.5,th:22,sh:22,ua:15,fa:14};
+  const R=d=>d*Math.PI/180;
+  const RUN={t:12,ra:[-50,10],la:[50,140],rl:[50,-5],ll:[-30,-75]};
+  const SWIM={t:90,yAbs:44,x:62,rl:[-86,-80],ll:[-94,-100]};
+  const P=(o,a)=>Object.assign({},o,a);
+
+  const DATA={
+   kugel:{H:130,f:[
+    {m:1,t:62,rl:[12,-6],ll:[-62,-58],ra:[5,150],la:[18,30],props:[{k:"ball",kind:"shot",at:"rh",dx:0,dy:-2}],hl:[]},
+    {m:1,t:72,rl:[38,-28],ll:[-78,-82],ra:[5,150],la:[40,60],props:[{k:"ball",kind:"shot",at:"rh",dx:0,dy:-2}],hl:["rl","ll"]},
+    {t:-22,rl:[28,-22],ll:[42,40],ra:[-140,40],la:[95,100],props:[{k:"ball",kind:"shot",at:"nk",dx:-6,dy:0}],hl:["tr"]},
+    {t:18,rl:[-28,-30],ll:[6,4],ra:[140,138],la:[-40,-15],props:[{k:"ball",kind:"shot",at:"rh",dx:2,dy:-3},{k:"stop",dx:20}],hl:["ra","rl"]},
+    {t:52,rl:[38,0],ll:[-82,-85],ra:[45,70],la:[-70,-40],props:[{k:"stop",dx:14},{k:"ball",kind:"shot",abs:[128,30]}],hl:[]}
+   ]},
+   weit:{H:130,f:[
+    P(RUN,{props:[]}),
+    {t:4,rl:[38,12],ll:[-28,-55],ra:[-40,30],la:[40,110],hl:["rl"]},
+    {t:4,rl:[-16,-20],ll:[82,4],ra:[118,150],la:[-38,15],props:[{k:"board",at:"rf"}],hl:["rl"]},
+    {t:4,rl:[-16,-20],ll:[92,8],ra:[140,165],la:[-30,30],props:[{k:"board",at:"rf"}],hl:["ll","ra","la"]},
+    {t:0,lift:10,rl:[-12,-48],ll:[68,22],ra:[130,150],la:[120,140],props:[{k:"pit",x1:30,x2:140}],hl:[]},
+    {t:42,y:16,rl:[78,82],ll:[82,86],ra:[35,60],la:[25,50],props:[{k:"pit",x1:0,x2:140}],hl:["rl","ll"]}
+   ]},
+   hoch:{H:130,f:[
+    P(RUN,{props:[{k:"jcurve",part:"s"}]}),
+    P(RUN,{t:-4,rl:[46,0],ll:[-36,-80],props:[{k:"jcurve",part:"c"}]}),
+    {t:-10,rl:[-10,-12],ll:[90,0],ra:[150,170],la:[145,165],props:[{k:"post",dx:42,h:82}],hl:["rl"]},
+    {t:-6,rl:[-10,-12],ll:[100,8],ra:[165,178],la:[160,175],props:[{k:"post",dx:42,h:82}],hl:["ll","ra","la"]},
+    {t:118,y:80,rl:[-62,6],ll:[-56,12],ra:[-100,-100],la:[-110,-108],props:[{k:"post",dx:0,h:70}],hl:["tr"]},
+    {t:96,y:22,rl:[-150,-178],ll:[-140,-170],ra:[-110,-120],la:[-100,-110],props:[{k:"mat",x1:10,x2:140,h:14}],hl:[]}
+   ]},
+   korb:{H:175,f:[
+    P(RUN,{ra:[35,25],props:[{k:"ball",kind:"bb",at:"rh",dx:9,dy:20}]}),
+    P(RUN,{ra:[55,125],la:[45,115],props:[{k:"ball",kind:"bb",at:"rh",dx:3,dy:-2}]}),
+    {t:-6,rl:[90,0],ll:[-10,-14],ra:[150,165],la:[120,140],props:[{k:"ball",kind:"bb",at:"rh",dx:0,dy:-5},{k:"hoop",dx:42,y:28}],hl:["ll"]},
+    {t:-2,lift:20,rl:[100,10],ll:[-8,-20],ra:[162,172],la:[100,120],props:[{k:"ball",kind:"bb",at:"rh",dx:0,dy:-5},{k:"hoop",dx:38,y:28}],hl:["rl","la"]},
+    {t:2,lift:30,rl:[70,0],ll:[-4,-10],ra:[168,175],la:[60,80],props:[{k:"ball",kind:"bb",at:"rh",dx:5,dy:-7},{k:"hoop",dx:26,y:28}],hl:["ra"]},
+    {t:16,rl:[42,-18],ll:[38,-22],ra:[40,70],la:[30,60],props:[{k:"hoop",dx:6,y:28}],hl:[]}
+   ]},
+   hand:{H:130,f:[
+    P(RUN,{ra:[40,115],props:[{k:"ball",kind:"hb",at:"rh",dx:2,dy:-3}]}),
+    {t:-2,rl:[85,0],ll:[-10,-14],ra:[125,175],la:[90,100],props:[{k:"ball",kind:"hb",at:"rh",dx:1,dy:-4}],hl:["ll"]},
+    {t:-14,lift:16,rl:[72,0],ll:[-18,-45],ra:[-155,-115],la:[100,110],props:[{k:"ball",kind:"hb",at:"rh",dx:-3,dy:0}],hl:["ra","tr"]},
+    {t:18,lift:22,rl:[70,4],ll:[-14,-40],ra:[140,115],la:[60,70],props:[{k:"ball",kind:"hb",at:"rh",dx:6,dy:-1}],hl:["ra"]},
+    {t:30,lift:16,rl:[64,6],ll:[-10,-30],ra:[110,90],la:[-30,10],props:[{k:"ball",kind:"hb",abs:[132,52]}],hl:["la","tr"]},
+    {t:26,rl:[62,-20],ll:[22,-10],ra:[60,80],la:[-30,0],hl:[]}
+   ]},
+   kraul:{H:90,f:[
+    P(SWIM,{ra:[80,84],la:[2,-14],props:[{k:"water",y:40}],hl:["ra"]}),
+    P(SWIM,{ra:[12,-24],la:[-150,30],props:[{k:"water",y:40}],hl:["ra"]}),
+    P(SWIM,{ra:[-160,15],la:[80,84],props:[{k:"water",y:40}],hl:["ra"]}),
+    P(SWIM,{rl:[-78,-72],ll:[-100,-106],ra:[80,84],la:[2,-14],props:[{k:"water",y:40}],hl:["rl","ll"]}),
+    P(SWIM,{ht:-40,ra:[-160,15],la:[80,84],props:[{k:"water",y:40}],hl:["tr"]})
+   ]}
+  };
+
+  function pose(p,H){
+    const m=p.m?-1:1, G=H-8;
+    const pt=(o,a,l)=>[o[0]+m*l*Math.sin(R(a)), o[1]+l*Math.cos(R(a))];
+    const hip=[0,0];
+    const nk=[m*L.tr*Math.sin(R(p.t)), -L.tr*Math.cos(R(p.t))];
+    const ht=p.t+(p.ht||0);
+    const hd=[nk[0]+m*(L.nk+L.hd)*Math.sin(R(ht)), nk[1]-(L.nk+L.hd)*Math.cos(R(ht))];
+    const J={hip,nk,hd};
+    [["r",p.rl,p.ra],["l",p.ll,p.la]].forEach(([s,lg,ar])=>{
+      J[s+"k"]=pt(hip,lg[0],L.th); J[s+"f"]=pt(J[s+"k"],lg[1],L.sh);
+      J[s+"e"]=pt(nk,ar[0],L.ua); J[s+"h"]=pt(J[s+"e"],ar[1],L.fa);
+    });
+    let hy;
+    if(p.yAbs!=null) hy=p.yAbs;
+    else if(p.y!=null) hy=G-p.y;
+    else hy=G-Math.max(J.rf[1],J.lf[1])-(p.lift||0);
+    const hx=p.x!=null?p.x:(p.m?78:62);
+    Object.keys(J).forEach(k=>J[k]=[J[k][0]+hx,J[k][1]+hy]);
+    return {J,G};
+  }
+
+  function render(id,i,C){
+    C=C||{ink:"var(--ink)",far:"var(--muted)",hl:"var(--yellow)",line:"var(--line)",bg:"var(--surface)"};
+    const ex=DATA[id]; if(!ex||!ex.f[i]) return "";
+    const p=ex.f[i], H=ex.H, W=140, {J,G}=pose(p,H);
+    const f=n=>n.toFixed(1);
+    const seg=(a,b)=>`M${f(J[a][0])} ${f(J[a][1])}L${f(J[b][0])} ${f(J[b][1])}`;
+    const limb={rl:["hip","rk","rf"],ll:["hip","lk","lf"],ra:["nk","re","rh"],la:["nk","le","lh"],tr:["hip","nk"]};
+    const path=k=>{const s=limb[k];let d=`M${f(J[s[0]][0])} ${f(J[s[0]][1])}`;for(let j=1;j<s.length;j++)d+=`L${f(J[s[j]][0])} ${f(J[s[j]][1])}`;return d;};
+    let back="",front="",over="";
+    if(id!=="kraul") back+=`<line x1="0" y1="${G}" x2="${W}" y2="${G}" stroke="${C.line}" stroke-width="2"/>`;
+    (p.props||[]).forEach(q=>{
+      const hx=J.hip[0];
+      if(q.k==="board"){const x=J[q.at][0];back+=`<rect x="${f(x-7)}" y="${G-1.5}" width="14" height="3" fill="${C.bg}" stroke="${C.ink}" stroke-width=".8"/>`;}
+      if(q.k==="pit") back+=`<rect x="${q.x1}" y="${G}" width="${q.x2-q.x1}" height="5" fill="#d9c27e" opacity=".8"/>`;
+      if(q.k==="mat") back+=`<rect x="${q.x1}" y="${G-q.h}" width="${q.x2-q.x1}" height="${q.h}" rx="2" fill="#7f8fae" opacity=".55"/>`;
+      if(q.k==="post"){const x=hx+q.dx,y=G-q.h;back+=`<line x1="${f(x)}" y1="${G}" x2="${f(x)}" y2="${f(y)}" stroke="${C.far}" stroke-width="1.5" stroke-dasharray="2 2"/>`;over+=`<circle cx="${f(x)}" cy="${f(y)}" r="3" fill="#c0392b"/>`;}
+      if(q.k==="hoop"){const x=hx+q.dx,y=q.y;back+=`<line x1="${f(x+10)}" y1="${y-16}" x2="${f(x+10)}" y2="${y+6}" stroke="${C.ink}" stroke-width="2"/><line x1="${f(x-6)}" y1="${y}" x2="${f(x+10)}" y2="${y}" stroke="#e07b24" stroke-width="2.4"/><path d="M${f(x-5)} ${y}l3 9h7l3-9" fill="none" stroke="${C.far}" stroke-width=".8"/>`;}
+      if(q.k==="stop"){const x=Math.max(J.rf[0],J.lf[0])+q.dx;back+=`<path d="M${f(x)} ${G}q4 -6 8 0z" fill="${C.ink}"/>`;}
+      if(q.k==="water"){const y=q.y;let d=`M0 ${y}`;for(let x=0;x<W;x+=10)d+=`q2.5 -2 5 0t5 0`;back+=`<path d="${d}" fill="none" stroke="#3d8fd6" stroke-width="1.4"/>`;over+=`<rect x="0" y="${y}" width="${W}" height="${H-y}" fill="#3d8fd6" opacity=".16"/>`;}
+      if(q.k==="jcurve"){const a=q.part==="s",x0=6,y0=8;
+        back+=`<rect x="${x0-3}" y="${y0-4}" width="40" height="28" rx="3" fill="${C.bg}" stroke="${C.line}"/>`+
+        `<line x1="${x0+2}" y1="${y0+17}" x2="${x0+18}" y2="${y0+17}" stroke="${a?C.hl:C.far}" stroke-width="${a?3:1.5}"/>`+
+        `<path d="M${x0+18} ${y0+17}q10 0 13 -11" fill="none" stroke="${a?C.far:C.hl}" stroke-width="${a?1.5:3}"/>`+
+        `<line x1="${x0+26}" y1="${y0+1}" x2="${x0+35}" y2="${y0+1}" stroke="#c0392b" stroke-width="1.6"/>`;}
+      if(q.k==="ball"){const c=q.abs?q.abs:[J[q.at][0]+(q.dx||0)*(p.m?-1:1),J[q.at][1]+(q.dy||0)];
+        if(q.kind==="bb") over+=`<circle cx="${f(c[0])}" cy="${f(c[1])}" r="5.5" fill="#e07b24" stroke="${C.ink}" stroke-width=".6"/><path d="M${f(c[0]-5.5)} ${f(c[1])}h11M${f(c[0])} ${f(c[1]-5.5)}v11" stroke="${C.ink}" stroke-width=".5"/>`;
+        if(q.kind==="hb") over+=`<circle cx="${f(c[0])}" cy="${f(c[1])}" r="4.6" fill="#f6f6f6" stroke="${C.ink}" stroke-width="1"/><path d="M${f(c[0]-3)} ${f(c[1]-2)}q3 3 6 0" fill="none" stroke="#c0392b" stroke-width=".8"/>`;
+        if(q.kind==="shot") over+=`<circle cx="${f(c[0])}" cy="${f(c[1])}" r="4.6" fill="#5b6270" stroke="${C.ink}" stroke-width=".6"/>`;}
+    });
+    let hl="";
+    (p.hl||[]).forEach(k=>{hl+=`<path d="${path(k)}" fill="none" stroke="${C.hl}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>`;});
+    const st=(c,w)=>`fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"`;
+    const farD=path("ll")+path("la"), nearD=path("rl")+path("ra");
+    front+=`<path d="${farD}" ${st(C.far,3.4)}/>`;
+    front+=`<path d="${path("tr")}" ${st(C.ink,4)}/>`;
+    front+=`<circle cx="${f(J.hd[0])}" cy="${f(J.hd[1])}" r="${L.hd}" fill="${C.ink}"/>`;
+    front+=`<path d="${nearD}" ${st(C.ink,3.6)}/>`;
+    const out=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${back}${hl}${front}${over}</svg>`;
+    return out.replace(/<[^>]+>/g,tag=>{let st="";tag=tag.replace(/ (fill|stroke)="(var\([^"]*\))"/g,(m0,k,v)=>{st+=k+":"+v+";";return "";});return st?tag.replace(/(\/?>)$/,` style="${st}"$1`):tag;});
+  }
+  return {render,has:id=>!!DATA[id]};
+})();
+</script>
+<script>
+const MS = {V:"Vorbereitungsphase",H:"Hauptphase",E:"Endphase",Z:"Zwischenphase"};
+const GO = {gH:"Hauptfunktionsphase",v1:"vorbereitend, 1. Ordnung",v2:"vorbereitend, 2. Ordnung",v3:"vorbereitend, 3. Ordnung",u:"unterstützend","ü":"überleitend"};
+
+const EX = [
+ {id:"kugel",name:"Kugelstoß (O’Brien)",typ:"azyklisch",
+  ziel:"Kugel möglichst weit stoßen – regelgerecht aus dem Kreis, Kugel am Hals, Verlassen nach hinten.",
+  seg:[
+   {n:"Ausgangsstellung",d:"Rücken zur Stoßrichtung, Kugel am Hals, Oberkörper vorgebeugt, Gewicht auf dem Standbein.",ms:"V",g:"v3",w:"Schafft die Ausgangslage für ein flaches, schnelles Angleiten."},
+   {n:"Angleiten",d:"Flacher Schub über das Standbein rückwärts durch den Kreis.",ms:"V",g:"v2",w:"Vorbeschleunigung von Körper und Kugel."},
+   {n:"Stoßauslage",d:"Landung in der Stoßauslage, Rumpf verwrungen, Kugel hinter dem Stemmbein.",ms:"V",g:"v1",w:"Verlängert den Beschleunigungsweg und spannt die Muskulatur vor."},
+   {n:"Ausstoß",d:"Streckung von Bein, Hüfte, Rumpf und Stoßarm, Abdruck über die Finger.",ms:"H",g:"gH",w:"Bestimmt Abfluggeschwindigkeit, -winkel und -höhe und damit direkt die Weite."},
+   {n:"Umspringen",d:"Beinwechsel, Abfangen des Körpers vor dem Stoßbalken.",ms:"E",g:null,w:"Regelbedingt nötig (kein Übertreten), trägt aber nichts zur Flugweite bei. Göhners drei Hilfsfunktionsarten erfassen eine solche Phase nach der Hauptfunktion nicht eindeutig."}
+  ]},
+ {id:"weit",name:"Weitsprung",typ:"azyklisch",
+  ziel:"Möglichst weit springen – Absprung vor der Brettkante; gemessen wird bis zum körpernächsten Abdruck in der Grube.",
+  seg:[
+   {n:"Anlauf",d:"Beschleunigungsanlauf, im Wettkampf etwa 16–20 Schritte, im Schulsport deutlich kürzer.",ms:"V",g:"v2",w:"Baut die Horizontalgeschwindigkeit auf – der wichtigste Einflussfaktor auf die Sprungweite."},
+   {n:"Absprungvorbereitung",d:"Langer vorletzter, kürzerer letzter Schritt; der Körperschwerpunkt wird leicht gesenkt.",ms:"V",g:"v1",w:"Schafft einen Beschleunigungsweg nach oben, ohne viel Anlaufgeschwindigkeit zu verlieren."},
+   {n:"Absprung",d:"Aktiver, flacher Fußaufsatz auf dem Brett, Streckung von Sprungbein, Hüfte und Rumpf.",ms:"H",g:"gH",w:"Bestimmt Abfluggeschwindigkeit und -winkel und damit die Flugkurve des Körperschwerpunkts."},
+   {n:"Schwungbein- und Armeinsatz",d:"Schwungbein und Arme schwingen beim Absprung energisch nach vorn-oben.",ms:"H",g:"u",w:"Läuft gleichzeitig mit dem Absprung ab und verstärkt den Abdruck vom Brett."},
+   {n:"Flugphase",d:"Schritt-, Hang- oder Laufsprung; die Beine werden zur Landung nach vorn gebracht.",ms:"H",g:"v1",w:"Kann die Flugkurve nicht mehr verändern. Sie gleicht die Vorwärtsrotation aus und bereitet eine Landung mit weit vorn liegenden Füßen vor."},
+   {n:"Landung",d:"Beine weit vorn, Hüfte nachschieben, nach vorn oder seitlich ausweichen.",ms:"E",g:"gH",w:"Wird häufig als zweite Hauptfunktionsphase eingeordnet: Wegen der Messregel entscheidet sie, wie viel der Flugweite gewertet wird. Manche Analysen sehen sie dagegen als Phase ohne Hauptfunktion."}
+  ]},
+ {id:"hoch",name:"Hochsprung (Flop)",typ:"azyklisch",
+  ziel:"Die Latte in möglichst großer Höhe überqueren, ohne sie abzuwerfen; der Absprung muss einbeinig erfolgen.",
+  seg:[
+   {n:"Gerader Anlauf",d:"Die ersten Anlaufschritte geradlinig und zunehmend schneller.",ms:"V",g:"v2",w:"Baut die Anlaufgeschwindigkeit auf."},
+   {n:"Kurvenanlauf",d:"Die letzten 4–5 Schritte im Bogen mit Innenlage.",ms:"V",g:"v1",w:"Die Innenlage senkt den Körperschwerpunkt ab (längerer Beschleunigungsweg beim Absprung) und leitet die Drehung in die Rückenlage über der Latte ein."},
+   {n:"Absprung",d:"Fußaufsatz mit dem lattenfernen Bein, Aufrichten aus der Innenlage, Streckung nach oben.",ms:"H",g:"gH",w:"Bestimmt die Steighöhe des Körperschwerpunkts – erstes Teilziel: Höhe gewinnen."},
+   {n:"Schwungbein- und Armeinsatz",d:"Knie des lattennahen Schwungbeins und die Arme schwingen energisch hoch.",ms:"H",g:"u",w:"Läuft gleichzeitig mit dem Absprung ab, verstärkt den Abdruck und unterstützt die Drehung."},
+   {n:"Lattenüberquerung",d:"Rückenlage, Hüfte hoch (Brücke), dann Kinn zur Brust und Beine nachziehen.",ms:"H",g:"gH",w:"Zweite Hauptfunktionsphase: Hier wird das zweite Teilziel erreicht, die Latte ohne Abwurf zu überqueren. Durch die Brücke kann der Körperschwerpunkt knapp unter Lattenhöhe bleiben."},
+   {n:"Landung",d:"Landung auf Schultern und Rücken in der Matte.",ms:"E",g:null,w:"Für die Höhe ohne Funktion; dient der sicheren Landung."}
+  ]},
+ {id:"korb",name:"Korbleger (Basketball)",typ:"azyklisch",
+  ziel:"Ball aus der Bewegung sicher in den Korb bringen – unter Einhaltung der Schrittregel und gegen Verteidiger.",
+  seg:[
+   {n:"Dribbling zum Korb",d:"Annäherung im Tempodribbling.",ms:"V",g:"v3",w:"Bringt den Spieler mit Tempo in Korbnähe."},
+   {n:"Zweier-Rhythmus",d:"Ball aufnehmen, zwei Schritte (lang – kurz).",ms:"V",g:"v2",w:"Regelgerechter Übergang vom Dribbling zum Sprung; horizontale Geschwindigkeit wird in Höhe umgesetzt."},
+   {n:"Absprung",d:"Einbeiniger Absprung vom Gegenbein der Wurfhand.",ms:"H",g:"v1",w:"Bringt Ball und Hand möglichst hoch und nah an den Korb."},
+   {n:"Schwungbein und Ballschutz",d:"Knie des Schwungbeins hoch, Körper zwischen Ball und Gegner.",ms:"H",g:"u",w:"Läuft gleichzeitig mit Absprung und Ballabgabe ab: Höhengewinn und Schutz vor dem Block."},
+   {n:"Ballabgabe",d:"Ball mit der Wurfhand ans Brett bzw. in den Korb legen.",ms:"H",g:"gH",w:"Löst die Bewegungsaufgabe unmittelbar: Treffer."},
+   {n:"Landung",d:"Beidbeinige, abgefederte Landung.",ms:"E",g:null,w:"Für den Treffer ohne Funktion; dient Gleichgewicht und Verletzungsschutz."}
+  ]},
+ {id:"hand",name:"Sprungwurf (Handball)",typ:"azyklisch",
+  ziel:"Torwurf über die Abwehr hinweg; der Ball muss vor der Landung im Torraum die Hand verlassen.",
+  seg:[
+   {n:"Anlauf",d:"Dreischrittrhythmus mit Ball.",ms:"V",g:"v2",w:"Erzeugt Horizontalgeschwindigkeit für einen hohen, weiten Absprung (Schrittregel)."},
+   {n:"Absprung",d:"Einbeiniger Absprung vom Gegenbein des Wurfarms.",ms:"V",g:"v1",w:"Verschafft Höhe über dem Block und Raumgewinn zum Tor."},
+   {n:"Ausholbewegung",d:"Wurfarm hoch nach hinten, Bogenspannung im Rumpf.",ms:"V",g:"v1",w:"Verlängert den Beschleunigungsweg, Vordehnung der Wurfmuskulatur."},
+   {n:"Abwurf",d:"Peitschenartiger Armzug, Ballabgabe über die Hand.",ms:"H",g:"gH",w:"Bestimmt Ballgeschwindigkeit und Richtung – unmittelbar zielwirksam."},
+   {n:"Gegenarm und Rumpfeinsatz",d:"Gegenarm wird zum Körper gezogen, Rumpf dreht ein.",ms:"H",g:"u",w:"Läuft gleichzeitig mit dem Abwurf ab und erhöht die Abwurfgeschwindigkeit."},
+   {n:"Landung",d:"Landung auf dem Sprungbein, Abfangen.",ms:"E",g:null,w:"Für den Wurf ohne Funktion; Landung im Torraum ist nach der Ballabgabe erlaubt."}
+  ]},
+ {id:"kraul",name:"Kraulschwimmen (Armzyklus)",typ:"zyklisch",
+  ziel:"Möglichst schneller Vortrieb über die Strecke im Medium Wasser.",
+  seg:[
+   {n:"Eintauchen und Wasserfassen",d:"Hand taucht vor der Schulter ein, streckt sich, fasst Wasser.",ms:"Z",g:"v1",w:"Bringt die Hand in eine Position, aus der Vortrieb möglich ist."},
+   {n:"Zug- und Druckphase",d:"Arm zieht und drückt unter dem Körper bis zum Oberschenkel.",ms:"H",g:"gH",w:"Erzeugt den Vortrieb und erreicht damit das Ziel unmittelbar."},
+   {n:"Überwasser-Rückführung",d:"Arm wird mit hohem Ellbogen locker nach vorn geführt.",ms:"Z",g:"ü",w:"Verbindet zwei Hauptfunktionsphasen desselben Arms; widerstandsarm über Wasser."},
+   {n:"Beinschlag",d:"Wechselbeinschlag aus der Hüfte.",ms:null,g:"u",w:"Läuft gleichzeitig ab: stabilisiert die Wasserlage, liefert wenig eigenen Vortrieb. Bei Meinel/Schnabel eine eigene zyklische Bewegung in simultaner Kombination."},
+   {n:"Rumpfrotation mit Atmung",d:"Körper rollt um die Längsachse, seitliche Einatmung.",ms:null,g:"u",w:"Erleichtert Zug und Rückführung und ermöglicht die Atmung, ohne die Wasserlage zu stören."}
+  ]}
+];
+
+const cls = k => k==null ? "c-none" : (k==="gH"?"c-gH":"c-"+k);
+
+/* Tabs */
+document.querySelectorAll('[role="tab"]').forEach(b=>{
+  b.addEventListener('click',()=>showTab(b.dataset.tab));
+});
+function showTab(id){
+  document.querySelectorAll('[role="tab"]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id));
+  document.querySelectorAll('main > section').forEach(s=>s.hidden = s.id!==id);
+  if(location.hash.slice(1)!==id) history.replaceState(null,"","#"+id);
+  window.scrollTo({top:0});
+}
+const start = location.hash.slice(1);
+if(["grundlagen","vergleich","beispiele","ueben"].includes(start)) showTab(start);
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1); if(document.getElementById(h)) showTab(h);});
+
+/* Picker */
+function picker(el, onPick){
+  el.innerHTML = EX.map((e,i)=>`<button type="button" aria-pressed="${i===0}" data-id="${e.id}">${e.name}</button>`).join("");
+  el.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    onPick(EX.find(e=>e.id===b.dataset.id));
+  }));
+  onPick(EX[0]);
+}
+
+/* Beispiele */
+function renderEx(e){
+  const sh=t=>t.replace("Vorbereitungsphase","Vorbereitungs&shy;phase").replace("Hauptfunktionsphase","Haupt&shy;funktions&shy;phase").replace("Hauptphase","Haupt&shy;phase").replace("Zwischenphase","Zwischen&shy;phase").replace("unterstützend","unter&shy;stützend").replace("überleitend","über&shy;leitend").replace("vorbereitend","vor&shy;bereitend");
+  const msBar = e.seg.map(s=>`<div class="${s.ms?('c-'+s.ms):'c-none'}">${s.ms?sh(MS[s.ms]):'simultan'}</div>`).join("");
+  const gBar = e.seg.map(s=>`<div class="${cls(s.g)}">${s.g?sh(GO[s.g]):'ohne Hilfs&shy;funktion'}</div>`).join("");
+  const names = e.seg.map(s=>`<div>${s.n}</div>`).join("");
+  document.getElementById('ex-out').innerHTML = `
+    <div class="goal"><b>Bewegungsziel (${e.typ})</b>${e.ziel}</div>
+    <div class="strip" role="img" aria-label="Phasengliederung beider Modelle">
+      <div class="row"><div class="lab">Bildreihe</div><div class="figs">${e.seg.map((s,i)=>`<div>${FIG.render(e.id,i)}</div>`).join("")}</div></div>
+      <div class="row"><div class="lab">Teilbewegung</div><div class="names">${names}</div></div>
+      <div class="row"><div class="lab">Meinel/Schnabel</div><div class="bar">${msBar}</div></div>
+      <div class="row"><div class="lab">Göhner</div><div class="bar">${gBar}</div></div>
+    </div>
+    <p class="figlegend"><i></i>Gelb hervorgehoben: die Körperteile, auf die es in dieser Teilbewegung ankommt. Graue Gliedmaßen liegen auf der abgewandten Seite.</p>
+    <div class="seglist">${e.seg.map((s,i)=>`
+      <div class="seg">
+        <div class="segfig">${FIG.render(e.id,i)}</div>
+        <h3>${s.n}</h3>
+        <p>${s.d}</p>
+        <div class="tags">
+          <span class="chip ${s.ms?('c-'+s.ms):'c-none'}">M/S: ${s.ms?MS[s.ms]:'simultane Kombination'}</span>
+          <span class="chip ${cls(s.g)}">Göhner: ${s.g?GO[s.g]:'keine Hilfsfunktion i. e. S.'}</span>
+        </div>
+        <p class="why">${s.w}</p>
+      </div>`).join("")}</div>`;
+}
+picker(document.getElementById('pick-ex'), renderEx);
+
+/* Üben */
+let cur=null, blind=false;
+function opts(map){return `<option value="">– wählen –</option>`+Object.entries(map).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");}
+function renderQuiz(e){
+  cur=e;
+  const msMap = e.typ==="zyklisch" ? {H:MS.H,Z:MS.Z,V:MS.V,E:MS.E} : {V:MS.V,H:MS.H,E:MS.E};
+  const qo=document.getElementById('quiz-out');
+  qo.classList.toggle('blind',blind);
+  qo.innerHTML = `
+    <div class="goal"><b>Bewegungsziel (${e.typ})</b>${e.ziel}</div>
+    <label class="toggle"><input type="checkbox" id="blind" ${blind?"checked":""}> Nur Bilder zeigen (Namen und Beschreibungen ausblenden)</label>
+    <div class="seglist">${e.seg.map((s,i)=>`
+      <div class="seg">
+        <div class="segfig">${FIG.render(e.id,i)}</div>
+        <div class="txt"><h3>${s.n}</h3><p>${s.d}</p></div>
+        <div class="pair">
+        ${s.ms?`<label>Meinel/Schnabel <span class="res" id="rm${i}"></span><select id="qm${i}">${opts(msMap)}</select></label>`:`<p class="note">Meinel/Schnabel: läuft simultan zur Armbewegung – nicht zuzuordnen.</p>`}
+        ${s.g?`<label>Göhner <span class="res" id="rg${i}"></span><select id="qg${i}">${opts(GO)}</select></label>`:`<p class="note">Göhner: keine Hilfsfunktion im engeren Sinn – nicht zuzuordnen.</p>`}
+        </div>
+        <p class="why" id="w${i}" hidden>${s.w}</p>
+      </div>`).join("")}</div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="check">Antworten prüfen</button>
+      <button class="btn sec" type="button" id="solve">Lösung zeigen</button>
+      <button class="btn sec" type="button" id="reset">Zurücksetzen</button>
+    </div>
+    <p class="score" id="score" aria-live="polite"></p>`;
+  document.getElementById('blind').onchange=ev=>{blind=ev.target.checked;qo.classList.toggle('blind',blind);};
+  document.getElementById('check').onclick=check;
+  document.getElementById('solve').onclick=()=>{solve();check();};
+  document.getElementById('reset').onclick=()=>renderQuiz(cur);
+}
+function mark(id,ok){const r=document.getElementById(id); r.textContent=ok?"✓":"✗"; r.className="res "+(ok?"ok":"bad");}
+function check(){
+  let right=0,total=0;
+  cur.seg.forEach((s,i)=>{
+    if(s.ms){total++;const ok=document.getElementById('qm'+i).value===s.ms;mark('rm'+i,ok);if(ok)right++;}
+    if(s.g){total++;const ok=document.getElementById('qg'+i).value===s.g;mark('rg'+i,ok);if(ok)right++;}
+    document.getElementById('w'+i).hidden=false;
+  });
+  document.getElementById('score').textContent=`${right} von ${total} richtig`;
+}
+function solve(){
+  cur.seg.forEach((s,i)=>{
+    if(s.ms) document.getElementById('qm'+i).value=s.ms;
+    if(s.g) document.getElementById('qg'+i).value=s.g;
+  });
+}
+picker(document.getElementById('pick-quiz'), renderQuiz);
+</script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Muskelkontraktion – Querbrückenzyklus in 3D</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#F6F4F8; --surface:#FFFFFF; --ink:#241F33; --muted:#5E5873; --line:#DDD7E6; --stage:#ECE8F2;
+  --actin:#C2416B; --myosin:#4A3F9E; --head:#7568D0; --tropo:#C9811A; --troponin:#7A4B0E;
+  --ca:#1F8FC9; --atp:#2F9A55; --adp:#E07A2E; --pi:#D9B22B; --zdisc:#3A3550; --site:#F3E7A6;
+  --accent:#4A3F9E; --accent-ink:#FFFFFF; --warn:#9B2D4E;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#17141F; --surface:#211D2B; --ink:#EDE9F5; --muted:#A8A1BA; --line:#352F44; --stage:#100E16;
+    --actin:#E0628C; --myosin:#8C80E8; --head:#A99FF2; --tropo:#E7A83E; --troponin:#B57A2A;
+    --ca:#4CB8EE; --atp:#4CC27A; --adp:#F19A55; --pi:#F2D25E; --zdisc:#CFC8E2; --site:#F7EDB5;
+    --accent:#A79CF0; --accent-ink:#17141F; --warn:#F08AAB;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#17141F; --surface:#211D2B; --ink:#EDE9F5; --muted:#A8A1BA; --line:#352F44; --stage:#100E16;
+  --actin:#E0628C; --myosin:#8C80E8; --head:#A99FF2; --tropo:#E7A83E; --troponin:#B57A2A;
+  --ca:#4CB8EE; --atp:#4CC27A; --adp:#F19A55; --pi:#F2D25E; --zdisc:#CFC8E2; --site:#F7EDB5;
+  --accent:#A79CF0; --accent-ink:#17141F; --warn:#F08AAB;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 20px 32px}
+header h1{font-size:clamp(1.5rem,2.6vw,2.1rem);line-height:1.15;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+header p{margin:0 0 18px;color:var(--muted);max-width:62ch}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+.stagecol{min-width:0}
+.stage{position:relative;height:min(62vh,560px);min-height:340px;background:var(--stage);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.hint-drag{position:absolute;right:12px;bottom:10px;font-size:.8rem;color:var(--muted);pointer-events:none}
+.labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,calc(-100% - 10px));background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:.82rem;white-space:nowrap;font-weight:700}
+.lbl::after{content:"";position:absolute;left:50%;bottom:-6px;width:8px;height:8px;background:var(--surface);
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:translateX(-50%) rotate(45deg)}
+.labels.off{display:none}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.btn{font:inherit;font-size:.95rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  padding:9px 16px;border-radius:999px;cursor:pointer;min-height:42px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;min-width:118px}
+.btn:focus-visible,.switch input:focus-visible + span{outline:3px solid var(--ca);outline-offset:2px}
+.spacer{flex:1}
+.switches{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px}
+.switch{display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:.95rem;user-select:none}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch span{width:40px;height:24px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--surface);transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.switch input:checked + span{background:var(--accent)}
+.switch input:checked + span::after{transform:translateX(16px)}
+
+.band{margin-top:18px}
+.band h2,.panel h2{font-size:1rem;margin:0 0 8px}
+.bandbox{position:relative;height:34px}
+.bar{position:absolute;left:0;top:0;height:34px;display:flex;transition:width .1s linear}
+.bar > div{height:100%}
+.zl{width:3px;background:var(--zdisc)}
+.iband{background:color-mix(in srgb,var(--actin) 28%,var(--stage))}
+.aband{position:relative;background:color-mix(in srgb,var(--myosin) 70%,var(--stage))}
+.hzone{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);background:color-mix(in srgb,var(--myosin) 38%,var(--stage))}
+.mline{position:absolute;top:0;bottom:0;left:50%;width:2px;transform:translateX(-50%);background:var(--zdisc);opacity:.7}
+.measures{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.measures div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+.measures dt{font-size:.78rem;color:var(--muted);margin:0}
+.measures dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.measures .chg dd{color:var(--actin)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px}
+.phase-title{font-size:1.35rem;line-height:1.2;margin:0 0 8px}
+.phase-text{margin:0 0 10px;min-height:7.5em}
+.status{min-height:1.5em;margin:0 0 12px;color:var(--warn);font-weight:700}
+ol.steps{list-style:none;margin:0 0 14px;padding:0;counter-reset:s}
+ol.steps li{counter-increment:s;display:flex;gap:10px;align-items:baseline;padding:5px 8px;border-radius:8px;color:var(--muted)}
+ol.steps li::before{content:counter(s);font-weight:700;font-size:.85rem;width:1.4em;text-align:right;flex:none}
+ol.steps li.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink);font-weight:700}
+.extra{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.extra span{font-size:.85rem;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.extra span.on{border-color:var(--warn);color:var(--warn);font-weight:700}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.88rem;margin:0;padding:12px 0 0;border-top:1px solid var(--line)}
+.legend li{list-style:none;display:flex;align-items:center;gap:8px}
+.sw{width:12px;height:12px;border-radius:50%;flex:none}
+.counter{font-size:.9rem;color:var(--muted);margin:0 0 12px}
+.note{font-size:.85rem;color:var(--muted);margin:18px 0 0;max-width:80ch}
+
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr}
+  .stage{height:52vh}
+  .measures{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .phase-text{min-height:0}
+}
+@media (prefers-reduced-motion: reduce){
+  .switch span,.switch span::after{transition:none}
+}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <header>
+    <h1>Wie sich ein Muskel verkürzt</h1>
+    <p>Gleitfilamenttheorie und Querbrückenzyklus an einem Sarkomer. Schritt für Schritt durchklicken oder abspielen lassen, das Modell mit dem Finger drehen.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stagecol">
+      <div class="stage" id="stage">
+        <canvas id="cv" aria-label="3D-Modell eines Sarkomers mit Aktin- und Myosinfilamenten"></canvas>
+        <div class="labels" id="labels"></div>
+        <div class="hint-drag">Ziehen zum Drehen, Mausrad oder zwei Finger zum Zoomen</div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="bPrev" type="button">Zurück</button>
+        <button class="btn primary" id="bPlay" type="button">Abspielen</button>
+        <button class="btn" id="bNext" type="button">Weiter</button>
+        <span class="spacer"></span>
+        <button class="btn" id="bReset" type="button">Neu starten</button>
+      </div>
+      <div class="switches">
+        <label class="switch"><input type="checkbox" id="tCa" checked><span></span>Nervenreiz (Ca²⁺-Freisetzung)</label>
+        <label class="switch"><input type="checkbox" id="tAtp" checked><span></span>ATP vorhanden</label>
+        <label class="switch"><input type="checkbox" id="tLbl" checked><span></span>Beschriftungen</label>
+      </div>
+
+      <section class="band" aria-label="Bänderung des Sarkomers">
+        <h2>Bänderung im Lichtmikroskop</h2>
+        <div class="bandbox" id="bandbox">
+          <div class="bar" id="bar">
+            <div class="zl"></div>
+            <div class="iband" id="iL"></div>
+            <div class="aband" id="aB"><div class="hzone" id="hZ"></div><div class="mline"></div></div>
+            <div class="iband" id="iR"></div>
+            <div class="zl"></div>
+          </div>
+        </div>
+        <dl class="measures">
+          <div class="chg"><dt>Sarkomer</dt><dd id="vSL">2,50 µm</dd></div>
+          <div><dt>A-Bande</dt><dd id="vA">1,60 µm</dd></div>
+          <div class="chg"><dt>I-Bande</dt><dd id="vI">0,90 µm</dd></div>
+          <div class="chg"><dt>H-Zone</dt><dd id="vH">0,50 µm</dd></div>
+        </dl>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <h2 class="phase-title" id="pTitle">Ruhezustand</h2>
+      <p class="phase-text" id="pText" aria-live="polite"></p>
+      <p class="status" id="pStatus" role="status"></p>
+      <ol class="steps" id="steps">
+        <li data-p="0">Ruhezustand</li>
+        <li data-p="1">Ca²⁺ gibt Bindestellen frei</li>
+        <li data-p="2">Querbrücken bilden sich</li>
+        <li data-p="3">Kraftschlag</li>
+        <li data-p="4">ATP löst den Kopf</li>
+        <li data-p="5">ATP-Spaltung spannt den Kopf</li>
+      </ol>
+      <div class="extra"><span data-p="6">Erschlaffung</span><span data-p="7">Totenstarre</span></div>
+      <p class="counter" id="pCount">Kraftschläge: 0</p>
+      <ul class="legend">
+        <li><span class="sw" style="background:var(--actin)"></span>Aktin</li>
+        <li><span class="sw" style="background:var(--myosin)"></span>Myosin</li>
+        <li><span class="sw" style="background:var(--tropo)"></span>Tropomyosin</li>
+        <li><span class="sw" style="background:var(--troponin)"></span>Troponin</li>
+        <li><span class="sw" style="background:var(--ca)"></span>Ca²⁺</li>
+        <li><span class="sw" style="background:var(--atp)"></span>ATP</li>
+        <li><span class="sw" style="background:var(--adp)"></span>ADP</li>
+        <li><span class="sw" style="background:var(--pi)"></span>Phosphat (Pi)</li>
+      </ul>
+    </aside>
+  </div>
+
+  <p class="note">Schematisch und nicht maßstabsgetreu. Ein Kraftschlag verschiebt das Aktin in Wirklichkeit nur um etwa 10 nm, und die Myosinköpfe arbeiten nicht gleichzeitig, sondern zeitversetzt. Im Modell arbeiten sie im Gleichtakt, damit die einzelnen Schritte sichtbar werden. Nur Köpfe, über denen ein Aktinfilament liegt, können binden: Je stärker die Überlappung, desto mehr Querbrücken.</p>
+</div>
+
+<script src="three.min.js"></script>
+<script>
+(function(){
+"use strict";
+const U = 4;                 // Szeneneinheiten pro µm
+const ACTIN = 1.0, MYO = 1.6, SL0 = 2.5, SL_MIN = 2.0;
+const STROKE = 0.0625;       // µm je Halbsarkomer und Kraftschlag (schematisch)
+const MAXSLIDE = (SL0 - SL_MIN) / 2;
+const R = 1.35;              // Abstand Aktin zur Myosinachse
+const PHIS = [Math.PI/4, 3*Math.PI/4, 5*Math.PI/4, 7*Math.PI/4];
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const ease = t => t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+const lerp = (a,b,t) => a + (b-a)*t;
+const fmt = v => v.toFixed(2).replace('.', ',') + ' µm';
+
+/* ---------- Szene ---------- */
+const canvas = document.getElementById('cv');
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 200);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8698, 0.85));
+const dl = new THREE.DirectionalLight(0xffffff, 0.75); dl.position.set(5, 9, 7); scene.add(dl);
+const root = new THREE.Group(); root.rotation.set(0.35, -0.45, 0); scene.add(root);
+
+const M = {};
+function mat(key, opts){ M[key] = new THREE.MeshStandardMaterial(Object.assign({roughness:.55, metalness:0}, opts||{})); return M[key]; }
+mat('actin'); mat('myosin'); mat('head'); mat('tropo'); mat('troponin'); mat('zdisc', {transparent:true, opacity:.85});
+mat('mline', {transparent:true, opacity:.25}); mat('site', {emissive:new THREE.Color(0xffffff), emissiveIntensity:0});
+mat('ca'); mat('atp'); mat('adp'); mat('pi');
+mat('pAtp', {transparent:true}); mat('pAdp', {transparent:true}); mat('pPi', {transparent:true});
+function applyColors(){
+  const map = {actin:'--actin', myosin:'--myosin', head:'--head', tropo:'--tropo', troponin:'--troponin', zdisc:'--zdisc',
+    mline:'--zdisc', site:'--site', ca:'--ca', atp:'--atp', adp:'--adp', pi:'--pi', pAtp:'--atp', pAdp:'--adp', pPi:'--pi'};
+  for (const k in map) M[k].color.set(css(map[k]));
+  M.site.emissive.set(css('--site'));
+}
+applyColors();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyColors);
+
+const bead = new THREE.SphereGeometry(0.13, 10, 8);
+const small = new THREE.SphereGeometry(0.07, 8, 6);
+function cylX(r, len){ const g = new THREE.CylinderGeometry(r, r, len, 14); g.rotateZ(Math.PI/2); return g; }
+
+// Z-Scheiben und M-Linie
+const zGeo = new THREE.CylinderGeometry(2.2, 2.2, 0.12, 40); zGeo.rotateZ(Math.PI/2);
+const zL = new THREE.Mesh(zGeo, M.zdisc), zR = new THREE.Mesh(zGeo, M.zdisc);
+root.add(zL, zR);
+const mGeo = new THREE.CylinderGeometry(1.0, 1.0, 0.05, 32); mGeo.rotateZ(Math.PI/2);
+root.add(new THREE.Mesh(mGeo, M.mline));
+
+// Myosinfilament
+root.add(new THREE.Mesh(cylX(0.3, MYO*U), M.myosin));
+
+// Aktinfilamente mit Tropomyosin, Troponin und Bindestellen
+const sides = {}; const tropoGroups = []; const troponins = [];
+let labelActin = null, labelTropo = null;
+[-1, 1].forEach(s => {
+  const side = new THREE.Group(); root.add(side); sides[s] = side;
+  const len = ACTIN*U;
+  PHIS.forEach((phi, pi) => {
+    const g = new THREE.Group();
+    g.position.set(0, R*Math.cos(phi), R*Math.sin(phi));
+    g.rotation.x = phi;
+    side.add(g);
+    const n = 30;
+    for (let i=0;i<n;i++){
+      const x = -s*(0.12 + i*(len-0.12)/(n-1));
+      for (let k=0;k<2;k++){
+        const a = i*0.42 + k*Math.PI;
+        const m = new THREE.Mesh(bead, M.actin);
+        m.position.set(x, 0.09*Math.cos(a), 0.09*Math.sin(a));
+        g.add(m);
+        if (s===1 && pi===0 && i===14 && k===0) labelActin = m;
+      }
+    }
+    for (let x=0.35; x<len; x+=0.5){
+      const site = new THREE.Mesh(small, M.site);
+      site.position.set(-s*x, -0.16, 0); g.add(site);
+    }
+    const tg = new THREE.Group(); g.add(tg); tropoGroups.push(tg);
+    const tm = new THREE.Mesh(cylX(0.055, len-0.2), M.tropo);
+    tm.position.set(-s*len/2, -0.235, 0); tg.add(tm);
+    for (let j=0;j<4;j++){
+      const tn = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), M.troponin);
+      tn.position.set(-s*(0.5 + j*1.0), -0.25, 0.05); tg.add(tn); troponins.push(tn);
+      if (s===-1 && pi===1 && j===2) labelTropo = tn;
+    }
+  });
+});
+
+// Myosinköpfe
+const heads = [];
+const leverGeo = new THREE.CylinderGeometry(0.045, 0.045, 1, 8); leverGeo.translate(0, 0.5, 0);
+const headGeo = new THREE.SphereGeometry(0.17, 14, 10);
+[-1, 1].forEach(h => {
+  for (let k=0;k<5;k++){
+    const xPos = h*(0.55 + k*0.6);
+    PHIS.forEach((phi, pi) => {
+      const g = new THREE.Group(); g.position.x = xPos; g.rotation.x = phi; root.add(g);
+      const pivot = new THREE.Group(); pivot.position.y = 0.3; g.add(pivot);
+      const lever = new THREE.Mesh(leverGeo, M.head); pivot.add(lever);
+      const hd = new THREE.Mesh(headGeo, M.head); hd.scale.set(1, 1.35, 1); pivot.add(hd);
+      const mk = new THREE.Group(); pivot.add(mk);
+      const mAdp = new THREE.Mesh(small, M.adp); mAdp.scale.setScalar(1.3); mAdp.position.set(0, 0, 0.2);
+      const mPi = new THREE.Mesh(small, M.pi); mPi.scale.setScalar(0.8); mPi.position.set(0.13*h, 0.06, 0.17);
+      const mAtp = new THREE.Mesh(small, M.atp); mAtp.scale.setScalar(1.5); mAtp.position.set(0, 0, 0.2);
+      mk.add(mAdp, mPi, mAtp);
+      const part = new THREE.Mesh(small, M.pPi); part.visible = false; pivot.add(part);
+      heads.push({h, xPos, pivot, lever, hd, mk, mAdp, mPi, mAtp, part, engaged:false, label:(h===1 && k===3 && pi===0)});
+    });
+  }
+});
+
+// Ca²⁺-Ionen
+const ions = troponins.map((tn, i) => {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 8), M.ca.clone());
+  m.material.transparent = true;
+  const a = Math.random()*Math.PI*2, r = 3.2 + Math.random()*1.4;
+  m.userData.away = new THREE.Vector3(-5.5 + Math.random()*11, r*Math.cos(a), r*Math.sin(a));
+  m.userData.delay = (i % 8) / 8 * 0.3;
+  root.add(m);
+  return m;
+});
+const labelIon = ions[17] || ions[0];
+
+/* ---------- Zustand und Phasen ---------- */
+const S0 = () => ({ca:0, tropo:0, angle:25, ext:0, slide:0, nuc:'adppi', strokes:0});
+let S = S0();
+let phase = 0, anim = null, playing = false, history = [], playTimer = null;
+
+const PH = [
+  {t:'Ruhezustand', d:'Der Muskel ist entspannt. Tropomyosin liegt auf den Bindestellen des Aktins und blockiert sie. Die Myosinköpfe sind bereits gespannt: Sie tragen ADP und Phosphat aus einer früheren ATP-Spaltung.'},
+  {t:'Ca²⁺ gibt die Bindestellen frei', d:'Ein Aktionspotenzial erreicht die Muskelfaser. Das sarkoplasmatische Retikulum setzt Ca²⁺-Ionen frei. Sie binden an Troponin, das daraufhin das Tropomyosin zur Seite zieht. Die Bindestellen am Aktin liegen jetzt frei.', dur:2600},
+  {t:'Querbrücken bilden sich', d:'Die gespannten Myosinköpfe binden an freie Bindestellen des Aktins. Es entstehen Querbrücken zwischen dicken und dünnen Filamenten. Köpfe ohne Aktin darüber bleiben ungebunden.', dur:1500},
+  {t:'Kraftschlag', d:'Das Phosphat löst sich vom Myosinkopf. Der Kopf kippt in Richtung M-Linie und zieht das Aktinfilament mit. Danach wird ADP abgegeben. Die Z-Scheiben rücken zusammen, die Filamente selbst bleiben gleich lang.', dur:2400},
+  {t:'ATP löst den Kopf', d:'Ein neues ATP-Molekül bindet an den Myosinkopf. Dadurch löst sich der Kopf vom Aktin. Ohne ATP bliebe er gebunden.', dur:1700},
+  {t:'ATP-Spaltung spannt den Kopf', d:'Der Myosinkopf spaltet ATP in ADP und Phosphat. Die frei werdende Energie spannt den Kopf wieder in die Ausgangsstellung. Solange Ca²⁺ vorhanden ist, beginnt der Zyklus von vorn.', dur:1500},
+  {t:'Erschlaffung', d:'Ohne neuen Nervenreiz wird Ca²⁺ unter ATP-Verbrauch in das sarkoplasmatische Retikulum zurückgepumpt. Tropomyosin blockiert die Bindestellen wieder. Gedehnt wird der Muskel passiv, zum Beispiel durch seinen Gegenspieler.', dur:2800},
+  {t:'Totenstarre', d:'Ohne ATP können sich die Myosinköpfe nicht vom Aktin lösen. Die Querbrücken bleiben bestehen, der Muskel ist starr. Das geschieht nach dem Tod, wenn die ATP-Vorräte erschöpft sind (Rigor mortis).', dur:600}
+];
+
+function target(p, s){
+  const t = Object.assign({}, s);
+  if (p===1){ t.ca=1; t.tropo=1; }
+  if (p===2){ t.ext=1; }
+  if (p===3){ t.angle=-25; t.slide=Math.min(s.slide+STROKE, MAXSLIDE); t.strokes=s.strokes+1; }
+  if (p===4){ t.ext=0; }
+  if (p===5){ t.angle=25; }
+  if (p===6){ t.ca=0; t.tropo=0; t.slide=0; t.ext=0; t.angle=25; }
+  return t;
+}
+const TIMING = {
+  1:{ca:[0,.55], tropo:[.45,1]},
+  2:{ext:[0,1]},
+  3:{angle:[.3,.85], slide:[.3,.85]},
+  4:{ext:[.45,1]},
+  5:{angle:[.2,.9]},
+  6:{ca:[0,.6], tropo:[.25,.7], slide:[.4,1]}
+};
+function nucAt(p, t, from){
+  if (p===3) return t<.3 ? 'adppi' : (t<.78 ? 'adp' : 'none');
+  if (p===4) return t<.45 ? 'none' : 'atp';
+  if (p===5) return t<.5 ? 'atp' : 'adppi';
+  return from;
+}
+
+function zx(){ return (SL0/2 - S.slide)*U; }
+
+function nextPhase(p){
+  const ca = document.getElementById('tCa').checked, atp = document.getElementById('tAtp').checked;
+  if (p===0) return ca ? 1 : {hint:'Kein Nervenreiz: Ohne Ca²⁺ bleiben die Bindestellen verdeckt. Schalte den Nervenreiz ein.'};
+  if (p===1) return ca ? 2 : 6;
+  if (p===2) return 3;
+  if (p===3) return atp ? 4 : 7;
+  if (p===7) return atp ? 4 : {hint:'Ohne ATP lösen sich die Köpfe nicht. Schalte ATP ein, um weiterzumachen.'};
+  if (p===4) return 5;
+  if (p===5) return ca ? 2 : 6;
+  if (p===6) return 0;
+  return 0;
+}
+
+function snapshot(){ return {phase, S:Object.assign({}, S), eng:heads.map(h => h.engaged)}; }
+
+function step(){
+  if (anim) finishAnim();
+  const n = nextPhase(phase);
+  if (typeof n === 'object'){ setStatus(n.hint); stopPlay(); return false; }
+  setStatus('');
+  history.push(snapshot());
+  if (n===2){
+    const tip = zx() - ACTIN*U;
+    heads.forEach(h => { if (!h.engaged) h.engaged = Math.abs(h.xPos) > tip + 0.05; });
+  }
+  const from = Object.assign({}, S);
+  const to = target(n, S);
+  if (n===3 && from.slide >= MAXSLIDE - 1e-6) setStatus('Maximale Verkürzung erreicht: Die H-Zone ist verschwunden. Die Köpfe ziehen weiter, das Sarkomer wird aber nicht mehr kürzer.');
+  phase = n;
+  const dur = (PH[n].dur || 800) * (reduced ? .35 : 1);
+  anim = {p:n, from, to, start:performance.now(), dur};
+  updatePanel();
+  return true;
+}
+
+function applyAnim(t){
+  const a = anim, tm = TIMING[a.p] || {};
+  ['ca','tropo','angle','ext','slide'].forEach(k => {
+    const w = tm[k] || [0,1];
+    const lt = ease(clamp((t - w[0])/(w[1]-w[0]), 0, 1));
+    S[k] = lerp(a.from[k], a.to[k], lt);
+  });
+  S.nuc = nucAt(a.p, t, a.from.nuc);
+  S.strokes = t >= .85 ? a.to.strokes : a.from.strokes;
+}
+
+function finishAnim(){
+  if (!anim) return;
+  applyAnim(1);
+  if (anim.p===6) heads.forEach(h => h.engaged = false);
+  anim = null;
+  updatePanel();
+}
+
+function prev(){
+  stopPlay();
+  if (anim){ anim = null; }
+  const s = history.pop();
+  if (!s){ setStatus(''); return; }
+  phase = s.phase; S = s.S; heads.forEach((h,i) => h.engaged = s.eng[i]);
+  setStatus(''); updatePanel();
+}
+
+function reset(){
+  stopPlay(); anim = null; history = []; phase = 0; S = S0();
+  heads.forEach(h => h.engaged = false);
+  setStatus(''); updatePanel();
+}
+
+function play(){
+  if (playing){ stopPlay(); return; }
+  playing = true; document.getElementById('bPlay').textContent = 'Pause';
+  if (!anim) step();
+}
+function stopPlay(){
+  playing = false; clearTimeout(playTimer);
+  document.getElementById('bPlay').textContent = 'Abspielen';
+}
+
+/* ---------- Oberfläche ---------- */
+function setStatus(t){ document.getElementById('pStatus').textContent = t; }
+function updatePanel(){
+  document.getElementById('pTitle').textContent = PH[phase].t;
+  document.getElementById('pText').textContent = PH[phase].d;
+  document.querySelectorAll('#steps li').forEach(li => li.classList.toggle('on', +li.dataset.p === phase));
+  document.querySelectorAll('.extra span').forEach(sp => sp.classList.toggle('on', +sp.dataset.p === phase));
+}
+function updateBand(){
+  const SL = SL0 - 2*S.slide, I = SL - MYO, H = Math.max(0, SL - 2*ACTIN);
+  document.getElementById('bar').style.width = (SL/SL0*100) + '%';
+  document.getElementById('iL').style.width = (I/2/SL*100) + '%';
+  document.getElementById('iR').style.width = (I/2/SL*100) + '%';
+  document.getElementById('aB').style.width = (MYO/SL*100) + '%';
+  document.getElementById('hZ').style.width = (H/MYO*100) + '%';
+  document.getElementById('vSL').textContent = fmt(SL);
+  document.getElementById('vI').textContent = fmt(I);
+  document.getElementById('vH').textContent = fmt(H);
+  document.getElementById('pCount').textContent = 'Kraftschläge: ' + S.strokes;
+}
+
+document.getElementById('bNext').addEventListener('click', () => { stopPlay(); step(); });
+document.getElementById('bPrev').addEventListener('click', prev);
+document.getElementById('bPlay').addEventListener('click', play);
+document.getElementById('bReset').addEventListener('click', reset);
+document.getElementById('tLbl').addEventListener('change', e => document.getElementById('labels').classList.toggle('off', !e.target.checked));
+['tCa','tAtp'].forEach(id => document.getElementById(id).addEventListener('change', () => setStatus('')));
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input')) return;
+  if (e.key === 'ArrowRight'){ stopPlay(); step(); }
+  else if (e.key === 'ArrowLeft'){ prev(); }
+});
+
+/* ---------- Beschriftungen ---------- */
+const labelsEl = document.getElementById('labels');
+const LB = [
+  {text:'Z-Scheibe', pos:v => v.set(zx(), 2.3, 0).applyMatrix4(root.matrixWorld)},
+  {text:'M-Linie', pos:v => v.set(0, -1.05, 0).applyMatrix4(root.matrixWorld)},
+  {text:'Aktin', pos:v => labelActin.getWorldPosition(v)},
+  {text:'Myosinkopf', pos:v => heads.find(h => h.label).hd.getWorldPosition(v)},
+  {text:'Tropomyosin', pos:v => labelTropo.getWorldPosition(v)},
+  {text:'Ca²⁺', pos:v => labelIon.getWorldPosition(v), show:() => S.ca > .7}
+].map(d => { const el = document.createElement('div'); el.className = 'lbl'; el.textContent = d.text; labelsEl.appendChild(el); return Object.assign(d, {el}); });
+const tmpV = new THREE.Vector3();
+function placeLabels(w, h){
+  LB.forEach(d => {
+    if (d.show && !d.show()){ d.el.style.display = 'none'; return; }
+    d.pos(tmpV); tmpV.project(camera);
+    if (tmpV.z > 1){ d.el.style.display = 'none'; return; }
+    d.el.style.display = '';
+    d.el.style.left = ((tmpV.x*.5+.5)*w) + 'px';
+    d.el.style.top = ((-tmpV.y*.5+.5)*h) + 'px';
+  });
+}
+
+/* ---------- Drehen und Zoomen ---------- */
+let zoom = 1, drag = null; const pts = new Map(); let pinch0 = null;
+canvas.addEventListener('pointerdown', e => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, {x:e.clientX, y:e.clientY}); drag = {x:e.clientX, y:e.clientY}; });
+canvas.addEventListener('pointermove', e => {
+  if (!pts.has(e.pointerId)) return;
+  pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if (pts.size === 2){
+    const [a,b] = [...pts.values()]; const d = Math.hypot(a.x-b.x, a.y-b.y);
+    if (pinch0) zoom = clamp(zoom * pinch0 / d, .55, 1.8);
+    pinch0 = d; return;
+  }
+  if (!drag) return;
+  root.rotation.y += (e.clientX - drag.x) * 0.008;
+  root.rotation.x = clamp(root.rotation.x + (e.clientY - drag.y) * 0.006, -1.3, 1.3);
+  drag = {x:e.clientX, y:e.clientY};
+});
+const up = e => { pts.delete(e.pointerId); pinch0 = null; drag = pts.size ? {x:[...pts.values()][0].x, y:[...pts.values()][0].y} : null; };
+canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+canvas.addEventListener('wheel', e => { e.preventDefault(); zoom = clamp(zoom * (e.deltaY > 0 ? 1.08 : 0.93), .55, 1.8); }, {passive:false});
+
+/* ---------- Darstellung ---------- */
+const NUC_ON = {adppi:[1,1,0], adp:[1,0,0], none:[0,0,0], atp:[0,0,1]};
+function render(now){
+  if (anim){
+    const t = clamp((now - anim.start)/anim.dur, 0, 1);
+    applyAnim(t);
+    if (t >= 1){
+      const p = anim.p;
+      finishAnim();
+      if (playing) playTimer = setTimeout(() => { if (playing) step(); }, reduced ? 250 : 650);
+    }
+  }
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (canvas.width !== Math.floor(w*renderer.getPixelRatio()) || canvas.height !== Math.floor(h*renderer.getPixelRatio())){
+    renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix();
+  }
+  camera.position.set(0, 0, Math.max(12.5, 17.5/camera.aspect) * zoom); camera.lookAt(0, 0, 0);
+
+  const z = zx();
+  zR.position.x = z; zL.position.x = -z;
+  sides[1].position.x = z; sides[-1].position.x = -z;
+  tropoGroups.forEach(g => g.rotation.x = 1.15 * S.tropo);
+  M.site.emissiveIntensity = 0.7 * S.tropo;
+
+  const p = anim ? anim.p : -1, t = anim ? clamp((now - anim.start)/anim.dur, 0, 1) : 0;
+  heads.forEach(hd => {
+    const ang = hd.engaged ? S.angle : 25, ext = hd.engaged ? S.ext : 0;
+    const L = 0.45 + 0.4*ext;
+    hd.pivot.rotation.z = -hd.h * ang * Math.PI/180;
+    hd.lever.scale.y = L; hd.hd.position.y = L + 0.17; hd.mk.position.y = L + 0.17;
+    const on = NUC_ON[hd.engaged ? S.nuc : 'adppi'];
+    hd.mAdp.visible = !!on[0]; hd.mPi.visible = !!on[1]; hd.mAtp.visible = !!on[2];
+    // fliegende Moleküle
+    let vis = false;
+    if (hd.engaged && p === 3){
+      const pp = clamp((t-.3)/.35, 0, 1), pa = clamp((t-.78)/.22, 0, 1);
+      if (pp > 0 && pp < 1){ vis = true; hd.part.material = M.pPi; M.pPi.opacity = 1-pp; hd.part.scale.setScalar(.8); hd.part.position.set(.13*hd.h, L+.23+pp*1.1, .17+pp*.9); }
+      else if (pa > 0 && pa < 1){ vis = true; hd.part.material = M.pAdp; M.pAdp.opacity = 1-pa; hd.part.scale.setScalar(1.3); hd.part.position.set(0, L+.17+pa*1.1, .2+pa*.9); }
+    } else if (hd.engaged && p === 4){
+      const pt = clamp(t/.45, 0, 1);
+      if (pt < 1){ vis = true; hd.part.material = M.pAtp; M.pAtp.opacity = pt; hd.part.scale.setScalar(1.5); hd.part.position.set(0, L+.17+(1-pt)*1.2, .2+(1-pt)*1.0); }
+    }
+    if (!vis) hd.part.scale.setScalar(1);
+    hd.part.visible = vis;
+  });
+
+  ions.forEach((ion, i) => {
+    const li = ease(clamp((S.ca*1.3) - ion.userData.delay, 0, 1));
+    troponins[i].getWorldPosition(tmpV); root.worldToLocal(tmpV);
+    ion.material.color.copy(M.ca.color);
+    ion.position.lerpVectors(ion.userData.away, tmpV, li);
+    ion.material.opacity = Math.min(1, li*1.5);
+    ion.visible = li > 0.02;
+  });
+
+  renderer.render(scene, camera);
+  root.updateMatrixWorld();
+  placeLabels(w, h);
+  updateBand();
+  requestAnimationFrame(render);
+}
+
+updatePanel();
+requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

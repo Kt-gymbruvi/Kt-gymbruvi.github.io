@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plasmolyse und Deplasmolyse</title>
+<meta name="description" content="Plasmolyse und Deplasmolyse an Zwiebelepidermiszellen: Mikroskop mit gefärbter Vakuole, Lösungen wechseln, Grenzplasmolyse bestimmen, Wasserpotenzial, Prognoseaufgaben und Praxisanleitung.">
+<style>
+:root{
+  --bg:#F1EEF4; --panel:#FFFFFF; --panel-2:#F6F3F9; --ink:#1E1626; --ink-soft:#5A4D66; --line:#D8CFE0; --nav:#4A1D5C; --nav-ink:#FFFFFF; --focus:#0B57D0; --acc:#E8590C;
+  --water:#1B73B0; --solute:#B8430C; --turgor:#2F8F44; --grid:#E2DCE9;
+  --ok:#1B6B3B; --ok-bg:#DCEFE2; --warn:#7A5600; --warn-bg:#FFF0C7; --bad:#B3261E; --bad-bg:#FBE3E0; --info:#2A4FB0; --info-bg:#E2E9FB;
+  --field:#F7F4EC; --field2:#E3DFD1; --micbg:#17141C; --wall:#5F6E56; --wallL:#C9D0BC; --membrane:#8A8474; --tonoplast:#6A665C;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif; --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#140F18; --panel:#1E1726; --panel-2:#261D30; --ink:#EFE8F5; --ink-soft:#B6A8C4; --line:#3A2D48; --nav:#E3CDF0; --nav-ink:#140F18; --focus:#8AB4FF; --acc:#FF9248;
+    --water:#6CB6EE; --solute:#FF9A62; --turgor:#6FD58A; --grid:#2B2236;
+    --ok:#6FD596; --ok-bg:#133422; --warn:#F2C25B; --warn-bg:#3A2F12; --bad:#FF8F85; --bad-bg:#47201D; --info:#9DB7FF; --info-bg:#1E2C5C;
+    --field:#DAD7CC; --field2:#BDB9AA; --micbg:#0B090D; --wallL:#B8BFA9;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#140F18; --panel:#1E1726; --panel-2:#261D30; --ink:#EFE8F5; --ink-soft:#B6A8C4; --line:#3A2D48; --nav:#E3CDF0; --nav-ink:#140F18; --focus:#8AB4FF; --acc:#FF9248;
+  --water:#6CB6EE; --solute:#FF9A62; --turgor:#6FD58A; --grid:#2B2236;
+  --ok:#6FD596; --ok-bg:#133422; --warn:#F2C25B; --warn-bg:#3A2F12; --bad:#FF8F85; --bad-bg:#47201D; --info:#9DB7FF; --info-bg:#1E2C5C;
+  --field:#DAD7CC; --field2:#BDB9AA; --micbg:#0B090D; --wallL:#B8BFA9;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1040px; margin:0 auto; padding:14px clamp(12px,3vw,24px) 4px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.55rem,5vw,2.3rem); line-height:1.08; margin:0; letter-spacing:-.02em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:76ch; }
+.tabs{ max-width:1040px; margin:8px auto 0; padding:0 clamp(12px,3vw,24px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em 1em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+.viewer{ position:sticky; top:0; z-index:20; max-width:1040px; margin:10px auto 0; padding:0 clamp(12px,3vw,24px); }
+.vbox{ background:var(--panel); border:2px solid var(--ink); border-radius:14px; overflow:hidden; box-shadow:0 6px 0 -2px color-mix(in srgb,var(--ink) 16%,transparent); }
+.vbar{ display:flex; flex-wrap:wrap; gap:6px 8px; padding:6px 8px; border-bottom:1px solid var(--line); align-items:center; background:var(--panel-2); }
+.vbar .btn{ min-height:40px; padding:.1em .7em; min-width:42px; font-size:.95rem; }
+.vt{ font-variant-numeric:tabular-nums; font-weight:800; font-size:.95rem; min-width:3.6em; }
+.vbar .seg button{ min-height:38px; padding:.1em .6em; font-size:.86rem; }
+.vbar .sp{ flex:1; }
+.viewer.collapsed .vpanes,.viewer.collapsed .vinfo{ display:none; }
+.vpanes{ display:flex; background:var(--micbg); }
+.vpane{ flex:1 1 0; min-width:0; } .vpane+.vpane{ border-left:2px solid var(--micbg); } .vpane[hidden]{ display:none; }
+#vChart{ background:var(--panel); } #vMicro svg.mic,#vCell svg.mic{ cursor:default; }
+.vinfo{ padding:5px 12px; font-size:.88rem; min-height:32px; border-top:1px solid var(--line); background:var(--panel); color:var(--ink-soft); }
+.vinfo b{ color:var(--ink); }
+@media (max-width:700px){ :root{ --mic-h:34vh; } .vinfo{ font-size:.8rem; padding:4px 10px; } .vbar .seg .opt-both{ display:none; } }
+.wrap{ max-width:1040px; margin:0 auto; padding:12px clamp(12px,3vw,24px) 40px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.25rem; margin:0 0 8px; line-height:1.2; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.05rem; margin:14px 0 4px; line-height:1.25; }
+.lead{ margin:0 0 10px; max-width:78ch; } .note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; max-width:84ch; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.4em .9em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); } .btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); border-color:var(--nav); }
+.btn.sm{ min-height:40px; font-size:.92rem; padding:.2em .8em; }
+.seg{ display:inline-flex; flex-wrap:wrap; border:2px solid var(--line); border-radius:10px; overflow:hidden; }
+.seg button{ border:0; background:var(--panel); padding:.35em .85em; font-weight:700; cursor:pointer; min-height:42px; border-right:1px solid var(--line); }
+.seg button:last-child{ border-right:0; } .seg button[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); }
+input[type=range]{ width:100%; accent-color:var(--nav); min-height:34px; }
+input[type=number],select{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+label.fl{ display:block; font-weight:700; font-size:.92rem; margin:10px 0 2px; } label.fl small{ display:block; font-weight:400; color:var(--ink-soft); font-size:.84rem; line-height:1.3; }
+.sl output{ font-variant-numeric:tabular-nums; font-weight:800; }
+.ck{ display:flex; gap:8px; align-items:center; min-height:40px; cursor:pointer; } .ck input{ width:22px; height:22px; accent-color:var(--nav); flex:none; }
+.grid2{ display:grid; gap:2px 22px; grid-template-columns:1fr; } @media (min-width:760px){ .grid2{ grid-template-columns:1fr 1fr; } }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--ok-bg); color:var(--ok); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--warn-bg); color:var(--warn); } .fb.info{ background:var(--info-bg); color:var(--info); }
+.warn{ background:var(--warn-bg); color:var(--warn); border-radius:12px; padding:10px 14px; margin:8px 0; font-size:.93rem; }
+.badge{ display:inline-block; font-size:.78rem; font-weight:700; border-radius:99px; padding:1px 10px; border:1px solid var(--line); background:var(--panel-2); margin-right:4px; white-space:nowrap; }
+.badge.info{ background:var(--info-bg); color:var(--info); border-color:transparent; } .badge.ok{ background:var(--ok-bg); color:var(--ok); border-color:transparent; }
+.chips{ display:flex; gap:8px; overflow-x:auto; padding:2px 0 8px; scrollbar-width:thin; }
+.chip{ flex:none; text-align:left; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:8px 12px; cursor:pointer; min-height:54px; max-width:230px; }
+.chip b{ display:block; font-family:var(--display); font-size:.95rem; line-height:1.2; } .chip span{ font-size:.8rem; color:var(--ink-soft); line-height:1.25; display:block; }
+.chip[aria-pressed="true"]{ border-color:var(--nav); box-shadow:0 0 0 2px var(--nav) inset; }
+.kpis{ display:grid; gap:8px; grid-template-columns:repeat(2,1fr); } @media (min-width:760px){ .kpis{ grid-template-columns:repeat(4,1fr); } }
+.kpis div{ border:1px solid var(--line); border-radius:12px; padding:6px 10px; background:var(--panel); }
+.kpis b{ display:block; font-family:var(--display); font-size:1.2rem; line-height:1.15; } .kpis small{ display:block; color:var(--ink-soft); font-size:.8rem; line-height:1.25; }
+.rule{ border-left:6px solid var(--acc); background:var(--panel-2); border-radius:10px; padding:8px 12px; margin:6px 0 10px; } .rule b{ font-family:var(--display); }
+.tbl{ width:100%; border-collapse:collapse; font-size:.9rem; } .tbl th,.tbl td{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:middle; } .tbl td.n,.tbl th.n{ text-align:right; font-variant-numeric:tabular-nums; } .tscroll{ overflow-x:auto; max-width:100%; }
+.tbl tr.sel td{ background:var(--panel-2); }
+.chart{ display:block; width:100%; } .chart text{ fill:var(--ink); font-family:var(--body); } .chart .tx2{ fill:var(--ink-soft); } .chart .gl{ stroke:var(--grid); } .chart .axl{ stroke:var(--ink-soft); }
+.mic text{ font-family:var(--body); } .mic .dl{ fill:#241C2B; } .mic .dl2{ fill:#4A3F55; } .mic .ldr{ stroke:#44394F; stroke-width:1; fill:none; }
+.opt{ text-align:left; border:2px solid var(--line); border-radius:12px; padding:8px 12px; background:var(--panel); cursor:pointer; display:block; width:100%; margin:6px 0; min-height:46px; }
+.opt.right{ border-color:var(--ok); background:var(--ok-bg); } .opt.wrong{ border-color:var(--bad); background:var(--bad-bg); }
+.evl{ list-style:none; padding:0; margin:6px 0 0; font-size:.92rem; } .evl li{ padding:4px 0; border-bottom:1px solid var(--line); display:flex; gap:8px; } .evl time{ font-variant-numeric:tabular-nums; font-weight:800; min-width:3.4em; }
+.state{ border:2px solid var(--line); border-radius:12px; padding:8px 12px; background:var(--panel-2); } .state b{ font-family:var(--display); }
+details.task,details.mode{ border-top:1px solid var(--line); padding:6px 0; } details.task>summary,details.mode>summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+ul.plain,ol.plain{ margin:4px 0 0; padding-left:1.3em; } ul.plain li,ol.plain li{ margin:3px 0; }
+.gl dt{ font-family:var(--display); font-weight:800; margin-top:10px; } .gl dd{ margin:2px 0 0; max-width:76ch; }
+.eqn{ font-family:ui-monospace,Consolas,monospace; background:var(--panel-2); border-radius:10px; padding:8px 12px; font-size:.95rem; overflow-x:auto; line-height:1.7; }
+.legendrow{ display:flex; flex-wrap:wrap; gap:4px 14px; font-size:.86rem; margin:4px 0; } .legendrow i{ display:inline-block; width:22px; height:0; border-top:3px solid; vertical-align:middle; margin-right:5px; }
+.swatch{ display:inline-block; width:16px; height:16px; border-radius:4px; border:1px solid var(--line); vertical-align:-3px; margin-right:6px; }
+@media print{ .tabs,.btnrow,.viewer .vbar{ display:none !important; } .viewer{ position:static; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Plasmolyse und Deplasmolyse</h1>
+  <p>Was passiert mit einer Zwiebelzelle in Zucker-, Salz- oder Harnstofflösung, und was beim Zurücklegen in Wasser? Beobachte die gefärbte Vakuole im Mikroskop, bestimme die Grenzplasmolyse und prüfe Vorhersagen. Alle Werte stammen aus einem vereinfachten Modell.</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab" role="tab" data-tab="lab" aria-selected="true">Mikroskop</button>
+  <button type="button" class="tab" role="tab" data-tab="ser" aria-selected="false">Messreihe</button>
+  <button type="button" class="tab" role="tab" data-tab="pot" aria-selected="false">Potenziale</button>
+  <button type="button" class="tab" role="tab" data-tab="train" aria-selected="false">Üben</button>
+  <button type="button" class="tab" role="tab" data-tab="info" aria-selected="false">Info und Aufgaben</button>
+</nav>
+<div class="viewer" id="viewer">
+  <div class="vbox">
+    <div class="vbar" role="toolbar" aria-label="Zeit und Ansicht">
+      <button type="button" class="btn" data-v="play" aria-label="Zeit laufen lassen" aria-pressed="false">▶</button>
+      <button type="button" class="btn" data-v="reset" aria-label="Neues Präparat, Zeit auf null">⏮</button>
+      <span class="vt" id="vt">00:00</span>
+      <select id="spd" aria-label="Zeitraffer" style="width:auto;min-height:38px;padding:.1em .4em;font-size:.88rem"><option value="1">1×</option><option value="5">5×</option><option value="10" selected>10×</option><option value="30">30×</option></select>
+      <span class="sp"></span>
+      <div class="seg" role="group" aria-label="Ansicht"><button type="button" data-v="view" data-m="micro" aria-pressed="true">Mikroskop</button><button type="button" data-v="view" data-m="cell" aria-pressed="false">Zelle</button><button type="button" data-v="view" data-m="chart" aria-pressed="false">Diagramm</button><button type="button" class="opt-both" data-v="view" data-m="both" aria-pressed="false">Beides</button></div>
+      <button type="button" class="btn" data-v="fold" aria-pressed="false" aria-label="Messfenster ein- oder ausklappen">▲</button>
+    </div>
+    <div class="vpanes"><div class="vpane" id="vMicro"></div><div class="vpane" id="vCell" hidden></div><div class="vpane" id="vChart" hidden></div></div>
+    <div class="vinfo" id="vinfo" aria-live="polite"></div>
+  </div>
+</div>
+<main class="wrap">
+  <section id="pane-lab"></section>
+  <section id="pane-ser" hidden></section>
+  <section id="pane-pot" hidden></section>
+  <section id="pane-train" hidden></section>
+  <section id="pane-info" hidden></section>
+</main>
+<script>
+(function(){
+'use strict';
+/* =============== Modell der Pflanzenzelle in Lösung (Plasmolyse) =============== */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const RT=2.48;          // MPa·L/mol bei etwa 25 °C
+const LP=0.005;         // Wasserdurchlässigkeit der Membran in 1/(MPa·s)
+const CMEAN=0.45;       // mittlere Osmolarität des Zellsafts bei vollem Turgor (Osm/L)
+const SOL={
+  water:{n:'Wasser',i:0,sig:1,perm:0,tox:0,max:0,step:0,dflt:0},
+  sucrose:{n:'Saccharose',i:1,sig:1,perm:0,tox:1,max:1.5,step:0.05,dflt:1.0},
+  nacl:{n:'Kochsalz (NaCl)',i:1.8,sig:1,perm:0,tox:3,max:1.0,step:0.05,dflt:0.5},
+  urea:{n:'Harnstoff',i:1,sig:0.95,perm:0.003,tox:0.5,max:1.5,step:0.05,dflt:1.0}
+};
+function outOf(sol,conc){ const s=SOL[sol]; return {sol,conc,osm:s.i*conc,sig:s.sig,perm:s.perm,tox:s.tox}; }
+function makeCells(N,seed){
+  const r=mulberry32(seed*7919+17), g=()=>{ let u=0; while(!u) u=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r()); }; const out=[];
+  for(let k=0;k<N;k++){ const c=clamp(CMEAN+0.05*g(),0.3,0.62), eps=clamp(10+1.5*g(),6,14); out.push({c,eps,v0:1/(1+RT*c/eps),v:1,np:0,D:0,dead:false,leak:0,nuc:r()}); }
+  return out;
+}
+function stepCell(cl,out,dt){
+  if(cl.dead){ cl.v+=(cl.v0-cl.v)*(1-Math.exp(-dt/20)); cl.leak=Math.min(1,cl.leak+dt*0.02); return; }
+  const v=cl.v, piIn=RT*(cl.c+cl.np)/v, psip=cl.eps*Math.max(0,v-cl.v0)/cl.v0, piOut=RT*out.sig*out.osm;
+  const nv=v+LP*(piIn-piOut-psip)*dt; cl.v=Math.max(0.12,nv);
+  if(out.perm>0) cl.np=Math.max(0,cl.np+out.perm*(out.osm-cl.np/cl.v)*dt);
+  const f=cl.v/cl.v0; if(f<0.75){ cl.D+=out.tox*(0.75-f)/0.75/900*dt; if(cl.D>=1) cl.dead=true; }
+}
+const frac=cl=>cl.v/cl.v0;                      // 1 = Protoplast füllt die Zellwand
+const isPlas=cl=>!cl.dead&&frac(cl)<0.97;
+const psiP=cl=>cl.dead?0:cl.eps*Math.max(0,cl.v-cl.v0)/cl.v0;
+const cIn=cl=>(cl.c+cl.np)/cl.v;
+function eqV(cl,piOutEff){ let lo=0.12,hi=1.3; for(let k=0;k<60;k++){ const m=(lo+hi)/2, g=RT*cl.c/m-piOutEff-cl.eps*Math.max(0,m-cl.v0)/cl.v0; if(g>0) lo=m; else hi=m; } return (lo+hi)/2; }
+/* Gleichgewicht für nicht eindringende Stoffe (Saccharose, NaCl) */
+function equilibrate(cells,sol,conc){ const o=outOf(sol,conc); cells.forEach(cl=>{ cl.v=eqV(cl,RT*o.sig*o.osm); cl.np=0; cl.dead=false; cl.leak=0; cl.D=0; }); return cells; }
+/* Ablauf ohne Oberfläche: events=[{t,sol,conc}] */
+function runSim(cells,events,T,dt){ dt=dt||0.5; let o=outOf('water',0), ei=0; const ev=events.slice().sort((a,b)=>a.t-b.t); for(let t=0;t<T;t+=dt){ while(ei<ev.length&&ev[ei].t<=t+1e-9){ o=outOf(ev[ei].sol,ev[ei].conc); ei++; } cells.forEach(cl=>stepCell(cl,o,dt)); } return cells; }
+const GAUSS_CDF=z=>0.5*(1+Math.sign(z)*Math.sqrt(1-Math.exp(-2*z*z/Math.PI)));
+/* =============== Hilfen =============== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const f1=x=>Math.round(x*10)/10;
+const de=(v,d)=>Number(v).toFixed(d).replace('.',',').replace('-','−');
+const mmss=t=>{ t=Math.max(0,Math.floor(t)); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); };
+function niceStep(range,target){ const raw=range/target, e=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/e; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*e; }
+function pathOf(pts){ let s=''; for(let i=0;i<pts.length;i++) s+=(i?'L':'M')+f1(pts[i][0])+' '+f1(pts[i][1]); return s; }
+function decim(x,y,max){ const n=x.length, st=Math.max(1,Math.floor(n/max)), o=[]; for(let i=0;i<n;i+=st) o.push([x[i],y[i]]); if((n-1)%st) o.push([x[n-1],y[n-1]]); return o; }
+
+/* =============== Färbung der Vakuole =============== */
+const STAIN={
+  antho:{n:'Rote Zwiebel (Anthocyan)',d:'Der rote Farbstoff liegt gelöst im Zellsaft der Vakuole.',light:[236,166,208],dark:[116,22,100],cyto:'#E3DCCB',nuc:'#9C8FA6',vac:true},
+  neutral:{n:'Weiße Zwiebel mit Neutralrot',d:'Neutralrot ist ein Lebendfarbstoff und reichert sich in der Vakuole lebender Zellen an.',light:[255,176,152],dark:[190,28,40],cyto:'#E6DDCC',nuc:'#B59A94',vac:true},
+  methylene:{n:'Weiße Zwiebel mit Methylenblau',d:'Methylenblau färbt vor allem den Zellkern. Die Vakuole bleibt fast farblos.',light:[232,238,240],dark:[214,226,232],cyto:'#C7D8EE',nuc:'#2858A8',vac:false},
+  none:{n:'Weiße Zwiebel ungefärbt',d:'Ohne Färbung ist der Kontrast gering, Plasmolyse ist schwer zu erkennen.',light:[236,240,232],dark:[228,234,226],cyto:'#E4E2D6',nuc:'#B9B6A8',vac:false}
+};
+const mixc=(a,b,t)=>`rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+function vacColor(cl,st){ if(!st.vac) return mixc(st.light,st.dark,Math.min(1,0.6*(1/cl.v-0.9)/1.5)); const kappa=1/Math.max(0.15,cl.v); const t=Math.max(0,Math.min(1,(kappa-0.9)/1.5)); return mixc(st.light,st.dark,t); }
+
+/* =============== Zellform: unregelmäßige, gestreckte Vielecke (Voronoi-Gewebe) =============== */
+const pDist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+function pArea(p){ let a=0; for(let i=0;i<p.length;i++){ const j=(i+1)%p.length; a+=p[i].x*p[j].y-p[j].x*p[i].y; } return Math.abs(a)/2; }
+function pCent(p){ let a=0,cx=0,cy=0; for(let i=0;i<p.length;i++){ const j=(i+1)%p.length, cr=p[i].x*p[j].y-p[j].x*p[i].y; a+=cr; cx+=(p[i].x+p[j].x)*cr; cy+=(p[i].y+p[j].y)*cr; } a/=2; return {x:cx/(6*a),y:cy/(6*a)}; }
+function pPerim(p){ let s=0; for(let i=0;i<p.length;i++) s+=pDist(p[i],p[(i+1)%p.length]); return s; }
+const pScale=(p,c,s)=>p.map(q=>({x:c.x+(q.x-c.x)*s,y:c.y+(q.y-c.y)*s}));
+function pPath(p,r){
+  const n=p.length; if(r<0.3) return 'M'+p.map(q=>f1(q.x)+' '+f1(q.y)).join('L')+'Z';
+  const pts=p.map((cur,i)=>{ const pr=p[(i+n-1)%n], nx=p[(i+1)%n], l1=pDist(pr,cur)||1, l2=pDist(cur,nx)||1, rr=Math.min(r,0.48*l1,0.48*l2); return {A:{x:cur.x+(pr.x-cur.x)/l1*rr,y:cur.y+(pr.y-cur.y)/l1*rr},B:{x:cur.x+(nx.x-cur.x)/l2*rr,y:cur.y+(nx.y-cur.y)/l2*rr},c:cur}; });
+  let d=`M${f1(pts[0].B.x)} ${f1(pts[0].B.y)}`; for(let k=1;k<=n;k++){ const q=pts[k%n]; d+=`L${f1(q.A.x)} ${f1(q.A.y)}Q${f1(q.c.x)} ${f1(q.c.y)} ${f1(q.B.x)} ${f1(q.B.y)}`; } return d+'Z';
+}
+function clipHalf(poly,a,b,c){ const out=[]; for(let i=0;i<poly.length;i++){ const P=poly[i], Q=poly[(i+1)%poly.length], fp=a*P.x+b*P.y-c, fq=a*Q.x+b*Q.y-c; if(fp<=0) out.push(P); if((fp<0&&fq>0)||(fp>0&&fq<0)){ const t=fp/(fp-fq); out.push({x:P.x+t*(Q.x-P.x),y:P.y+t*(Q.y-P.y)}); } } return out; }
+const GRID=(()=>{
+  const rnd=mulberry32(4711), K=3.0, D=24, cx=180, cy=150, R=140, pts=[];
+  for(let j=-12;j<=12;j++) for(let i=-9;i<=9;i++){ const x=(i*D+((j&1)?D/2:0)+(rnd()-0.5)*0.5*D), y=j*0.866*D+(rnd()-0.5)*0.5*D; if(Math.hypot(x*K,y)<=R+46) pts.push({x,y}); }
+  const box=[{x:-420,y:-300},{x:420,y:-300},{x:420,y:300},{x:-420,y:300}], out=[];
+  pts.forEach((p,i)=>{ let poly=box; pts.forEach((q,j)=>{ if(i===j) return; const nx=q.x-p.x, ny=q.y-p.y; if(nx*nx+ny*ny>(D*3.4)*(D*3.4)) return; poly=clipHalf(poly,nx,ny,nx*(p.x+q.x)/2+ny*(p.y+q.y)/2); }); const P=poly.map(v=>({x:cx+v.x*K,y:cy+v.y})); const c=pCent(P); out.push({x:c.x,y:c.y,poly:P,vis:Math.hypot(c.x-cx,c.y-cy)<=R-14}); });
+  return out;
+})();
+const VISI=GRID.map((g,i)=>g.vis?i:-1).filter(i=>i>=0);
+const visCells=cells=>VISI.map(i=>cells[i]);
+function rayHit(poly,c,dir){ let best=null,bt=1e9; for(let i=0;i<poly.length;i++){ const a=poly[i], b=poly[(i+1)%poly.length], ex=b.x-a.x, ey=b.y-a.y, den=dir.x*ey-dir.y*ex; if(Math.abs(den)<1e-9) continue; const t=((a.x-c.x)*ey-(a.y-c.y)*ex)/den, u=((a.x-c.x)*dir.y-(a.y-c.y)*dir.x)/den; if(t>0&&u>=0&&u<=1&&t<bt){ bt=t; best={x:c.x+dir.x*t,y:c.y+dir.y*t}; } } return best||c; }
+/* Eine Zelle zeichnen. poly: Zellwand als Vieleck, sc: Maßstab für Linienbreiten */
+function cellSVG(cl,poly,st,o){
+  o=o||{}; const sc=o.sc||1, tc=(o.tc||3)*sc, c=pCent(poly), A=pArea(poly), rho=2*A/pPerim(poly), wallW=1.5*sc;
+  const f=Math.max(0.08,frac(cl)), fill=cl.dead?1:Math.min(1,f), inner=pScale(poly,c,Math.max(0.5,1-wallW*0.9/rho));
+  const s=Math.sqrt(fill), pp=pScale(inner,c,s), rhoP=rho*s*0.92, r=fill>=0.999?0.5*sc:(0.05+(1-fill)*1.5)*rhoP;
+  let g='';
+  const dW=pPath(poly,0.6*sc), pig=st.vac?mixc(st.light,st.dark,0.5):'#bbb';
+  g+=`<path d="${dW}" fill="${cl.leak>0&&st.vac?pig:'none'}" fill-opacity="${f1(cl.leak*0.2)}" style="stroke:var(--wallL);stroke-width:${f1(wallW*2.1)}" stroke-linejoin="round"/><path d="${dW}" fill="none" style="stroke:var(--wall);stroke-width:${f1(wallW*0.75)}" stroke-linejoin="round"/>`;
+  const cyto=cl.dead?'rgb(214,208,196)':st.cyto;
+  g+=`<path d="${pPath(pp,r)}" fill="${cyto}" style="stroke:var(--membrane);stroke-width:${f1(0.9*sc)}" stroke-linejoin="round"/>`;
+  const sv=Math.max(0.2,(rhoP-tc)/Math.max(rhoP,1)), vp=pScale(pp,c,sv), vcol=vacColor(cl,st), op=cl.dead?1-cl.leak:1, rv=Math.max(0.8,r*sv-tc*0.2);
+  g+=`<path d="${pPath(vp,rv)}" fill="${vcol}" fill-opacity="${f1(st.vac?Math.max(0.12,op):1)}" style="stroke:var(--tonoplast);stroke-width:${f1(0.6*sc)}" stroke-linejoin="round"/><path d="${pPath(vp,rv)}" fill="url(#vg)" opacity="${cl.dead?0:1}"/>`;
+  // Zellkern an der Wand
+  const tgt={x:c.x+(cl.nuc-0.5)*rho*1.7, y:c.y-rhoP}; let best=null,bd=1e9;
+  for(let i=0;i<pp.length;i++){ const a=pp[i], b=pp[(i+1)%pp.length]; for(let k=0;k<=4;k++){ const q={x:a.x+(b.x-a.x)*k/4,y:a.y+(b.y-a.y)*k/4}, dd=pDist(q,tgt); if(dd<bd){ bd=dd; best=q; } } }
+  const dirx=c.x-best.x, diry=c.y-best.y, dl=Math.hypot(dirx,diry)||1, nuc={x:best.x+dirx/dl*tc*0.85,y:best.y+diry/dl*tc*0.85};
+  if(!cl.dead||cl.leak<0.7) g+=`<ellipse cx="${f1(nuc.x)}" cy="${f1(nuc.y)}" rx="${f1(Math.min(5.6*sc,rhoP*0.42))}" ry="${f1(Math.min(3.6*sc,rhoP*0.3))}" transform="rotate(${f1(Math.atan2(diry,dirx)*57.3+90)} ${f1(nuc.x)} ${f1(nuc.y)})" fill="${st.nuc}" style="stroke:var(--tonoplast);stroke-width:${f1(0.55*sc)}"/>`;
+  if(o.strands&&f<0.9&&!cl.dead){ for(let i=0;i<inner.length;i+=1){ if(i%2===0||fill<0.7) g+=`<path d="M${f1(inner[i].x)} ${f1(inner[i].y)}L${f1(pp[i].x)} ${f1(pp[i].y)}" style="stroke:var(--membrane);stroke-width:${f1(0.7*sc)}" opacity=".75"/>`; } }
+  return {svg:g,c,P:{pts:pp,rho:rhoP},V:{pts:vp},nuc,tc,inner,rho};
+}
+/* Mikroskopfeld */
+const DEFS=`<defs><radialGradient id="vg" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset=".6" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".1"/></radialGradient></defs>`;
+function microSVG(cells,stainId,sel,o){
+  o=o||{}; const st=STAIN[stainId]; let s=`<svg class="mic" viewBox="0 0 360 300" role="img" aria-label="Mikroskopbild von Zwiebelepidermiszellen mit gefärbter Vakuole" style="display:block;width:100%;height:auto;max-height:var(--mic-h,min(52vh,420px))">${DEFS}<defs><clipPath id="mclip"><circle cx="180" cy="150" r="140"/></clipPath><radialGradient id="mfield" cx=".5" cy=".5" r=".6"><stop offset="0" style="stop-color:var(--field)"/><stop offset="1" style="stop-color:var(--field2)"/></radialGradient></defs>`;
+  s+=`<rect width="360" height="300" style="fill:var(--micbg)"/><circle cx="180" cy="150" r="140" fill="url(#mfield)"/><g clip-path="url(#mclip)">`;
+  let leak=0; cells.forEach(c=>{ leak+=c.leak; }); leak/=cells.length;
+  cells.forEach((cl,i)=>{ const b=GRID[i]; if(!b) return; const r=cellSVG(cl,b.poly,st,{sc:0.62,tc:2.3}); s+=`<g class="cl" data-cell="${i}" style="cursor:pointer">${r.svg}</g>`; });
+  if(leak>0&&st.vac) s+=`<circle cx="180" cy="150" r="140" fill="${mixc(st.light,st.dark,0.5)}" opacity="${f1(leak*0.12)}"/>`;
+  if(sel!=null&&GRID[sel]) s+=`<path d="${pPath(GRID[sel].poly,0.6)}" fill="none" stroke="var(--acc)" stroke-width="2.4" stroke-dasharray="5 3" stroke-linejoin="round"/>`;
+  s+=`</g><circle cx="180" cy="150" r="140" fill="none" style="stroke:#000" stroke-opacity=".5" stroke-width="2"/>`;
+  s+=`<line x1="28" x2="67" y1="284" y2="284" stroke="#EEE" stroke-width="3"/><text x="28" y="277" font-size="10" fill="#EEE">ca. 100 µm</text>`;
+  return s+'</svg>';
+}
+/* Einzelzelle mit Beschriftung und Wasserpfeilen: die gewählte Zelle wird auf die Zeichenfläche eingepasst */
+function detailSVG(cl,stainId,o){
+  o=o||{}; const st=STAIN[stainId], flux=o.flux||0, f=frac(cl); const base=(o.idx!=null&&GRID[o.idx])?GRID[o.idx].poly:GRID[VISI[Math.floor(VISI.length/2)]].poly;
+  const xs=base.map(q=>q.x), ys=base.map(q=>q.y), bx=(Math.min(...xs)+Math.max(...xs))/2, by=(Math.min(...ys)+Math.max(...ys))/2, bw=Math.max(...xs)-Math.min(...xs), bh=Math.max(...ys)-Math.min(...ys), kx=Math.min(250/bw,5), ky=Math.min(kx*1.5,125/bh), k=kx;
+  const poly=base.map(q=>({x:160+(q.x-bx)*kx,y:122+(q.y-by)*ky})); const r=cellSVG(cl,poly,st,{sc:1.7,tc:3.4,strands:true});
+  let s=`<svg class="mic" viewBox="0 0 320 260" role="img" aria-label="Einzelne Zwiebelzelle mit Zellwand, Plasmalemma, Vakuole und Zellkern" style="display:block;width:100%;height:auto;max-height:var(--mic-h,min(52vh,420px))">${DEFS}<rect width="320" height="260" style="fill:var(--field)"/>`+r.svg;
+  if(o.labels!==false){
+    const L=(x,y,tx,ex,ey,anc,top)=>{ const lx=anc==='start'?x+8:anc==='end'?x-8:x, ly=top?y+4:y-13; return `<path d="M${f1(lx)} ${f1(ly)}L${f1(ex)} ${f1(ey)}" class="ldr"/><circle cx="${f1(ex)}" cy="${f1(ey)}" r="1.8" fill="#44394F"/><text x="${x}" y="${y}" font-size="10.5" font-weight="700" text-anchor="${anc}" class="dl">${tx}</text>`; };
+    const c=r.c, hw=bw*kx/2, W=rayHit(poly,c,{x:-0.8,y:-1}), Pm=rayHit(r.P.pts,c,{x:0.08,y:-1}), Vl={x:c.x-hw*0.28,y:c.y+r.P.rho*0.2}, Vt=rayHit(r.V.pts,c,{x:0.1,y:1}), Zp0=rayHit(r.P.pts,c,{x:0.85,y:0.75}), Zp={x:Zp0.x+(c.x-Zp0.x)*(r.tc*0.35/Math.max(1,pDist(c,Zp0))),y:Zp0.y+(c.y-Zp0.y)*(r.tc*0.35/Math.max(1,pDist(c,Zp0)))};
+    s+=L(14,20,'Zellwand',W.x,W.y,'start',true)+L(160,20,'Plasmalemma',Pm.x,Pm.y,'middle',true)+L(306,20,'Zellkern',r.nuc.x,r.nuc.y,'end',true);
+    s+=L(14,246,'Vakuole mit Zellsaft',Vl.x,Vl.y,'start',false)+L(176,246,'Tonoplast',Vt.x,Vt.y,'middle',false)+L(306,246,'Zytoplasma',Zp.x,Zp.y,'end',false);
+    const g1=rayHit(poly,c,{x:-0.45,y:0.95}), g2=rayHit(r.P.pts,c,{x:-0.45,y:0.95}); if(f<0.97&&!cl.dead&&pDist(g1,g2)>6) s+=L(160,214,'Plasmolyseraum (mit Außenlösung gefüllt)',(g1.x+g2.x)/2,(g1.y+g2.y)/2,'middle',false);
+  }
+  const cy0=r.c.y, mag=Math.min(1,Math.abs(flux)/0.012); if(mag>0.03){ const out=flux<0, c=out?'var(--bad)':'var(--info)'; for(let q=-1;q<=1;q++){ const y=cy0+q*18, x1=out?r.c.x+30:r.c.x-30, x2=out?r.c.x-30:r.c.x+30; s+=`<path d="M${f1(x1)} ${f1(y)}L${f1(x2)} ${f1(y)}M${f1(x2+(out?8:-8))} ${f1(y-4)}L${f1(x2)} ${f1(y)}L${f1(x2+(out?8:-8))} ${f1(y+4)}" stroke="${c}" stroke-width="${f1(1.5+3*mag)}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`; } s+=`<text x="160" y="${f1(cy0-26)}" text-anchor="middle" font-size="11" font-weight="800" style="fill:${c};stroke:var(--field);stroke-width:3.5px;paint-order:stroke">${out?'H₂O strömt hinaus':'H₂O strömt hinein'}</text>`; }
+  else s+=`<text x="160" y="${f1(cy0-26)}" text-anchor="middle" font-size="11" font-weight="800" class="dl2" style="stroke:var(--field);stroke-width:3.5px;paint-order:stroke">${cl.dead?'Zelle tot: keine Osmose':'Wasserbewegung im Gleichgewicht'}</text>`;
+  return s+'</svg>';
+}
+
+/* =============== Diagramme =============== */
+function panelSVG(W,H,o,last){
+  const L=50,R=12,T=10,B=last?32:12, pw=W-L-R, ph=H-T-B;
+  const xs=v=>L+pw*(v-o.x[0])/(o.x[1]-o.x[0]), ys=v=>T+ph-ph*(v-o.y[0])/(o.y[1]-o.y[0]);
+  let s=`<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="none" class="axl"/>`;
+  (o.bands||[]).forEach(b=>{ const x0=xs(Math.max(o.x[0],b.x0)), x1=xs(Math.min(o.x[1],b.x1)); if(x1-x0<1) return; s+=`<rect x="${f1(x0)}" y="${T}" width="${f1(x1-x0)}" height="${ph}" style="fill:${b.c}" opacity="${b.op||.13}"/>${b.l&&x1-x0>40?`<text x="${f1((x0+x1)/2)}" y="${T+ph-5}" text-anchor="middle" font-size="9.5" font-weight="700" class="tx2">${b.l}</text>`:''}`; });
+  const sy=niceStep(o.y[1]-o.y[0],3.5); for(let v=Math.ceil(o.y[0]/sy-1e-9)*sy;v<=o.y[1]+1e-9;v+=sy){ s+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${f1(ys(v))}" y2="${f1(ys(v))}"/><text x="${L-5}" y="${f1(ys(v)+3.5)}" text-anchor="end" font-size="10.5" class="tx2">${de(v,sy<1?(sy<0.1?2:1):0)}</text>`; }
+  const sx=o.sx||niceStep(o.x[1]-o.x[0],5); for(let v=Math.ceil(o.x[0]/sx-1e-9)*sx;v<=o.x[1]+1e-9;v+=sx){ s+=`<line class="gl" x1="${f1(xs(v))}" x2="${f1(xs(v))}" y1="${T}" y2="${T+ph}"/>`; if(last) s+=`<text x="${f1(xs(v))}" y="${T+ph+14}" text-anchor="middle" font-size="10.5" class="tx2">${o.xt?o.xt(v):de(v,sx<1?(sx<0.1?2:1):0)}</text>`; }
+  if(last&&o.xl) s+=`<text x="${f1(L+pw/2)}" y="${H-3}" text-anchor="middle" font-size="10.5" class="tx2">${o.xl}</text>`;
+  s+=`<text x="11" y="${f1(T+ph/2)}" text-anchor="middle" font-size="10.5" font-weight="700" class="tx2" transform="rotate(-90 11 ${f1(T+ph/2)})">${o.yl||''}</text>`;
+  (o.hl||[]).forEach(h=>{ s+=`<line x1="${L}" x2="${W-R}" y1="${f1(ys(h.y))}" y2="${f1(ys(h.y))}" stroke="${h.c||'var(--ink-soft)'}" stroke-width="1.4" stroke-dasharray="5 4"/>${h.l?`<text x="${W-R-3}" y="${f1(ys(h.y)-4)}" text-anchor="end" font-size="10" font-weight="700" style="fill:${h.c||'var(--ink-soft)'}">${h.l}</text>`:''}`; });
+  (o.vl||[]).forEach(h=>{ s+=`<line x1="${f1(xs(h.x))}" x2="${f1(xs(h.x))}" y1="${T}" y2="${T+ph}" stroke="${h.c||'var(--ink-soft)'}" stroke-width="1.4" stroke-dasharray="5 4"/>${h.l?`<text x="${f1(xs(h.x)+4)}" y="${T+12}" font-size="10" font-weight="700" style="fill:${h.c||'var(--ink-soft)'}">${h.l}</text>`:''}`; });
+  (o.series||[]).forEach(q=>{ const pts=decim(q.x,q.y,420).map(p=>[xs(p[0]),ys(p[1])]); if(pts.length) s+=`<path d="${pathOf(pts)}" fill="none" stroke="${q.c}" stroke-width="${q.w||2.6}" stroke-linejoin="round" ${q.dash?`stroke-dasharray="${q.dash}"`:''} opacity="${q.op||1}"/>`; });
+  (o.mk||[]).forEach(m=>{ s+=`<circle cx="${f1(xs(m.x))}" cy="${f1(ys(m.y))}" r="${m.r||4.8}" style="fill:${m.c};stroke:var(--panel);stroke-width:2"/>`; });
+  let lx=L+8; (o.leg||[]).forEach(g=>{ s+=`<g font-size="10.5" font-weight="700"><line x1="${f1(lx)}" x2="${f1(lx+18)}" y1="${T+10}" y2="${T+10}" stroke="${g.c}" stroke-width="3" ${g.dash?`stroke-dasharray="${g.dash}"`:''}/><text x="${f1(lx+22)}" y="${T+14}" style="fill:${g.c}">${g.t}</text></g>`; lx+=22+g.t.length*6.1+12; });
+  return {svg:s,ctx:{L,T,pw,ph,xs,ys}};
+}
+function renderPanels(W,H,panels){
+  const n=panels.length, gap=4, ph=(H-(n-1)*gap)/n; let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(panels[0].aria||'Diagramme')}">`; const ctx=[];
+  panels.forEach((o,i)=>{ const r=panelSVG(W,ph,o,i===n-1); s+=`<g transform="translate(0,${f1(i*(ph+gap))})">${r.svg}</g>`; ctx.push(r.ctx); });
+  return {svg:s+'</svg>',ctx};
+}
+/* =============== Zustand =============== */
+const N=GRID.length, STEP=0.25;
+const S={tab:'lab',t:0,run:false,speed:10,acc:0,seed:11,stain:'antho',cells:null,out:outOf('water',0),sel:0,events:[],H:null,script:null,lastRec:-1,
+  view:window.innerWidth>=900?'both':'micro',sol:'sucrose',conc:1.0,labels:true,
+  ser:{sol:'sucrose',seed:5,rows:null,sel:null,reveal:false,base:null},hof:{c:0.45,eps:10,cout:0.8},poe:{},score:{ok:0,n:0}};
+const SERBASE={sucrose:[0.2,0.3,0.4,0.45,0.5,0.55,0.6,0.8],nacl:[0.11,0.17,0.22,0.25,0.28,0.31,0.33,0.44]};
+const SCRIPTS=[
+ {id:'pd',t:'Plasmolyse und Deplasmolyse',d:'1,0 mol/L Saccharose, nach 4 min Wasser',steps:[{t:0,sol:'sucrose',conc:1.0},{t:240,sol:'water',conc:0}],end:540},
+ {id:'late',t:'Zu lange Plasmolyse',d:'0,6 mol/L Kochsalz 25 min, dann Wasser',steps:[{t:0,sol:'nacl',conc:0.6},{t:1500,sol:'water',conc:0}],end:1800},
+ {id:'urea',t:'Harnstoff-Versuch',d:'Plasmolyse, dann Deplasmolyse von selbst',steps:[{t:0,sol:'urea',conc:1.0}],end:900},
+ {id:'dead',t:'Kochprobe (tote Zellen)',d:'abgetötete Zellen in 1,0 mol/L Saccharose',steps:[{t:0,sol:'sucrose',conc:1.0,kill:true}],end:240}
+];
+function medianSel(cells){ const s=VISI.map(i=>[cells[i].c,i]).sort((a,b)=>a[0]-b[0]); return s[Math.floor(s.length/2)][1]; }
+function initHist(){ S.H={t:[],cout:[],vm:[],pl:[],v:S.cells.map(()=>[]),cin:S.cells.map(()=>[]),p:S.cells.map(()=>[])}; S.lastRec=-1; }
+function record(){ const H=S.H; H.t.push(S.t); H.cout.push(S.out.osm); let vm=0,pl=0; S.cells.forEach((cl,k)=>{ H.v[k].push(cl.v); H.cin[k].push(cIn(cl)); H.p[k].push(psiP(cl)); }); visCells(S.cells).forEach(cl=>{ vm+=cl.v; if(isPlas(cl)) pl++; }); H.vm.push(vm/VISI.length); H.pl.push(pl/VISI.length); S.lastRec=Math.floor(S.t); }
+function newPrep(){ stopRun(); S.seed++; S.cells=makeCells(N,S.seed); S.out=outOf('water',0); S.t=0; S.acc=0; S.events=[]; S.script=null; S.sel=medianSel(S.cells); initHist(); record(); }
+function setOut(sol,conc,label){ S.out=outOf(sol,conc); S.events.push({t:S.t,text:label||(sol==='water'?'In Wasser gespült':`${SOL[sol].n} ${de(conc,2)} mol/L eingelassen`)}); }
+function killAll(){ S.cells.forEach(cl=>{ cl.dead=true; }); S.events.push({t:S.t,text:'Zellen abgetötet (Kochprobe)'}); }
+function stepAll(){
+  const sc=S.script; if(sc){ while(sc.i<sc.steps.length&&sc.steps[sc.i].t<=S.t+1e-9){ const st=sc.steps[sc.i++]; if(st.kill) killAll(); setOut(st.sol,st.conc); } if(S.t>=sc.end){ S.script=null; stopRun(); } }
+  S.cells.forEach(cl=>stepCell(cl,S.out,STEP)); S.t+=STEP; if(Math.floor(S.t)>S.lastRec) record();
+}
+let rafId=null,lastTs=0,lastDraw=0,lastChart=0;
+function stopRun(){ S.run=false; if(rafId) cancelAnimationFrame(rafId); rafId=null; const b=$('[data-v="play"]'); if(b){ b.setAttribute('aria-pressed','false'); b.textContent='▶'; b.setAttribute('aria-label','Zeit laufen lassen'); } }
+function startRun(){ if(S.run) return; S.run=true; const b=$('[data-v="play"]'); b.setAttribute('aria-pressed','true'); b.textContent='⏸'; b.setAttribute('aria-label','Pause'); lastTs=0; rafId=requestAnimationFrame(tick); }
+function tick(ts){ if(!S.run) return; if(!lastTs) lastTs=ts; const dt=Math.min(0.1,(ts-lastTs)/1000); lastTs=ts; S.acc+=dt*S.speed; let n=0; while(S.acc>=STEP&&n<80){ stepAll(); S.acc-=STEP; n++; if(!S.run) break; }
+  if(ts-lastDraw>70||!S.run){ lastDraw=ts; drawViewer(false); } if(ts-lastChart>350||!S.run){ lastChart=ts; drawLabLive(); } if(S.run) rafId=requestAnimationFrame(tick); }
+
+/* =============== Messfenster =============== */
+function viewCells(){ if(S.tab==='ser'){ const sr=S.ser; if(sr.rows&&sr.sel!=null) return sr.rows[sr.sel].cells; if(!sr.base) sr.base=makeCells(N,99); return sr.base; } return S.cells; }
+function fluxOf(cl,o){ if(cl.dead) return 0; return LP*(RT*(cl.c+cl.np)/cl.v-RT*o.sig*o.osm-psiP(cl)); }
+function paneW(){ const box=$('.vpanes'); return Math.max(280,Math.round(box.clientWidth||340)); }
+function labPanels(){
+  const H=S.H, k=S.sel, cl=S.cells[k], tmax=Math.max(120,Math.ceil((S.t*1.04)/60)*60), sx=tmax<=240?30:tmax<=600?60:tmax<=1800?300:600;
+  const base={x:[0,tmax],sx,xt:v=>mmss(v),xl:'Zeit in min:s'};
+  const mx=Math.max(1.6,...H.cout,...H.cin[k])+0.1;
+  return [
+    Object.assign({},base,{y:[0,130],yl:'Protoplast %',series:[{x:H.t,y:H.vm.map(v=>v*100),c:'var(--ink-soft)',dash:'5 4',w:2},{x:H.t,y:H.v[k].map(v=>v*100),c:'var(--water)'}],hl:[{y:cl.v0*100,c:'var(--solute)',l:'Zellwand erreicht'}],leg:[{c:'var(--water)',t:'gewählte Zelle'},{c:'var(--ink-soft)',t:'Mittel aller Zellen',dash:'5 4'}],aria:'Zeitverlauf des Protoplastvolumens, der Osmolarität und des Druckpotenzials'}),
+    Object.assign({},base,{y:[0,Math.ceil(mx*5)/5],yl:'Osm/L',series:[{x:H.t,y:H.cin[k],c:'var(--water)'},{x:H.t,y:H.cout,c:'var(--solute)'}],leg:[{c:'var(--water)',t:'Zellsaft'},{c:'var(--solute)',t:'Außenlösung'}]}),
+    Object.assign({},base,{y:[0,Math.ceil((RT*CMEAN*1.2)*5)/5],yl:'Druck in MPa',series:[{x:H.t,y:H.p[k],c:'var(--turgor)'}],leg:[{c:'var(--turgor)',t:'Druckpotenzial (Turgor)'}]})
+  ];
+}
+function drawViewer(full){
+  if($('#viewer').hidden) return; const cells=viewCells(); if(!cells) return; const sel=Math.min(S.sel,cells.length-1), cl=cells[sel];
+  let v=S.view; if(S.tab==='ser'&&v==='chart') v='micro';
+  const m=$('#vMicro'), c=$('#vCell'), ch=$('#vChart'); m.hidden=!(v==='micro'||v==='both'); c.hidden=!(v==='cell'||v==='both'); ch.hidden=!(v==='chart');
+  $$('.vbar [data-v="view"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.view));
+  const o=S.tab==='ser'?outOf('water',0):S.out;
+  if(!m.hidden) m.innerHTML=microSVG(cells,S.stain,sel);
+  if(!c.hidden) c.innerHTML=detailSVG(cl,S.stain,{flux:S.tab==='ser'?0:fluxOf(cl,o),labels:S.labels,idx:sel});
+  if(!ch.hidden&&S.tab==='lab'){ const W=paneW(), r=renderPanels(W,Math.round(Math.max(290,Math.min(380,W*0.9))),labPanels()); ch.innerHTML=r.svg; }
+  const vt=$('#vt'); vt.textContent=mmss(S.t);
+  let info;
+  if(S.tab==='ser'){ const sr=S.ser, r=sr.rows&&sr.sel!=null?sr.rows[sr.sel]:null; info=r?`<b>${SOL[sr.sol].n} ${de(r.conc,2)} mol/L</b> · Gleichgewicht nach etwa 15 min · plasmolysiert: <b>${r.n} von ${r.N} Zellen</b>`:'Wähle in der Tabelle ein Mikroskopfeld.'; }
+  else { const vc=visCells(cells), pl=vc.filter(isPlas).length, dead=vc.filter(x=>x.dead).length; info=`<b>${S.out.sol==='water'?'Wasser':SOL[S.out.sol].n+' '+de(S.out.conc,2)+' mol/L'}</b> · plasmolysiert: <b>${pl} von ${vc.length}</b>${dead?` · abgestorben: ${dead}`:''} · gewählte Zelle: Protoplast ${de(cl.v*100,0)} %, Turgor ${de(psiP(cl),2)} MPa`; }
+  $('#vinfo').innerHTML=info;
+}
+
+/* =============== Reiter: Mikroskop =============== */
+function stateHTML(){
+  const cl=S.cells[S.sel], o=S.out, f=frac(cl), psip=psiP(cl), piIn=RT*(cl.c+cl.np)/cl.v, piOut=RT*o.sig*o.osm, flux=fluxOf(cl,o); let z,w;
+  if(cl.dead){ z='Abgestorbene Zelle'; w='Plasmalemma und Tonoplast sind nicht mehr selektiv durchlässig. Es gibt weder Turgor noch Plasmolyse'+(STAIN[S.stain].vac?', der Farbstoff tritt aus der Vakuole aus.':'.'); }
+  else {
+    if(f>=0.999) z=psip>0.03?`Turgeszent: Der Protoplast liegt der Zellwand an, das Druckpotenzial beträgt ${de(psip,2)} MPa.`:'Grenzfall: Der Protoplast liegt gerade noch an der Zellwand an (Druckpotenzial fast null).';
+    else if(f>=0.97) z='Grenzplasmolyse: Der Protoplast löst sich gerade von der Zellwand.';
+    else if(f>=0.8) z='Beginnende (konkave) Plasmolyse: Der Protoplast löst sich zuerst an den Ecken von der Wand, der Raum dazwischen füllt sich mit Außenlösung.';
+    else z='Konvexe Plasmolyse: Der Protoplast ist abgerundet und deutlich geschrumpft.';
+    w=flux>0.0006?'Wasser strömt in die Zelle ein'+(f<1?' (Deplasmolyse läuft).':'.'):flux<-0.0006?'Wasser strömt aus der Zelle aus.':'Wasserbewegung im Gleichgewicht.';
+    if(o.perm>0&&cl.np>0.02) w+=' Harnstoff dringt langsam in die Zelle ein und erhöht deren Osmolarität.';
+  }
+  const psi=-piIn+psip, pso=-piOut;
+  return `<div class="state"><b>Gewählte Zelle:</b> ${z}<br><b>Wasserbewegung:</b> ${w}<br><span class="note" style="margin:4px 0 0">Wasserpotenzial innen ${de(psi,2)} MPa (Osmotisches Potenzial ${de(-piIn,2)} MPa plus Druckpotenzial ${de(psip,2)} MPa), außen ${de(pso,2)} MPa. Wasser strömt zum niedrigeren Wasserpotenzial.</span></div>`;
+}
+function evHTML(){ if(!S.events.length) return '<p class="note">Noch keine Ereignisse. Die Zellen liegen in Wasser.</p>'; return `<ul class="evl">${S.events.map(e=>`<li><time>${mmss(e.t)}</time><span>${esc(e.text)}</span></li>`).join('')}</ul>`; }
+function drawLabLive(){ if(S.tab!=='lab') return; const a=$('#state'); if(a) a.innerHTML=stateHTML(); const e=$('#evl'); if(e) e.innerHTML=evHTML(); const c=$('#labChart'); if(c){ const W=Math.max(280,Math.round(c.clientWidth||340)); c.innerHTML=renderPanels(W,Math.round(Math.max(260,Math.min(380,W*0.62))),labPanels()).svg; } }
+function tonicText(){ const o=outOf(S.sol,S.sol==='water'?0:S.conc), eff=o.sig*o.osm; const thr=0.50; if(S.sol==='water') return 'Wasser: 0 Osm/L, deutlich hypotonisch gegenüber dem Zellsaft.'; const base=`${SOL[S.sol].n} ${de(S.conc,2)} mol/L entspricht ${de(o.osm,2)} Osm/L${SOL[S.sol].i>1?` (NaCl zerfällt in zwei Ionen, Faktor ${de(SOL[S.sol].i,1)})`:''}. `; return base+(eff<thr-0.1?'Hypotonisch gegenüber dem Zellsaft (etwa 0,45 Osm/L): Wasser strömt ein, die Zelle bleibt turgeszent.':eff<thr+0.1?'Etwa isotonisch: im Bereich der Grenzplasmolyse. Ein Teil der Zellen plasmolysiert.':'Hypertonisch: Wasser strömt aus, die Zellen plasmolysieren.')+(SOL[S.sol].perm>0?' Harnstoff dringt in die Zelle ein, deshalb ist die Plasmolyse nur vorübergehend.':''); }
+function renderLab(){
+  const st=STAIN[S.stain]; let h='';
+  h+=`<div class="card"><h2>Präparat und Färbung der Vakuole</h2><div class="chips" role="group" aria-label="Färbung">${Object.keys(STAIN).map(k=>`<button type="button" class="chip" data-act="stain" data-k="${k}" aria-pressed="${S.stain===k}"><b>${esc(STAIN[k].n)}</b><span>${k==='antho'||k==='neutral'?'Vakuole gefärbt':k==='methylene'?'Zellkern gefärbt':'kaum Kontrast'}</span></button>`).join('')}</div><p class="note" id="stdesc">${esc(st.d)}</p>
+  <div class="btnrow"><button type="button" class="btn sm" data-act="newprep">Neues Präparat</button><button type="button" class="btn sm" data-act="kill">Zellen abtöten (Kochprobe)</button></div><p class="note">Jedes Präparat hat andere Zellen: Der Zellsaft jeder Zelle ist etwas anders konzentriert. Tippe im Mikroskopbild eine Zelle an, dann zeigt die Ansicht „Zelle“ sie im Detail.</p></div>`;
+  h+=`<div class="card"><h2>Lösung einlassen</h2><div class="seg" role="group" aria-label="Lösung">${Object.keys(SOL).map(k=>`<button type="button" data-act="sol" data-k="${k}" aria-pressed="${S.sol===k}">${SOL[k].n}</button>`).join('')}</div>`;
+  if(S.sol!=='water') h+=`<div class="sl"><label class="fl" for="conc">Konzentration: <output id="oconc">${de(S.conc,2)} mol/L</output></label><input type="range" id="conc" data-conc="1" min="0.05" max="${SOL[S.sol].max}" step="${SOL[S.sol].step}" value="${Math.min(S.conc,SOL[S.sol].max)}"></div>`;
+  h+=`<p class="note" id="tonic">${tonicText()}</p><div class="btnrow"><button type="button" class="btn primary" data-act="apply">${S.sol==='water'?'Mit Wasser spülen':'Lösung einlassen'}</button><button type="button" class="btn" data-act="water">Wasser: Deplasmolyse</button></div></div>`;
+  h+=`<div class="card"><h2>Versuchsabläufe</h2><p class="lead">Fertige Abläufe starten ein neues Präparat und laufen automatisch.</p><div class="chips">${SCRIPTS.map(q=>`<button type="button" class="chip" data-act="script" data-id="${q.id}"><b>${esc(q.t)}</b><span>${esc(q.d)}</span></button>`).join('')}</div></div>`;
+  h+=`<div class="card"><h2>Was passiert gerade?</h2><div id="state"></div><h3>Ereignisse</h3><div id="evl"></div><label class="ck" style="margin-top:8px"><input type="checkbox" data-sh="labels" ${S.labels?'checked':''}> Beschriftung in der Zellansicht</label></div>`;
+  h+=`<div class="card"><h2>Diagramme der gewählten Zelle</h2><div class="chartbox" id="labChart"></div><p class="note">Oben: Der Protoplast schrumpft. Unterhalb der gestrichelten Linie hat er die Zellwand verlassen: Plasmolyse. Mitte: Der Zellsaft wird beim Wasserverlust konzentrierter und gleicht sich der Außenlösung an. Unten: Der Turgor sinkt auf null, sobald die Plasmolyse beginnt.</p></div>`;
+  $('#pane-lab').innerHTML=h; drawLabLive();
+}
+
+/* =============== Reiter: Messreihe =============== */
+function c50of(rows){ const xs=rows.map(r=>r.conc), ys=rows.map(r=>r.n/r.N); for(let i=1;i<xs.length;i++){ if(ys[i-1]<0.5&&ys[i]>=0.5){ return xs[i-1]+(0.5-ys[i-1])/(ys[i]-ys[i-1])*(xs[i]-xs[i-1]); } } return null; }
+function buildSeries(){ const sr=S.ser, sol=sr.sol; sr.rows=SERBASE[sol].map((c,i)=>{ const cells=makeCells(N,sr.seed*131+i*17+3); equilibrate(cells,sol,c); return {conc:c,osm:SOL[sol].i*c,n:visCells(cells).filter(isPlas).length,N:VISI.length,cells}; }); sr.sel=sr.rows.findIndex(r=>r.n/r.N>=0.4); if(sr.sel<0) sr.sel=0; sr.reveal=false; S.sel=0; }
+function modelTheta(){ const cs=makeCells(1500,1), th=cs.map(c=>c.c/c.v0), m=th.reduce((a,b)=>a+b)/th.length, sd=Math.sqrt(th.reduce((a,b)=>a+(b-m)**2,0)/th.length); return {m,sd}; }
+function serChart(W){ const sr=S.ser, rows=sr.rows, i=SOL[sr.sol].i, xmax=Math.max(...rows.map(r=>r.conc))*1.05, c50=c50of(rows); const ser=[{x:rows.map(r=>r.conc),y:rows.map(r=>100*r.n/r.N),c:'var(--water)',w:2}];
+  const o={x:[0,xmax],y:[0,100],xl:'Konzentration in mol/L',yl:'plasmolysiert in %',series:ser,mk:rows.map(r=>({x:r.conc,y:100*r.n/r.N,c:'var(--water)'})),hl:[{y:50,c:'var(--ink-soft)',l:'50 %'}],vl:c50!=null?[{x:c50,c:'var(--solute)',l:'Grenzplasmolyse'}]:[],aria:'Anteil plasmolysierter Zellen in Abhängigkeit von der Konzentration'};
+  if(sr.reveal){ const tm=modelTheta(), xs=[],ys=[]; for(let k=0;k<=100;k++){ const c=xmax*k/100; xs.push(c); ys.push(100*GAUSS_CDF((i*c-tm.m)/tm.sd)); } o.series.unshift({x:xs,y:ys,c:'var(--solute)',dash:'5 4',w:2}); o.leg=[{c:'var(--water)',t:'Messreihe'},{c:'var(--solute)',t:'Modellkurve',dash:'5 4'}]; } else o.leg=[{c:'var(--water)',t:'Messreihe'}];
+  return renderPanels(W,Math.round(Math.max(220,Math.min(320,W*0.56))),[o]).svg; }
+function renderSer(){
+  const sr=S.ser; let h=`<div class="card"><h2>Grenzplasmolyse bestimmen</h2><p class="lead">Die Zellen eines Präparats haben unterschiedlich konzentrierten Zellsaft. Deshalb plasmolysiert in einer Lösung mittlerer Stärke nur ein Teil der Zellen. Die Konzentration, bei der <b>die Hälfte der Zellen</b> plasmolysiert ist, heißt Grenzplasmolyse. Sie liefert den osmotischen Wert des Zellsafts.</p>
+  <div class="seg" role="group" aria-label="Stoff"><button type="button" data-act="sersol" data-k="sucrose" aria-pressed="${sr.sol==='sucrose'}">Saccharose</button><button type="button" data-act="sersol" data-k="nacl" aria-pressed="${sr.sol==='nacl'}">Kochsalz (NaCl)</button></div>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="serbuild">Messreihe erstellen</button>${sr.rows?'<button type="button" class="btn" data-act="sernew">Wiederholung mit neuem Präparat</button>':''}</div><p class="note">Für jede Lösung wird ein eigenes Präparat nach etwa 15 Minuten Einwirkzeit ausgezählt. Wiederholungen schwanken, weil immer andere Zellen im Gesichtsfeld liegen.</p></div>`;
+  if(sr.rows){ const c50=c50of(sr.rows), i=SOL[sr.sol].i;
+    h+=`<div class="card"><h2>Ergebnis</h2><div class="tscroll"><table class="tbl"><thead><tr><th>Konzentration</th><th class="n">Osm/L</th><th class="n">plasmolysiert</th><th class="n">Anteil</th><th></th></tr></thead><tbody>${sr.rows.map((r,k)=>`<tr class="${sr.sel===k?'sel':''}"><td>${de(r.conc,2)} mol/L</td><td class="n">${de(r.osm,2)}</td><td class="n">${r.n} von ${r.N}</td><td class="n">${de(100*r.n/r.N,0)} %</td><td><button type="button" class="btn sm" data-act="serfield" data-i="${k}">Feld ansehen</button></td></tr>`).join('')}</tbody></table></div><div class="chartbox" id="serChart"></div>`;
+    if(c50!=null){ const osm=c50*i, psi=-RT*osm; h+=`<div class="kpis"><div><b>${de(c50,2)} mol/L</b><small>Grenzplasmolyse (50 %), linear interpoliert</small></div><div><b>${de(osm,2)} Osm/L</b><small>osmotisch wirksame Konzentration (${SOL[sr.sol].i>1?'Faktor '+de(SOL[sr.sol].i,1)+' für NaCl':'Saccharose: Faktor 1'})</small></div><div><b>${de(psi,2)} MPa</b><small>osmotisches Potenzial ψₛ = −R·T·Osm bei etwa 25 °C</small></div><div><b>ψₚ ≈ 0</b><small>bei Grenzplasmolyse: Druckpotenzial verschwindet</small></div></div>`; }
+    else h+='<div class="fb tip">Aus dieser Reihe lässt sich keine 50-%-Marke ablesen. Erstelle die Reihe mit neuem Präparat oder wähle den anderen Stoff.</div>';
+    const tm=modelTheta(); h+=`<div class="btnrow"><button type="button" class="btn sm" data-act="serreveal">${sr.reveal?'Modellwert ausblenden':'Modellwert zeigen'}</button></div>${sr.reveal?`<div class="fb info" role="status">Im Modell liegt die Grenzplasmolyse im Mittel bei ${de(tm.m/i,2)} mol/L (${de(tm.m,2)} Osm/L), die Zellen streuen mit etwa ±${de(tm.sd/i,2)} mol/L. Deine Messreihe weicht davon zufällig ab: Je mehr Zellen man zählt, desto genauer wird der Wert.</div>`:''}
+    <p class="note">Hinweis: Gezählt werden Zellen, bei denen sich der Protoplast sichtbar von der Wand gelöst hat. In der Praxis zählt man mehrere Gesichtsfelder und mittelt.</p></div>`; }
+  $('#pane-ser').innerHTML=h; const c=$('#serChart'); if(c) c.innerHTML=serChart(Math.max(280,Math.round(c.clientWidth||340)));
+}
+
+/* =============== Reiter: Potenziale =============== */
+function hofCell(){ const h=S.hof, v0=1/(1+RT*h.c/h.eps), cell={c:h.c,eps:h.eps,v0,v:1,np:0,D:0,dead:false,leak:0,nuc:0.5}; cell.v=eqV(cell,RT*h.cout); return cell; }
+function hofChart(W){ const cell=hofCell(), xs=[],a=[],b=[],c=[]; for(let v=0.25;v<=1.15001;v+=0.005){ xs.push(v); const ps=-RT*cell.c/v, pp=cell.eps*Math.max(0,v-cell.v0)/cell.v0; a.push(ps); b.push(pp); c.push(ps+pp); }
+  const o={x:[0.25,1.15],y:[-5,3],sx:0.1,xl:'relatives Protoplastenvolumen (1 = voller Turgor)',yl:'Potenzial in MPa',series:[{x:xs,y:a,c:'var(--water)',w:2.4},{x:xs,y:b,c:'var(--turgor)',w:2.4},{x:xs,y:c,c:'var(--ink)',w:3}],hl:[{y:-RT*S.hof.cout,c:'var(--solute)',l:'Außenlösung'}],vl:[{x:cell.v0,c:'var(--ink-soft)',l:'Wand erreicht'}],bands:[{x0:0.25,x1:cell.v0,c:'var(--solute)',op:.1,l:'Plasmolyse'}],mk:[{x:cell.v,y:-RT*(S.hof.cout)+0*cell.v,c:'var(--acc)',r:6}],leg:[{c:'var(--water)',t:'ψₛ osmotisch'},{c:'var(--turgor)',t:'ψₚ Druck'},{c:'var(--ink)',t:'ψ gesamt'}],aria:'Höfler-Diagramm: osmotisches Potenzial, Druckpotenzial und Wasserpotenzial der Zelle'};
+  return renderPanels(W,Math.round(Math.max(260,Math.min(380,W*0.7))),[o]).svg; }
+function potTexts(){ const cell=hofCell(), psip=psiP(cell), psis=-RT*cell.c/cell.v, f=cell.v/cell.v0; return {cell,psip,psis,f}; }
+function renderPot(){
+  const h0=S.hof, t=potTexts(); let h=`<div class="card"><h2>Wasserpotenzial der Zelle (Höfler-Diagramm)</h2><p class="lead">Das Wasserpotenzial ψ einer Zelle ist die Summe aus osmotischem Potenzial ψₛ (negativ, durch gelöste Teilchen) und Druckpotenzial ψₚ (positiv, durch die gespannte Zellwand): <b>ψ = ψₛ + ψₚ</b>. Wasser strömt zum niedrigeren Wasserpotenzial. Im Gleichgewicht ist ψ innen gleich ψ außen.</p>
+  <div class="grid2"><div class="sl"><label class="fl" for="hc">Zellsaft: <output id="ohc">${de(h0.c,2)} Osm/L</output><small>Osmolarität bei vollem Turgor</small></label><input type="range" id="hc" data-hof="c" min="0.3" max="0.6" step="0.01" value="${h0.c}"></div>
+  <div class="sl"><label class="fl" for="he">Wanddehnbarkeit ε: <output id="ohe">${de(h0.eps,0)} MPa</output><small>kleiner = dehnbarere Wand, größer = steifere Wand</small></label><input type="range" id="he" data-hof="eps" min="4" max="20" step="1" value="${h0.eps}"></div></div>
+  <div class="sl"><label class="fl" for="hw">Außenlösung: <output id="ohw">${de(h0.cout,2)} Osm/L</output><small>für Saccharose gleich mol/L, 0 = Wasser</small></label><input type="range" id="hw" data-hof="cout" min="0" max="1.5" step="0.05" value="${h0.cout}"></div></div>`;
+  h+=`<div class="card"><div class="grid2"><div><div class="chartbox" id="hofChart"></div></div><div id="hofCell"></div></div><div id="hofTxt"></div></div>`;
+  $('#pane-pot').innerHTML=h; drawPot();
+}
+function drawPot(){ const t=potTexts(), c=$('#hofChart'); if(!c) return; c.innerHTML=hofChart(Math.max(260,Math.round(c.clientWidth||340)));
+  const w=$('#hofCell'); w.innerHTML=`<div style="background:var(--micbg);border-radius:12px;overflow:hidden;--mic-h:300px">${detailSVG(t.cell,S.stain,{flux:0,labels:true,idx:VISI[Math.floor(VISI.length/2)]})}</div>`;
+  const state=t.f>=0.999?(t.psip>0.03?'Die Zelle ist turgeszent.':'Die Zelle ist an der Grenze zur Plasmolyse.'):'Die Zelle ist plasmolysiert: Der Protoplast hat die Zellwand verlassen, ψₚ = 0.';
+  $('#hofTxt').innerHTML=`<div class="kpis" style="margin-top:10px"><div><b>${de(t.cell.v*100,0)} %</b><small>Protoplast im Gleichgewicht (voller Turgor = 100 %)</small></div><div><b>${de(t.psis,2)} MPa</b><small>ψₛ des Zellsafts im Gleichgewicht</small></div><div><b>${de(t.psip,2)} MPa</b><small>ψₚ Druckpotenzial</small></div><div><b>${de(t.psis+t.psip,2)} MPa</b><small>ψ innen = ψ außen (${de(-RT*S.hof.cout,2)} MPa)</small></div></div><div class="fb info" role="status">${state} Die Grenzplasmolyse liegt hier bei ${de(t.cell.c/t.cell.v0,2)} Osm/L: Darüber plasmolysiert die Zelle, darunter bleibt sie turgeszent.</div><p class="note">Der orange Punkt liegt im Gleichgewicht auf der Linie der Außenlösung. Bei Wasser (0 Osm/L) liegt er bei ψ = 0 und ψₚ = −ψₛ.</p>`; }
+/* =============== Reiter: Üben (Prognose) =============== */
+const POE=[
+ {t:'Ein Stück Zwiebelepidermis liegt lange in destilliertem Wasser.',q:'Was geschieht mit den Zellen?',opts:['Sie platzen, weil Wasser einströmt.','Sie nehmen Wasser auf und bleiben durch die Zellwand begrenzt: Der Turgor steigt.','Sie plasmolysieren.'],ok:1,ev:[],T:600,why:'Wasser strömt ein, bis der Druck der gespannten Zellwand (Druckpotenzial) den osmotischen Sog ausgleicht. Die feste Zellwand verhindert das Platzen.'},
+ {t:'Die Zellen kommen in Saccharoselösung mit 0,2 mol/L.',q:'Wie verändert sich die Zelle?',opts:['Sie plasmolysiert stark.','Sie verliert etwas Wasser, bleibt aber turgeszent: Der Protoplast liegt der Wand an.','Sie wird größer als in Wasser.'],ok:1,ev:[{t:0,sol:'sucrose',conc:0.2}],T:600,why:'0,2 mol/L ist niedriger als die Zellsaftkonzentration (Grenzplasmolyse bei etwa 0,5 mol/L). Der Turgor sinkt nur, die Plasmolyse bleibt aus.'},
+ {t:'Rote Zwiebelzellen liegen 3 Minuten in Saccharoselösung mit 1,0 mol/L.',q:'Wie sieht die Vakuole aus?',opts:['Kleiner und dunkler gefärbt.','Größer und heller gefärbt.','Unverändert.'],ok:0,ev:[{t:0,sol:'sucrose',conc:1.0}],T:180,why:'Wasser verlässt die Vakuole. Der Farbstoff bleibt zurück und ist in weniger Volumen gelöst, die Farbe wird kräftiger.'},
+ {t:'Zellen waren 3 Minuten in 1,0 mol/L Saccharose plasmolysiert und werden dann mit Wasser gespült.',q:'Was geschieht?',opts:['Sie bleiben dauerhaft plasmolysiert.','Sie deplasmolysieren: Der Protoplast legt sich der Wand wieder an.','Sie platzen sofort.'],ok:1,ev:[{t:0,sol:'sucrose',conc:1.0},{t:180,sol:'water',conc:0}],T:480,why:'Der Zellsaft ist konzentrierter als das Wasser. Wasser strömt ein, der Protoplast wächst, bis er die Wand erreicht. Die Zellwand begrenzt die Aufnahme.'},
+ {t:'Die Zwiebelhaut wurde vorher abgekocht und liegt dann in 1,0 mol/L Saccharose.',q:'Was beobachtest du?',opts:['Plasmolyse wie bei lebenden Zellen.','Keine Plasmolyse, der Farbstoff tritt aus.','Die Zellen schrumpfen samt Zellwand.'],ok:1,kill:true,ev:[{t:0,sol:'sucrose',conc:1.0}],T:240,why:'Beim Abkochen sterben die Zellen. Plasmalemma und Tonoplast sind dann nicht mehr selektiv durchlässig, es gibt keine Osmose und keinen Turgor. Darum gilt Plasmolyse als Lebendnachweis.'},
+ {t:'Die Zellen liegen 10 Minuten in Harnstofflösung (1,0 mol/L). Harnstoff dringt langsam durch die Membran.',q:'Was beobachtest du?',opts:['Dauerhafte Plasmolyse.','Zuerst Plasmolyse, dann Deplasmolyse ohne Wasserzugabe.','Keine Veränderung.'],ok:1,ev:[{t:0,sol:'urea',conc:1.0}],T:600,why:'Anfangs fließt Wasser schneller hinaus, als Harnstoff hineinkommt: Plasmolyse. Dann gleicht sich die Harnstoffkonzentration innen und außen an, der Zellsaft ist wieder konzentrierter, Wasser strömt zurück.'},
+ {t:'Vergleiche zwei Lösungen mit jeweils 0,3 mol/L: Saccharose und Kochsalz.',q:'Welche Lösung plasmolysiert mehr Zellen?',opts:['Saccharose, weil die Moleküle größer sind.','Kochsalz, weil bei gleicher Stoffmenge mehr Teilchen (Na⁺ und Cl⁻) osmotisch wirken.','Beide gleich, denn die Konzentration ist gleich.'],ok:1,eq:[{sol:'sucrose',conc:0.3,label:'Saccharose 0,3 mol/L'},{sol:'nacl',conc:0.3,label:'Kochsalz 0,3 mol/L'}],why:'Entscheidend ist die Zahl der gelösten Teilchen (Osmolarität). NaCl zerfällt in Ionen und entspricht 0,3 mol/L × etwa 1,8 ≈ 0,54 Osm/L. Das liegt über der Grenzplasmolyse, Saccharose mit 0,3 Osm/L darunter.'},
+ {t:'Zellen werden in Saccharoselösungen verschiedener Konzentration gelegt.',q:'Bei welcher Konzentration sind etwa 50 % der Zellen plasmolysiert (Grenzplasmolyse)?',opts:['etwa 0,2 mol/L','etwa 0,5 mol/L','etwa 1,0 mol/L'],ok:1,c50:true,why:'Im Modell liegt der Zellsaft bei etwa 0,45 Osm/L. Die Plasmolyse beginnt, sobald der Protoplast die Zellwand verlässt, bei etwa 0,5 Osm/L.'},
+ {t:'Die Zellen liegen 25 Minuten in Kochsalzlösung (0,6 mol/L) und werden dann mit Wasser gespült.',q:'Was geschieht beim Spülen?',opts:['Deplasmolyse wie immer.','Keine Deplasmolyse: Die Zellen sind durch die lange starke Plasmolyse geschädigt oder abgestorben.','Die Zellen platzen.'],ok:1,ev:[{t:0,sol:'nacl',conc:0.6},{t:1500,sol:'water',conc:0}],T:1800,why:'Starke und lange Plasmolyse, besonders in Salzlösung, schädigt die Zellen. Geschädigte Zellen haben keine selektiv durchlässigen Membranen mehr. Im Modell ist das eine Annahme: Die Zeit bis zum Zelltod hängt in Wirklichkeit von Zelle und Lösung ab.'}
+];
+function poeRun(sc){
+  if(sc.eq){ return {eq:sc.eq.map(e=>{ const cs=makeCells(400,5); equilibrate(cs,e.sol,e.conc); return {label:e.label,pl:cs.filter(isPlas).length/cs.length}; })}; }
+  if(sc.c50){ for(let c=0.1;c<=1.5;c+=0.01){ const cs=makeCells(600,5); equilibrate(cs,'sucrose',c); if(cs.filter(isPlas).length/cs.length>=0.5) return {c50:c}; } return {c50:null}; }
+  const cells=makeCells(N,77); if(sc.kill) cells.forEach(c=>{ c.dead=true; });
+  let o=outOf('water',0), ei=0, maxPl=0; const ev=sc.ev;
+  for(let t=0;t<sc.T;t+=0.5){ while(ei<ev.length&&ev[ei].t<=t+1e-9){ o=outOf(ev[ei].sol,ev[ei].conc); ei++; } cells.forEach(cl=>stepCell(cl,o,0.5)); if(Math.round(t*2)%10===0) maxPl=Math.max(maxPl,visCells(cells).filter(isPlas).length); }
+  const vc=visCells(cells), vm=vc.reduce((a,c)=>a+c.v,0)/vc.length, ps=vc.reduce((a,c)=>a+psiP(c),0)/vc.length;
+  return {cells,pl:vc.filter(isPlas).length,maxPl,dead:vc.filter(c=>c.dead).length,vm,ps,n:vc.length};
+}
+function renderTrain(){
+  let h=`<div class="card"><h2>Prognose: Was passiert, wenn …?</h2><p class="lead">Entscheide zuerst, dann rechnet die App den Versuch durch und zeigt das Mikroskopbild am Ende.</p>${S.score.n?`<span class="badge info">Richtig: ${S.score.ok} von ${S.score.n}</span>`:''}</div>`;
+  POE.forEach((sc,i)=>{ const st=S.poe[i]; h+=`<div class="card"><h3 style="margin-top:0">Aufgabe ${i+1}</h3><p style="margin:2px 0">${esc(sc.t)}</p><p style="margin:6px 0"><b>${esc(sc.q)}</b></p>${sc.opts.map((o,j)=>`<button type="button" class="opt${st?(j===sc.ok?' right':j===st.c?' wrong':''):''}" data-act="poe" data-i="${i}" data-j="${j}" ${st?'disabled':''}>${esc(o)}</button>`).join('')}`;
+    if(st){ const r=st.res, ok=st.c===sc.ok; h+=`<div class="fb ${ok?'ok':'no'}" role="status">${ok?'Richtig. ':'Nicht ganz. '}${esc(sc.why)}</div>`;
+      if(r.eq) h+=`<div class="tscroll"><table class="tbl"><thead><tr><th>Lösung</th><th class="n">plasmolysierte Zellen im Gleichgewicht</th></tr></thead><tbody>${r.eq.map(e=>`<tr><td>${esc(e.label)}</td><td class="n">${de(e.pl*100,0)} %</td></tr>`).join('')}</tbody></table></div>`;
+      else if(r.c50!==undefined) h+=`<div class="kpis"><div><b>${r.c50!=null?de(r.c50,2)+' mol/L':'–'}</b><small>Grenzplasmolyse im Modell (50 % der Zellen)</small></div></div>`;
+      else h+=`<div class="kpis"><div><b>${r.pl} von ${r.n}</b><small>plasmolysiert am Ende</small></div><div><b>${r.maxPl} von ${r.n}</b><small>plasmolysiert höchstens</small></div><div><b>${de(r.vm*100,0)} %</b><small>Protoplast im Mittel (Turgor = 100 %)</small></div><div><b>${r.dead}</b><small>abgestorbene Zellen</small></div></div><div style="background:var(--micbg);border-radius:12px;overflow:hidden;margin-top:8px;--mic-h:230px">${microSVG(r.cells,S.stain,null)}</div>`; }
+    h+='</div>'; });
+  $('#pane-train').innerHTML=h;
+}
+
+/* =============== Reiter: Info und Aufgaben =============== */
+const GLOS=[
+ ['Zellwand','Feste, dehnbare Hülle aus Cellulose. Sie begrenzt die Wasseraufnahme und verhindert das Platzen der Zelle.'],
+ ['Plasmalemma','Zellmembran an der Innenseite der Zellwand. Sie ist selektiv durchlässig (semipermeabel).'],
+ ['Vakuole, Tonoplast','Die große Zellsaft-Vakuole füllt den größten Teil der ausgewachsenen Pflanzenzelle. Der Tonoplast ist ihre Membran.'],
+ ['Zellsaft','Wässrige Lösung in der Vakuole mit Zuckern, Salzen und Farbstoffen. Sie bestimmt das osmotische Potenzial.'],
+ ['Anthocyane','Rote bis violette Pflanzenfarbstoffe im Zellsaft, zum Beispiel in der Roten Zwiebel. Ihre Farbe hängt vom pH-Wert ab.'],
+ ['Vitalfarbstoff (Neutralrot)','Farbstoff, der lebende Zellen nicht sofort tötet und sich in der Vakuole anreichert.'],
+ ['Turgor, Druckpotenzial','Innendruck der Zelle: Der Protoplast drückt gegen die gespannte Zellwand.'],
+ ['Osmose','Gerichtete Diffusion von Wasser durch eine selektiv durchlässige Membran von niedriger zu hoher Teilchenkonzentration.'],
+ ['hypotonisch, isotonisch, hypertonisch','Vergleich der Außenlösung mit dem Zellsaft: weniger, gleich viele, mehr gelöste Teilchen.'],
+ ['Osmolarität','Konzentration aller osmotisch wirksamen Teilchen in Osm/L. NaCl zerfällt in zwei Ionen und zählt etwa doppelt so viel wie Saccharose gleicher Stoffmengenkonzentration.'],
+ ['Plasmolyse','Der Protoplast löst sich durch Wasserverlust von der Zellwand. Erst konkav (an den Ecken), später konvex (abgerundet).'],
+ ['Deplasmolyse','Rückgang der Plasmolyse: Wasser strömt wieder in die Zelle, der Protoplast legt sich der Wand an.'],
+ ['Grenzplasmolyse','Konzentration, bei der etwa die Hälfte der Zellen plasmolysiert ist. Dort ist das Druckpotenzial gerade null.'],
+ ['Hechtsche Fäden','Dünne Plasmastränge, die den geschrumpften Protoplasten bei starker Plasmolyse noch mit der Zellwand verbinden.'],
+ ['Wasserpotenzial','ψ = ψₛ + ψₚ. Wasser strömt zum niedrigeren Wasserpotenzial.']
+];
+const ITASKS=[
+ {afb:'I',t:'Zellbestandteile benennen',p:6,op:'Benenne',text:'Benenne im Mikroskopbild und in der Zellansicht Zellwand, Plasmalemma, Zytoplasma, Vakuole und Zellkern und gib je eine Funktion an.',load:'lab',sol:['Zellwand: Schutz und Begrenzung der Wasseraufnahme (1 P)','Plasmalemma: selektiv durchlässige Außenmembran (1 P)','Zytoplasma: Stoffwechsel, schmaler Saum (1 P)','Vakuole: Zellsaft, Wasserspeicher, hier mit Farbstoff (2 P)','Zellkern: Erbinformation (1 P)']},
+ {afb:'II',t:'Plasmolyse erklären',p:7,op:'Erkläre',text:'Erkläre mit dem Versuchsablauf „Plasmolyse und Deplasmolyse“, warum sich der Protoplast in 1,0 mol/L Saccharose von der Zellwand löst.',load:'pd',sol:['Außenlösung hat mehr gelöste Teilchen als der Zellsaft (hypertonisch) (2 P).','Wasser kann durch die selektiv durchlässigen Membranen, Saccharose nicht (2 P).','Wasser strömt aus der Vakuole, der Protoplast schrumpft, die starre Zellwand nicht (2 P).','Der Raum zwischen Wand und Protoplast füllt sich mit Außenlösung (1 P).']},
+ {afb:'II',t:'Deplasmolyse erklären',p:6,op:'Erkläre',text:'Erkläre, was beim Spülen mit Wasser geschieht und warum die Zelle dabei nicht platzt.',load:'pd',sol:['Zellsaft ist konzentrierter als Wasser: Wasser strömt ein (2 P).','Der Protoplast wächst, bis er der Wand anliegt (1 P).','Die Zellwand setzt dem Wachstum Widerstand entgegen, das Druckpotenzial steigt, bis es den osmotischen Sog ausgleicht (3 P).']},
+ {afb:'II',t:'Farbe der Vakuole deuten',p:7,op:'Erkläre',text:'Erkläre, warum die gefärbte Vakuole bei Plasmolyse kleiner und dunkler erscheint.',load:'lab',sol:['Wasser verlässt die Vakuole (2 P).','Der Farbstoff bleibt in der Vakuole zurück (2 P).','Gleiche Menge Farbstoff in weniger Volumen: höhere Konzentration, stärkere Farbe (3 P).']},
+ {afb:'II',t:'Messreihe auswerten',p:7,op:'Werte aus',text:'Erstelle in der Messreihe eine Reihe mit Saccharose. Bestimme die Grenzplasmolyse und berechne das osmotische Potenzial des Zellsafts mit ψₛ = −R·T·c (R·T ≈ 2,48 MPa·L/mol).',load:'ser',sol:['Konzentration ablesen, bei der etwa 50 % der Zellen plasmolysiert sind (2 P).','Osmotisch wirksame Konzentration bestimmen: Saccharose Faktor 1 (1 P).','ψₛ ≈ −2,48 MPa·L/mol × c, zum Beispiel c = 0,5 mol/L ergibt etwa −1,2 MPa (3 P).','Hinweis: Streuung zwischen den Zellen und Präparaten (1 P).']},
+ {afb:'II',t:'Salz und Zucker vergleichen',p:6,op:'Erkläre',text:'Erkläre, warum 0,3 mol/L Kochsalz stärker plasmolysiert als 0,3 mol/L Saccharose.',load:'train',sol:['Osmotisch wirkt die Teilchenzahl (2 P).','NaCl zerfällt in Na⁺ und Cl⁻, etwa das 1,8-Fache an Teilchen (2 P).','Ergebnis: etwa 0,54 Osm/L gegen 0,3 Osm/L, über beziehungsweise unter der Grenzplasmolyse (2 P).']},
+ {afb:'III',t:'Aussagekraft beurteilen',p:8,op:'Beurteile',text:'Beurteile, warum man die Grenzplasmolyse über 50 % der Zellen definiert und welche Fehlerquellen die Messung beeinflussen.',load:'ser',sol:['Zellen unterscheiden sich in ihrem Zellsaft, deshalb plasmolysieren sie bei verschiedenen Konzentrationen (2 P).','Die 50-%-Marke ist der Mittelwert dieser Verteilung (2 P).','Fehlerquellen: Zellalter, Verletzung der Zellen, zu kurze Einwirkzeit, ungenau angesetzte Lösungen, Zählfehler (3 P).','Wiederholungen und mehr Zellen verringern den Zufallsfehler (1 P).']},
+ {afb:'III',t:'Lebendnachweis planen',p:8,op:'Entwickle',text:'Entwickle ein Experiment, mit dem man prüft, ob Zellen einer Zwiebelepidermis leben. Nutze Plasmolyse und die Kochprobe und nenne Kontrollen und Erwartungen.',load:'dead',sol:['Lebende Zellen in hypertonische Lösung legen: Plasmolyse erwartet (2 P).','Kontrolle: abgekochte Zellen in gleiche Lösung: keine Plasmolyse, Farbstoff tritt aus (3 P).','Deplasmolyse mit Wasser als zusätzlicher Nachweis intakter Membranen (1 P).','Fehlerquellen: zu lange Plasmolyse schädigt Zellen, Lösung zu schwach (2 P).']}
+];
+const PRAXIS=[
+ {t:'Material',b:['Rote Küchenzwiebel (oder weiße Zwiebel mit Neutralrot, verdünnt nach Vorgabe der Schule)','Pinzette, Objektträger, Deckgläser, Pipetten, Filterpapier, Mikroskop','Lösungen: Wasser, Saccharose etwa 0,8 bis 1,0 mol/L (etwa 270 bis 340 g Haushaltszucker je Liter), Kochsalz etwa 0,5 mol/L (etwa 29 g je Liter)']},
+ {t:'Durchführung',b:['Von einer inneren Zwiebelschuppe ein dünnes Häutchen (Epidermis, etwa 5 mm × 5 mm) abziehen und glatt in einen Wassertropfen legen, Deckglas auflegen.','Mikroskopieren: Zellwand, Vakuole mit Farbstoff, Zellkern erkennen und skizzieren (Zellen turgeszent).','Auf der einen Seite des Deckglases Lösung zutropfen, auf der anderen mit Filterpapier absaugen. Nach 2 bis 5 Minuten beobachten: Plasmolyse.','Danach Wasser durchsaugen und beobachten: Deplasmolyse.']},
+ {t:'Erwartetes Ergebnis',b:['Zuerst löst sich der Protoplast an den Ecken von der Wand (konkav), später ist er abgerundet (konvex).','Die Vakuole wird kleiner und der Farbstoff dunkler.','Nach dem Spülen mit Wasser legt sich der Protoplast wieder an, die Vakuole wird heller.']},
+ {t:'Fehlerquellen',b:['Häutchen gefaltet, zu dick oder verletzt: Zellen sind abgestorben, keine Plasmolyse.','Luftblasen oder Austrocknen unter dem Deckglas.','Lösung zu schwach oder zu kurze Einwirkzeit: Plasmolyse bleibt aus.','Zu lange in starker Lösung (besonders Salz): Zellen sterben, Deplasmolyse bleibt aus.']},
+ {t:'Sicherheit',b:['Gefährdungsbeurteilung und Gefahrstoffvorgaben nach Schulvorschriften beachten. Das musst du für deine Schule selbst prüfen, besonders für Farbstoffe wie Neutralrot und Methylenblau.','Nichts probieren oder verzehren, Hände waschen, Kittel und gegebenenfalls Schutzbrille und Handschuhe.','Skalpell oder Rasierklinge nur mit Einweisung und Aufsicht. Das Häutchen lässt sich meist mit der Pinzette abziehen.','Objektträger und Deckgläser sind zerbrechlich: Scherben nicht mit der Hand aufnehmen. Für Lernende, die nicht mikroskopieren können, gibt es Rollen wie Protokoll, Zeitnahme und Auswertung.']}
+];
+function renderInfo(){
+  let h=`<div class="card"><h2>Formeln</h2><div class="eqn">Osmotisches Potenzial: ψₛ = −i · c · R · T (R·T ≈ 2,48 MPa·L/mol bei 25 °C)<br>Wasserpotenzial: ψ = ψₛ + ψₚ<br>Grenzplasmolyse: ψₚ = 0<br>Wasserfluss: zum niedrigeren Wasserpotenzial<br>Beispiel: Zellsaft 0,45 Osm/L ergibt ψₛ ≈ −1,1 MPa</div><p class="note">i ist der Teilchenfaktor: Saccharose 1, NaCl etwa 1,8. Alle Zahlen sind Modellwerte. Reale Werte hängen von Zwiebelsorte, Zellalter und Temperatur ab.</p></div>`;
+  h+=`<div class="card"><h2>Praxis: Plasmolyse am Zwiebelhäutchen</h2>${PRAXIS.map(q=>`<details class="task" ${q.t==='Sicherheit'?'open':''}><summary>${esc(q.t)}</summary><ul class="plain">${q.b.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`).join('')}</div>`;
+  h+=`<div class="card"><h2>Annahmen und Grenzen des Modells</h2><ul class="plain"><li>Jede Zelle wird als Protoplast in einer Zellwand beschrieben. Der Zellsaft jeder Zelle ist etwas anders konzentriert (Mittel 0,45 Osm/L, Streuung etwa 0,05).</li><li>Die Zellwand ist elastisch bis zum entspannten Volumen und danach starr. Der Protoplast kann sich davon lösen.</li><li>Wasser strömt durch die Membran proportional zur Differenz der Wasserpotenziale. Saccharose und NaCl dringen nicht ein, Harnstoff dringt langsam ein.</li><li>Die Schädigung durch lange Plasmolyse ist eine Annahme: Je stärker und je länger die Plasmolyse, desto eher sterben Zellen. Salz wirkt im Modell stärker als Zucker.</li><li>Die Zeit läuft im Modell im Zeitraffer. Reale Zeiten hängen vom Präparat ab.</li><li>Die Zellbilder sind schematisch (Form, Maßstab, Farbtöne).</li></ul></div>`;
+  h+=`<div class="card"><h2>Begriffe</h2><dl class="gl">${GLOS.map(([t,d])=>`<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl></div>`;
+  h+=`<div class="card"><h2>Aufgaben</h2><p class="note">Die Punktzahlen sind ein Vorschlag. Notengebung und Bewertungsmaßstab richten sich nach den Beschlüssen eurer Fachkonferenz.</p>`;
+  ITASKS.forEach((t,i)=>{ h+=`<details class="task"><summary><span class="badge">AFB ${t.afb}</span>${i+1}. ${esc(t.t)} <span class="badge">${t.p} P</span></summary><p><b>${t.op}:</b> ${esc(t.text)}</p><div class="btnrow"><button type="button" class="btn sm" data-act="itask" data-load="${t.load}">Passende Einstellung öffnen</button></div><details><summary style="cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:700">Erwartungshorizont</summary><div class="sol"><ul class="plain">${t.sol.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></details></details>`; });
+  h+='</div>';
+  h+=`<div class="card"><details class="mode"><summary>Hinweise für die Lehrkraft</summary><p><b>Einsatz:</b> Vorab die Prognoseaufgaben als Hypothesenbildung, dann Praxisphase am Mikroskop, danach Vergleich mit dem virtuellen Versuch und Auswertung der Messreihe.</p><p><b>Typische Fehlvorstellungen:</b> „Die Zelle schrumpft samt Zellwand“; „Salz zieht Wasser an, deshalb ist die Zelle tot“; „Die Farbe verschwindet beim Wasserentzug“; „Zellen platzen im Wasser wie Tierzellen“; „Plasmolyse ist immer schädlich“.</p><p><b>Einordnung:</b> Die Zuordnung zu Themenschwerpunkten und Kompetenzbereichen im Kerncurriculum Biologie und in den Vorgaben zum Abitur musst du auf nibis.de prüfen. Die Fachbegriffe können je nach Schulbuch abweichen (zum Beispiel Wasserpotenzial).</p><p><b>Bewertung:</b> Die Punktevorschläge sind unverbindlich. Notengebung bleibt deine Verantwortung und folgt den Fachkonferenzbeschlüssen.</p><p><b>Datenschutz:</b> Die App speichert nichts.</p></details></div>`;
+  $('#pane-info').innerHTML=h;
+}
+
+/* =============== Steuerung =============== */
+function renderTab(){ ({lab:renderLab,ser:renderSer,pot:renderPot,train:renderTrain,info:renderInfo}[S.tab])(); }
+function showTab(t){
+  if(S.tab==='lab'&&t!=='lab') stopRun(); S.tab=t;
+  $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t)); ['lab','ser','pot','train','info'].forEach(k=>{ $('#pane-'+k).hidden=k!==t; });
+  const vis=t==='lab'||t==='ser'; $('#viewer').hidden=!vis; const liveOnly=t==='lab'; ['[data-v="play"]','[data-v="reset"]','#spd','#vt'].forEach(sel=>{ $(sel).hidden=!liveOnly; });
+  renderTab(); if(vis) drawViewer(); window.scrollTo({top:0});
+}
+function runScript(id){ const sc=SCRIPTS.find(q=>q.id===id); newPrep(); S.script={steps:sc.steps.map(s=>Object.assign({},s)),i:0,end:sc.end}; S.speed=(id==='late'||id==='urea')?30:10; $('#spd').value=String(S.speed); stepAll(); S.t=0; S.acc=0; startRun(); }
+function applyLoad(l){ if(['pd','late','urea','dead'].includes(l)){ showTab('lab'); runScript(l); renderLab(); drawViewer(); return; } showTab(l); }
+document.addEventListener('input',e=>{ const t=e.target;
+  if(t.id==='spd'){ S.speed=parseFloat(t.value); return; }
+  if(t.dataset.conc){ S.conc=parseFloat(t.value); $('#oconc').textContent=de(S.conc,2)+' mol/L'; $('#tonic').textContent=tonicText(); return; }
+  if(t.dataset.hof){ S.hof[t.dataset.hof]=parseFloat(t.value); const id={c:'ohc',eps:'ohe',cout:'ohw'}[t.dataset.hof]; $('#'+id).textContent=t.dataset.hof==='eps'?de(S.hof.eps,0)+' MPa':de(S.hof[t.dataset.hof],2)+' Osm/L'; drawPot(); return; }
+});
+document.addEventListener('change',e=>{ const t=e.target; if(t.id==='spd'){ S.speed=parseFloat(t.value); return; } if(t.dataset.sh==='labels'){ S.labels=t.checked; drawViewer(); } });
+document.addEventListener('pointerdown',e=>{ const cl=e.target.closest&&e.target.closest('#vMicro .cl'); if(cl){ S.sel=+cl.dataset.cell; drawViewer(); drawLabLive(); } });
+document.addEventListener('click',e=>{
+  const v=e.target.closest('[data-v]'); if(v){ const k=v.dataset.v;
+    if(k==='play'){ if(S.run) stopRun(); else startRun(); } else if(k==='reset'){ newPrep(); renderLab(); drawViewer(); }
+    else if(k==='view'){ S.view=v.dataset.m; drawViewer(); } else if(k==='fold'){ const c=$('#viewer').classList.toggle('collapsed'); v.setAttribute('aria-pressed',c); v.textContent=c?'▼':'▲'; }
+    return; }
+  const tb=e.target.closest('.tab'); if(tb){ showTab(tb.dataset.tab); return; }
+  const a=e.target.closest('[data-act]'); if(!a) return; const act=a.dataset.act;
+  switch(act){
+    case 'stain': S.stain=a.dataset.k; $$('.chip[data-act="stain"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===S.stain)); $('#stdesc').textContent=STAIN[S.stain].d; drawViewer(); break;
+    case 'newprep': newPrep(); renderLab(); drawViewer(); break;
+    case 'kill': killAll(); drawViewer(); drawLabLive(); break;
+    case 'sol': S.sol=a.dataset.k; S.conc=SOL[S.sol].dflt||S.conc; renderLab(); break;
+    case 'apply': setOut(S.sol,S.sol==='water'?0:S.conc); startRun(); drawLabLive(); break;
+    case 'water': setOut('water',0); startRun(); drawLabLive(); break;
+    case 'script': runScript(a.dataset.id); renderLab(); drawViewer(); break;
+    case 'sersol': S.ser.sol=a.dataset.k; S.ser.rows=null; S.ser.sel=null; renderSer(); drawViewer(); break;
+    case 'serbuild': buildSeries(); renderSer(); drawViewer(); break;
+    case 'sernew': S.ser.seed++; buildSeries(); renderSer(); drawViewer(); break;
+    case 'serfield': S.ser.sel=+a.dataset.i; renderSer(); drawViewer(); window.scrollTo({top:0,behavior:'smooth'}); break;
+    case 'serreveal': S.ser.reveal=!S.ser.reveal; renderSer(); break;
+    case 'poe': { const i=+a.dataset.i, j=+a.dataset.j; if(S.poe[i]) break; S.poe[i]={c:j,res:poeRun(POE[i])}; S.score.n++; if(j===POE[i].ok) S.score.ok++; renderTrain(); break; }
+    case 'itask': applyLoad(a.dataset.load); break;
+  }
+});
+let rsz=null; window.addEventListener('resize',()=>{ clearTimeout(rsz); rsz=setTimeout(()=>{ if(S.tab==='lab'||S.tab==='ser') drawViewer(); if(S.tab==='lab') drawLabLive(); if(S.tab==='pot') drawPot(); if(S.tab==='ser'&&S.ser.rows){ const c=$('#serChart'); if(c) c.innerHTML=serChart(Math.max(280,Math.round(c.clientWidth||340))); } },120); });
+$$('.vbar [data-v="view"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.view));
+
+/* =============== Start =============== */
+(function init(){ newPrep(); showTab('lab'); })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#EEF2F7;--surface:#FFFFFF;--ink:#16202F;--muted:#556070;--line:#D5DCE6;--accent:#13294B;--accent-ink:#FFFFFF;--yellow:#F2C230;--yellow-ink:#13294B;--bone:#F1EAD8;--boneline:#13294B;--ok:#1F7A4D;--okbg:#DDF2E6;--bad:#A3261B;--badbg:#FBE3E0;--focus:#C98F00;--mem:rgba(19,41,75,.10);--c1:#2F6DB5;--c2:#D99A00;--c3:#5E9A35;--c4:#C2475A;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:18px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.12;margin:0}
+h1{font-weight:800;font-size:clamp(28px,6.4vw,42px);letter-spacing:-.01em}
+h2{font-weight:800;font-size:clamp(22px,4.6vw,27px);margin:36px 0 8px}
+h3{font-weight:700;font-size:20px}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:4px 0 16px}
+.lead{max-width:64ch}
+.btn{font:inherit;font-weight:700;border:2px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:10px;padding:9px 16px;cursor:pointer;min-height:46px;touch-action:manipulation}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.okb{background:var(--okbg);border-color:var(--ok);color:var(--ink);opacity:1}
+.btn.badb{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.fb{border-radius:10px;padding:10px 14px;margin-top:12px;border-left:6px solid var(--line);background:var(--surface)}
+.fb.ok{background:var(--okbg);border-left-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-left-color:var(--bad)}
+.muted{color:var(--muted)}
+footer{margin-top:44px;color:var(--muted);font-size:15px;max-width:64ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<title>Wirbeltier oder nicht? – Biologie Klasse 6</title>
+<style>
+.crit{border-left:6px solid var(--yellow)}
+.crit h3{margin-bottom:4px}
+.game{margin-top:18px}
+.animal{display:flex;gap:16px;align-items:center}
+.pic{flex:none;width:84px;height:84px;border-radius:18px;background:var(--bg);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:50px;line-height:1}
+.pic.letter{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;font-weight:800;font-size:40px;color:var(--accent)}
+.name{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;font-weight:800;font-size:clamp(26px,6vw,34px);line-height:1.1;margin:0}
+.prog{color:var(--muted);font-size:15px;margin:0 0 10px}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.big .btn{min-height:60px;font-size:19px}
+.classes{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:14px}
+.classes .btn{min-height:54px}
+.feat{margin:10px 0 0;padding-left:20px}
+.feat li{margin:2px 0}
+.tip{margin-top:10px}
+table.c{border-collapse:collapse;width:100%;min-width:520px;font-size:16px}
+.tw{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:10px}
+table.c th,table.c td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.c tr:last-child th,table.c tr:last-child td{border-bottom:0}
+table.c thead th{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif}
+.sumlist{padding-left:20px}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <h1>Wirbeltier oder nicht?</h1>
+  <p class="sub">Biologie Klasse 6: Wiederholung der Merkmale der Wirbeltiere</p>
+  <div id="app"></div>
+  <footer>Bilder sind Emoji-Symbole und zeigen die Tiere nur ungefähr. Für Tiere ohne passendes Symbol steht der Anfangsbuchstabe.</footer>
+</div>
+<script>
+const KL = {f:"Fische", l:"Lurche", r:"Kriechtiere", v:"Vögel", s:"Säugetiere"};
+const A = [
+  {n:"Hund", e:"🐕", w:true, k:"s", tip:"Fühl an deinem eigenen Rücken: Bei einem Hund kannst du dasselbe fühlen.", why:"Der Hund hat ein Knochenskelett mit Wirbelsäule.", m:["Fell aus Haaren","atmet mit der Lunge","die Jungen trinken Milch"]},
+  {n:"Fledermaus", e:"🦇", w:true, k:"s", tip:"Sie hat Knochen in den Flügeln, im Rumpf und im Kopf.", why:"Die Fledermaus hat ein Knochenskelett mit Wirbelsäule, genau wie du.", m:["Fell aus Haaren","atmet mit der Lunge","die Jungen trinken Milch","kann fliegen"]},
+  {n:"Delfin", e:"🐬", w:true, k:"s", tip:"Er lebt im Wasser, hat aber ein Knochenskelett.", why:"Auch wenn er im Wasser lebt: Der Delfin hat eine Wirbelsäule.", m:["fast nackte Haut","atmet mit der Lunge und taucht dafür auf","die Jungen trinken Milch"]},
+  {n:"Amsel", e:"🐦", w:true, k:"v", tip:"Vögel haben leichte, hohle Knochen.", why:"Vögel haben ein Knochenskelett mit Wirbelsäule.", m:["Federn","atmet mit der Lunge","legt Eier mit harter Kalkschale","gleichwarm"]},
+  {n:"Pinguin", e:"🐧", w:true, k:"v", tip:"Er kann nicht fliegen, hat aber Knochen wie andere Vögel.", why:"Der Pinguin ist ein Vogel und hat eine Wirbelsäule.", m:["Federn","atmet mit der Lunge","legt Eier mit harter Kalkschale","kann nicht fliegen, aber gut schwimmen"]},
+  {n:"Forelle", e:"🐟", w:true, k:"f", tip:"Beim Fischessen findest du die Gräten.", why:"Die Forelle hat eine Wirbelsäule. Die Gräten gehören zu ihrem Skelett.", m:["Schuppen","atmet mit Kiemen","Flossen"]},
+  {n:"Seepferdchen", e:"", w:true, k:"f", tip:"Es sieht seltsam aus, hat aber Knochen.", why:"Das Seepferdchen ist ein Fisch und hat eine Wirbelsäule.", m:["Knochenplatten unter der Haut","atmet mit Kiemen","Flossen"]},
+  {n:"Grasfrosch", e:"🐸", w:true, k:"l", tip:"Er hat lange Beinknochen zum Springen.", why:"Der Grasfrosch hat ein Knochenskelett mit Wirbelsäule.", m:["nackte, feuchte Haut","die Larven (Kaulquappen) leben im Wasser und atmen mit Kiemen","wechselwarm"]},
+  {n:"Feuersalamander", e:"", w:true, k:"l", tip:"Er hat vier Beine mit Knochen darin.", why:"Der Feuersalamander hat eine Wirbelsäule.", m:["nackte, feuchte Haut","die Larven entwickeln sich im Wasser und atmen mit Kiemen","wechselwarm"]},
+  {n:"Zauneidechse", e:"🦎", w:true, k:"r", tip:"Sie hat einen langen Schwanz mit vielen Wirbeln.", why:"Die Zauneidechse hat eine Wirbelsäule.", m:["trockene Haut mit Hornschuppen","atmet mit der Lunge","legt Eier mit weicher, lederartiger Schale"]},
+  {n:"Blindschleiche", e:"", w:true, k:"r", tip:"Sie hat keine Beine. Denk an eine Schlange: Hat sie Knochen?", why:"Sie sieht aus wie ein Wurm oder eine Schlange. Sie ist aber eine Echse ohne Beine und hat eine Wirbelsäule.", m:["trockene Haut mit Hornschuppen","atmet mit der Lunge","keine Beine"]},
+  {n:"Ringelnatter", e:"🐍", w:true, k:"r", tip:"Schlangen haben sehr viele Rippen.", why:"Eine Schlange hat eine sehr lange Wirbelsäule mit vielen Wirbeln.", m:["trockene Haut mit Hornschuppen","atmet mit der Lunge","legt Eier mit weicher, lederartiger Schale"]},
+  {n:"Regenwurm", e:"🪱", w:false, tip:"Kannst du in einem Regenwurm etwas Hartes fühlen?", why:"Der Regenwurm hat keine Knochen. Sein Körper wird von Flüssigkeit und Muskeln in Form gehalten."},
+  {n:"Weinbergschnecke", e:"🐌", w:false, tip:"Das Harte ist das Haus. Und im Körper?", why:"Die Schnecke ist ein Weichtier. Das Gehäuse liegt außen. Im Körper gibt es keine Knochen."},
+  {n:"Honigbiene", e:"🐝", w:false, tip:"Insekten sind außen hart.", why:"Insekten haben ein Außenskelett aus Chitin. Eine Wirbelsäule haben sie nicht."},
+  {n:"Kreuzspinne", e:"🕷️", w:false, tip:"Spinnen sind außen hart.", why:"Spinnen haben ein Außenskelett. Eine Wirbelsäule haben sie nicht."},
+  {n:"Ohrenqualle", e:"🪼", w:false, tip:"Eine Qualle ist fast ganz aus Wasser.", why:"Quallen haben überhaupt kein Skelett."},
+  {n:"Strandkrabbe", e:"🦀", w:false, tip:"Ihr Panzer liegt außen.", why:"Krebse haben einen harten Panzer außen. Das ist ein Außenskelett, keine Wirbelsäule."},
+  {n:"Krake", e:"🐙", w:false, tip:"Ein Krake passt durch sehr enge Spalten.", why:"Kraken sind Weichtiere ohne Knochen. Deshalb passen sie durch enge Öffnungen."}
+];
+const CRIT = [
+  ["f","Schuppen; Flossen","Kiemen","im Wasser, Eier ohne Schale (Laich)","wechselwarm"],
+  ["l","nackte, feuchte Haut","Larven: Kiemen; Erwachsene: Lunge und Haut","Laich im Wasser, Larven leben im Wasser","wechselwarm"],
+  ["r","trockene Haut mit Hornschuppen","Lunge","an Land, meist Eier mit lederartiger Schale","wechselwarm"],
+  ["v","Federn","Lunge","Eier mit harter Kalkschale","gleichwarm"],
+  ["s","Haare (Fell)","Lunge","die Jungen trinken Milch","gleichwarm"]
+];
+const app = document.getElementById("app");
+const shuffle = (a) => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let stage = 0, list = [], idx = 0, ans = null, tipOn = false, wrong1 = [], wrong2 = [], tries = 0;
+const pic = (a) => a.e ? `<div class="pic" aria-hidden="true">${a.e}</div>` : `<div class="pic letter" aria-hidden="true">${a.n[0]}</div>`;
+
+function intro(){
+  stage = 0;
+  app.innerHTML = `<div class="panel crit"><h3>Das Kriterium</h3><p>Wirbeltiere haben ein <strong>Innenskelett aus Knochen</strong>. Der wichtigste Teil davon ist die <strong>Wirbelsäule</strong>. Tiere ohne Wirbelsäule sind keine Wirbeltiere.</p></div>
+  <div class="panel game"><h3>So geht’s</h3><p><strong>Runde 1:</strong> Entscheide für ${A.length} Tiere: Wirbeltier oder nicht?</p><p><strong>Runde 2:</strong> Ordne alle Wirbeltiere einer der fünf Wirbeltierklassen zu.</p><p class="muted">Wenn du nicht weiterweißt, tippe auf „Tipp“.</p><div class="row" style="margin-top:12px"><button class="btn primary" id="go">Runde 1 starten</button><button class="btn" id="go2">Gleich zu Runde 2</button></div></div>`;
+  document.getElementById("go").onclick = () => startStage(1);
+  document.getElementById("go2").onclick = () => startStage(2);
+}
+function startStage(s){
+  stage = s; idx = 0; ans = null; tipOn = false; tries = 0;
+  if(s === 1){ list = shuffle(A); wrong1 = []; } else { list = shuffle(A.filter(a => a.w)); wrong2 = []; }
+  draw();
+}
+function critTable(){
+  return `<div class="tw"><table class="c"><thead><tr><th scope="col">Klasse</th><th scope="col">Haut</th><th scope="col">Atmung</th><th scope="col">Fortpflanzung</th><th scope="col">Körpertemperatur</th></tr></thead><tbody>` +
+    CRIT.map(r => `<tr><th scope="row">${KL[r[0]]}</th><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("") + `</tbody></table></div>`;
+}
+function draw(){
+  if(idx >= list.length){ return summary(); }
+  const a = list[idx];
+  let h = `<div class="panel game"><p class="prog">Runde ${stage}: Tier ${idx + 1} von ${list.length}</p><div class="animal">${pic(a)}<p class="name">${a.n}</p></div>`;
+  if(stage === 1){
+    const btn = (val, label) => {
+      let cls = "";
+      if(ans !== null){ if(val === a.w) cls = "okb"; else if(val === ans) cls = "badb"; }
+      return `<button class="btn ${cls}" data-v="${val}" ${ans !== null ? "disabled" : ""}>${label}</button>`;
+    };
+    h += `<div class="big">${btn(true, "Wirbeltier")}${btn(false, "Kein Wirbeltier")}</div>`;
+    if(ans === null){
+      h += `<div class="row tip"><button class="btn" id="tip" aria-expanded="${tipOn}">Tipp</button></div>`;
+      if(tipOn) h += `<div class="fb">${a.tip}</div>`;
+    } else {
+      const right = ans === a.w;
+      h += `<div class="fb ${right ? "ok" : "bad"}"><strong>${right ? "Richtig." : "Nicht richtig."} ${a.w ? "Wirbeltier." : "Kein Wirbeltier."}</strong> ${a.why}</div><div class="row tip"><button class="btn primary" id="next">Weiter</button></div>`;
+    }
+  } else {
+    h += `<p style="margin-top:12px"><strong>Merkmale:</strong></p><ul class="feat">${a.m.map(x => `<li>${x}</li>`).join("")}</ul>`;
+    h += `<div class="classes">` + Object.keys(KL).map(k => {
+      let cls = "";
+      if(ans !== null){ if(k === a.k) cls = "okb"; else if(k === ans) cls = "badb"; }
+      return `<button class="btn ${cls}" data-k="${k}" ${ans !== null ? "disabled" : ""}>${KL[k]}</button>`;
+    }).join("") + `</div>`;
+    if(ans !== null){
+      const right = ans === a.k;
+      h += `<div class="fb ${right ? "ok" : "bad"}"><strong>${right ? "Richtig." : "Nicht richtig."}</strong> ${a.n}: ${KL[a.k]}. ${hint2(a)}</div><div class="row tip"><button class="btn primary" id="next">Weiter</button></div>`;
+    }
+    h += `</div><h2>Kriterien der Wirbeltierklassen</h2>${critTable()}<div>`;
+  }
+  h += `</div>`;
+  app.innerHTML = h;
+  app.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { ans = b.dataset.v === "true"; if(ans !== a.w) wrong1.push(a.n); draw(); document.getElementById("next").focus({preventScroll:true}); });
+  app.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { ans = b.dataset.k; if(ans !== a.k) wrong2.push(a.n); draw(); document.getElementById("next").focus({preventScroll:true}); });
+  const t = document.getElementById("tip"); if(t) t.onclick = () => { tipOn = !tipOn; draw(); };
+  const n = document.getElementById("next"); if(n) n.onclick = () => { idx++; ans = null; tipOn = false; draw(); window.scrollTo({top:0, behavior:"smooth"}); };
+}
+function hint2(a){
+  const H = {
+    s:"Entscheidend: Die Jungen trinken Milch.",
+    v:"Entscheidend: Federn und Eier mit Kalkschale.",
+    f:"Entscheidend: Kiemen und Flossen, auch beim erwachsenen Tier.",
+    l:"Entscheidend: nackte, feuchte Haut und Larven, die im Wasser mit Kiemen atmen.",
+    r:"Entscheidend: trockene Haut mit Hornschuppen."
+  };
+  return H[a.k];
+}
+function summary(){
+  const wr = stage === 1 ? wrong1 : wrong2, total = list.length, ok = total - wr.length;
+  let h = `<div class="panel game"><h3>Runde ${stage} geschafft</h3><p>${ok} von ${total} richtig.</p>`;
+  if(wr.length) h += `<p>Diese Tiere solltest du dir noch einmal ansehen:</p><ul class="sumlist">${wr.map(x => `<li>${x}</li>`).join("")}</ul>`;
+  if(stage === 1) h += `<div class="fb"><strong>Merksatz:</strong> Ob ein Tier ein Wirbeltier ist, erkennst du nicht am Lebensraum oder an der Körperform, sondern an der Wirbelsäule.</div>`;
+  else h += `<div class="fb"><strong>Merksatz:</strong> Fische, Lurche, Kriechtiere, Vögel und Säugetiere haben alle eine Wirbelsäule. Unterscheiden kannst du sie an Haut, Atmung und Fortpflanzung.</div>`;
+  h += `<div class="row" style="margin-top:12px">`;
+  if(stage === 1) h += `<button class="btn primary" id="s2">Weiter zu Runde 2</button><button class="btn" id="r">Runde 1 wiederholen</button>`;
+  else h += `<button class="btn primary" id="r">Runde 2 wiederholen</button><button class="btn" id="s1">Von vorn beginnen</button>`;
+  h += `</div></div>`;
+  app.innerHTML = h;
+  const s2 = document.getElementById("s2"); if(s2) s2.onclick = () => startStage(2);
+  const s1 = document.getElementById("s1"); if(s1) s1.onclick = () => startStage(1);
+  document.getElementById("r").onclick = () => startStage(stage);
+}
+intro();
+</script>
+</body>
+</html>

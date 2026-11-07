@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wenn Gefäße eng werden – Erkrankungen des Herz-Kreislauf-Systems</title>
+<style>
+:root{
+  --paper:#F4F7F9;--card:#FFFFFF;--ink:#1B2433;--muted:#566275;--line:#D6DEE6;
+  --artery:#B3122E;--artery-soft:#F6DCE0;--plaque:#E3B53B;--wall:#F1C9CF;--wall-outer:#E3A9B2;
+  --ok:#2E7A57;--ok-soft:#DDF0E6;--bad:#B3122E;--clot:#5E0B19;--focus:#1F5FBF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161D;--card:#1A202A;--ink:#E7ECF2;--muted:#A2ADBC;--line:#2C3542;
+    --artery:#FF5C72;--artery-soft:#3A1C24;--plaque:#E9C35A;--wall:#6B3440;--wall-outer:#8A4552;
+    --ok:#5BC491;--ok-soft:#173326;--bad:#FF5C72;--clot:#2A0509;--focus:#7DB0FF;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161D;--card:#1A202A;--ink:#E7ECF2;--muted:#A2ADBC;--line:#2C3542;
+  --artery:#FF5C72;--artery-soft:#3A1C24;--plaque:#E9C35A;--wall:#6B3440;--wall-outer:#8A4552;
+  --ok:#5BC491;--ok-soft:#173326;--bad:#FF5C72;--clot:#2A0509;--focus:#7DB0FF;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font:1.0625rem/1.6 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.15;margin:0 0 .5em}
+h1{font-size:clamp(2.1rem,7vw,3.4rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,4.5vw,2rem);font-weight:700}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0 0 1em}
+a{color:var(--artery)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.wrap{max-width:46rem;margin:0 auto;padding:0 1.25rem}
+
+/* Kapitel-Navigation */
+nav.path{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);border-bottom:1px solid var(--line)}
+nav.path ol{display:flex;gap:.25rem;list-style:none;margin:0 auto;padding:.6rem 1.25rem;max-width:46rem;overflow-x:auto;scrollbar-width:none}
+nav.path ol::-webkit-scrollbar{display:none}
+nav.path a{display:flex;align-items:center;gap:.4rem;white-space:nowrap;text-decoration:none;color:var(--muted);font-size:.92rem;padding:.35rem .7rem;border-radius:999px}
+nav.path a span{display:inline grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:50%;border:1.5px solid currentColor;font-size:.75rem;font-weight:700}
+nav.path a:hover{color:var(--ink)}
+nav.path a.current{color:var(--artery);background:var(--artery-soft)}
+
+/* Hero mit Gefäßquerschnitt */
+header.hero{padding:2.2rem 0 1.5rem}
+.hero-lede{font-size:1.15rem;color:var(--muted);max-width:36rem}
+.vessel{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);gap:1.5rem;align-items:center;margin-top:1.5rem}
+@media (max-width:600px){.vessel{grid-template-columns:1fr}.vessel svg{max-width:15rem;margin:0 auto;display:block}}
+.vessel svg{width:100%;height:auto}
+#lumen,#clot{transition:r .25s ease,cy .25s ease,opacity .3s ease}
+.readout{font-family:"Bricolage Grotesque",sans-serif;font-size:2.6rem;font-weight:800;line-height:1;color:var(--artery)}
+.readout small{display:block;font-family:"Atkinson Hyperlegible",sans-serif;font-size:.9rem;font-weight:400;color:var(--muted);margin-top:.35rem}
+input[type=range]{width:100%;accent-color:var(--artery);margin:1rem 0 .3rem}
+.slider-label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted)}
+.status{margin-top:.9rem;padding:.75rem .9rem;border-left:4px solid var(--plaque);background:var(--card);border-radius:0 8px 8px 0;font-size:.98rem;min-height:4.2rem}
+.status.alarm{border-left-color:var(--artery)}
+.legend{display:flex;flex-wrap:wrap;gap:.4rem 1rem;font-size:.85rem;color:var(--muted);margin-top:.8rem}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:2px;margin-right:.35rem;vertical-align:-.1rem}
+
+/* Kapitel */
+section.ch{padding:2.5rem 0;border-top:1px solid var(--line)}
+.chno{display:inline grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--artery);color:#fff;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;margin-bottom:.6rem}
+.task{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:1.2rem 0}
+.task h3{color:var(--artery)}
+.task ol,.task ul{margin:.3rem 0 0;padding-left:1.25rem}
+.note{font-size:.92rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:560px){.two{grid-template-columns:1fr}}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1rem}
+.box h3{margin-bottom:.35rem}
+.box ul{margin:0;padding-left:1.15rem}
+
+/* FAST */
+.fast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin:1rem 0}
+@media (max-width:560px){.fast{grid-template-columns:1fr 1fr}}
+.fast div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.8rem}
+.fast b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:2rem;line-height:1;color:var(--artery)}
+.fast strong{display:block;margin:.3rem 0 .15rem}
+.fast p{font-size:.9rem;margin:0;color:var(--muted)}
+
+/* Blutdruck-Skala */
+.bp{display:flex;border-radius:8px;overflow:hidden;margin:1rem 0 .4rem;font-size:.85rem;text-align:center;font-weight:700}
+.bp div{padding:.55rem .3rem;color:#fff}
+.bp-scale{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+
+/* Sortieraufgabe */
+.sort{list-style:none;padding:0;margin:1rem 0}
+.sort li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;padding:.65rem .8rem;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:.5rem}
+.sort .btns{display:flex;gap:.35rem}
+button{font:inherit;cursor:pointer}
+.choice{border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:.3rem .75rem;font-size:.88rem}
+.choice:hover{border-color:var(--muted)}
+.choice.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+.choice.wrong{background:var(--artery-soft);border-color:var(--bad);color:var(--bad)}
+.fb{flex-basis:100%;font-size:.9rem;color:var(--muted);display:none}
+.fb.show{display:block}
+.score{font-weight:700}
+
+/* Erste Hilfe */
+.steps{counter-reset:s;list-style:none;padding:0;margin:1rem 0}
+.steps li{counter-increment:s;position:relative;padding:0 0 1rem 3rem}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:2.1rem;height:2.1rem;border-radius:50%;border:2px solid var(--artery);color:var(--artery);display:grid;place-items:center;font-family:"Bricolage Grotesque",sans-serif;font-weight:800}
+.call{display:inline-block;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.6rem;color:#fff;background:var(--artery);padding:.1rem .7rem;border-radius:8px}
+
+/* Quiz */
+.q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin-bottom:.9rem}
+.q p.qt{font-weight:700;margin-bottom:.6rem}
+.q .opts{display:grid;gap:.4rem}
+.q .opt{text-align:left;border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:.55rem .75rem}
+.q .opt:hover:not(:disabled){border-color:var(--muted)}
+.q .opt:disabled{cursor:default}
+.q .opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.q .opt.wrong{background:var(--artery-soft);border-color:var(--bad)}
+.q .why{display:none;margin:.6rem 0 0;font-size:.93rem;color:var(--muted)}
+.q .why.show{display:block}
+.result{font-family:"Bricolage Grotesque",sans-serif;font-size:1.3rem;font-weight:700;margin-top:1rem}
+.reset{border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:8px;padding:.45rem .9rem;margin-top:.5rem}
+
+/* Lehrkraft */
+details.teacher{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 1.1rem;margin:1rem 0 3rem}
+details.teacher summary{cursor:pointer;padding:1rem 0;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.15rem}
+details.teacher h3{margin-top:1.2rem}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:30rem}
+th,td{text-align:left;vertical-align:top;padding:.5rem .6rem;border-bottom:1px solid var(--line)}
+th{font-family:"Bricolage Grotesque",sans-serif}
+.tag{font-size:.78rem;font-weight:700;color:var(--muted);white-space:nowrap}
+footer{font-size:.85rem;color:var(--muted);padding-bottom:2rem}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<nav class="path" aria-label="Lernpfad">
+  <ol>
+    <li><a href="#start"><span>1</span>Gefäß</a></li>
+    <li><a href="#infarkt"><span>2</span>Herzinfarkt</a></li>
+    <li><a href="#schlaganfall"><span>3</span>Schlaganfall</a></li>
+    <li><a href="#druck"><span>4</span>Bluthochdruck</a></li>
+    <li><a href="#risiko"><span>5</span>Risikofaktoren</a></li>
+    <li><a href="#hilfe"><span>6</span>Erste Hilfe</a></li>
+    <li><a href="#quiz"><span>7</span>Quiz</a></li>
+  </ol>
+</nav>
+
+<main class="wrap">
+
+<header class="hero" id="start">
+  <h1>Wenn Gefäße eng werden</h1>
+  <p class="hero-lede">Erkrankungen des Herz-Kreislauf-Systems sind in Deutschland die häufigste Todesursache. Fast alle beginnen gleich: mit einer Arterie, die über viele Jahre enger und starrer wird.</p>
+
+  <div class="vessel">
+    <svg viewBox="0 0 200 200" role="img" aria-labelledby="svgt">
+      <title id="svgt">Querschnitt durch eine Arterie mit wachsender Ablagerung in der Wand</title>
+      <circle cx="100" cy="100" r="92" fill="var(--wall-outer)"/>
+      <circle cx="100" cy="100" r="74" fill="var(--wall)"/>
+      <circle id="plaque" cx="100" cy="100" r="62" fill="var(--plaque)"/>
+      <circle id="lumen" cx="100" cy="100" r="62" fill="var(--artery)" stroke="#fff" stroke-width="2.5" stroke-opacity=".85"/>
+      <circle id="clot" cx="100" cy="100" r="0" fill="var(--clot)" opacity="0"/>
+    </svg>
+    <div>
+      <div class="readout" id="areaOut">100 %<small>des Gefäßquerschnitts sind noch frei</small></div>
+      <label for="sten" class="slider-label" style="margin-top:1rem"><span>Verengung des Durchmessers</span><span id="stenOut">0 %</span></label>
+      <input id="sten" type="range" min="0" max="90" step="5" value="0" aria-describedby="status">
+      <div class="slider-label"><span>gesund</span><span>stark verengt</span></div>
+      <button class="reset" id="rupture" type="button">Plaque reißt auf</button>
+    </div>
+  </div>
+  <p class="status" id="status" aria-live="polite">Gesunde Arterie: Die innere Zellschicht (weiße Linie) ist glatt, die Wand elastisch. Das Blut fließt ungehindert.</p>
+  <div class="legend">
+    <span><i style="background:var(--artery)"></i>Blut</span>
+    <span><i style="background:#fff;border:1px solid var(--line)"></i>innere Zellschicht</span>
+    <span><i style="background:var(--plaque)"></i>Ablagerung (Plaque)</span>
+    <span><i style="background:var(--wall)"></i>Gefäßwand</span>
+    <span><i style="background:var(--clot)"></i>Blutgerinnsel</span>
+  </div>
+
+  <div class="task">
+    <h3>Aufgabe 1</h3>
+    <ol>
+      <li>Beschreibe, was mit dem freien Querschnitt passiert, wenn du den Regler auf 50 % stellst.</li>
+      <li>Oft wird Arteriosklerose mit einem verkalkten Wasserrohr verglichen. Erkläre mithilfe der Grafik, an welcher Stelle dieser Vergleich nicht stimmt.</li>
+    </ol>
+    <p class="note" style="margin:.6rem 0 0">Tipp: Achte darauf, wo die gelbe Plaque liegt – auf oder unter der weißen Zellschicht?</p>
+  </div>
+
+  <h3>Was ist Arteriosklerose?</h3>
+  <p>Bei der Arteriosklerose lagern sich Fette (vor allem Cholesterin), Bindegewebe, Entzündungszellen und später auch Kalk <strong>in der Wand</strong> der Arterien ab. Diese Ablagerung heißt Plaque. Das Gefäß wird enger, härter und weniger elastisch. Der Vorgang beginnt oft schon in der Jugend und dauert Jahrzehnte – man spürt lange nichts.</p>
+</header>
+
+<section class="ch" id="infarkt">
+  <div class="chno">2</div>
+  <h2>Herzinfarkt</h2>
+  <p>Der Herzmuskel wird über eigene Arterien versorgt, die <strong>Herzkranzgefäße</strong>. Reißt dort eine Plaque auf, bildet sich an der Stelle ein Blutgerinnsel. Es kann das Gefäß komplett verschließen. Der Teil des Herzmuskels dahinter bekommt keinen Sauerstoff mehr und stirbt ab, wenn nicht schnell geholfen wird.</p>
+  <div class="two">
+    <div class="box">
+      <h3>Typische Anzeichen</h3>
+      <ul>
+        <li>starker Druck oder Schmerz in der Brust, länger als ein paar Minuten</li>
+        <li>Schmerz strahlt in Arme, Hals, Kiefer, Rücken oder Oberbauch aus</li>
+        <li>Atemnot, Übelkeit, kalter Schweiß, Angst</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Gut zu wissen</h3>
+      <ul>
+        <li>Bei Frauen und älteren Menschen sind die Anzeichen oft weniger eindeutig, etwa nur Übelkeit oder Atemnot.</li>
+        <li>Herzinfarkt heißt nicht „das Herz bleibt stehen“. Ein Herzstillstand kann aber eine Folge sein.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="task">
+    <h3>Aufgabe 2</h3>
+    <p style="margin:0">Stelle im Gefäßmodell oben eine Verengung von 60 % ein und drücke „Plaque reißt auf“. Erkläre in drei Sätzen, wie aus einer langsam wachsenden Plaque plötzlich ein Herzinfarkt wird.</p>
+  </div>
+</section>
+
+<section class="ch" id="schlaganfall">
+  <div class="chno">3</div>
+  <h2>Schlaganfall</h2>
+  <p>Beim Schlaganfall ist ein Teil des <strong>Gehirns</strong> nicht mehr ausreichend durchblutet. Meist verschließt ein Blutgerinnsel eine Hirnarterie, seltener platzt ein Gefäß und es blutet ins Gehirn. Nervenzellen sterben dann innerhalb kurzer Zeit ab. Je nachdem, welcher Bereich betroffen ist, fallen Sprache, Bewegung oder Sehen aus.</p>
+  <p>Mit dem FAST-Test kannst du einen Verdacht schnell prüfen:</p>
+  <div class="fast">
+    <div><b>F</b><strong>Face – Gesicht</strong><p>Bitte die Person zu lächeln. Hängt ein Mundwinkel?</p></div>
+    <div><b>A</b><strong>Arms – Arme</strong><p>Beide Arme nach vorn strecken. Sinkt ein Arm ab?</p></div>
+    <div><b>S</b><strong>Speech – Sprache</strong><p>Einen einfachen Satz nachsprechen. Klingt es verwaschen?</p></div>
+    <div><b>T</b><strong>Time – Zeit</strong><p>Sofort 112 anrufen und die Uhrzeit merken.</p></div>
+  </div>
+  <div class="task">
+    <h3>Aufgabe 3</h3>
+    <p style="margin:0">Herzinfarkt und Schlaganfall haben dieselbe Ursache, aber verschiedene Folgen. Vergleiche beide Erkrankungen in einer Tabelle (betroffenes Organ, Ursache, Anzeichen, was du tust).</p>
+  </div>
+</section>
+
+<section class="ch" id="druck">
+  <div class="chno">4</div>
+  <h2>Bluthochdruck</h2>
+  <p>Der Blutdruck wird mit zwei Zahlen angegeben, z. B. 120/80 mmHg. Die erste Zahl ist der Druck, wenn das Herz sich zusammenzieht, die zweite der Druck in der Entspannungsphase. Bei Erwachsenen spricht man ab 140/90 mmHg von Bluthochdruck.</p>
+  <div class="bp" aria-hidden="true">
+    <div style="flex:3;background:var(--ok)">normal</div>
+    <div style="flex:2;background:#B8860B">erhöht</div>
+    <div style="flex:3;background:var(--artery)">Bluthochdruck</div>
+  </div>
+  <div class="bp-scale"><span>bis 120/80</span><span>ab 140/90</span></div>
+  <p style="margin-top:1rem">Bluthochdruck tut nicht weh. Der dauerhaft hohe Druck belastet aber die Gefäßwände, beschädigt die innere Zellschicht und beschleunigt so die Arteriosklerose. Das Herz muss ständig gegen einen höheren Widerstand pumpen.</p>
+  <div class="task">
+    <h3>Aufgabe 4</h3>
+    <p style="margin:0">Man nennt Bluthochdruck manchmal einen „stillen Killer“. Erläutere, was mit diesem Ausdruck gemeint ist.</p>
+  </div>
+</section>
+
+<section class="ch" id="risiko">
+  <div class="chno">5</div>
+  <h2>Risikofaktoren</h2>
+  <p>Ein Risikofaktor macht eine Erkrankung wahrscheinlicher – er bedeutet nicht, dass man sicher krank wird. Ordne zu: Kann man diesen Faktor selbst beeinflussen?</p>
+  <ul class="sort" id="sort"></ul>
+  <p class="score" id="sortScore" aria-live="polite"></p>
+  <div class="task">
+    <h3>Aufgabe 5</h3>
+    <p style="margin:0">Wähle zwei beeinflussbare Risikofaktoren. Beurteile, wie leicht oder schwer es im Alltag ist, sie zu verändern, und was dabei helfen könnte.</p>
+  </div>
+</section>
+
+<section class="ch" id="hilfe">
+  <div class="chno">6</div>
+  <h2>Erste Hilfe</h2>
+  <p>Bei Verdacht auf Herzinfarkt oder Schlaganfall zählt jede Minute. Wähle die <span class="call">112</span> und sage: Wo ist es? Was ist passiert? Dann warte auf Rückfragen.</p>
+  <div class="two">
+    <div class="box">
+      <h3>Die Person ist ansprechbar</h3>
+      <ul>
+        <li>Notruf 112</li>
+        <li>beruhigen, nicht allein lassen</li>
+        <li>bei Herzinfarkt-Verdacht: Oberkörper erhöht lagern, enge Kleidung öffnen</li>
+        <li>nichts zu essen oder trinken geben</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Die Person reagiert nicht und atmet nicht normal</h3>
+      <ol class="steps" style="margin:.5rem 0 0">
+        <li><strong>Prüfen:</strong> ansprechen, anfassen, Atmung kontrollieren</li>
+        <li><strong>Rufen:</strong> 112 – Handy auf Lautsprecher</li>
+        <li><strong>Drücken:</strong> Mitte der Brust, 5–6 cm tief, 100- bis 120-mal pro Minute, bis Hilfe kommt. Gibt es einen Defibrillator (AED), einschalten und den Ansagen folgen.</li>
+      </ol>
+    </div>
+  </div>
+  <p class="note">Atmet die Person normal, ist aber bewusstlos: stabile Seitenlage und weiter beobachten.</p>
+</section>
+
+<section class="ch" id="quiz">
+  <div class="chno">7</div>
+  <h2>Quiz: Was hast du verstanden?</h2>
+  <div id="quizBox"></div>
+  <p class="result" id="quizResult" aria-live="polite"></p>
+  <button class="reset" id="quizReset" type="button">Quiz neu starten</button>
+</section>
+
+<details class="teacher">
+  <summary>Hinweise für die Lehrkraft</summary>
+
+  <h3>Einordnung</h3>
+  <p><span class="tag">[Wahrscheinlich]</span> Passt im KC Biologie Gymnasium Sek I (Niedersachsen) zum Themenfeld Blut/Kreislauf bzw. Stoffwechsel des Menschen in Jg. 7/8, Basiskonzept Struktur und Funktion. Dieses Material entstand ohne vorliegendes KC-Dokument. <strong>Bitte auf nibis.de prüfen:</strong> genaue Jahrgangszuordnung, die zugehörigen Kompetenzformulierungen und den schuleigenen Arbeitsplan.</p>
+
+  <h3>Kompetenzbezug</h3>
+  <div class="tbl"><table>
+    <tr><th>Bereich</th><th>Im Material</th></tr>
+    <tr><td>Fachwissen</td><td>Aufbau Arterie, Entstehung Arteriosklerose, Herzinfarkt, Schlaganfall, Bluthochdruck (Kap. 1–4)</td></tr>
+    <tr><td>Erkenntnisgewinnung</td><td>Modellkritik „verkalktes Rohr“ mit dem Querschnittsmodell (Aufg. 1.2)</td></tr>
+    <tr><td>Kommunikation</td><td>Vergleichstabelle (Aufg. 3), Erklärung in Sätzen (Aufg. 2), Begriff „stiller Killer“ erläutern (Aufg. 4)</td></tr>
+    <tr><td>Bewertung</td><td>Beeinflussbarkeit von Risikofaktoren beurteilen (Aufg. 5)</td></tr>
+  </table></div>
+
+  <h3>Einsatz in 45 Minuten</h3>
+  <div class="tbl"><table>
+    <tr><th>Zeit</th><th>Phase</th><th>Inhalt</th></tr>
+    <tr><td>5′</td><td>Einstieg</td><td>Folie/Beamer: Gefäßmodell, Regler live von 0 auf 70 % ziehen, Vermutungen sammeln.</td></tr>
+    <tr><td>25′</td><td>Erarbeitung</td><td>Partnerarbeit am Tablet: Kap. 1–5 mit Aufgaben 1–5 (Aufg. 3 als Heftaufgabe).</td></tr>
+    <tr><td>10′</td><td>Sicherung</td><td>Vergleichstabelle Herzinfarkt/Schlaganfall im Plenum; Modellkritik besprechen.</td></tr>
+    <tr><td>5′</td><td>Abschluss</td><td>Quiz einzeln als Exit-Ticket; Kap. 6 als Hausaufgabe oder Folgestunde mit praktischer Übung.</td></tr>
+  </table></div>
+  <p class="note">Methodenwahl: selbstgesteuerter Lernpfad mit Sofort-Rückmeldung aktiviert alle, die Lehrkraft wird frei für Einzelbetreuung. In 90 Minuten: Kap. 6 als praktische Herzdruckmassage-Übung an Übungspuppen ergänzen (falls vorhanden, ggf. mit Schulsanitätsdienst).</p>
+
+  <h3>Typische Fehlvorstellungen</h3>
+  <div class="tbl"><table>
+    <tr><th>Vorstellung</th><th>Gegenstrategie</th></tr>
+    <tr><td>„Fett setzt sich innen ab wie Kalk im Rohr.“</td><td>Modell zeigt: Plaque liegt <em>unter</em> der inneren Zellschicht in der Wand. Rohrvergleich ausdrücklich kritisieren lassen (Aufg. 1.2).</td></tr>
+    <tr><td>„Beim Herzinfarkt hört das Herz auf zu schlagen.“</td><td>Infarkt = Durchblutungsstörung des Herzmuskels; Herzstillstand ist eine mögliche Folge. Quizfrage 1.</td></tr>
+    <tr><td>„Das betrifft nur alte Menschen.“</td><td>Arteriosklerose beginnt oft in Kindheit/Jugend und schreitet über Jahrzehnte fort. Quizfrage 8.</td></tr>
+    <tr><td>„Ein Schlaganfall ist eine Herzkrankheit.“</td><td>Betroffenes Organ ist das Gehirn; gemeinsam ist die Gefäßursache. Vergleichstabelle Aufg. 3.</td></tr>
+    <tr><td>„Herzschmerz ist immer links.“</td><td>Das Herz liegt mittig hinter dem Brustbein; Schmerz oft in Brustmitte, kann ausstrahlen.</td></tr>
+  </table></div>
+
+  <h3>Mögliche Störstellen</h3>
+  <ul>
+    <li>Betroffenheit: Einzelne Lernende können Angehörige mit Herzinfarkt oder Schlaganfall haben. Vorab ankündigen, keine persönlichen Erfahrungen abfragen.</li>
+    <li>Schuldzuweisung: Risikofaktoren erhöhen die Wahrscheinlichkeit, sie erklären keinen Einzelfall. Körpergewicht nicht an Personen in der Klasse besprechen.</li>
+    <li>Der Regler zeigt die freie <em>Fläche</em> (geometrisch exakt), nicht den Blutfluss. Der Körper gleicht leichte Verengungen lange aus; Beschwerden unter Belastung treten typischerweise erst bei starker Verengung auf. <span class="tag">[Wahrscheinlich]</span></li>
+  </ul>
+
+  <h3>Differenzierung</h3>
+  <ul>
+    <li><strong>Schwächere Lernende:</strong> nur Kap. 1, 2, 5 und Quiz; Vergleichstabelle (Aufg. 3) mit vorgegebenen Zeilen und Wortspeicher.</li>
+    <li><strong>Stärkere Lernende:</strong> Zusatzfrage zu Aufg. 1: Bei 50 % Verengung des Durchmessers sind nur noch 25 % der Fläche frei – begründe rechnerisch (A = π·r²).</li>
+  </ul>
+
+  <h3>Fachliche Kennzeichnung</h3>
+  <ul>
+    <li><span class="tag">[Sicher]</span> Herz-Kreislauf-Erkrankungen sind die häufigste Todesursache in Deutschland (aktuelle Zahl bei Destatis prüfen).</li>
+    <li><span class="tag">[Sicher]</span> Bluthochdruck-Grenze ab 140/90 mmHg (Praxismessung, Erwachsene); Zwischenstufe „erhöht“ vereinfacht dargestellt.</li>
+    <li><span class="tag">[Sicher]</span> FAST-Test und Prüfen–Rufen–Drücken entsprechen der gängigen Laien-Erste-Hilfe. Vor dem Einsatz mit den aktuellen Empfehlungen des Deutschen Rats für Wiederbelebung (GRC) abgleichen.</li>
+  </ul>
+</details>
+
+<footer>Lernmaterial Biologie, Klasse 8. Ersetzt keine ärztliche Beratung.</footer>
+</main>
+
+<script>
+(function(){
+  /* Gefäßmodell */
+  var R=62, wallInner=62;
+  var sten=document.getElementById('sten'),lumen=document.getElementById('lumen'),clot=document.getElementById('clot');
+  var areaOut=document.getElementById('areaOut'),stenOut=document.getElementById('stenOut'),status=document.getElementById('status');
+  var rupture=document.getElementById('rupture'), ruptured=false;
+  function msg(s){
+    if(ruptured) return 'Die Plaque ist aufgerissen. An der Rissstelle bildet sich ein Blutgerinnsel und verschließt das Gefäß vollständig. Dahinter bekommt das Gewebe keinen Sauerstoff mehr – im Herzen ist das ein Herzinfarkt, im Gehirn ein Schlaganfall.';
+    if(s===0) return 'Gesunde Arterie: Die innere Zellschicht (weiße Linie) ist glatt, die Wand elastisch. Das Blut fließt ungehindert.';
+    if(s<40) return 'Die Plaque wächst in der Gefäßwand, unter der inneren Zellschicht. Man spürt davon nichts.';
+    if(s<70) return 'Das Gefäß ist deutlich enger und weniger elastisch. In Ruhe reicht die Durchblutung meist noch, bei Belastung wird es knapp.';
+    return 'Starke Verengung: Bei Anstrengung bekommt das Gewebe zu wenig Sauerstoff. Am Herzen zeigt sich das oft als Brustenge (Angina pectoris). Ein Warnsignal!';
+  }
+  function draw(){
+    var s=parseInt(sten.value,10)/100;
+    var r=R*(1-s);
+    var cy=100+(wallInner-r);
+    lumen.setAttribute('r',r.toFixed(1));lumen.setAttribute('cy',cy.toFixed(1));
+    clot.setAttribute('r',ruptured?(r+1).toFixed(1):0);clot.setAttribute('cy',cy.toFixed(1));clot.setAttribute('opacity',ruptured?1:0);
+    var area=ruptured?0:Math.round(Math.pow(1-s,2)*100);
+    areaOut.firstChild.nodeValue=area+' %';
+    stenOut.textContent=ruptured?'100 %':Math.round(s*100)+' %';
+    status.textContent=msg(Math.round(s*100));
+    status.classList.toggle('alarm',ruptured||s>=0.7);
+  }
+  sten.addEventListener('input',function(){ruptured=false;rupture.textContent='Plaque reißt auf';draw();});
+  rupture.addEventListener('click',function(){
+    if(!ruptured&&parseInt(sten.value,10)<20){sten.value=40;}
+    ruptured=!ruptured;rupture.textContent=ruptured?'Zurück zur Plaque':'Plaque reißt auf';draw();
+  });
+  draw();
+
+  /* Risikofaktoren */
+  var factors=[
+    ['Rauchen',true,'Nikotin und andere Stoffe schädigen die innere Zellschicht der Gefäße und verengen sie.'],
+    ['Alter',false,'Mit den Jahren schreitet Arteriosklerose fort – das kann niemand aufhalten, nur verlangsamen.'],
+    ['Bewegungsmangel',true,'Regelmäßige Bewegung senkt Blutdruck und Blutfette.'],
+    ['Herzinfarkte in der Familie',false,'Erbanlagen kann man nicht ändern – umso wichtiger sind die beeinflussbaren Faktoren.'],
+    ['Starkes Übergewicht',true,'Lässt sich durch Ernährung und Bewegung beeinflussen, auch wenn das oft nicht leicht ist.'],
+    ['Bluthochdruck',true,'Lässt sich durch Lebensstil und, wenn nötig, Medikamente senken.'],
+    ['Geschlecht',false,'Männer erkranken im Durchschnitt früher, Frauen holen nach den Wechseljahren auf.'],
+    ['Viel Salz, Zucker und tierisches Fett',true,'Die Ernährung kann man selbst gestalten.'],
+    ['Dauerstress',true,'Stress lässt sich nicht immer vermeiden, aber man kann lernen, damit umzugehen.']
+  ];
+  var sortEl=document.getElementById('sort'),scoreEl=document.getElementById('sortScore'),done=0,correct=0;
+  factors.forEach(function(f){
+    var li=document.createElement('li');
+    li.innerHTML='<span>'+f[0]+'</span><span class="btns"><button type="button" class="choice" data-v="1">beeinflussbar</button><button type="button" class="choice" data-v="0">nicht beeinflussbar</button></span><span class="fb"></span>';
+    var answered=false;
+    li.querySelectorAll('.choice').forEach(function(b){
+      b.addEventListener('click',function(){
+        if(answered) return; answered=true; done++;
+        var ok=(b.dataset.v==='1')===f[1]; if(ok) correct++;
+        b.classList.add(ok?'right':'wrong');
+        if(!ok){li.querySelector('.choice[data-v="'+(f[1]?'1':'0')+'"]').classList.add('right');}
+        var fb=li.querySelector('.fb'); fb.textContent=(ok?'Richtig. ':'Nicht ganz. ')+f[2]; fb.classList.add('show');
+        if(done===factors.length) scoreEl.textContent=correct+' von '+factors.length+' richtig zugeordnet.';
+      });
+    });
+    sortEl.appendChild(li);
+  });
+
+  /* Quiz */
+  var quiz=[
+    ['Was passiert bei einem Herzinfarkt?',['Das Herz hört auf zu schlagen.','Ein Herzkranzgefäß wird verschlossen und ein Teil des Herzmuskels bekommt keinen Sauerstoff.','Eine Herzklappe reißt.','Das Blut im ganzen Körper gerinnt.'],1,'Ein Herzinfarkt ist eine Durchblutungsstörung des Herzmuskels. Ein Herzstillstand kann folgen, ist aber nicht dasselbe.'],
+    ['Wo entsteht die Plaque bei Arteriosklerose?',['Als Belag auf der Innenseite, wie Kalk im Wasserrohr.','In der Gefäßwand, unter der inneren Zellschicht.','Nur in den Venen.','Im Herzmuskel selbst.'],1,'Die Plaque wächst in der Wand. Deshalb hinkt der Rohr-Vergleich.'],
+    ['Wofür steht das T im FAST-Test?',['Temperatur messen','Tabletten geben','Time: sofort 112 rufen','Treppe hochgehen lassen'],2,'Bei einem Schlaganfall sterben schnell Nervenzellen ab. Jede Minute zählt.'],
+    ['Welcher Risikofaktor ist nicht beeinflussbar?',['Rauchen','Bewegungsmangel','Alter','Bluthochdruck'],2,'Alter, Geschlecht und Erbanlagen kann man nicht ändern.'],
+    ['Ab welchem Wert spricht man bei Erwachsenen von Bluthochdruck?',['100/60 mmHg','120/80 mmHg','140/90 mmHg','200/150 mmHg'],2,'120/80 gilt als normal, ab 140/90 spricht man von Bluthochdruck.'],
+    ['Warum ist Bluthochdruck gefährlich, obwohl man ihn nicht spürt?',['Er schädigt über Jahre die Gefäßwände und fördert Arteriosklerose.','Er macht sofort bewusstlos.','Er verdünnt das Blut.','Er ist gar nicht gefährlich.'],0,'Der dauerhaft hohe Druck beschädigt die innere Zellschicht – darum heißt er „stiller Killer“.'],
+    ['Eine Person reagiert nicht und atmet nicht normal. Was tust du?',['Stabile Seitenlage und warten.','Prüfen – Rufen (112) – Drücken (Herzdruckmassage).','Wasser ins Gesicht spritzen und gehen.','Erst einen Erwachsenen suchen, dann weitersehen.'],1,'Ohne normale Atmung ist sofortige Herzdruckmassage nötig. Die stabile Seitenlage ist für Bewusstlose, die normal atmen.'],
+    ['Wann beginnt Arteriosklerose meistens?',['Erst ab etwa 60 Jahren.','Oft schon in Kindheit und Jugend, sie wächst über Jahrzehnte.','Nur nach einem Herzinfarkt.','Sie ist angeboren und verändert sich nie.'],1,'Darum lohnt sich ein gesunder Lebensstil schon jetzt.']
+  ];
+  var qBox=document.getElementById('quizBox'),qRes=document.getElementById('quizResult'),qDone,qRight;
+  function buildQuiz(){
+    qBox.innerHTML='';qRes.textContent='';qDone=0;qRight=0;
+    quiz.forEach(function(q,i){
+      var d=document.createElement('div');d.className='q';
+      var h='<p class="qt">'+(i+1)+'. '+q[0]+'</p><div class="opts">';
+      q[1].forEach(function(o,j){h+='<button type="button" class="opt" data-j="'+j+'">'+o+'</button>';});
+      h+='</div><p class="why"></p>';d.innerHTML=h;
+      d.querySelectorAll('.opt').forEach(function(b){
+        b.addEventListener('click',function(){
+          var j=parseInt(b.dataset.j,10),ok=j===q[2];
+          d.querySelectorAll('.opt').forEach(function(x){x.disabled=true;});
+          b.classList.add(ok?'right':'wrong');
+          if(!ok) d.querySelector('.opt[data-j="'+q[2]+'"]').classList.add('right');
+          var w=d.querySelector('.why');w.textContent=(ok?'Richtig. ':'Leider falsch. ')+q[3];w.classList.add('show');
+          qDone++; if(ok) qRight++;
+          if(qDone===quiz.length) qRes.textContent='Ergebnis: '+qRight+' von '+quiz.length+' Fragen richtig.';
+        });
+      });
+      qBox.appendChild(d);
+    });
+  }
+  document.getElementById('quizReset').addEventListener('click',buildQuiz);
+  buildQuiz();
+
+  /* aktuelles Kapitel in der Navigation markieren */
+  var links=[].slice.call(document.querySelectorAll('nav.path a'));
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){links.forEach(function(l){l.classList.toggle('current',l.getAttribute('href')==='#'+e.target.id);});}
+      });
+    },{rootMargin:'-40% 0px -55% 0px'});
+    ['start','infarkt','schlaganfall','druck','risiko','hilfe','quiz'].forEach(function(id){var el=document.getElementById(id);if(el) io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>

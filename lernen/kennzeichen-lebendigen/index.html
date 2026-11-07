@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Erklär-Schaubild: Kennzeichen des Lebendigen</title>
+<style>
+:root{
+  --bg:#D9F0FF; --paper:#FFFFFF; --grid:#CFE2F1; --ink:#14304A; --edge:#14304A; --shadow:#14304A;
+  --muted:#3A556E; --leaf:#1F8A4C; --leaf-soft:#CDEFD9; --on-leaf:#FFFFFF;
+  --sun:#FFC933; --berry:#B81F57; --berry-soft:#FFE3EC; --on-berry:#FFFFFF;
+  --node:#FFFFFF; --focus:#6B2FD9;
+  color-scheme: light dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D2033; --paper:#152C44; --grid:#23425F; --ink:#EAF4FB; --edge:#9CC6E6; --shadow:#04101B;
+    --muted:#B9CFE0; --leaf:#6BD99A; --leaf-soft:#1E5A47; --on-leaf:#0D2033;
+    --sun:#FFD45C; --berry:#FF9EBD; --berry-soft:#43202F; --on-berry:#3A1527;
+    --node:#1E3C5C; --focus:#C2B2FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D2033; --paper:#152C44; --grid:#23425F; --ink:#EAF4FB; --edge:#9CC6E6; --shadow:#04101B;
+  --muted:#B9CFE0; --leaf:#6BD99A; --leaf-soft:#1E5A47; --on-leaf:#0D2033;
+  --sun:#FFD45C; --berry:#FF9EBD; --berry-soft:#43202F; --on-berry:#3A1527;
+  --node:#1E3C5C; --focus:#C2B2FF;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; min-height:100%; background:var(--bg); color:var(--ink);
+  font-family:"Nunito","Segoe UI","Trebuchet MS",system-ui,sans-serif;
+  font-size:clamp(17px,0.9rem + 0.45vw,21px); line-height:1.5;
+}
+h1,h2,h3,.fred{font-family:"Fredoka","Trebuchet MS","Segoe UI Rounded","Arial Rounded MT Bold",system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:1rem 1rem 2.5rem}
+header{padding:.5rem 0 1rem}
+h1{margin:0;font-size:clamp(1.7rem,5.2vw,2.9rem);line-height:1.1;font-weight:700}
+.sub{margin:.4rem 0 0;color:var(--muted);max-width:44rem}
+h2{margin:0 0 .5rem;font-size:clamp(1.3rem,3.4vw,1.8rem);line-height:1.2;font-weight:600}
+h3{margin:0;font-size:1.05rem;font-weight:600}
+:focus-visible{outline:4px solid var(--focus);outline-offset:3px}
+
+.main-grid{display:grid;gap:1.1rem;grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){.main-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}}
+
+/* Bildtafel im Kästchenpapier-Look */
+.stage{
+  margin:0; border:3px solid var(--edge); border-radius:28px; box-shadow:0 6px 0 var(--shadow);
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; padding:.5rem; overflow:hidden;
+}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif}
+.line{stroke:var(--leaf);stroke-width:5;stroke-linecap:round;fill:none}
+.shade{fill:var(--shadow);opacity:.9}
+.main{fill:var(--node);stroke:var(--leaf);stroke-width:5}
+.sel .main{fill:var(--sun);stroke:var(--edge);stroke-width:6}
+.ring{fill:none;stroke:var(--focus);stroke-width:5;opacity:0}
+.real:focus{outline:none}
+.real:focus-visible .ring,.center:focus-visible .ring{opacity:1}
+.real,.center,.ghost{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lab{font-size:17px;font-weight:600;fill:var(--ink);text-anchor:middle;paint-order:stroke;stroke:var(--paper);stroke-width:5px;stroke-linejoin:round}
+.emo{font-size:36px;text-anchor:middle;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.ghost-c{fill:none;stroke:var(--edge);stroke-width:3;stroke-dasharray:7 7;opacity:.75}
+.ghost-q{font-size:30px;font-weight:600;fill:var(--muted);text-anchor:middle}
+.chk-c{fill:var(--leaf);stroke:var(--paper);stroke-width:3}
+.chk-t{fill:var(--on-leaf);font-size:15px;font-weight:700;text-anchor:middle}
+.num-c{fill:var(--ink);stroke:var(--paper);stroke-width:3}
+.num-t{fill:var(--paper);font-size:14px;font-weight:700;text-anchor:middle}
+.blob{fill:var(--leaf-soft);stroke:var(--edge);stroke-width:5}
+.face{stroke:var(--ink);stroke-width:4;stroke-linecap:round;fill:none}
+.eye{fill:var(--ink)}
+.cheek{fill:var(--berry);opacity:0}
+.happy .cheek{opacity:.55}
+.c-lab{font-size:19px;font-weight:700;fill:var(--ink);text-anchor:middle}
+
+@keyframes pop{from{transform:scale(.15);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes draw{from{stroke-dasharray:200;stroke-dashoffset:200}to{stroke-dasharray:200;stroke-dashoffset:0}}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}70%{transform:translateY(0)}85%{transform:translateY(-5px)}}
+.pop{transform-box:fill-box;transform-origin:center}
+.just .pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.just-line{animation:draw .45s ease-out}
+.hop{transform-box:fill-box;transform-origin:center;animation:hop .8s ease-out}
+
+/* Bedienung */
+.controls{margin-top:1rem}
+.status{margin:0 0 .6rem;font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;font-weight:600;font-size:1.1rem}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.btn{
+  font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;font-weight:600;font-size:1.05rem;color:var(--ink);
+  min-height:48px;min-width:48px;padding:.5rem 1.1rem;border-radius:999px;border:3px solid var(--edge);
+  background:var(--paper);box-shadow:0 4px 0 var(--shadow);cursor:pointer;
+}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
+.btn.primary{background:var(--sun);font-size:1.2rem;min-height:56px}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+/* Detail-Karte */
+.card{
+  background:var(--paper);border:3px solid var(--edge);border-radius:24px;box-shadow:0 6px 0 var(--shadow);
+  padding:1.1rem 1.2rem 1.3rem;
+}
+.card p{margin:.5rem 0 0}
+.panel-title{display:flex;align-items:center;gap:.6rem;margin:0}
+.panel-title .big{font-size:2rem;line-height:1}
+.merk{
+  margin:.7rem 0 0;padding:.5rem .8rem;border-radius:16px;background:var(--leaf-soft);
+  font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;font-weight:600;font-size:1.15rem;
+}
+.ex{display:grid;gap:.7rem;margin-top:.8rem;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.ex div{border:3px solid var(--leaf);border-radius:16px;padding:.5rem .8rem .7rem}
+.ex p{margin:.25rem 0 0}
+.falle{margin-top:.8rem;border:3px solid var(--berry);background:var(--berry-soft);border-radius:16px;padding:.5rem .8rem .7rem}
+.falle h3{color:var(--berry)}
+.falle p{margin:.25rem 0 0}
+.einfach{margin-top:.8rem;border:3px dashed var(--edge);border-radius:16px;padding:.5rem .8rem .7rem;color:var(--muted)}
+.einfach h3{color:var(--ink)}
+.einfach p{margin:.25rem 0 0}
+.card .btn{margin-top:1rem}
+
+/* Legende */
+section.block{margin-top:1.6rem}
+.legend{list-style:none;margin:.6rem 0 0;padding:0;display:grid;gap:.7rem 1.4rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.legend li{display:flex;align-items:center;gap:.8rem}
+.sw{
+  flex:0 0 44px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;font-weight:700;font-size:1.1rem;
+  border:4px solid var(--leaf);background:var(--node);color:var(--ink)
+}
+.sw.sun{background:var(--sun);border-color:var(--edge)}
+.sw.seen{background:var(--leaf);color:var(--on-leaf);border-color:var(--leaf)}
+.sw.ghostsw{border:3px dashed var(--edge);background:transparent;color:var(--muted)}
+.sw.fall{border-radius:12px;border-color:var(--berry);background:var(--berry-soft);color:var(--berry)}
+.sw.vereinf{border-radius:12px;border:3px dashed var(--edge);background:transparent;font-size:1.2rem}
+.sw.ok{background:var(--leaf);color:var(--on-leaf);border-color:var(--leaf)}
+.sw.teil{background:var(--sun);color:#14304A;border-color:var(--edge)}
+.sw.nein{background:var(--berry);color:var(--on-berry);border-color:var(--berry)}
+
+/* Lebendig-Check */
+.picks{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0 1rem}
+.pick{
+  display:inline-flex;align-items:center;gap:.5rem;min-height:48px;padding:.35rem 1rem .35rem .7rem;border-radius:999px;
+  border:3px solid var(--edge);background:var(--paper);color:var(--ink);box-shadow:0 4px 0 var(--shadow);cursor:pointer;
+  font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;font-weight:600;font-size:1.05rem;
+}
+.pick .e{font-size:1.5rem;line-height:1}
+.pick[aria-pressed="true"]{background:var(--sun);transform:translateY(2px);box-shadow:0 2px 0 var(--shadow)}
+.result h3{font-size:1.35rem}
+.verdict{display:flex;align-items:center;gap:.6rem;margin:0 0 .3rem}
+.rows{list-style:none;margin:.8rem 0 0;padding:0;display:grid;gap:.6rem}
+.rows li{display:flex;gap:.8rem;align-items:flex-start}
+.rows .sw{flex-basis:38px;width:38px;height:38px;font-size:1.05rem;border-width:3px;margin-top:.1rem}
+.rows p{margin:0}
+.rows strong{font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;font-weight:600}
+.empty{color:var(--muted)}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer{margin-top:2rem;color:var(--muted);font-size:.95rem}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <header>
+    <h1>Kennzeichen des Lebendigen</h1>
+    <p class="sub">Woran erkennst du ein Lebewesen? Baue das Schaubild Schritt für Schritt auf und tippe auf die Kreise.</p>
+  </header>
+
+  <main>
+    <div class="main-grid">
+      <div>
+        <figure class="stage">
+          <svg id="svg" viewBox="0 0 440 490" role="group" aria-label="Schaubild: Ein Lebewesen in der Mitte, darum fünf Kennzeichen des Lebendigen"></svg>
+        </figure>
+        <div class="controls" role="group" aria-label="Schaubild aufbauen">
+          <p class="status" id="status"></p>
+          <div class="btns">
+            <button type="button" class="btn" id="back">Zurück</button>
+            <button type="button" class="btn primary" id="next">Weiter</button>
+            <button type="button" class="btn" id="all">Alles zeigen</button>
+            <button type="button" class="btn" id="reset">Neu starten</button>
+          </div>
+        </div>
+      </div>
+      <section class="card" id="panel" aria-live="polite" aria-atomic="true" aria-label="Details zum ausgewählten Element"></section>
+    </div>
+
+    <section class="block" id="legende" aria-labelledby="legende-h">
+      <h2 id="legende-h">Legende</h2>
+      <div class="card">
+        <ul class="legend">
+          <li><span class="sw" aria-hidden="true">1</span><span>Ein Kennzeichen des Lebendigen. Tippe darauf für Details. Die Zahl zeigt die Reihenfolge beim Aufbauen.</span></li>
+          <li><span class="sw sun" aria-hidden="true"></span><span>Gelb: Das hast du gerade ausgewählt.</span></li>
+          <li><span class="sw seen" aria-hidden="true">✓</span><span>Grüner Haken: Das hast du dir schon angesehen.</span></li>
+          <li><span class="sw ghostsw" aria-hidden="true">?</span><span>Gestrichelt: Noch verdeckt. Tippe auf „Weiter“.</span></li>
+          <li><span class="sw fall" aria-hidden="true">!</span><span>Rosa Kasten: Denkfalle, ein häufiger Irrtum.</span></li>
+          <li><span class="sw vereinf" aria-hidden="true">✂️</span><span>Gestrichelter Kasten: Vereinfacht erklärt. Genaueres lernst du später.</span></li>
+          <li><span class="sw ok" aria-hidden="true">✓</span><span>Im Lebendig-Check: Trifft zu.</span></li>
+          <li><span class="sw teil" aria-hidden="true">~</span><span>Im Lebendig-Check: Ähnlich, ruht oder nur teilweise.</span></li>
+          <li><span class="sw nein" aria-hidden="true">✗</span><span>Im Lebendig-Check: Trifft nicht zu.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="block" id="check" aria-labelledby="check-h">
+      <h2 id="check-h" tabindex="-1">Lebendig-Check</h2>
+      <p>Welches Ding ist ein Lebewesen? Tippe eines an und prüfe die fünf Kennzeichen.</p>
+      <div class="picks" id="picks" role="group" aria-label="Dinge zum Prüfen"></div>
+      <div class="card result" id="result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>Biologie, Jahrgang 5/6, Gymnasium Niedersachsen. Es werden keine Daten gespeichert.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Inhalte ---------- */
+  var K = [
+    { name:"Stoffwechsel", lines:["Stoffwechsel"], emoji:"🍎",
+      merk:"Stoffe rein, umbauen, Stoffe raus.",
+      text:"Lebewesen nehmen Stoffe aus ihrer Umgebung auf, zum Beispiel Nahrung, Wasser und Luft. Im Körper werden diese Stoffe umgebaut. So bekommt das Lebewesen Energie und Baumaterial. Was der Körper nicht braucht, gibt er wieder ab.",
+      tier:"Eine Maus frisst Körner und atmet Sauerstoff ein. Sie atmet Kohlenstoffdioxid aus und scheidet Kot und Urin aus.",
+      pflanze:"Eine Sonnenblume nimmt Wasser mit den Wurzeln auf und Kohlenstoffdioxid aus der Luft. Mit Licht stellt sie Zucker her und gibt Sauerstoff ab.",
+      falle:"„Pflanzen essen Erde.“ Das stimmt nicht. Pflanzen nehmen Wasser und Mineralstoffe aus dem Boden auf. Ihren Zucker bauen sie selbst, mit Licht, Wasser und Luft.",
+      einfach:"Was im Körper genau umgebaut wird, lernst du später bei Atmung und Photosynthese kennen." },
+    { name:"Reizbarkeit", lines:["Reizbarkeit"], emoji:"👀",
+      merk:"Reiz kommt an, Lebewesen reagiert.",
+      text:"Lebewesen nehmen Reize aus ihrer Umgebung wahr, zum Beispiel Licht, Wärme, Berührung, Geräusche oder Gerüche. Sie reagieren darauf. Das hilft ihnen, Futter zu finden und Gefahren zu meiden.",
+      tier:"Eine Katze hört ein Rascheln, dreht die Ohren und schaut hin. Ein Regenwurm zieht sich bei Berührung zusammen.",
+      pflanze:"Die Mimose klappt ihre Blätter zusammen, wenn man sie berührt. Keimlinge wachsen zum Licht hin.",
+      falle:"„Pflanzen reagieren nicht.“ Doch, sie reagieren. Nur geht es oft so langsam, dass man es nicht sofort sieht.",
+      einfach:"Wie Reize im Körper weitergeleitet werden, zum Beispiel durch Nerven, kommt später dran." },
+    { name:"Bewegung", lines:["Bewegung"], emoji:"🏃",
+      merk:"Aus eigener Kraft: der ganze Körper oder Teile davon.",
+      text:"Lebewesen können sich aus eigener Kraft bewegen. Manche bewegen den ganzen Körper, zum Beispiel beim Laufen, Fliegen oder Schwimmen. Andere bewegen nur Teile ihres Körpers.",
+      tier:"Ein Fisch schwimmt, ein Vogel fliegt. Eine Muschel öffnet und schließt ihre Schalen.",
+      pflanze:"Eine Tulpe öffnet ihre Blüte am Tag und schließt sie am Abend. Eine Erbsenranke dreht sich um einen Stab.",
+      falle:"„Was sich bewegt, lebt.“ Nicht ganz. Auto, Wolke und Bach bewegen sich auch, aber sie werden angetrieben oder getragen. Und ein schlafender Hund lebt, obwohl er ruht.",
+      einfach:"Bewegung allein reicht nicht aus. Sie ist nur eines von fünf Kennzeichen." },
+    { name:"Wachstum und Entwicklung", lines:["Wachstum und","Entwicklung"], emoji:"🌱",
+      merk:"Größer werden und sich verändern.",
+      text:"Lebewesen werden größer. Das nennt man Wachstum. Sie verändern sich auch im Laufe ihres Lebens. Das nennt man Entwicklung. Der Körper baut sich dabei selbst aus aufgenommenen Stoffen weiter auf.",
+      tier:"Aus einer Kaulquappe wird ein Frosch. Aus einer Raupe wird ein Schmetterling.",
+      pflanze:"Aus einer Bohne wird ein Keimling, dann eine Pflanze mit Blüten und später mit Früchten.",
+      falle:"„Auch Kristalle und Wolken wachsen.“ Sie werden größer, weil von außen etwas dazukommt. Lebewesen wachsen, weil ihr Körper selbst Stoffe verarbeitet und neue Teile baut.",
+      einfach:"Dass Körper aus Zellen bestehen, die sich teilen, lernst du später genauer. Viele erwachsene Lebewesen wachsen kaum noch, verändern sich aber weiter." },
+    { name:"Fortpflanzung", lines:["Fortpflanzung"], emoji:"🥚",
+      merk:"Nachkommen sichern die Art.",
+      text:"Lebewesen bekommen Nachkommen, die ihnen ähnlich sind. So bleibt die Art erhalten, auch wenn einzelne Lebewesen sterben.",
+      tier:"Ein Huhn legt Eier, aus denen Küken schlüpfen. Eine Kuh bekommt ein Kalb.",
+      pflanze:"Ein Apfelbaum bildet Blüten, Früchte und Samen. Aus den Samen können neue Bäume wachsen. Erdbeeren bilden außerdem Ausläufer.",
+      falle:"„Jedes Lebewesen muss Nachkommen bekommen.“ Nein, gemeint ist die ganze Art. Ein Küken oder eine Arbeiterbiene lebt auch ohne eigene Nachkommen.",
+      einfach:"Dass Kinder ihren Eltern ähneln (Vererbung) und dass es verschiedene Arten der Fortpflanzung gibt, kommt später." }
+  ];
+
+  var CHECK = [
+    { id:"katze", e:"🐱", name:"Katze", alive:true, label:"Lebewesen",
+      verdict:"Alle fünf Kennzeichen treffen zu. Eine Katze ist ein Lebewesen.",
+      rows:[["ok","Frisst, trinkt und atmet. Sie gibt Kot, Urin und Atemluft ab."],
+            ["ok","Sie spitzt die Ohren bei Geräuschen und zuckt bei Berührung."],
+            ["ok","Läuft, springt und klettert aus eigener Kraft."],
+            ["ok","Aus winzigen Kitten werden erwachsene Katzen."],
+            ["ok","Katzen bekommen Junge."]] },
+    { id:"sonnenblume", e:"🌻", name:"Sonnenblume", alive:true, label:"Lebewesen",
+      verdict:"Auch Pflanzen zeigen alle fünf Kennzeichen, oft nur langsamer als Tiere.",
+      rows:[["ok","Nimmt Wasser auf, stellt mit Licht Zucker her und gibt Sauerstoff ab."],
+            ["ok","Junge Blütenknospen drehen sich zur Sonne."],
+            ["ok","Sie bewegt Teile ihres Körpers, langsam, aber sichtbar."],
+            ["ok","Vom Samenkorn bis zur mannshohen Pflanze."],
+            ["ok","Bildet Samen, aus denen neue Pflanzen wachsen."]] },
+    { id:"samen", e:"🌰", name:"Trockener Samen", alive:true, label:"Lebewesen im Ruhezustand",
+      verdict:"Im Samen steckt ein lebender Keimling, der gerade ruht. Lebewesen müssen nicht in jedem Moment alles zeigen.",
+      rows:[["teil","Läuft nur ganz langsam, solange der Samen trocken liegt."],
+            ["ok","Wasser und Wärme wecken ihn auf. Dann keimt er."],
+            ["teil","Erst beim Keimen schiebt sich die Wurzel heraus."],
+            ["teil","Er wächst erst, wenn er keimt."],
+            ["teil","Aus ihm wird eine Pflanze, die später selbst Samen bildet."]] },
+    { id:"auto", e:"🚗", name:"Auto", alive:false, label:"Kein Lebewesen",
+      verdict:"Ein Auto bewegt sich und verbraucht Treibstoff. Es wächst aber nicht, es bekommt keine Nachkommen und es besteht nicht aus Zellen.",
+      rows:[["teil","Sieht ähnlich aus: Benzin rein, Abgase raus. Aber es baut seinen Körper nicht selbst auf."],
+            ["nein","Es hat keine Sinnesorgane. Sensoren sind nur eingebaute Technik."],
+            ["teil","Es fährt, aber Motor und Fahrer treiben es an."],
+            ["nein","Ein Auto wird nicht größer. Es wird gebaut."],
+            ["nein","Autos bekommen keine Nachkommen. Sie werden in Fabriken hergestellt."]] },
+    { id:"feuer", e:"🔥", name:"Feuer", alive:false, label:"Kein Lebewesen",
+      verdict:"Feuer sieht lebendig aus, hat aber keinen Körper aus Zellen und zeigt nicht alle Kennzeichen.",
+      rows:[["teil","Verbraucht Holz und Sauerstoff und gibt Rauch ab. Einen Körper baut es nicht auf."],
+            ["nein","Wind facht es an, aber es nimmt nichts wahr."],
+            ["teil","Es flackert und breitet sich aus, aber es hat keinen Körper, der sich bewegt."],
+            ["teil","Es wird größer, solange Holz da ist. Es wächst nicht aus sich selbst."],
+            ["nein","Funken zünden neue Feuer, aber das ist keine Fortpflanzung."]] },
+    { id:"wolke", e:"☁️", name:"Wolke", alive:false, label:"Kein Lebewesen",
+      verdict:"Eine Wolke verändert sich, aber nur durch Wasser und Wind. Sie besteht nicht aus Zellen und ist kein Lebewesen.",
+      rows:[["nein","Wasser verdunstet und wird wieder zu Tröpfchen. Das ist ein Naturvorgang, kein Körper."],
+            ["nein","Sie nimmt nichts wahr."],
+            ["teil","Der Wind schiebt sie. Sie bewegt sich nicht selbst."],
+            ["teil","Sie kann größer werden, wenn sich mehr Wasserdampf zu Tröpfchen verwandelt."],
+            ["nein","Wolken haben keine Nachkommen."]] }
+  ];
+  var SYM = {ok:["✓","trifft zu"], teil:["~","teilweise oder ähnlich"], nein:["✗","trifft nicht zu"]};
+
+  /* ---------- Zustand ---------- */
+  var step = 0;            // 0 bis 6
+  var sel = "c";           // "c", "ghost" oder Index 0..4
+  var ghostIdx = null;
+  var seen = {};
+  var justBuilt = -1;
+
+  var NS = "http://www.w3.org/2000/svg";
+  var CX = 220, CY = 262, R = 155, NR = 40;
+  var svg = document.getElementById("svg");
+  var panel = document.getElementById("panel");
+  var statusEl = document.getElementById("status");
+  var btnBack = document.getElementById("back");
+  var btnNext = document.getElementById("next");
+  var btnAll = document.getElementById("all");
+  var btnReset = document.getElementById("reset");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function el(name, attrs, parent){
+    var e = document.createElementNS(NS, name);
+    if(attrs){ for(var k in attrs){ e.setAttribute(k, attrs[k]); } }
+    if(parent){ parent.appendChild(e); }
+    return e;
+  }
+
+  /* ---------- Schaubild aufbauen ---------- */
+  var linesG = el("g", {}, svg);
+  var nodesG = el("g", {}, svg);
+  var centerG = el("g", {"class":"center", role:"button", tabindex:"0", transform:"translate("+CX+","+CY+")"}, svg);
+
+  el("circle", {"class":"shade", cx:0, cy:6, r:58}, centerG);
+  el("circle", {"class":"blob", r:58}, centerG);
+  el("circle", {"class":"ring", r:68}, centerG);
+  var faceG = el("g", {}, centerG);
+  el("circle", {"class":"eye", cx:-18, cy:-22, r:5.5}, faceG);
+  el("circle", {"class":"eye", cx:18, cy:-22, r:5.5}, faceG);
+  el("circle", {"class":"cheek", cx:-30, cy:-8, r:7}, faceG);
+  el("circle", {"class":"cheek", cx:30, cy:-8, r:7}, faceG);
+  var mouth = el("path", {"class":"face", d:"M -16 -6 Q 0 6 16 -6"}, faceG);
+  var cl = el("text", {"class":"c-lab", x:0, y:32}, centerG);
+  cl.textContent = "Lebewesen";
+
+  var nodes = K.map(function(k, i){
+    var a = (-90 + i*72) * Math.PI / 180;
+    var x = CX + R*Math.cos(a), y = CY + R*Math.sin(a);
+    var line = el("line", {"class":"line", x1:CX, y1:CY, x2:x.toFixed(1), y2:y.toFixed(1)}, linesG);
+    var g = el("g", {transform:"translate("+x.toFixed(1)+","+y.toFixed(1)+")"}, nodesG);
+
+    var ghost = el("g", {"class":"ghost", "aria-hidden":"true"}, g);
+    el("circle", {"class":"ghost-c", r:NR}, ghost);
+    var q = el("text", {"class":"ghost-q", x:0, y:11}, ghost); q.textContent = "?";
+
+    var real = el("g", {"class":"real", role:"button", tabindex:"0"}, g);
+    var pop = el("g", {"class":"pop"}, real);
+    el("circle", {"class":"shade", cx:0, cy:5, r:NR}, pop);
+    el("circle", {"class":"main", r:NR}, pop);
+    el("circle", {"class":"ring", r:NR+9}, pop);
+    var em = el("text", {"class":"emo", x:0, y:13}, pop); em.textContent = k.emoji;
+    var lab = el("text", {"class":"lab", x:0, y:NR+24}, pop);
+    k.lines.forEach(function(t, n){
+      var ts = el("tspan", {x:0, dy: n === 0 ? 0 : 20}, lab); ts.textContent = t;
+    });
+    var nb = el("g", {transform:"translate(-29,-29)"}, pop);
+    el("circle", {"class":"num-c", r:12}, nb);
+    var nt = el("text", {"class":"num-t", x:0, y:5}, nb); nt.textContent = String(i+1);
+    var cb = el("g", {"class":"chkb", transform:"translate(29,-29)"}, pop);
+    el("circle", {"class":"chk-c", r:13}, cb);
+    var ct = el("text", {"class":"chk-t", x:0, y:5}, cb); ct.textContent = "✓";
+
+    real.addEventListener("click", function(){ selectNode(i); });
+    real.addEventListener("keydown", keyAct(function(){ selectNode(i); }));
+    ghost.addEventListener("click", function(){ selectGhost(i); });
+    return {g:g, line:line, ghost:ghost, real:real, cb:cb};
+  });
+
+  centerG.addEventListener("click", function(){ sel = "c"; render(false); });
+  centerG.addEventListener("keydown", keyAct(function(){ sel = "c"; render(false); }));
+
+  function keyAct(fn){
+    return function(e){
+      if(e.key === "Enter" || e.key === " " || e.key === "Spacebar"){ e.preventDefault(); fn(); }
+    };
+  }
+
+  /* ---------- Aktionen ---------- */
+  function selectNode(i){
+    if(i >= step){ selectGhost(i); return; }
+    sel = i; seen[i] = true; render(false);
+  }
+  function selectGhost(i){ sel = "ghost"; ghostIdx = i; render(false); }
+
+  function next(){
+    if(step >= 6){ return; }
+    step++;
+    if(step <= 5){ sel = step-1; seen[sel] = true; justBuilt = step-1; }
+    else { sel = "c"; justBuilt = -1; }
+    render(true);
+  }
+  function back(){
+    if(step <= 0){ return; }
+    step--;
+    sel = step >= 1 ? step-1 : "c";
+    justBuilt = -1;
+    render(true);
+  }
+  function showAll(){ step = 6; sel = "c"; justBuilt = -1; render(true); }
+  function resetAll(){ step = 0; sel = "c"; seen = {}; justBuilt = -1; render(true); }
+
+  btnNext.addEventListener("click", next);
+  btnBack.addEventListener("click", back);
+  btnAll.addEventListener("click", showAll);
+  btnReset.addEventListener("click", resetAll);
+
+  /* ---------- Darstellung ---------- */
+  function panelHTML(){
+    if(sel === "ghost"){
+      var n = ghostIdx + 1;
+      var need = n - step;
+      return '<h2 class="panel-title"><span class="big" aria-hidden="true">❔</span>Noch verdeckt</h2>' +
+        '<p>Dieses Kennzeichen baut sich ' + (need === 1 ? 'im nächsten Schritt' : 'in ' + need + ' Schritten') +
+        ' auf. Tippe auf „Weiter“.</p>';
+    }
+    if(sel === "c"){
+      if(step < 6){
+        return '<h2 class="panel-title"><span class="big" aria-hidden="true">🔍</span>Was ist ein Lebewesen?</h2>' +
+          '<p>Tiere, Pflanzen, Pilze und winzige Bakterien sind Lebewesen. Sie alle zeigen fünf Kennzeichen.</p>' +
+          '<p>Tippe auf „Weiter“. Dann baut sich das Schaubild Stück für Stück auf. Jedes Kennzeichen kannst du antippen.</p>' +
+          '<div class="einfach"><h3>✂️ Vereinfacht</h3><p>Alle Lebewesen bestehen aus Zellen. Was das genau bedeutet, schaust du dir später an.</p></div>';
+      }
+      return '<h2 class="panel-title"><span class="big" aria-hidden="true">🎉</span>Alle fünf zusammen: ein Lebewesen!</h2>' +
+        '<p>Ein Lebewesen zeigt alle fünf Kennzeichen. Ein einzelnes Kennzeichen reicht nicht. Ein Auto bewegt sich und Feuer wird größer, trotzdem sind beide keine Lebewesen.</p>' +
+        '<p>Tippe auf einen Kreis, wenn du ein Kennzeichen noch einmal nachlesen willst.</p>' +
+        '<div class="einfach"><h3>✂️ Vereinfacht</h3><p>Manche Lebewesen zeigen nicht in jedem Moment alles. Ein Samen zum Beispiel ruht. Das siehst du im Lebendig-Check.</p></div>' +
+        '<button type="button" class="btn primary" id="gocheck">Zum Lebendig-Check</button>';
+    }
+    var k = K[sel];
+    return '<h2 class="panel-title"><span class="big" aria-hidden="true">' + k.emoji + '</span>' + k.name + '</h2>' +
+      '<p class="merk">' + k.merk + '</p>' +
+      '<p>' + k.text + '</p>' +
+      '<div class="ex"><div><h3>🐾 Beispiel Tier</h3><p>' + k.tier + '</p></div>' +
+      '<div><h3>🌿 Beispiel Pflanze</h3><p>' + k.pflanze + '</p></div></div>' +
+      '<div class="falle"><h3>⚠️ Denkfalle</h3><p>' + k.falle + '</p></div>' +
+      '<div class="einfach"><h3>✂️ Vereinfacht</h3><p>' + k.einfach + '</p></div>';
+  }
+
+  function render(scroll){
+    // Knoten
+    nodes.forEach(function(n, i){
+      var built = i < step;
+      n.real.style.display = built ? "" : "none";
+      n.ghost.style.display = built ? "none" : "";
+      n.line.style.display = built ? "" : "none";
+      n.cb.style.display = (built && seen[i]) ? "" : "none";
+      var isSel = (sel === i);
+      n.real.setAttribute("class", "real" + (isSel ? " sel" : "") + (i === justBuilt && !reduce ? " just" : ""));
+      n.real.setAttribute("aria-pressed", isSel ? "true" : "false");
+      n.real.setAttribute("aria-label", K[i].name + ", Kennzeichen " + (i+1) + " von 5" + (seen[i] ? ", schon angesehen" : ""));
+      n.line.setAttribute("class", "line" + (i === justBuilt && !reduce ? " just-line" : ""));
+    });
+    // Mitte
+    var happy = step === 6;
+    centerG.setAttribute("class", "center" + (happy ? " happy" : "") + (sel === "c" ? " sel" : ""));
+    centerG.setAttribute("aria-label", "Lebewesen, Überblick");
+    mouth.setAttribute("d", happy ? "M -22 -8 Q 0 20 22 -8" : "M -16 -6 Q 0 6 16 -6");
+    faceG.setAttribute("class", happy && !reduce && scroll ? "hop" : "");
+
+    // Status und Knöpfe
+    var names = ["Start"].concat(K.map(function(k){ return k.name; })).concat(["Alles zusammen"]);
+    statusEl.textContent = "Schritt " + step + " von 6: " + names[step];
+    btnBack.disabled = step === 0;
+    btnNext.disabled = step === 6;
+    btnReset.disabled = step === 0 && Object.keys(seen).length === 0;
+    btnAll.disabled = step === 6;
+
+    panel.innerHTML = panelHTML();
+    var go = document.getElementById("gocheck");
+    if(go){ go.addEventListener("click", function(){
+      var h = document.getElementById("check-h");
+      h.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"});
+      h.focus({preventScroll:true});
+    }); }
+
+    if(scroll || sel !== "c"){ keepPanelVisible(); }
+  }
+
+  function keepPanelVisible(){
+    if(window.matchMedia("(max-width: 899px)").matches){
+      panel.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"nearest"});
+    }
+  }
+
+  /* ---------- Lebendig-Check ---------- */
+  var picks = document.getElementById("picks");
+  var result = document.getElementById("result");
+  var current = null;
+
+  CHECK.forEach(function(c){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "pick"; b.setAttribute("aria-pressed", "false");
+    b.innerHTML = '<span class="e" aria-hidden="true">' + c.e + '</span><span>' + c.name + '</span>';
+    b.addEventListener("click", function(){ current = c.id; renderCheck(); });
+    c.btn = b;
+    picks.appendChild(b);
+  });
+
+  function renderCheck(){
+    CHECK.forEach(function(c){ c.btn.setAttribute("aria-pressed", c.id === current ? "true" : "false"); });
+    var c = CHECK.filter(function(x){ return x.id === current; })[0];
+    if(!c){
+      result.innerHTML = '<p class="empty">Noch nichts ausgewählt. Tippe oben auf ein Ding, zum Beispiel auf die Katze. Dann siehst du, welche Kennzeichen zutreffen.</p>';
+      return;
+    }
+    var rows = c.rows.map(function(r, i){
+      var s = SYM[r[0]];
+      return '<li><span class="sw ' + (r[0] === "ok" ? "ok" : r[0] === "teil" ? "teil" : "nein") + '" aria-hidden="true">' + s[0] + '</span>' +
+        '<p><strong>' + K[i].name + '</strong><span class="vh">: ' + s[1] + '.</span><br>' + r[1] + '</p></li>';
+    }).join("");
+    result.innerHTML =
+      '<h3 class="verdict"><span aria-hidden="true">' + c.e + '</span> ' + c.name + ': ' + c.label + '</h3>' +
+      '<p>' + c.verdict + '</p><ul class="rows">' + rows + '</ul>';
+  }
+
+  render(false);
+  renderCheck();
+})();
+</script>
+</body>
+</html>

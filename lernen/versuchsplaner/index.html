@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Versuchsplaner – Biologie Klasse 5</title>
+<style>
+:root{
+  --bg:#e9eef6; --surface:#ffffff; --surface-2:#f3f6fb; --ink:#14223d; --muted:#56647d;
+  --line:#c9d3e3; --navy:#1d3a6b; --yellow:#f2c230; --ok:#1f7a52; --ok-bg:#e3f4ec; --err:#b42318; --err-bg:#fde8e6; --warn-bg:#fff4cf;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif; --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1829; --surface:#16243c; --surface-2:#1c2d4a; --ink:#e7edf7; --muted:#a3b0c6;
+    --line:#2d4166; --navy:#9dbbf0; --yellow:#f5cb45; --ok:#5fd19d; --ok-bg:#163a2c; --err:#ff8b80; --err-bg:#3d1c1c; --warn-bg:#3a3214; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1829; --surface:#16243c; --surface-2:#1c2d4a; --ink:#e7edf7; --muted:#a3b0c6;
+  --line:#2d4166; --navy:#9dbbf0; --yellow:#f5cb45; --ok:#5fd19d; --ok-bg:#163a2c; --err:#ff8b80; --err-bg:#3d1c1c; --warn-bg:#3a3214; color-scheme:dark;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:inherit;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.5;-webkit-text-size-adjust:100%;}
+.wrap{max-width:960px;margin:0 auto;padding:1.25rem 1rem 3rem;}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;color:var(--navy);}
+h1{font-size:clamp(2rem,6vw,3rem);}
+h2{font-size:1.6rem;margin-bottom:.3rem;}
+h3{font-size:1.15rem;margin:1.1rem 0 .3rem;}
+p{margin:.4rem 0;}
+.lead{color:var(--muted);max-width:62ch;margin-top:.4rem;}
+.topbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1rem 0;}
+.topbar label{font-weight:700;}
+select,input[type=text],input[type=date],textarea{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:.5rem .65rem;min-height:44px;}
+textarea{width:100%;min-height:5.5rem;resize:vertical;}
+input[type=text]{width:100%;}
+select:focus,input:focus,textarea:focus{border-color:var(--navy);outline:none;}
+.btn{font:inherit;font-weight:700;border-radius:12px;padding:.55rem 1rem;cursor:pointer;min-height:44px;border:2px solid var(--navy);background:var(--surface);color:var(--navy);}
+.btn.primary{background:var(--navy);color:var(--surface);}
+.btn.quiet{border-color:var(--line);color:var(--muted);}
+.btn.danger{border-color:var(--err);color:var(--err);}
+.btn.small{min-height:36px;padding:.3rem .7rem;font-size:.9rem;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.steps{display:flex;gap:.35rem;overflow-x:auto;padding:.2rem .1rem .6rem;margin:0 0 .6rem;list-style:none;}
+.steps button{font:inherit;font-size:.92rem;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:.4rem;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:.35rem .8rem .35rem .4rem;cursor:pointer;min-height:42px;}
+.steps .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--surface-2);border:2px solid var(--line);font-size:.85rem;}
+.steps button.done .n{background:var(--ok);border-color:var(--ok);color:var(--surface);}
+.steps button[aria-current="step"]{border-color:var(--navy);background:var(--navy);color:var(--surface);}
+.steps button[aria-current="step"] .n{background:var(--surface);color:var(--navy);border-color:var(--surface);}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:1.1rem;}
+.field{margin:.9rem 0;}
+.field > label,.lbl{display:block;font-weight:700;margin-bottom:.3rem;}
+.hint{color:var(--muted);font-size:.92rem;}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem;margin:.35rem 0;}
+.chip{font:inherit;font-size:.88rem;border:2px dashed var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:.2rem .7rem;cursor:pointer;min-height:34px;}
+.box{border-radius:12px;padding:.7rem .9rem;margin:.6rem 0;}
+.box.info{background:var(--surface-2);border-left:5px solid var(--navy);}
+.box.ok{background:var(--ok-bg);border-left:5px solid var(--ok);}
+.box.err{background:var(--err-bg);border-left:5px solid var(--err);}
+.box.warn{background:var(--warn-bg);border-left:5px solid var(--yellow);}
+.tplchoice{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin:.4rem 0;}
+.tplchoice label{display:flex;gap:.6rem;align-items:flex-start;border:2px solid var(--line);border-radius:14px;padding:.7rem;cursor:pointer;background:var(--surface-2);}
+.tplchoice input{margin-top:.25rem;width:20px;height:20px;accent-color:var(--navy);}
+.tplchoice b{display:block;}
+.scroll{overflow-x:auto;}
+table{border-collapse:collapse;width:100%;}
+th,td{border:1px solid var(--line);padding:.4rem .5rem;text-align:left;vertical-align:top;}
+th{background:var(--surface-2);font-size:.95rem;}
+td select{width:100%;min-width:7.6rem;font-size:.95rem;padding-right:.3rem;}
+td.changed select{background:var(--warn-bg);border-color:var(--yellow);}
+td input[type=text]{min-width:7.5rem;}
+.ctrl-head{display:flex;justify-content:space-between;align-items:center;gap:.4rem;}
+.x{font:inherit;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:1.2rem;line-height:1;padding:.1rem .3rem;}
+.checklist label{display:flex;gap:.55rem;align-items:flex-start;padding:.3rem 0;}
+.checklist input{width:20px;height:20px;margin-top:.15rem;accent-color:var(--navy);flex:none;}
+.safety li{margin:.3rem 0;}
+.canvas-wrap{border:2px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;touch-action:none;}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;}
+.tools{display:flex;flex-wrap:wrap;gap:.4rem;margin:.6rem 0;}
+.tools .btn[aria-pressed="true"]{background:var(--navy);color:var(--surface);}
+.radio-row{display:flex;flex-wrap:wrap;gap:.5rem;}
+.radio-row label{display:flex;gap:.4rem;align-items:center;border:2px solid var(--line);border-radius:999px;padding:.3rem .8rem;cursor:pointer;}
+.radio-row input{accent-color:var(--navy);width:18px;height:18px;}
+.nav{display:flex;justify-content:space-between;gap:.6rem;margin-top:1rem;}
+.doc{background:#fff;color:#14223d;border:2px solid var(--line);border-radius:12px;padding:1.2rem;margin-top:.8rem;}
+.doc h2,.doc h3{color:#1d3a6b;}
+.doc table th{background:#f3f6fb;}
+.doc th,.doc td{border-color:#c9d3e3;}
+.doc img{max-width:100%;border:1px solid #c9d3e3;border-radius:8px;}
+.doc .meta{color:#56647d;}
+.complete li{list-style:none;margin:.2rem 0;}
+.complete li::before{content:"✗ ";color:var(--err);font-weight:700;}
+.complete li.y::before{content:"✓ ";color:var(--ok);}
+.complete{padding-left:0;}
+.storage-warn{display:none;}
+.storage-warn.show{display:block;}
+details.teacher{background:var(--surface);border:2px dashed var(--line);border-radius:16px;margin-top:1.4rem;}
+details.teacher summary{cursor:pointer;padding:.85rem 1rem;font-family:var(--display);font-weight:700;font-size:1.15rem;color:var(--navy);}
+details.teacher .dbody{padding:0 1rem 1rem;max-width:72ch;}
+.confirm{display:none;gap:.4rem;align-items:center;flex-wrap:wrap;}
+.confirm.show{display:flex;}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px;}
+@media (max-width:520px){ .wrap{padding:1rem .75rem 2.5rem;} .card{padding:.85rem;} }
+@media print{
+  body{background:#fff;}
+  body *{visibility:hidden;}
+  #printArea, #printArea *{visibility:visible;}
+  #printArea{position:absolute;left:0;top:0;width:100%;border:0;}
+}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <header>
+    <h1>Versuchsplaner</h1>
+    <p class="lead">Plane deinen Versuch Schritt für Schritt. Am Ende hast du ein fertiges Versuchsprotokoll. Alles wird auf diesem Gerät gespeichert.</p>
+  </header>
+
+  <div class="topbar">
+    <label for="protoSel">Mein Versuch:</label>
+    <select id="protoSel"></select>
+    <button class="btn small" id="newBtn" type="button">Neuer Versuch</button>
+    <button class="btn small danger" id="delBtn" type="button">Löschen</button>
+    <span class="confirm" id="delConfirm"><span>Wirklich löschen?</span><button class="btn small danger" id="delYes" type="button">Ja, löschen</button><button class="btn small quiet" id="delNo" type="button">Nein</button></span>
+  </div>
+  <div class="box warn storage-warn" id="storageWarn">Speichern ist auf diesem Gerät nicht möglich. Wenn du die Seite schließt, ist dein Versuch weg. Lade das Protokoll am Ende herunter.</div>
+
+  <ol class="steps" id="steps" aria-label="Schritte"></ol>
+  <main class="card" id="stage" aria-live="polite"></main>
+  <div class="nav">
+    <button class="btn" id="prevBtn" type="button">Zurück</button>
+    <button class="btn primary" id="nextBtn" type="button">Weiter</button>
+  </div>
+
+  <details class="teacher">
+    <summary>Für Lehrkräfte: Hinweise</summary>
+    <div class="dbody">
+      <p><b>Curriculumsbezug (schuleigenes Curriculum Kl. 5):</b> EG 2.2 (ein- und mehrfaktorielle Versuche mit Kontrollexperiment planen), EG 2.3 (Experimente unter Anleitung durchführen, z. B. Keimung), EG 1.4 (Versuchsaufbau skizzieren), EG 2.5 (Versuchsprotokoll unter Anleitung), EG 2.6 (Schlussfolgerungen aus einfacher Datenlage). Einsetzbar in „Pflanzen sind Lebewesen“ (Keimung) und „Tiere im Winter“.</p>
+      <p><b>Automatische Prüfung:</b> Jeder Versuchsansatz muss sich in genau einem Faktor vom Kontrollansatz unterscheiden. Mehrere Versuchsansätze mit je einem anderen Faktor ergeben einen mehrfaktoriellen Versuch. Inhaltliche Texte (Frage, Vermutung, Schlussfolgerung) werden nicht bewertet.</p>
+      <p><b>Sicherheit:</b> Die Sicherheitshinweise in den Vorlagen sind allgemeine Hinweise. Sie ersetzen nicht die Gefährdungsbeurteilung nach den Vorgaben Ihrer Schule. Die Temperatur beim Abkühlungsversuch (ca. 40 °C) ist eine Annahme; bitte an Ihre Vorgaben anpassen.</p>
+      <p><b>Datenschutz und Speicherung:</b> Die Daten bleiben im Browser des jeweiligen Geräts. Es wird nichts an Sie oder an andere übertragen. Auf geteilten Tablets sehen nachfolgende Gruppen die Versuche; deshalb wird nur ein Gruppenname abgefragt. Löschen oder Browser-Daten-Bereinigung entfernt alles.</p>
+    </div>
+  </details>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "versuchsplaner-v1";
+  var STEPS = ["Start","Frage & Vermutung","Versuchsansätze","Material & Sicherheit","Skizze","Beobachtung","Auswertung","Protokoll"];
+  var TEMPLATES = {
+    keimung:{
+      label:"Keimungsversuch", desc:"Was brauchen Kressesamen zum Keimen?", title:"Keimung von Kressesamen",
+      frageChips:["Braucht ein Kressesamen Wasser zum Keimen?","Braucht ein Kressesamen Licht zum Keimen?","Braucht ein Kressesamen Wärme zum Keimen?","Braucht ein Kressesamen Erde zum Keimen?"],
+      factors:[{name:"Wasser",opts:["feucht","trocken"]},{name:"Licht",opts:["hell","dunkel"]},{name:"Temperatur",opts:["Zimmerwärme","Kühlschrank"]},{name:"Untergrund",opts:["Watte","Erde"]}],
+      material:["Gläser oder Petrischalen (gleiche Größe)","Watte oder Küchenpapier","unbehandelte Kressesamen (gleich viele pro Ansatz)","Wasser","Pipette oder Sprühflasche","Etiketten und Stift","Pappkarton zum Abdunkeln","Platz im Kühlschrank","Lineal"],
+      safety:["Nur unbehandelte Samen verwenden. Samen nicht in den Mund nehmen.","Nach der Arbeit Hände waschen.","Verschüttetes Wasser sofort aufwischen.","Schimmelt ein Ansatz: nicht öffnen und nicht daran riechen. Sag der Lehrkraft Bescheid."],
+      obsRows:["Tag 1","Tag 2","Tag 3","Tag 4","Tag 5"]
+    },
+    abkuehlung:{
+      label:"Abkühlungsversuch", desc:"Hält eine Hülle aus Watte oder Federn warm?", title:"Wärmeschutz durch Federn",
+      frageChips:["Kühlt warmes Wasser mit einer Hülle aus Watte langsamer ab?","Kühlt warmes Wasser mit einer Hülle aus Federn langsamer ab?"],
+      factors:[{name:"Hülle",opts:["ohne Hülle","mit Watte oder Federn"]},{name:"Wassermenge",opts:["100 ml","200 ml"]},{name:"Starttemperatur",opts:["ca. 40 °C","ca. 30 °C"]},{name:"Ort",opts:["Tisch","Fensterbank"]}],
+      material:["2 gleiche Gläser oder Becher","warmes Wasser (füllt die Lehrkraft ein)","Messzylinder","2 Thermometer","Watte, Wolle oder Federn","Gummiband","Stoppuhr"],
+      safety:["Das warme Wasser füllt die Lehrkraft ein. Verbrühungsgefahr!","Gläser vorsichtig abstellen. Bei Glasbruch nichts anfassen und die Lehrkraft holen.","Das Thermometer nicht zum Umrühren benutzen."],
+      obsRows:["0 min","2 min","4 min","6 min","8 min","10 min"]
+    },
+    eigen:{
+      label:"Eigener Versuch", desc:"Du legst die Faktoren selbst fest.", title:"Mein Versuch",
+      frageChips:[], factors:[{name:"",opts:["",""]}], material:[],
+      safety:["Plane deinen Versuch nur zusammen mit deiner Lehrkraft."],
+      obsRows:["1. Messung","2. Messung","3. Messung"]
+    }
+  };
+
+  var storageOK = true, store = {protocols:[], current:null}, step = 0, downloads = null, dlState = "pending", saveTimer = null;
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function uid(){ return "p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+  function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+  function load(){
+    try{ var raw = localStorage.getItem(KEY); if(raw){ var s = JSON.parse(raw); if(s && Array.isArray(s.protocols)) store = s; } }
+    catch(e){ storageOK = false; }
+    try{ localStorage.setItem(KEY+"-test","1"); localStorage.removeItem(KEY+"-test"); } catch(e){ storageOK = false; }
+    $("storageWarn").classList.toggle("show", !storageOK);
+    if(!store.protocols.length) newProtocol();
+    if(!cur()) store.current = store.protocols[0].id;
+  }
+  function save(){
+    if(!storageOK) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){ storageOK=false; $("storageWarn").classList.add("show"); } }, 250);
+  }
+  function cur(){ for(var i=0;i<store.protocols.length;i++) if(store.protocols[i].id===store.current) return store.protocols[i]; return null; }
+
+  function applyTemplate(p, key){
+    var T = TEMPLATES[key];
+    p.template = key;
+    p.factors = clone(T.factors);
+    var base = p.factors.map(function(){ return 0; });
+    p.ansaetze = [{control:true, vals:base.slice()},{control:false, vals:base.slice()}];
+    p.material = T.material.map(function(t){ return {text:t, checked:false}; });
+    p.safety = T.safety.slice();
+    p.safetyRead = false;
+    p.obsRows = T.obsRows.map(function(l){ return {label:l, cells:["",""]}; });
+    if(!p.title || p.titleAuto){ p.title = T.title; p.titleAuto = true; }
+  }
+  function newProtocol(){
+    var p = {id:uid(), title:"", titleAuto:true, gruppe:"", datum:today(), frage:"", vermutung:"", weil:"", materialExtra:"", sketch:"", ergebnis:"", bestaetigt:"", schluss:"", fehler:""};
+    applyTemplate(p, "keimung");
+    store.protocols.push(p); store.current = p.id; save();
+    return p;
+  }
+
+  function ansatzName(p, idx){
+    if(p.ansaetze[idx].control) return "Kontrollansatz";
+    var n = 0; for(var i=0;i<idx;i++) if(!p.ansaetze[i].control) n++;
+    return "Versuchsansatz "+String.fromCharCode(65+n);
+  }
+  function activeFactors(p){ return p.factors.map(function(f,i){ return i; }).filter(function(i){ return (p.factors[i].name||"").trim() !== ""; }); }
+
+  function checkAnsaetze(p){
+    var ctrl = p.ansaetze[0], res = [], ok = true, act = activeFactors(p);
+    if(!act.length){ return {ok:false, msgs:[{type:"err", text:"Lege zuerst mindestens einen Faktor fest."}]}; }
+    p.ansaetze.forEach(function(a, i){
+      if(a.control) return;
+      var diff = act.filter(function(f){ return a.vals[f] !== ctrl.vals[f]; });
+      var name = ansatzName(p,i);
+      if(diff.length===0){ ok=false; res.push({type:"warn", text:name+" ist genauso wie der Kontrollansatz. Ändere genau einen Faktor."}); }
+      else if(diff.length===1){ var f=p.factors[diff[0]]; res.push({type:"ok", text:name+": Du veränderst nur den Faktor „"+f.name+"“ ("+f.opts[a.vals[diff[0]]]+" statt "+f.opts[ctrl.vals[diff[0]]]+"). Gut so!"}); }
+      else { ok=false; res.push({type:"err", text:name+": Du veränderst "+diff.length+" Faktoren ("+diff.map(function(d){ return p.factors[d].name; }).join(", ")+"). Dann weißt du am Ende nicht, welcher Faktor die Ursache war. Ändere nur einen."}); }
+    });
+    var keys = {};
+    p.ansaetze.forEach(function(a,i){ if(a.control) return; var k=act.map(function(f){ return a.vals[f]; }).join(","); if(keys[k]!==undefined) res.push({type:"info", text:ansatzName(p,i)+" ist genauso wie "+ansatzName(p,keys[k])+". Das ist eine Wiederholung. Damit kannst du prüfen, ob dein Ergebnis zuverlässig ist."}); else keys[k]=i; });
+    return {ok:ok, msgs:res};
+  }
+
+  function stepDone(p, i){
+    switch(i){
+      case 0: return !!p.title.trim();
+      case 1: return !!p.frage.trim() && !!p.vermutung.trim();
+      case 2: return checkAnsaetze(p).ok;
+      case 3: return !!p.safetyRead;
+      case 4: return !!p.sketch;
+      case 5: return p.obsRows.filter(function(r){ return r.cells.some(function(c){ return c.trim(); }); }).length >= 2;
+      case 6: return !!p.schluss.trim() && !!p.bestaetigt;
+      case 7: return [0,1,2,3,4,5,6].every(function(k){ return stepDone(p,k); });
+    }
+    return false;
+  }
+
+  /* --- Rendering --- */
+  function renderTop(){
+    var sel = $("protoSel"); sel.innerHTML = "";
+    store.protocols.forEach(function(p){
+      var o = document.createElement("option"); o.value = p.id;
+      o.textContent = (p.title||"Ohne Titel")+(p.gruppe?" ("+p.gruppe+")":"");
+      if(p.id===store.current) o.selected = true; sel.appendChild(o);
+    });
+    var p = cur(), ol = $("steps"); ol.innerHTML = "";
+    STEPS.forEach(function(s,i){
+      var li = document.createElement("li"), b = document.createElement("button");
+      b.type = "button"; b.className = stepDone(p,i) ? "done" : "";
+      if(i===step) b.setAttribute("aria-current","step");
+      b.innerHTML = '<span class="n">'+(i+1)+'</span>'+esc(s);
+      b.addEventListener("click", function(){ go(i); });
+      li.appendChild(b); ol.appendChild(li);
+    });
+    var cb = ol.querySelector('[aria-current="step"]'); if(cb){ var o=ol.getBoundingClientRect(), r=cb.getBoundingClientRect(); if(r.right>o.right||r.left<o.left) ol.scrollLeft += r.left-o.left-12; }
+    $("prevBtn").disabled = step===0;
+    $("nextBtn").textContent = step===STEPS.length-1 ? "Fertig" : "Weiter";
+    $("nextBtn").disabled = step===STEPS.length-1;
+  }
+  function refreshSteps(){ var p=cur(); var bs=$("steps").querySelectorAll("button"); bs.forEach(function(b,i){ b.classList.toggle("done", stepDone(p,i)); }); var o=$("protoSel").querySelector('option[value="'+p.id+'"]'); if(o) o.textContent=(p.title||"Ohne Titel")+(p.gruppe?" ("+p.gruppe+")":""); }
+  function go(i){ step = Math.max(0, Math.min(STEPS.length-1, i)); render(); var st=$("stage"); if(st.getBoundingClientRect().top<0) st.scrollIntoView({block:"start"}); }
+
+  function bindText(el, p, key, after){ el.value = p[key]||""; el.addEventListener("input", function(){ p[key] = el.value; if(key==="title") p.titleAuto=false; save(); refreshSteps(); if(after) after(); }); }
+
+  function field(label, inner, hint){ return '<div class="field"><label>'+label+'</label>'+inner+(hint?'<p class="hint">'+hint+'</p>':'')+'</div>'; }
+
+  function render(){
+    var p = cur(), st = $("stage");
+    renderTop();
+    var html = '<h2>'+(step+1)+'. '+esc(STEPS[step])+'</h2>';
+    switch(step){
+      case 0:
+        html += field('<label for="fTitle">Titel des Versuchs</label>','<input type="text" id="fTitle">');
+        html += field('<label for="fGruppe">Gruppe</label>','<input type="text" id="fGruppe" placeholder="z. B. Gruppe 3">','Bitte nur einen Gruppennamen eintragen, keine vollen Namen.');
+        html += field('<label for="fDatum">Datum</label>','<input type="date" id="fDatum">');
+        html += '<h3>Vorlage</h3><p class="hint">Aktuell: <b>'+esc(TEMPLATES[p.template].label)+'</b>. Eine neue Vorlage setzt Ansätze, Material und Beobachtungen zurück.</p><div class="tplchoice" role="radiogroup">';
+        Object.keys(TEMPLATES).forEach(function(k){ html += '<label><input type="radio" name="tpl" value="'+k+'"'+(k===p.template?' checked':'')+'><span><b>'+esc(TEMPLATES[k].label)+'</b><span class="hint">'+esc(TEMPLATES[k].desc)+'</span></span></label>'; });
+        html += '</div><button class="btn small" id="tplApply" type="button">Vorlage übernehmen</button>';
+        break;
+      case 1:
+        html += '<div class="box info">Eine Frage für einen Versuch kann man mit dem Versuch beantworten. Sie endet mit einem Fragezeichen.</div>';
+        html += field('<label for="fFrage">Meine Frage</label>','<textarea id="fFrage" rows="2"></textarea>'+(TEMPLATES[p.template].frageChips.length?'<div class="chips" id="frageChips"></div><p class="hint">Tippe eine Frage an, um sie zu übernehmen. Du kannst sie danach ändern.</p>':''));
+        html += field('<label for="fVerm">Ich vermute, dass …</label>','<textarea id="fVerm" rows="2"></textarea>');
+        html += field('<label for="fWeil">… weil …</label>','<textarea id="fWeil" rows="2"></textarea>','Begründe deine Vermutung mit dem, was du schon weißt.');
+        html += '<div id="frageCheck"></div>';
+        break;
+      case 2:
+        html += '<div class="box info"><b>Kontrollansatz:</b> Hier ist alles normal. Er ist dein Vergleich.<br><b>Versuchsansatz:</b> Hier änderst du <b>genau einen</b> Faktor. Alles andere bleibt gleich.</div>';
+        if(p.template==="eigen") html += '<h3>Faktoren festlegen</h3><p class="hint">Trage für jeden Faktor die normale Einstellung (Kontrolle) und die veränderte Einstellung ein.</p><div class="scroll"><table id="facEdit"></table></div><button class="btn small" id="addFac" type="button" style="margin-top:.5rem">+ Faktor</button><h3>Ansätze</h3>';
+        html += '<div class="scroll"><table id="ansTable"></table></div>';
+        html += '<div style="margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn small" id="addAns" type="button">+ Versuchsansatz</button></div>';
+        html += '<p class="hint">Gelb markiert: Hier unterscheidet sich der Ansatz vom Kontrollansatz.</p><div id="ansCheck"></div>';
+        break;
+      case 3:
+        html += '<h3>Material</h3><p class="hint">Hake ab, was du bereitgelegt hast.</p><div class="checklist" id="matList"></div>';
+        html += field('<label for="fMat">Weiteres Material</label>','<textarea id="fMat" rows="2"></textarea>');
+        html += '<h3>Sicherheit</h3><ul class="safety">'+p.safety.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join("")+'</ul>';
+        html += '<div class="box warn">Die Lehrkraft prüft vor dem Versuch die Gefährdungsbeurteilung nach den Vorgaben der Schule.</div>';
+        html += '<div class="checklist"><label><input type="checkbox" id="fSafe"'+(p.safetyRead?' checked':'')+'> Ich habe die Sicherheitshinweise gelesen und halte mich daran.</label></div>';
+        break;
+      case 4:
+        html += '<p>Zeichne deinen Versuchsaufbau. Zeichne alle Ansätze nebeneinander und beschrifte sie (z. B. „Kontrolle“, „A“).</p>';
+        html += '<div class="tools"><button class="btn small" type="button" data-tool="pen" aria-pressed="true">Stift</button><button class="btn small" type="button" data-tool="thick" aria-pressed="false">Dicker Stift</button><button class="btn small" type="button" data-tool="eraser" aria-pressed="false">Radierer</button><button class="btn small quiet" type="button" id="undoBtn">Rückgängig</button><button class="btn small danger" type="button" id="clearBtn">Alles löschen</button></div>';
+        html += '<div class="canvas-wrap"><canvas id="sketch" width="900" height="540" aria-label="Zeichenfläche für die Skizze"></canvas></div>';
+        html += '<p class="hint">Tipp: Skizzen sind einfach. Keine Farben, keine Schatten. Lieber klar beschriften.</p>';
+        break;
+      case 5:
+        html += '<p>Trage deine Beobachtungen für jeden Ansatz ein. Schreib kurz und genau, z. B. „keine Veränderung“ oder „Keimling 3 mm“.</p>';
+        html += '<div class="scroll"><table id="obsTable"></table></div>';
+        html += '<div style="margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn small" id="addRow" type="button">+ Zeile</button><button class="btn small quiet" id="delRow" type="button">Letzte Zeile entfernen</button></div>';
+        break;
+      case 6:
+        html += field('<label for="fErg">Ergebnis</label>','<textarea id="fErg" rows="3"></textarea>','Beschreibe, was du beobachtet hast. Vergleiche jeden Versuchsansatz mit dem Kontrollansatz.');
+        html += '<div class="field"><span class="lbl">Meine Vermutung wurde …</span><div class="radio-row" id="bestRow">'+["bestätigt","nicht bestätigt","teilweise bestätigt"].map(function(v){ return '<label><input type="radio" name="best" value="'+v+'"'+(p.bestaetigt===v?' checked':'')+'> '+v+'</label>'; }).join("")+'</div></div>';
+        html += field('<label for="fSchluss">Schlussfolgerung</label>','<textarea id="fSchluss" rows="3"></textarea><div class="chips" id="schlussChips"></div>','Beantworte deine Frage. Tippe einen Satzanfang an.');
+        html += field('<label for="fFehler">Fehlerquellen (freiwillig)</label>','<textarea id="fFehler" rows="2"></textarea>','Was könnte dein Ergebnis verfälscht haben?');
+        break;
+      case 7:
+        html += '<h3>Ist dein Protokoll vollständig?</h3><ul class="complete">'+[
+          [0,"Titel"],[1,"Frage und Vermutung"],[2,"Versuchsansätze richtig geplant"],[3,"Sicherheitshinweise gelesen"],[4,"Skizze"],[5,"Mindestens 2 Beobachtungen"],[6,"Ergebnis und Schlussfolgerung"]
+        ].map(function(x){ return '<li class="'+(stepDone(p,x[0])?"y":"")+'">'+x[1]+'</li>'; }).join("")+'</ul>';
+        html += '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0"><button class="btn primary" id="dlBtn" type="button">Protokoll herunterladen</button><button class="btn" id="printBtn" type="button">Drucken</button></div><div id="dlMsg" class="hint" aria-live="polite"></div>';
+        html += '<div class="doc" id="printArea">'+protocolBody(p)+'</div>';
+        break;
+    }
+    st.innerHTML = html;
+    wire(p);
+  }
+
+  function wire(p){
+    switch(step){
+      case 0:
+        bindText($("fTitle"),p,"title"); bindText($("fGruppe"),p,"gruppe"); bindText($("fDatum"),p,"datum");
+        $("tplApply").addEventListener("click", function(){
+          var k = (document.querySelector('input[name="tpl"]:checked')||{}).value; if(!k) return;
+          applyTemplate(p,k); save(); render();
+        });
+        break;
+      case 1:
+        bindText($("fFrage"),p,"frage",frageCheck); bindText($("fVerm"),p,"vermutung"); bindText($("fWeil"),p,"weil");
+        var fc = $("frageChips");
+        if(fc) TEMPLATES[p.template].frageChips.forEach(function(q){ var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=q; b.addEventListener("click",function(){ $("fFrage").value=q; p.frage=q; save(); refreshSteps(); frageCheck(); }); fc.appendChild(b); });
+        frageCheck();
+        break;
+      case 2: renderAnsaetze(p); break;
+      case 3:
+        var ml = $("matList");
+        if(!p.material.length) ml.innerHTML = '<p class="hint">Trage dein Material unten ein.</p>';
+        p.material.forEach(function(m){ var l=document.createElement("label"); var c=document.createElement("input"); c.type="checkbox"; c.checked=m.checked; c.addEventListener("change",function(){ m.checked=c.checked; save(); }); l.appendChild(c); l.appendChild(document.createTextNode(m.text)); ml.appendChild(l); });
+        bindText($("fMat"),p,"materialExtra");
+        $("fSafe").addEventListener("change", function(e){ p.safetyRead = e.target.checked; save(); refreshSteps(); });
+        break;
+      case 4: initSketch(p); break;
+      case 5: renderObs(p); break;
+      case 6:
+        bindText($("fErg"),p,"ergebnis"); bindText($("fSchluss"),p,"schluss"); bindText($("fFehler"),p,"fehler");
+        document.querySelectorAll('input[name="best"]').forEach(function(r){ r.addEventListener("change",function(){ p.bestaetigt=r.value; save(); refreshSteps(); }); });
+        var sc=$("schlussChips");
+        ["Der Faktor … ist für … notwendig.","Der Faktor … ist für … nicht notwendig.","Ohne … passiert … ."].forEach(function(t){ var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=t; b.addEventListener("click",function(){ var ta=$("fSchluss"); ta.value=(ta.value?ta.value.replace(/\s*$/," "):"")+t; p.schluss=ta.value; save(); refreshSteps(); ta.focus(); }); sc.appendChild(b); });
+        break;
+      case 7:
+        $("dlBtn").addEventListener("click", function(){ download(p); });
+        $("printBtn").addEventListener("click", function(){ try{ window.print(); } catch(e){ $("dlMsg").textContent="Drucken ist hier nicht möglich. Nutze „Protokoll herunterladen“."; } });
+        dlHint();
+        break;
+    }
+  }
+
+  function dlHint(){
+    var m=$("dlMsg"), b=$("dlBtn"); if(!m||!b) return;
+    if(dlState==="ready"){ b.style.display=""; if(m.textContent.indexOf("vorbereitet")>-1) m.textContent=""; }
+    else if(dlState==="pending"){ m.textContent="Herunterladen wird vorbereitet …"; }
+    else { b.style.display="none"; m.textContent="Herunterladen ist hier nicht verfügbar. Nutze „Drucken“ oder mache ein Bildschirmfoto."; }
+  }
+  function frageCheck(){
+    var p=cur(), box=$("frageCheck"); if(!box) return;
+    var f=(p.frage||"").trim();
+    if(!f){ box.innerHTML=""; return; }
+    box.innerHTML = /\?$/.test(f) ? '<div class="box ok">Deine Frage endet mit einem Fragezeichen.</div>' : '<div class="box warn">Eine Frage endet mit einem Fragezeichen.</div>';
+  }
+
+  function renderAnsaetze(p){
+    if(p.template==="eigen"){
+      var fe=$("facEdit"), h='<tr><th>Faktor</th><th>normal (Kontrolle)</th><th>verändert</th><th></th></tr>';
+      p.factors.forEach(function(f,i){ h+='<tr><td><input type="text" data-fi="'+i+'" data-k="name" value="'+esc(f.name)+'" placeholder="z. B. Wasser"></td><td><input type="text" data-fi="'+i+'" data-k="0" value="'+esc(f.opts[0])+'" placeholder="z. B. feucht"></td><td><input type="text" data-fi="'+i+'" data-k="1" value="'+esc(f.opts[1])+'" placeholder="z. B. trocken"></td><td>'+(p.factors.length>1?'<button class="x" type="button" data-delfac="'+i+'" aria-label="Faktor entfernen">×</button>':'')+'</td></tr>'; });
+      fe.innerHTML=h;
+      fe.querySelectorAll("input").forEach(function(inp){ inp.addEventListener("input",function(){ var f=p.factors[+inp.dataset.fi]; if(inp.dataset.k==="name") f.name=inp.value; else f.opts[+inp.dataset.k]=inp.value; save(); drawAnsTable(p); }); });
+      fe.querySelectorAll("[data-delfac]").forEach(function(b){ b.addEventListener("click",function(){ var i=+b.dataset.delfac; p.factors.splice(i,1); p.ansaetze.forEach(function(a){ a.vals.splice(i,1); }); save(); renderAnsaetze(p); }); });
+      $("addFac").disabled = p.factors.length>=5;
+      $("addFac").onclick=function(){ if(p.factors.length>=5) return; p.factors.push({name:"",opts:["",""]}); p.ansaetze.forEach(function(a){ a.vals.push(0); }); save(); renderAnsaetze(p); };
+    }
+    drawAnsTable(p);
+    $("addAns").disabled = p.ansaetze.length>=4;
+    $("addAns").onclick=function(){ if(p.ansaetze.length>=4) return; p.ansaetze.push({control:false, vals:p.ansaetze[0].vals.slice()}); p.obsRows.forEach(function(r){ r.cells.push(""); }); save(); renderAnsaetze(p); };
+  }
+
+  function drawAnsTable(p){
+    var t=$("ansTable"), act=activeFactors(p), ctrl=p.ansaetze[0], vers=p.ansaetze.filter(function(a){ return !a.control; }).length;
+    var h='<tr><th>Faktor</th>'+p.ansaetze.map(function(a,i){ return '<th><div class="ctrl-head"><span>'+ansatzName(p,i)+'</span>'+(!a.control&&vers>1?'<button class="x" type="button" data-delans="'+i+'" aria-label="'+ansatzName(p,i)+' entfernen">×</button>':'')+'</div></th>'; }).join("")+'</tr>';
+    act.forEach(function(fi){
+      var f=p.factors[fi];
+      h+='<tr><th scope="row">'+esc(f.name)+'</th>'+p.ansaetze.map(function(a,ai){
+        var changed=!a.control && a.vals[fi]!==ctrl.vals[fi];
+        return '<td class="'+(changed?"changed":"")+'"><select data-ai="'+ai+'" data-fi="'+fi+'" aria-label="'+esc(f.name)+', '+ansatzName(p,ai)+'">'+f.opts.map(function(o,oi){ return '<option value="'+oi+'"'+(a.vals[fi]===oi?' selected':'')+'>'+esc(o||("Einstellung "+(oi+1)))+'</option>'; }).join("")+'</select></td>';
+      }).join("")+'</tr>';
+    });
+    if(!act.length) h+='<tr><td colspan="'+(p.ansaetze.length+1)+'" class="hint">Trage oben mindestens einen Faktor mit Namen ein.</td></tr>';
+    t.innerHTML=h;
+    t.querySelectorAll("select").forEach(function(s){ s.addEventListener("change",function(){ p.ansaetze[+s.dataset.ai].vals[+s.dataset.fi]=+s.value; save(); drawAnsTable(p); refreshSteps(); }); });
+    t.querySelectorAll("[data-delans]").forEach(function(b){ b.addEventListener("click",function(){ var i=+b.dataset.delans; p.ansaetze.splice(i,1); p.obsRows.forEach(function(r){ r.cells.splice(i,1); }); save(); renderAnsaetze(p); refreshSteps(); }); });
+    var c=checkAnsaetze(p);
+    $("ansCheck").innerHTML = c.msgs.map(function(m){ return '<div class="box '+m.type+'">'+esc(m.text)+'</div>'; }).join("") + (c.ok?'<div class="box ok"><b>Alles richtig geplant.</b> Jeder Versuchsansatz unterscheidet sich in genau einem Faktor vom Kontrollansatz.</div>':'');
+  }
+
+  function renderObs(p){
+    var t=$("obsTable");
+    var h='<tr><th>Zeitpunkt</th>'+p.ansaetze.map(function(a,i){ return '<th>'+ansatzName(p,i)+'</th>'; }).join("")+'</tr>';
+    p.obsRows.forEach(function(r,ri){
+      h+='<tr><td><input type="text" data-ri="'+ri+'" data-c="label" value="'+esc(r.label)+'" aria-label="Zeitpunkt '+(ri+1)+'"></td>'+p.ansaetze.map(function(a,ci){ return '<td><input type="text" data-ri="'+ri+'" data-c="'+ci+'" value="'+esc(r.cells[ci]||"")+'" aria-label="'+esc(r.label)+', '+ansatzName(p,ci)+'"></td>'; }).join("")+'</tr>';
+    });
+    t.innerHTML=h;
+    t.querySelectorAll("input").forEach(function(inp){ inp.addEventListener("input",function(){ var r=p.obsRows[+inp.dataset.ri]; if(inp.dataset.c==="label") r.label=inp.value; else r.cells[+inp.dataset.c]=inp.value; save(); refreshSteps(); }); });
+    $("addRow").onclick=function(){ p.obsRows.push({label:"",cells:p.ansaetze.map(function(){ return ""; })}); save(); renderObs(p); };
+    $("delRow").onclick=function(){ if(p.obsRows.length>1){ p.obsRows.pop(); save(); renderObs(p); refreshSteps(); } };
+  }
+
+  /* --- Skizze --- */
+  function initSketch(p){
+    var cv=$("sketch"), ctx=cv.getContext("2d"), tool="pen", drawing=false, last=null, history=[];
+    function blank(){ ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,cv.width,cv.height); }
+    blank();
+    if(p.sketch){ var img=new Image(); img.onload=function(){ ctx.drawImage(img,0,0,cv.width,cv.height); }; img.src=p.sketch; }
+    function pos(e){ var r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*cv.width/r.width, y:(e.clientY-r.top)*cv.height/r.height}; }
+    function snapshot(){ try{ history.push(ctx.getImageData(0,0,cv.width,cv.height)); if(history.length>20) history.shift(); }catch(e){} }
+    function persist(){ try{ p.sketch=cv.toDataURL("image/png"); save(); refreshSteps(); }catch(e){} }
+    cv.addEventListener("pointerdown",function(e){ e.preventDefault(); cv.setPointerCapture(e.pointerId); snapshot(); drawing=true; last=pos(e); dot(last); });
+    cv.addEventListener("pointermove",function(e){ if(!drawing) return; var pt=pos(e); line(last,pt); last=pt; });
+    function end(){ if(!drawing) return; drawing=false; persist(); }
+    cv.addEventListener("pointerup",end); cv.addEventListener("pointercancel",end); cv.addEventListener("pointerleave",end);
+    function style(){ ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle= tool==="eraser"?"#ffffff":"#14223d"; ctx.fillStyle=ctx.strokeStyle; ctx.lineWidth= tool==="eraser"?28 : tool==="thick"?7:3; }
+    function line(a,b){ style(); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+    function dot(a){ style(); ctx.beginPath(); ctx.arc(a.x,a.y,ctx.lineWidth/2,0,Math.PI*2); ctx.fill(); }
+    document.querySelectorAll("[data-tool]").forEach(function(b){ b.addEventListener("click",function(){ tool=b.dataset.tool; document.querySelectorAll("[data-tool]").forEach(function(x){ x.setAttribute("aria-pressed",String(x===b)); }); }); });
+    $("undoBtn").addEventListener("click",function(){ var s=history.pop(); if(s){ ctx.putImageData(s,0,0); persist(); } });
+    $("clearBtn").addEventListener("click",function(){ snapshot(); blank(); p.sketch=""; save(); refreshSteps(); });
+  }
+
+  /* --- Protokoll --- */
+  function nl(s){ return esc(s).replace(/\n/g,"<br>"); }
+  function protocolBody(p){
+    var act=activeFactors(p), h='';
+    h+='<h2>Versuchsprotokoll: '+esc(p.title||"Ohne Titel")+'</h2><p class="meta">'+(p.gruppe?esc(p.gruppe)+", ":"")+esc(fmtDate(p.datum))+'</p>';
+    h+='<h3>1. Frage</h3><p>'+(nl(p.frage)||"–")+'</p>';
+    h+='<h3>2. Vermutung</h3><p>'+(p.vermutung?"Ich vermute, dass "+nl(p.vermutung):"–")+(p.weil?"<br>Begründung: "+nl(p.weil):"")+'</p>';
+    h+='<h3>3. Versuchsaufbau</h3><div style="overflow-x:auto"><table><tr><th>Faktor</th>'+p.ansaetze.map(function(a,i){ return '<th>'+ansatzName(p,i)+'</th>'; }).join("")+'</tr>'+act.map(function(fi){ var f=p.factors[fi]; return '<tr><th>'+esc(f.name)+'</th>'+p.ansaetze.map(function(a){ return '<td>'+esc(f.opts[a.vals[fi]])+'</td>'; }).join("")+'</tr>'; }).join("")+'</table></div>';
+    var mats=p.material.filter(function(m){ return m.checked; }).map(function(m){ return m.text; });
+    if(p.materialExtra.trim()) mats=mats.concat(p.materialExtra.split(/\n|,/).map(function(s){ return s.trim(); }).filter(Boolean));
+    h+='<p><b>Material:</b> '+(mats.length?esc(mats.join(", ")):"–")+'</p>';
+    h+='<p><b>Sicherheit:</b> '+esc(p.safety.join(" "))+'</p>';
+    h+='<p><b>Skizze:</b></p>'+(p.sketch?'<img src="'+p.sketch+'" alt="Skizze des Versuchsaufbaus">':'<p>–</p>');
+    h+='<h3>4. Beobachtung</h3><div style="overflow-x:auto"><table><tr><th>Zeitpunkt</th>'+p.ansaetze.map(function(a,i){ return '<th>'+ansatzName(p,i)+'</th>'; }).join("")+'</tr>'+p.obsRows.map(function(r){ return '<tr><td>'+esc(r.label)+'</td>'+p.ansaetze.map(function(a,ci){ return '<td>'+esc(r.cells[ci]||"")+'</td>'; }).join("")+'</tr>'; }).join("")+'</table></div>';
+    h+='<h3>5. Auswertung</h3><p><b>Ergebnis:</b> '+(nl(p.ergebnis)||"–")+'</p><p><b>Meine Vermutung wurde '+(esc(p.bestaetigt)||"…")+'.</b></p><p><b>Schlussfolgerung:</b> '+(nl(p.schluss)||"–")+'</p>'+(p.fehler.trim()?'<p><b>Fehlerquellen:</b> '+nl(p.fehler)+'</p>':'');
+    return h;
+  }
+  function fmtDate(d){ if(!d) return ""; var m=d.match(/^(\d{4})-(\d{2})-(\d{2})$/); return m? m[3]+"."+m[2]+"."+m[1] : d; }
+  function protocolDoc(p){
+    return '<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Versuchsprotokoll – '+esc(p.title)+'</title><style>body{font-family:Arial,Helvetica,sans-serif;color:#14223d;max-width:800px;margin:2rem auto;padding:0 1rem;line-height:1.5}h2,h3{color:#1d3a6b}table{border-collapse:collapse;width:100%;margin:.4rem 0}th,td{border:1px solid #9aa8c0;padding:.35rem .5rem;text-align:left;vertical-align:top}th{background:#eef2f8}img{max-width:100%;border:1px solid #9aa8c0}.meta{color:#56647d}</style></head><body>'+protocolBody(p)+'</body></html>';
+  }
+  function download(p){
+    var msg=$("dlMsg");
+    if(!downloads){ msg.textContent="Herunterladen ist hier nicht verfügbar. Nutze „Drucken“ oder mache ein Bildschirmfoto."; return; }
+    var name=("Versuchsprotokoll "+(p.title||"")+(p.gruppe?" "+p.gruppe:"")).trim().replace(/[\\\/:*?"<>|]+/g,"-")+".html";
+    msg.textContent="";
+    downloads.save({filename:name, data:protocolDoc(p)}).then(function(){ msg.textContent="Protokoll gespeichert. Du kannst die Datei öffnen und drucken."; })
+      .catch(function(err){ var c=err&&err.code; msg.textContent = c==="declined" ? "Speichern abgebrochen." : c==="rate_limited" ? "Bitte kurz warten und noch einmal tippen." : "Speichern ist hier nicht möglich. Nutze „Drucken“ oder mache ein Bildschirmfoto."; });
+  }
+
+  /* --- Steuerung --- */
+  $("protoSel").addEventListener("change",function(e){ store.current=e.target.value; save(); step=0; render(); });
+  $("newBtn").addEventListener("click",function(){ newProtocol(); step=0; render(); });
+  $("delBtn").addEventListener("click",function(){ $("delConfirm").classList.add("show"); $("delBtn").style.display="none"; });
+  $("delNo").addEventListener("click",function(){ $("delConfirm").classList.remove("show"); $("delBtn").style.display=""; });
+  $("delYes").addEventListener("click",function(){
+    store.protocols=store.protocols.filter(function(p){ return p.id!==store.current; });
+    if(!store.protocols.length) newProtocol(); store.current=store.protocols[0].id; save();
+    $("delConfirm").classList.remove("show"); $("delBtn").style.display=""; step=0; render();
+  });
+  $("prevBtn").addEventListener("click",function(){ go(step-1); });
+  $("nextBtn").addEventListener("click",function(){ go(step+1); });
+
+  load(); render();
+
+  // Auf der Schulseite: Protokoll direkt über den Browser herunterladen (die Datei bleibt auf dem Gerät)
+  downloads = { save: function(o){ var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([o.data],{type:(/\.csv$/i.test(o.filename)?"text/csv":/\.json$/i.test(o.filename)?"application/json":"text/html")+";charset=utf-8"})); a.download=o.filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },5000); return Promise.resolve(); } };
+  dlState = "ready"; dlHint();
+})();
+</script>
+</body>
+</html>

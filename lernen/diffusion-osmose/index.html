@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diffusion und Osmose am Zellmodell</title>
+<meta name="description" content="Diffusion und Osmose am Zellmodell: Teilchen, Erythrozyt, Pflanzenzelle, Kartoffelversuch, Meerwasser trinken und Spaltöffnungsmechanismus. Biologie Oberstufe.">
+<style>
+:root{
+  --bg:#E7F0F4; --panel:#FFFFFF; --panel-2:#EFF5F8; --ink:#10222E; --ink-soft:#4A6070; --line:#C5D6DF;
+  --paper:#FAFDFE; --grid-minor:#E1ECF1; --grid-major:#B9CFDA; --axis:#233845;
+  --stage:#06283D; --stage-2:#0B4163; --stage-ink:#E6F4FB; --stage-soft:#9CC3D9;
+  --water:#2E9BE0; --solute:#E8553F; --solute2:#C58A00; --cur:#1B5FA8; --ref:#6B7F8C; --s1:#E8553F; --s2:#1C9A74; --s3:#8A4FD0;
+  --wall:#6E8F2E; --vac:#B0447A; --rbc:#D94A4A; --stoma:#2E8B57;
+  --btn:#10222E; --btn-ink:#FFFFFF; --focus:#0B57D0; --accent:#F2B84B;
+  --good:#17693B; --good-bg:#DCF1E4; --bad:#A3241B; --bad-bg:#FBE0DC; --note:#6B4A00; --note-bg:#FFF2CF;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A141B; --panel:#122029; --panel-2:#192C38; --ink:#E6F2F8; --ink-soft:#A2BAC8; --line:#294050;
+    --paper:#0D1A22; --grid-minor:#162833; --grid-major:#29465A; --axis:#CBDDE8;
+    --stage:#04202F; --stage-2:#09334D;
+    --water:#5DB8F5; --solute:#FF8A73; --solute2:#F2B84B; --cur:#7DB8F5; --ref:#9DB2BF; --s1:#FF8A73; --s2:#4FD1A5; --s3:#B58CFF;
+    --wall:#9DBB4B; --vac:#D872A8; --stoma:#5CC48A; --btn:#E6F2F8; --btn-ink:#0A141B; --focus:#8AB4FF;
+    --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A141B; --panel:#122029; --panel-2:#192C38; --ink:#E6F2F8; --ink-soft:#A2BAC8; --line:#294050;
+  --paper:#0D1A22; --grid-minor:#162833; --grid-major:#29465A; --axis:#CBDDE8;
+  --stage:#04202F; --stage-2:#09334D;
+  --water:#5DB8F5; --solute:#FF8A73; --solute2:#F2B84B; --cur:#7DB8F5; --ref:#9DB2BF; --s1:#FF8A73; --s2:#4FD1A5; --s3:#B58CFF;
+  --wall:#9DBB4B; --vac:#D872A8; --stoma:#5CC48A; --btn:#E6F2F8; --btn-ink:#0A141B; --focus:#8AB4FF;
+  --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; font-variant-numeric:tabular-nums; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1280px; margin:0 auto; padding:16px clamp(12px,3vw,28px) 6px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.6rem,4.8vw,2.4rem); line-height:1.1; margin:0; letter-spacing:-.015em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:72ch; }
+.tabs{ max-width:1280px; margin:6px auto 0; padding:0 clamp(12px,3vw,28px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em .95em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.wrap{ max-width:1280px; margin:0 auto; padding:12px clamp(12px,3vw,28px) 24px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.2rem; margin:0 0 8px; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.02rem; margin:12px 0 4px; }
+.lead{ margin:0 0 10px; max-width:72ch; }
+.note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.45em .95em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn[aria-pressed="true"]{ background:var(--btn); color:var(--btn-ink); border-color:var(--btn); }
+.seg{ display:flex; border:2px solid var(--line); border-radius:10px; overflow:hidden; margin:6px 0; }
+.seg button{ flex:1; min-width:0; border:0; background:var(--panel); padding:.35em .4em; font-weight:700; font-size:.88rem; line-height:1.2; cursor:pointer; min-height:46px; }
+.seg button+button{ border-left:2px solid var(--line); }
+.seg button[aria-pressed="true"]{ background:var(--btn); color:var(--btn-ink); }
+.txtin, input[type=number], select{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+label.fl{ display:block; font-weight:700; font-size:.92rem; color:var(--ink-soft); margin:8px 0 3px; }
+.chk{ display:flex; gap:10px; align-items:center; min-height:44px; cursor:pointer; font-weight:700; }
+.chk input{ width:22px; height:22px; accent-color:var(--btn); }
+
+/* Raster */
+.pgrid{ display:grid; grid-template-columns:minmax(0,1fr); gap:14px; align-items:start; }
+.pgrid .left{ display:contents; }
+.viz{ order:1; position:sticky; top:env(safe-area-inset-top,0px); z-index:30; padding:8px 10px; margin-bottom:0; }
+.ctlcard{ order:2; margin-bottom:0; } .more{ order:3; margin-bottom:0; }
+@media (min-width:1000px){
+  .pgrid{ grid-template-columns:minmax(0,1fr) 410px; }
+  .pgrid .left{ display:flex; flex-direction:column; gap:14px; }
+  .viz,.ctlcard,.more{ order:0; } .viz{ top:calc(env(safe-area-inset-top,0px) + 8px); padding:12px 14px; }
+}
+.vhead{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; }
+.vhead b{ font-family:var(--display); font-size:1rem; }
+.mini-btn{ border:0; background:none; font-weight:700; cursor:pointer; min-height:44px; min-width:44px; padding:0 6px; }
+.viz.collapsed .stagebox,.viz.collapsed .legend{ display:none; }
+.viz.collapsed .mini-btn span{ display:inline-block; transform:rotate(180deg); }
+.stagebox{ background:radial-gradient(120% 100% at 50% 40%,var(--stage-2) 0%,var(--stage) 80%); border-radius:12px; overflow:hidden; color:var(--stage-ink); }
+.stagebox svg, .stagebox canvas{ display:block; width:100%; height:auto; }
+.plot{ border-radius:10px; overflow:hidden; background:var(--paper); border:1px solid var(--line); }
+.plot svg{ display:block; width:100%; height:auto; }
+.legend{ display:flex; flex-wrap:wrap; gap:2px 12px; margin:6px 0 0; padding:0; list-style:none; font-size:.76rem; line-height:1.3; color:var(--ink-soft); }
+.legend li{ display:flex; align-items:center; gap:6px; }
+.legend i{ display:inline-block; width:14px; height:14px; border-radius:50%; }
+.legend i.ln{ width:20px; height:0; border-radius:0; border-top:3px solid; }
+.legend i.dash{ border-top-style:dashed; }
+@media (min-width:700px){ .legend{ font-size:.82rem; } }
+.strip{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-top:6px; }
+.stat{ background:var(--panel-2); border-radius:10px; padding:3px 8px; display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
+.stat span{ font-size:.74rem; color:var(--ink-soft); line-height:1.2; }
+.stat b{ font-family:var(--display); font-size:.95rem; white-space:nowrap; }
+.stat{ min-width:0; flex-wrap:wrap; }
+@media (min-width:700px){ .stat{ display:block; padding:6px 10px; } .stat span{ display:block; font-size:.78rem; } .stat b{ font-size:1.15rem; } }
+
+/* SVG-Klassen */
+.gm{ stroke:var(--grid-minor); stroke-width:.7; } .gM{ stroke:var(--grid-major); stroke-width:1.1; }
+.tk{ font-size:15px; fill:var(--ink-soft); } .al{ font-size:16px; fill:var(--ink); font-weight:700; }
+.c-cur{ fill:none; stroke:var(--cur); stroke-width:3.6; stroke-linecap:round; stroke-linejoin:round; }
+.c-ref{ fill:none; stroke:var(--ref); stroke-width:2.2; stroke-dasharray:7 5; }
+.c-1{ fill:none; stroke:var(--s1); stroke-width:3; stroke-linecap:round; } .c-2{ fill:none; stroke:var(--s2); stroke-width:3; stroke-linecap:round; } .c-3{ fill:none; stroke:var(--s3); stroke-width:3; stroke-linecap:round; }
+.lbl{ font-size:15px; font-weight:700; fill:var(--ink); paint-order:stroke; stroke:var(--paper); stroke-width:4px; }
+.pt{ fill:var(--cur); stroke:var(--paper); stroke-width:2.5; }
+
+/* Regler */
+.ctl{ padding:8px 0 10px; border-top:1px solid var(--line); }
+.ctl:first-of-type{ border-top:0; }
+.ctl-head{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.ctl-head label{ font-weight:700; display:flex; gap:8px; align-items:center; }
+.dotc{ width:12px; height:12px; border-radius:50%; background:var(--c,var(--ink-soft)); flex:none; }
+.ctl output{ font-family:var(--display); font-weight:800; font-size:1.05rem; white-space:nowrap; }
+.ctl input[type=range]{ width:100%; height:44px; margin:2px 0; accent-color:var(--c,var(--btn)); background:transparent; }
+.ctl-desc{ margin:0; font-size:.86rem; color:var(--ink-soft); }
+.ctlcard h2{ font-family:var(--display); font-weight:800; font-size:1.1rem; margin:0 0 6px; }
+.status{ background:var(--panel-2); border-left:6px solid var(--accent); border-radius:10px; padding:8px 12px; margin:8px 0; }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--good-bg); color:var(--good); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--note-bg); color:var(--note); }
+table.t{ width:100%; border-collapse:collapse; font-size:.95rem; margin:8px 0; }
+table.t th, table.t td{ text-align:right; padding:6px 8px; border-bottom:1px solid var(--line); }
+table.t th:first-child, table.t td:first-child{ text-align:left; }
+table.t th{ font-size:.82rem; color:var(--ink-soft); }
+.calc{ background:var(--panel-2); border-radius:12px; padding:8px 14px; margin:8px 0; font-size:.98rem; }
+.calc p{ margin:4px 0; }
+.eq{ font-family:var(--display); font-weight:700; }
+.two{ display:grid; gap:14px; grid-template-columns:minmax(0,1fr); }
+@media (min-width:900px){ .two{ grid-template-columns:1fr 1fr; align-items:start; } }
+.two .card{ margin-bottom:0; }
+.steps{ list-style:none; padding:0; margin:6px 0; display:grid; gap:6px; counter-reset:s; }
+.steps li{ counter-increment:s; display:flex; gap:10px; align-items:flex-start; padding:7px 10px; border-radius:10px; background:var(--panel-2); font-size:.93rem; opacity:.55; }
+.steps li::before{ content:counter(s); flex:none; width:1.6em; height:1.6em; border-radius:50%; display:grid; place-items:center; background:var(--line); font-weight:700; font-size:.85rem; }
+.steps li.on{ opacity:1; box-shadow:inset 4px 0 0 var(--accent); }
+.steps li.on::before{ background:var(--accent); color:#3A2A00; }
+
+/* Aufgaben */
+details.task{ border-top:1px solid var(--line); padding:8px 0; }
+details.task summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:10px; }
+details.task .badge{ flex:none; font-size:.8rem; font-weight:700; border-radius:99px; padding:2px 10px; background:var(--panel-2); border:1px solid var(--line); }
+details.task p{ margin:6px 0; max-width:75ch; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+details.task ul{ margin:4px 0 0; padding-left:1.2em; }
+details.teacher{ max-width:1280px; margin:0 auto 40px; padding:0 clamp(12px,3vw,28px); }
+details.teacher > .inner{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:6px 16px 14px; }
+details.teacher summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; }
+details.teacher li, details.teacher p{ font-size:.95rem; max-width:80ch; }
+details.teacher h3{ font-family:var(--display); font-size:1.02rem; margin:12px 0 4px; }
+@media (prefers-reduced-motion:reduce){ *{ scroll-behavior:auto !important; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Diffusion und Osmose am Zellmodell</h1>
+  <p>Biologie Oberstufe, Stofftransport. Teilchenbewegung beobachten, Zellen in Lösungen legen, einen Kartoffelversuch auswerten, Meerwasser trinken (im Modell) und den Mechanismus der Spaltöffnung nachvollziehen.</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab" role="tab" data-tab="dif" aria-selected="true">Diffusion</button>
+  <button type="button" class="tab" role="tab" data-tab="cell" aria-selected="false">Zellmodell</button>
+  <button type="button" class="tab" role="tab" data-tab="pot" aria-selected="false">Kartoffelversuch</button>
+  <button type="button" class="tab" role="tab" data-tab="sea" aria-selected="false">Meerwasser</button>
+  <button type="button" class="tab" role="tab" data-tab="sto" aria-selected="false">Spaltöffnung</button>
+  <button type="button" class="tab" role="tab" data-tab="task" aria-selected="false">Aufgaben</button>
+</nav>
+
+<main class="wrap">
+<!-- Diffusion -->
+<section id="pane-dif">
+  <div class="pgrid">
+    <div class="left">
+      <div class="card viz" id="vizDif">
+        <div class="vhead"><b>Teilchenmodell mit Membran</b><button type="button" class="mini-btn" data-collapse="vizDif" aria-label="Ansicht einklappen"><span aria-hidden="true">▲</span></button></div>
+        <div class="stagebox"><canvas id="difCv" width="600" height="300" role="img" aria-label="Zufällig bewegte Teilchen links und rechts einer Membran"></canvas></div>
+        <ul class="legend" id="legDif"></ul>
+        <div class="strip" id="stripDif"></div>
+      </div>
+      <div class="card more" id="moreDif"></div>
+    </div>
+    <div class="card ctlcard" id="ctlDif"></div>
+  </div>
+</section>
+
+<!-- Zellmodell -->
+<section id="pane-cell" hidden>
+  <div class="pgrid">
+    <div class="left">
+      <div class="card viz" id="vizCell">
+        <div class="vhead"><b id="cellTitle">Zellmodell</b><button type="button" class="mini-btn" data-collapse="vizCell" aria-label="Ansicht einklappen"><span aria-hidden="true">▲</span></button></div>
+        <div class="stagebox"><svg id="cellSvg" viewBox="0 0 600 340" role="img" aria-label="Zelle in einer Lösung"></svg></div>
+        <ul class="legend" id="legCell"></ul>
+        <div class="strip" id="stripCell"></div>
+      </div>
+      <div class="card more" id="moreCell"></div>
+    </div>
+    <div class="card ctlcard" id="ctlCell"></div>
+  </div>
+</section>
+
+<!-- Kartoffelversuch -->
+<section id="pane-pot" hidden>
+  <div class="pgrid">
+    <div class="left">
+      <div class="card viz" id="vizPot">
+        <div class="vhead"><b>Massenänderung der Kartoffelstreifen</b><button type="button" class="mini-btn" data-collapse="vizPot" aria-label="Diagramm einklappen"><span aria-hidden="true">▲</span></button></div>
+        <div class="stagebox" style="background:none"><div class="plot" id="plotPot"></div></div>
+        <ul class="legend" id="legPot"></ul>
+        <div class="strip" id="stripPot"></div>
+      </div>
+      <div class="card more" id="morePot"></div>
+    </div>
+    <div class="card ctlcard" id="ctlPot"></div>
+  </div>
+</section>
+
+<!-- Meerwasser -->
+<section id="pane-sea" hidden>
+  <div class="card" id="seaA"></div>
+  <div class="card" id="seaB"></div>
+</section>
+
+<!-- Spaltöffnung -->
+<section id="pane-sto" hidden>
+  <div class="pgrid">
+    <div class="left">
+      <div class="card viz" id="vizSto">
+        <div class="vhead"><b>Spaltöffnung mit Schließzellen (Aufsicht)</b><button type="button" class="mini-btn" data-collapse="vizSto" aria-label="Ansicht einklappen"><span aria-hidden="true">▲</span></button></div>
+        <div class="stagebox"><svg id="stoSvg" viewBox="0 0 600 300" role="img" aria-label="Zwei Schließzellen um eine Spaltöffnung"></svg></div>
+        <div class="strip" id="stripSto"></div>
+      </div>
+      <div class="card more" id="moreSto"></div>
+    </div>
+    <div class="card ctlcard" id="ctlSto"></div>
+  </div>
+</section>
+
+<!-- Aufgaben -->
+<section id="pane-task" hidden>
+  <div class="card">
+    <h2>Aufgaben</h2>
+    <p class="note" style="margin-top:0">„Versuch einrichten“ stellt die Simulation passend ein. Die Lösungshinweise sind aufklappbar.</p>
+    <div id="taskList"></div>
+  </div>
+</section>
+</main>
+
+<details class="teacher">
+  <summary>Hinweise für die Lehrkraft</summary>
+  <div class="inner">
+    <h3>Modellannahmen und Vereinfachungen</h3>
+    <ul>
+      <li>Diffusion: Zufallsbewegung (Brownsche Bewegung) in zwei Kammern. Die Teilchen sind stark vereinfacht (kein Lösungsmittel dargestellt). Die Membran lässt je nach Einstellung alle, nur kleine oder keine Teilchen durch.</li>
+      <li>Diffusionszeit: t = x² / (2D) als eindimensionale Näherung in Wasser bei etwa 25 °C. D (Sauerstoff) = 2,0·10⁻⁹ m²/s, D (Glucose) = 0,67·10⁻⁹ m²/s, D (Hämoglobin) = 7·10⁻¹¹ m²/s. Das sind gerundete Lehrbuchwerte.</li>
+      <li>Zellmodell: ideale Lösungen nach van-’t-Hoff (π = c·R·T bei 20 °C, 2,44 MPa je mol/L Teilchen). Wasserfluss ∝ (π<sub>innen</sub> − π<sub>außen</sub> − Turgor). Die Konzentrationen sind in Osmol/L (Teilchenkonzentration) angegeben. 0,30 Osmol/L entspricht etwa 0,9 % NaCl oder 0,30 mol/L Saccharose.</li>
+      <li>Erythrozyt: 40 % des Volumens sind osmotisch inaktiv (Hämoglobin und Membranstruktur). Die Zelle platzt ab etwa dem 1,6-fachen Volumen. Pflanzenzelle: elastische Zellwand, Turgordruck steigt linear mit der Volumenzunahme.</li>
+      <li>Kartoffelversuch: Die Zellen verhalten sich wie das Pflanzenzellmodell. Die Massenänderung berücksichtigt, dass nur etwa 30 % der Masse auf das Zellvolumen zurückgehen. Messfehler sind zufällig zugefügt.</li>
+      <li>Meerwasser: 70-kg-Mensch, Gesamtkörperwasser 42 L (28 L intrazellulär, 14 L extrazellulär), Osmolalität 290 mOsm/kg, Mindestmenge an auszuscheidenden Teilchen 600 mOsm pro Tag. Das Modell ist vereinfacht und vernachlässigt unter anderem Wasserverluste über Haut und Atmung, Durchfall und hormonelle Regelung (ADH).</li>
+      <li>Spaltöffnung: Die Zahlenwerte (K⁺-Konzentration, Turgor, Porenweite) sind schematisch. Der Zusammenhang aus Licht, CO₂ und Abscisinsäure ist qualitativ nachgebildet.</li>
+    </ul>
+    <h3>Einsatz und Anforderungsbereiche</h3>
+    <ul>
+      <li>Die Aufgaben sind mit Anforderungsbereichen (I bis III) und Operatoren gekennzeichnet. Die Lösungshinweise können als Erwartungshorizont dienen. Punktezuteilung und Notengebung liegen in deiner Verantwortung und folgen den Fachkonferenzbeschlüssen.</li>
+      <li>Vorschlag für 90 Minuten: Diffusion (20 Minuten), Zellmodell mit Erythrozyt und Pflanzenzelle (30 Minuten), Kartoffelversuch (20 Minuten), Spaltöffnung oder Meerwasser (20 Minuten).</li>
+      <li>Differenzierung: Unterstützung mit Diffusion und Zellmodell (nur Pflanzenzelle). Erweiterung mit Wasserpotenzial, Fehlerdiskussion beim Kartoffelversuch, Meerwasser und Spaltöffnung (CAM-Pflanze).</li>
+    </ul>
+    <h3>Typische Fehlvorstellungen</h3>
+    <ul>
+      <li>„Bei der Osmose bewegt sich das Salz.“ Bei einer semipermeablen Membran, die nur Wasser durchlässt, wandert Wasser.</li>
+      <li>„Im Gleichgewicht hört die Bewegung auf.“ Die Teilchen bewegen sich weiter (dynamisches Gleichgewicht), es gibt nur keinen Nettotransport mehr.</li>
+      <li>„Pflanzenzellen platzen in Wasser.“ Die Zellwand begrenzt die Volumenzunahme, es entsteht Turgor.</li>
+      <li>„Hypertonisch heißt, die Zelle hat mehr Salz.“ Die Begriffe beziehen sich auf die Außenlösung im Vergleich zur Zelle.</li>
+      <li>„Diffusion ist immer schnell.“ Sie ist nur auf kurzen Strecken schnell.</li>
+    </ul>
+    <h3>Hinweise</h3>
+    <p>Die Zuordnung zum Kerncurriculum Niedersachsen und zu den Zentralabitur-Vorgaben bitte auf nibis.de prüfen. Meerwasser nicht trinken: Das Beispiel dient nur der Modellierung. Die Seite speichert keine Daten.</p>
+  </div>
+</details>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const fmt=(x,d=2)=>Number(x).toFixed(d).replace('.',',');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ r=r||Math.random; let u=0; while(u===0) u=r(); const v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+
+/* ---------- Zustand ---------- */
+const S={tab:'dif',
+ dif:{n:160,T:50,pm:.6,mem:'semi',init:'left',trail:false,run:true,t:0,ps:[],h:[],trailPts:[],lx:-5},
+ cell:{type:'rbc',co:.15,ci:.30,ei:1,V:1,t:0,run:false,hist:[[0,1]],lysed:false,speed:2},
+ pot:{series:'std',ct:.28,seed:5,data:null,guess:'',shown:false},
+ sea:{type:'sea',sal:35,vol:1,umax:1200,org:'mf',env:'sea'},
+ sto:{plant:'c3',mode:'manual',light:70,ci:40,aba:0,dry:0,hour:12,cur:0}};
+const get=k=>k.split('.').reduce((o,x)=>o[x],S);
+const set=(k,v)=>{ const a=k.split('.'), last=a.pop(); a.reduce((o,x)=>o[x],S)[last]=v; };
+const SPEC={
+ 'dif.n':{l:'Anzahl der Teilchen',min:20,max:300,step:10,f:v=>v,c:'--water'},
+ 'dif.T':{l:'Temperatur (relativ)',min:10,max:100,step:5,f:v=>v+' %',c:'--solute',d:'Höhere Temperatur bedeutet schnellere Teilchenbewegung.'},
+ 'dif.pm':{l:'Durchlässigkeit der Membran',min:.05,max:1,step:.05,f:v=>fmt(v,2),c:'--s3',d:'Wahrscheinlichkeit, dass ein passendes Teilchen beim Aufprall durch die Membran gelangt.'},
+ 'dif.lx':{l:'Strecke x (Zehnerlogarithmus in m)',min:-6,max:0,step:.05,f:v=>distFmt(Math.pow(10,v)),c:'--solute2'},
+ 'cell.co':{l:'Konzentration der Außenlösung',min:0,max:.6,step:.01,f:v=>fmt(v,2)+' Osmol/L',c:'--water'},
+ 'cell.ci':{l:'Konzentration im Schlauch',min:0,max:.6,step:.01,f:v=>fmt(v,2)+' Osmol/L',c:'--solute'},
+ 'cell.ei':{l:'Dehnbarkeit der Hülle',min:0,max:4,step:1,f:v=>['sehr dehnbar','dehnbar','begrenzt','Zellwand','starr'][v],c:'--wall',d:'Je starrer die Hülle, desto stärker steigt der Druck.'},
+ 'cell.speed':{l:'Zeitraffer',min:1,max:6,step:1,f:v=>'× '+v,c:'--ref'},
+ 'sea.sal':{l:'Salzgehalt des Getränks',min:0,max:45,step:.5,f:v=>fmt(v,1)+' ‰',c:'--water',d:'Meerwasser: etwa 35 ‰ (35 g Salz je kg).'},
+ 'sea.vol':{l:'Getrunkene Menge',min:.1,max:2,step:.1,f:v=>fmt(v,1)+' L',c:'--solute'},
+ 'sea.umax':{l:'Maximale Konzentration des Harns',min:500,max:1400,step:50,f:v=>v+' mOsm/L',c:'--s3',d:'Die menschliche Niere schafft etwa 1200 mOsm/L.'},
+ 'sto.light':{l:'Licht (Blaulichtanteil)',min:0,max:100,step:5,f:v=>v+' %',c:'--solute2'},
+ 'sto.ci':{l:'CO₂ in den Interzellularen',min:0,max:100,step:5,f:v=>v+' %',c:'--stoma',d:'Hoher CO₂-Gehalt fördert das Schließen.'},
+ 'sto.aba':{l:'Trockenstress (Abscisinsäure)',min:0,max:100,step:5,f:v=>v+' %',c:'--solute'},
+ 'sto.dry':{l:'Bodentrockenheit',min:0,max:100,step:5,f:v=>v+' %',c:'--solute'},
+ 'sto.hour':{l:'Uhrzeit',min:0,max:24,step:.5,f:v=>fmt(v,1)+' Uhr',c:'--water'}
+};
+function slHTML(k){ const s=SPEC[k]; return `<div class="ctl" style="--c:var(${s.c})"><div class="ctl-head"><label for="i_${k}"><span class="dotc"></span>${s.l}</label><output id="o_${k}"></output></div><input type="range" data-k="${k}" id="i_${k}" min="${s.min}" max="${s.max}" step="${s.step}">${s.d?`<p class="ctl-desc">${s.d}</p>`:''}</div>`; }
+function syncInputs(root){ $$('input[data-k]',root).forEach(el=>{ const k=el.dataset.k, v=get(k); if(el.type==='checkbox') el.checked=!!v; else el.value=v; const o=$('#o_'+k); if(o&&SPEC[k]) o.textContent=SPEC[k].f(+v); }); }
+function segHTML(id,opts,cur,label){ return `<div class="seg" id="${id}" role="group" aria-label="${label}">${opts.map(o=>`<button type="button" data-v="${o[0]}" aria-pressed="${o[0]===cur}">${o[1]}</button>`).join('')}</div>`; }
+function setSeg(id,cur){ $$('#'+id+' button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===cur)); }
+
+/* ---------- Diagrammbausteine ---------- */
+const CW=600,CH=330,ML=64,MR=16,MT=16,MB=54,PW=CW-ML-MR,PHT=CH-MT-MB;
+const niceCeil=v=>{ const e=Math.pow(10,Math.floor(Math.log10(v))), m=v/e; return (m<=1?1:m<=1.2?1.2:m<=1.5?1.5:m<=2?2:m<=2.5?2.5:m<=3?3:m<=4?4:m<=5?5:m<=6?6:m<=8?8:10)*e; };
+const tickStep=max=>{ const raw=max/5, e=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/e; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*e; };
+const decOf=s=>(Math.abs(s-Math.round(s))<1e-9?0:(Math.abs(s*10-Math.round(s*10))<1e-9?1:2));
+function axes(o){
+  const X=v=>ML+(v-o.x0)/(o.x1-o.x0)*PW, Y=v=>MT+PHT-(v-o.y0)/(o.y1-o.y0)*PHT;
+  let g=`<rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}" fill="var(--paper)"/>`;
+  const dy=decOf(o.ys), dx=decOf(o.xs);
+  for(let k=Math.ceil(o.x0/(o.xs/5)-1e-9); k*(o.xs/5)<=o.x1+1e-9; k++){ const v=k*o.xs/5; g+=`<line class="gm" x1="${X(v).toFixed(1)}" x2="${X(v).toFixed(1)}" y1="${MT}" y2="${MT+PHT}"/>`; }
+  for(let k=Math.ceil(o.x0/o.xs-1e-9); k*o.xs<=o.x1+1e-9; k++){ const v=k*o.xs; g+=`<line class="gM" x1="${X(v).toFixed(1)}" x2="${X(v).toFixed(1)}" y1="${MT}" y2="${MT+PHT}"/><text class="tk" x="${X(v).toFixed(1)}" y="${MT+PHT+19}" text-anchor="middle">${fmt(v,dx)}</text>`; }
+  for(let k=Math.ceil(o.y0/(o.ys/5)-1e-9); k*(o.ys/5)<=o.y1+1e-9; k++){ const v=k*o.ys/5; g+=`<line class="gm" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" x1="${ML}" x2="${ML+PW}"/>`; }
+  for(let k=Math.ceil(o.y0/o.ys-1e-9); k*o.ys<=o.y1+1e-9; k++){ const v=k*o.ys; g+=`<line class="gM" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" x1="${ML}" x2="${ML+PW}"/><text class="tk" x="${ML-8}" y="${(Y(v)+5).toFixed(1)}" text-anchor="end">${fmt(v,dy)}</text>`; }
+  if(o.y0<0) g+=`<line y1="${Y(0)}" y2="${Y(0)}" x1="${ML}" x2="${ML+PW}" stroke="var(--axis)" stroke-width="1.6"/>`;
+  g+=`<rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}" fill="none" stroke="var(--axis)" stroke-width="1.6"/>`;
+  g+=`<text class="al" x="${ML+PW/2}" y="${CH-10}" text-anchor="middle">${o.xl}</text><text class="al" transform="translate(17 ${MT+PHT/2}) rotate(-90)" text-anchor="middle">${o.yl}</text>`;
+  return {X,Y,g};
+}
+const svgO=label=>`<svg viewBox="0 0 ${CW} ${CH}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(label)}"><defs><clipPath id="cpx"><rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}"/></clipPath></defs>`;
+const pathOf=(ax,pts)=>pts.map((p,i)=>(i?'L':'M')+ax.X(p[0]).toFixed(1)+' '+ax.Y(p[1]).toFixed(1)).join(' ');
+function distFmt(m){ if(m<1e-3) return fmt(m*1e6,m*1e6<10?1:0)+' µm'; if(m<1) return fmt(m*1e3,m*1e3<10?1:0)+' mm'; return fmt(m,2)+' m'; }
+function timeFmt(t){ if(t<1e-3) return fmt(t*1e6,0)+' µs'; if(t<1) return fmt(t*1e3,1)+' ms'; if(t<60) return fmt(t,1)+' s'; if(t<3600) return fmt(t/60,1)+' min'; if(t<86400) return fmt(t/3600,1)+' h'; if(t<31557600) return fmt(t/86400,1)+' Tage'; return fmt(t/31557600,1)+' Jahre'; }
+
+/* =============== 1 DIFFUSION =============== */
+const DW=600,DH=300,DM=300;
+$('#ctlDif').innerHTML=`<h2>Versuchsaufbau</h2>${slHTML('dif.n')}${slHTML('dif.T')}${slHTML('dif.pm')}
+ <label class="fl">Membran</label>${segHTML('segMem',[['open','durchlässig'],['semi','selektiv'],['closed','dicht']],S.dif.mem,'Membran')}
+ <p class="note" style="margin-top:0">Selektiv: nur kleine Teilchen (blau) passen durch, große (orange) nicht.</p>
+ <label class="fl">Anfangsverteilung</label>${segHTML('segInit',[['left','alle links'],['both','gemischt']],S.dif.init,'Anfangsverteilung')}
+ <label class="chk"><input type="checkbox" data-k="dif.trail"> Spur eines Teilchens zeigen</label>
+ <div class="btnrow"><button type="button" class="btn primary" id="difRun">Pause</button><button type="button" class="btn" id="difReset">Neu starten</button></div>`;
+function difInit(){
+  const d=S.dif, nl=Math.round(d.n*.3); d.ps=[];
+  for(let i=0;i<d.n;i++){ d.ps.push({x:d.init==='left'?8+Math.random()*(DM-16):8+Math.random()*(DW-16),y:8+Math.random()*(DH-16),a:Math.random()*6.283,L:i<nl}); }
+  d.t=0; d.h=[]; d.trailPts=[]; difSample(); difRender();
+}
+function difFrac(){ let sl=0,ss=0,ll=0,ls=0; S.dif.ps.forEach(p=>{ if(p.L){ ls++; if(p.x<DM) ll++; } else { ss++; if(p.x<DM) sl++; } }); return {s:ss?sl/ss:0.5,l:ls?ll/ls:0.5,ns:ss,nl:ls}; }
+function difSample(){ const f=difFrac(); S.dif.h.push([S.dif.t,f.s,f.l]); }
+function difStep(){
+  const d=S.dif, k=Math.sqrt(d.T/50);
+  d.ps.forEach((p,i)=>{
+    const sp=(p.L?3.2:5.2)*k; p.a+=gauss()*.9;
+    let nx=p.x+Math.cos(p.a)*sp, ny=p.y+Math.sin(p.a)*sp;
+    if(nx<5||nx>DW-5){ p.a=Math.PI-p.a; nx=clamp(nx,5,DW-5); }
+    if(ny<5||ny>DH-5){ p.a=-p.a; ny=clamp(ny,5,DH-5); }
+    if((p.x<DM)!==(nx<DM)){
+      const ok=d.mem==='open'||(d.mem==='semi'&&!p.L);
+      if(!(ok&&Math.random()<d.pm)){ nx=p.x; p.a=Math.PI-p.a; }
+    }
+    p.x=nx; p.y=ny;
+    if(i===0&&d.trail){ d.trailPts.push([nx,ny]); if(d.trailPts.length>260) d.trailPts.shift(); }
+  });
+  d.t+=.05;
+  const last=d.h[d.h.length-1]; if(d.t-last[0]>=1) difSample();
+}
+function difRender(){
+  const d=S.dif, cv=$('#difCv'), ctx=cv.getContext('2d');
+  const cs=getComputedStyle(document.documentElement), water=cs.getPropertyValue('--water').trim()||'#2E9BE0', sol=cs.getPropertyValue('--solute').trim()||'#E8553F';
+  ctx.clearRect(0,0,DW,DH);
+  ctx.fillStyle='rgba(93,184,245,.10)'; ctx.fillRect(0,0,DM,DH); ctx.fillStyle='rgba(93,184,245,.05)'; ctx.fillRect(DM,0,DM,DH);
+  ctx.lineWidth=5; ctx.strokeStyle='#B9A5F5';
+  if(d.mem==='closed'){ ctx.beginPath(); ctx.moveTo(DM,0); ctx.lineTo(DM,DH); ctx.stroke(); }
+  else { ctx.setLineDash(d.mem==='open'?[10,26]:[16,8]); ctx.beginPath(); ctx.moveTo(DM,0); ctx.lineTo(DM,DH); ctx.stroke(); ctx.setLineDash([]); }
+  if(d.trail&&d.trailPts.length>1){ ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.lineWidth=1.6; ctx.beginPath(); d.trailPts.forEach((q,i)=>{ i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]); }); ctx.stroke(); }
+  d.ps.forEach((p,i)=>{ ctx.fillStyle=p.L?'#FF8A65':'#5CC8FF'; ctx.beginPath(); ctx.arc(p.x,p.y,p.L?6.5:3.6,0,6.283); ctx.fill(); if(i===0&&d.trail){ ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(p.x,p.y,p.L?9.5:7,0,6.283); ctx.stroke(); } });
+  const f=difFrac();
+  ctx.fillStyle='rgba(230,244,251,.85)'; ctx.font='bold 15px sans-serif'; ctx.textAlign='left'; ctx.fillText('links',10,22); ctx.textAlign='right'; ctx.fillText('rechts',DW-10,22);
+  $('#legDif').innerHTML='<li><i style="background:#5CC8FF"></i>kleine Teilchen (zum Beispiel Wasser, O₂)</li><li><i style="background:#FF8A65"></i>große Teilchen (zum Beispiel Zucker, Farbstoff)</li>';
+  $('#stripDif').innerHTML=`<div class="stat"><span>klein links</span><b>${fmt(f.s*100,0)} %</b></div><div class="stat"><span>groß links</span><b>${S.dif.mem==='closed'&&false?'':fmt(f.l*100,0)+' %'}</b></div><div class="stat"><span>Zeit</span><b>${fmt(d.t,0)}</b></div>`;
+}
+function difChart(){
+  const d=S.dif, tmax=niceCeil(Math.max(60,d.t*1.05)), ax=axes({x0:0,x1:tmax,y0:0,y1:1,xs:tickStep(tmax),ys:.25,xl:'Zeit (Modelleinheiten)',yl:'Anteil der Teilchen links'});
+  let s=svgO('Anteil der Teilchen in der linken Kammer über der Zeit')+ax.g+'<g clip-path="url(#cpx)">';
+  s+=`<line x1="${ML}" x2="${ML+PW}" y1="${ax.Y(.5)}" y2="${ax.Y(.5)}" stroke="var(--ref)" stroke-width="2" stroke-dasharray="3 5"/>`;
+  s+=`<path class="c-cur" d="${pathOf(ax,d.h.map(h=>[h[0],h[1]]))}"/><path class="c-1" d="${pathOf(ax,d.h.map(h=>[h[0],h[2]]))}"/></g>`;
+  return s+`<text class="lbl" x="${ML+PW-8}" y="${ax.Y(.5)-8}" text-anchor="end">gestrichelt: 50 %</text></svg>`;
+}
+function difMore(){
+  const dx=Math.pow(10,S.dif.lx);
+  const subs=[['O₂',2.0e-9,'Sauerstoff'],['Glc',0.67e-9,'Glucose'],['Hb',7e-11,'Hämoglobin']];
+  let rows=subs.map(s=>`<tr><td>${s[2]} (D = ${s[1].toExponential(1).replace('e-','·10⁻').replace('.',',')} m²/s)</td><td>${timeFmt(dx*dx/(2*s[1]))}</td></tr>`).join('');
+  $('#moreDif').innerHTML=`<h2>Anteil links über der Zeit</h2><div class="plot">${difChart()}</div><ul class="legend"><li><i class="ln" style="border-color:var(--cur)"></i>kleine Teilchen</li><li><i class="ln" style="border-color:var(--s1)"></i>große Teilchen</li></ul>
+   <div class="status" id="difMsg"></div>
+   <h2 style="margin-top:14px">Wie lange dauert Diffusion?</h2>
+   <p class="lead">Die Zeit wächst mit dem Quadrat der Strecke: t ≈ x² / (2D). Stelle die Strecke ein.</p>
+   <div id="fickCtl">${slHTML('dif.lx')}</div>
+   <table class="t"><tr><th>Stoff</th><th>Diffusionszeit über ${distFmt(dx)}</th></tr>${rows}</table>
+   <p class="note">Über eine Zellbreite (10 µm) dauert es Bruchteile einer Sekunde, über 1 m viele Jahre. Deshalb brauchen große Lebewesen Transportsysteme wie den Blutkreislauf, und Zellen sind klein. Werte: Wasser, etwa 25 °C, gerundet.</p>`;
+  syncInputs($('#fickCtl'));
+  const f=difFrac(), m=$('#difMsg'); let txt;
+  if(S.dif.mem==='closed') txt='<b>Dichte Membran:</b> Es findet kein Austausch statt.';
+  else if(Math.abs(f.s-.5)<.06&&(S.dif.mem==='open'?Math.abs(f.l-.5)<.08:true)) txt='<b>Dynamisches Gleichgewicht:</b> Auf beiden Seiten befindet sich etwa gleich viel. Die Teilchen bewegen sich weiter, nur der Nettotransport ist null.';
+  else txt=S.dif.mem==='semi'?'<b>Selektive Membran:</b> Die kleinen Teilchen gleichen sich aus, die großen bleiben auf ihrer Seite.':'<b>Diffusion:</b> Die Teilchen verteilen sich durch zufällige Bewegung, bis es links und rechts gleich viele gibt. Es gibt kein Ziel und keine Kraft.';
+  m.innerHTML=txt;
+}
+let difLast=0;
+function difLoop(ts){
+  requestAnimationFrame(difLoop);
+  if(S.tab!=='dif') return;
+  if(S.dif.run){ for(let i=0;i<4;i++) difStep(); }
+  difRender();
+  if(ts-difLast>500){ difLast=ts; difMore(); }
+}
+$('#segMem').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.dif.mem=b.dataset.v; setSeg('segMem',S.dif.mem); });
+$('#segInit').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.dif.init=b.dataset.v; setSeg('segInit',S.dif.init); difInit(); });
+$('#difRun').addEventListener('click',function(){ S.dif.run=!S.dif.run; this.textContent=S.dif.run?'Pause':'Weiter'; });
+$('#difReset').addEventListener('click',difInit);
+
+/* =============== 2 ZELLMODELL =============== */
+const RT=2.436, KW=.4;
+const CT={rbc:{nm:'Erythrozyt (tierische Zelle)',Vb:.4,lysis:1.6},plant:{nm:'Pflanzenzelle (Zwiebel)',Vb:0,eps:6},bag:{nm:'Dialyseschlauch (Modell)',Vb:0}};
+const EPSL=[.1,.6,2,6,25];
+const RPD=(()=>{ let s=987654; const r=()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; return Array.from({length:600},()=>[r(),r()]); })();
+function cellP(){ const c=S.cell, t=CT[c.type], ci=c.type==='bag'?c.ci:.30, eps=c.type==='bag'?EPSL[c.ei]:(c.type==='plant'?t.eps:0); return {Vb:t.Vb,eps,lysis:t.lysis||null,ci,n:ci*(1-t.Vb)}; }
+const piIn=(V,P)=>RT*P.n/Math.max(.02,V-P.Vb);
+const turgor=(V,P)=>P.eps*Math.max(0,V-1);
+function cellEq(co,P){ let lo=P.Vb+.02, hi=12; for(let k=0;k<80;k++){ const m=(lo+hi)/2, f=piIn(m,P)-RT*co-turgor(m,P); if(f>0) lo=m; else hi=m; } return (lo+hi)/2; }
+function cellStep(dt){ const c=S.cell, P=cellP(); if(c.lysed) return; const f=piIn(c.V,P)-RT*c.co-turgor(c.V,P); c.V=clamp(c.V+KW*f*dt,P.Vb+.03,12); c.t+=dt; if(P.lysis&&c.V>=P.lysis){ c.V=P.lysis; c.lysed=true; } c.hist.push([c.t,c.V]); if(c.hist.length>1500) c.hist.splice(1,1); }
+$('#ctlCell').innerHTML=`<h2>Versuch</h2><label class="fl">Zelltyp</label>${segHTML('segCell',[['rbc','Erythrozyt'],['plant','Pflanzenzelle'],['bag','Schlauch']],S.cell.type,'Zelltyp')}
+ ${slHTML('cell.co')}
+ <div class="btnrow" style="margin-top:0"><button type="button" class="btn" data-co="0">Wasser</button><button type="button" class="btn" data-co="0.15">halb so konzentriert</button><button type="button" class="btn" data-co="0.3">isotonisch</button><button type="button" class="btn" data-co="0.5">stark konzentriert</button></div>
+ <p class="note" id="cellConv"></p>
+ <div id="bagCtl">${slHTML('cell.ci')}${slHTML('cell.ei')}</div>
+ ${slHTML('cell.speed')}
+ <div class="btnrow"><button type="button" class="btn primary" id="cellRun">Start</button><button type="button" class="btn" id="cellEq">Gleichgewicht</button><button type="button" class="btn" id="cellRes">Neu einsetzen</button></div>`;
+function cellReset(){ const c=S.cell; c.V=1; c.t=0; c.hist=[[0,1]]; c.lysed=false; c.run=false; $('#cellRun').textContent='Start'; }
+function cellDots(n,fn){ let s=''; for(let i=0;i<n;i++){ const q=RPD[i], p=fn(q,i); if(p) s+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${p[2]||3}" fill="${p[3]}" opacity=".9"/>`; } return s; }
+function cellScene(){
+  const c=S.cell, P=cellP(), V=c.V, CX=300, CY=170, f=piIn(V,P)-RT*c.co-turgor(V,P);
+  let s=`<rect x="14" y="14" width="572" height="312" rx="16" fill="rgba(93,184,245,.16)" stroke="rgba(230,244,251,.45)" stroke-width="3"/>`;
+  let box; // Ausschlussrechteck für Außenteilchen
+  let shape='', inner='';
+  if(c.type==='rbc'){
+    const r=60*Math.pow(V,.42); box=[CX-r-14,CY-r-14,CX+r+14,CY+r+14];
+    if(c.lysed){
+      shape=`<circle cx="${CX}" cy="${CY}" r="${(60*Math.pow(1.6,.42)).toFixed(1)}" fill="none" stroke="#FF9A9A" stroke-width="3" stroke-dasharray="6 6"/>`+cellDots(70,(q,i)=>{ const a=q[0]*6.283, d=20+q[1]*100; return [CX+Math.cos(a)*d,CY+Math.sin(a)*d,3.5,'#E04848']; })+`<text x="${CX}" y="${CY+4}" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">Hämolyse</text>`; box=[CX-125,CY-125,CX+125,CY+125];
+    } else if(V<.88){
+      const N=18, amp=(.88-V)*70, pts=[]; for(let k=0;k<N*2;k++){ const a=Math.PI*k/N, rr=r+(k%2?amp:0); pts.push((CX+rr*Math.cos(a)).toFixed(1)+','+(CY+rr*Math.sin(a)).toFixed(1)); }
+      shape=`<polygon points="${pts.join(' ')}" fill="#D94A4A" stroke="#7E1F1F" stroke-width="2.5" stroke-linejoin="round"/>`; box=[CX-r-amp-14,CY-r-amp-14,CX+r+amp+14,CY+r+amp+14];
+      inner=cellDots(Math.round(P.n*100),(q)=>{ const a=q[0]*6.283, d=r*.75*Math.sqrt(q[1]); return [CX+Math.cos(a)*d,CY+Math.sin(a)*d,3,'#FFE0D0']; });
+    } else {
+      const dm=clamp((1.5-V)/.5,0,1);
+      shape=`<circle cx="${CX}" cy="${CY}" r="${r.toFixed(1)}" fill="#D94A4A" stroke="#7E1F1F" stroke-width="3"/><ellipse cx="${CX}" cy="${CY}" rx="${(r*.5*dm).toFixed(1)}" ry="${(r*.5*dm).toFixed(1)}" fill="#B73A3A" opacity=".7"/>`;
+      inner=cellDots(Math.round(P.n*100),(q)=>{ const a=q[0]*6.283, d=r*.82*Math.sqrt(q[1]); return [CX+Math.cos(a)*d,CY+Math.sin(a)*d,3,'#FFE0D0']; });
+    }
+  } else if(c.type==='plant'){
+    const W0=250,H0=150, ws=1+Math.max(0,V-1)*.8, W=W0*ws, H=H0*ws, ps=V>=1?1:Math.sqrt(V), pw=(W-12)*ps, ph=(H-12)*ps;
+    box=[CX-W/2-18,CY-H/2-18,CX+W/2+18,CY+H/2+18];
+    const k=clamp((1-V)/.5,0,1), vacCol=`rgb(${Math.round(215-60*k)},${Math.round(150-90*k)},${Math.round(190-70*k)})`;
+    shape=`<rect x="${(CX-W/2).toFixed(1)}" y="${(CY-H/2).toFixed(1)}" width="${W.toFixed(1)}" height="${H.toFixed(1)}" rx="12" fill="rgba(93,184,245,.18)" stroke="var(--wall)" stroke-width="10"/>
+      <rect x="${(CX-pw/2).toFixed(1)}" y="${(CY-ph/2).toFixed(1)}" width="${pw.toFixed(1)}" height="${ph.toFixed(1)}" rx="${(12*ps).toFixed(1)}" fill="#7DB36A" stroke="#3E6E3A" stroke-width="3"/>
+      <rect x="${(CX-pw/2+9*ps).toFixed(1)}" y="${(CY-ph/2+9*ps).toFixed(1)}" width="${(pw-18*ps).toFixed(1)}" height="${(ph-18*ps).toFixed(1)}" rx="${(8*ps).toFixed(1)}" fill="${vacCol}"/>
+      <circle cx="${(CX-pw/2+16*ps).toFixed(1)}" cy="${(CY-ph/2+16*ps).toFixed(1)}" r="${(7*ps).toFixed(1)}" fill="#2F5D2C"/>`;
+    inner=cellDots(Math.round(P.n*100),(q)=>[CX-pw/2+14*ps+q[0]*(pw-28*ps),CY-ph/2+14*ps+q[1]*(ph-28*ps),2.8,'#FFF1E8']);
+    if(V<1) shape+=`<text x="${CX}" y="${CY+H/2+34}" text-anchor="middle" font-size="15" font-weight="700" fill="#E6F4FB">Plasmolyse: Protoplast löst sich von der Zellwand</text>`;
+  } else {
+    const vv=Math.min(V,3.2), w=170*Math.sqrt(vv), h=100*Math.sqrt(vv);
+    box=[CX-w/2-16,CY-h/2-16,CX+w/2+16,CY+h/2+16];
+    shape=`<rect x="${(CX-w/2).toFixed(1)}" y="${(CY-h/2).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="${(Math.min(h/2,40)).toFixed(1)}" fill="rgba(255,240,200,.30)" stroke="#E8D8A8" stroke-width="5"/><circle cx="${(CX-w/2-5).toFixed(1)}" cy="${CY}" r="7" fill="#E8D8A8"/><circle cx="${(CX+w/2+5).toFixed(1)}" cy="${CY}" r="7" fill="#E8D8A8"/>`;
+    inner=cellDots(Math.round(P.n*100),(q)=>[CX-w/2+10+q[0]*(w-20),CY-h/2+10+q[1]*(h-20),3,'#FF8A65']);
+  }
+  const nOut=Math.round(c.co*300);
+  const out=cellDots(Math.min(nOut,300),(q,i)=>{ const x=30+q[0]*540, y=30+q[1]*280; if(x>box[0]&&x<box[2]&&y>box[1]&&y<box[3]) return null; return [x,y,3,'#FF8A65']; });
+  let arrows='';
+  if(!c.lysed&&Math.abs(f)>.01){
+    const len=clamp(Math.abs(f)*45,26,50), dir=f>0?1:-1;
+    const mk=(x,y,dx,dy)=>{ const x0=dir>0?x-dx*len:x, y0=dir>0?y-dy*len:y, x2=dir>0?x:x+dx*len, y2=dir>0?y:y+dy*len; const sx=dir>0?x0:x, sy=dir>0?y0:y, ex=dir>0?x:x2, ey=dir>0?y:y2; return `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="#7FD4FF" stroke-width="5" stroke-linecap="round" marker-end="url(#ah)"/>`; };
+    arrows=mk(CX,box[1],0,1)+mk(CX,box[3],0,-1)+mk(box[0],CY,1,0)+mk(box[2],CY,-1,0);
+  }
+  return `<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7FD4FF"/></marker></defs>`+s+out+shape+inner+arrows;
+}
+function cellRender(){
+  const c=S.cell, P=cellP(), V=c.V, Pt=turgor(V,P), pii=piIn(V,P), eq=cellEq(c.co,P);
+  $('#cellTitle').textContent=CT[c.type].nm; $('#cellSvg').innerHTML=cellScene();
+  $('#legCell').innerHTML=`<li><i style="background:#FF8A65"></i>gelöste Teilchen (können die Membran nicht passieren)</li><li><i class="ln" style="border-color:#7FD4FF"></i>Wasserstrom</li>`;
+  $('#stripCell').innerHTML=`<div class="stat"><span>Volumen</span><b>${fmt(V,2)}×</b></div><div class="stat"><span>${c.type==='bag'?'Masse':'Turgor'}</span><b>${c.type==='bag'?(V>=1?'+':'')+fmt((V-1)*100,0)+' %':fmt(Pt,2)+' MPa'}</b></div><div class="stat"><span>Zeit</span><b>${fmt(c.t,0)} min</b></div>`;
+  const rel=c.co<P.ci*.97?'hypotonisch':(c.co>P.ci*1.03?'hypertonisch':'isotonisch');
+  const f=piIn(V,P)-RT*c.co-turgor(V,P), settled=Math.abs(f)<.01;
+  let state='';
+  if(c.type==='rbc'){ const lysisEq=eq>=CT.rbc.lysis; state=c.lysed?'Die Zelle ist geplatzt (Hämolyse). Die Zellmembran hält die Volumenzunahme nicht aus.':(V<.88?'Die Zelle ist geschrumpft und hat eine Stechapfelform (Krenation).':(V>1.15?'Die Zelle ist angeschwollen und fast kugelig.':'Die Zelle hat ihre normale Form (Scheibe mit Delle).'));
+    if(!c.lysed&&lysisEq) state+=' Im Gleichgewicht wäre das Volumen größer als das 1,6-Fache: Die Zelle würde platzen.'; }
+  else if(c.type==='plant'){ state=V<.995?'Plasmolyse: Der Protoplast schrumpft und löst sich von der Zellwand.':(Pt>.05?`Turgeszenz: Die Zellwand hält gegen. Der Turgordruck beträgt ${fmt(Pt,2)} MPa.`:'Grenzplasmolyse: Der Protoplast liegt gerade noch an der Wand an.'); }
+  else { state=V>1.02?'Der Schlauch nimmt Wasser auf und wird schwerer.':(V<.98?'Der Schlauch verliert Wasser und wird leichter.':'Kaum Veränderung.'); }
+  const cn=c.co*2.922, cs=c.co;
+  $('#cellConv').textContent=`Entspricht etwa ${fmt(cn,2)} % NaCl-Lösung oder ${fmt(cs,2)} mol/L Saccharose. Die Außenlösung ist ${rel} gegenüber ${c.type==='bag'?'dem Schlauchinhalt':'der Zelle'}.`;
+  // Wasserpotenzial
+  const ps=-pii, pp=Pt, pin=ps+pp, pout=-RT*c.co, mn=-2, mx=1.2, W=PW+40;
+  const X=v=>ML+(v-mn)/(mx-mn)*PW, bar=(label,v,col,y)=>`<text class="tk" x="8" y="${y+15}">${label}</text><rect x="${Math.min(X(0),X(v)).toFixed(1)}" y="${y}" width="${Math.abs(X(v)-X(0)).toFixed(1)}" height="22" rx="4" fill="${col}"/><text class="lbl" x="${(v<0?X(v)-6:X(v)+6).toFixed(1)}" y="${y+16}" text-anchor="${v<0?'end':'start'}">${fmt(v,2)}</text>`;
+  const psi=`<svg viewBox="0 0 ${CW} 220" role="img" aria-label="Wasserpotenzial innen und außen"><rect x="${ML}" y="6" width="${PW}" height="200" fill="var(--paper)"/><line x1="${X(0)}" x2="${X(0)}" y1="6" y2="206" stroke="var(--axis)" stroke-width="2"/>${[-2,-1.5,-1,-.5,.5,1].map(v=>`<line class="gm" x1="${X(v)}" x2="${X(v)}" y1="6" y2="206"/><text class="tk" x="${X(v)}" y="218" text-anchor="middle">${fmt(v,1)}</text>`).join('')}${bar('Ψ außen',pout,'var(--water)',14)}${bar('Ψs innen',ps,'var(--solute)',58)}${bar('Ψp innen',pp,'var(--wall)',102)}${bar('Ψ innen',pin,'var(--cur)',146)}</svg>`;
+  const showMore=`<h2>Volumen über der Zeit</h2><div class="plot">${cellChart(eq,P)}</div><ul class="legend"><li><i class="ln" style="border-color:var(--cur)"></i>relatives Volumen</li><li><i class="ln dash" style="border-color:var(--ref)"></i>Gleichgewicht</li></ul>
+    <div class="status">${state}</div>
+    <h3>Wasserpotenzial in MPa</h3><div class="plot">${psi}</div><p class="note">Ψ = Ψs + Ψp. Wasser strömt zum niedrigeren (negativeren) Wasserpotenzial. Im Gleichgewicht sind Ψ innen und Ψ außen gleich. Ψs = −π (Saugkraft durch gelöste Teilchen), Ψp = Druck.</p>`;
+  $('#moreCell').innerHTML=showMore;
+  $('#bagCtl').hidden=c.type!=='bag';
+  syncInputs($('#ctlCell')); setSeg('segCell',c.type);
+}
+function cellChart(eq,P){
+  const c=S.cell, tmax=niceCeil(Math.max(30,c.t*1.1)), vm=niceCeil(Math.max(1.8,eq*1.1,...c.hist.map(h=>h[1]))*1.05);
+  const ax=axes({x0:0,x1:tmax,y0:0,y1:vm,xs:tickStep(tmax),ys:tickStep(vm),xl:'Zeit (min, Zeitraffer)',yl:'relatives Volumen V / V₀'});
+  let s=svgO('Verlauf des relativen Zellvolumens')+ax.g+'<g clip-path="url(#cpx)">';
+  s+=`<line x1="${ML}" x2="${ML+PW}" y1="${ax.Y(1)}" y2="${ax.Y(1)}" stroke="var(--grid-major)" stroke-width="2"/>`;
+  if(P.lysis) s+=`<line x1="${ML}" x2="${ML+PW}" y1="${ax.Y(P.lysis)}" y2="${ax.Y(P.lysis)}" stroke="var(--solute)" stroke-width="2" stroke-dasharray="6 4"/><text class="lbl" x="${ML+8}" y="${ax.Y(P.lysis)-6}">Platzen</text>`;
+  s+=`<line class="c-ref" x1="${ML}" x2="${ML+PW}" y1="${ax.Y(Math.min(eq,vm))}" y2="${ax.Y(Math.min(eq,vm))}"/><path class="c-cur" d="${pathOf(ax,c.hist)}"/></g>`;
+  return s+'</svg>';
+}
+function cellLoop(){
+  const c=S.cell; if(S.tab==='cell'&&c.run&&!c.lysed){ for(let i=0;i<c.speed;i++) cellStep(.05); const P=cellP(), f=piIn(c.V,P)-RT*c.co-turgor(c.V,P); if(Math.abs(f)<.004||c.t>120){ c.run=false; $('#cellRun').textContent='Start'; } cellRender(); }
+  requestAnimationFrame(cellLoop);
+}
+$('#segCell').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.cell.type=b.dataset.v; cellReset(); cellRender(); });
+$('#ctlCell').addEventListener('click',e=>{
+  const p=e.target.closest('[data-co]'); if(p){ S.cell.co=+p.dataset.co; cellRender(); return; }
+  if(e.target.closest('#cellRun')){ const c=S.cell; if(c.lysed) return; c.run=!c.run; $('#cellRun').textContent=c.run?'Pause':'Start'; return; }
+  if(e.target.closest('#cellEq')){ const c=S.cell, P=cellP(); let guard=0; while(guard++<4000){ const f=piIn(c.V,P)-RT*c.co-turgor(c.V,P); if(Math.abs(f)<.003||c.lysed) break; cellStep(.05); } c.run=false; $('#cellRun').textContent='Start'; cellRender(); return; }
+  if(e.target.closest('#cellRes')){ cellReset(); cellRender(); }
+});
+
+/* =============== 3 KARTOFFELVERSUCH =============== */
+$('#ctlPot').innerHTML=`<h2>Versuchsreihe</h2><p class="lead" style="font-size:.95rem">Kartoffelstreifen liegen 60 Minuten in Saccharoselösungen verschiedener Konzentration. Die Massenänderung zeigt, bei welcher Konzentration die Zellen weder Wasser aufnehmen noch abgeben (isotonischer Punkt).</p>
+ <label class="fl">Konzentrationsreihe</label>${segHTML('segPot',[['std','0 bis 0,6 mol/L'],['fine','fein, 0,20 bis 0,36']],S.pot.series,'Reihe')}
+ <div class="btnrow"><button type="button" class="btn primary" id="potRun">Versuch durchführen</button><button type="button" class="btn" id="potNew">Neue Kartoffel</button></div>
+ <h3>Auswertung</h3><label class="fl" for="potGuess">Deine Schätzung der isotonischen Konzentration (mol/L)</label><input type="number" class="txtin" id="potGuess" min="0" max="1" step="0.01" placeholder="zum Beispiel 0,25">
+ <div class="btnrow"><button type="button" class="btn" id="potCheck">Schätzung prüfen</button><button type="button" class="btn" id="potShow">Interpolation zeigen</button></div><div id="potFb" aria-live="polite"></div>`;
+function potConcs(){ return S.pot.series==='std'?[0,.1,.2,.3,.4,.5,.6]:[.20,.22,.24,.26,.28,.30,.32,.34,.36]; }
+function potRun(){
+  const p=S.pot, r=mulberry32(p.seed), P={Vb:0,eps:6,n:p.ct}; const cs=potConcs();
+  p.data=cs.map(c=>{ const V=cellEq(c,P), dm=100*.3*(V-1)+gauss(r)*.6; return {c,dm}; }); p.shown=false; potRender();
+}
+function potInterp(){ const d=S.pot.data; if(!d) return null; for(let i=0;i<d.length-1;i++){ if(d[i].dm>=0&&d[i+1].dm<0){ const a=d[i],b=d[i+1]; return a.c+(0-a.dm)*(b.c-a.c)/(b.dm-a.dm); } } return null; }
+function potRender(){
+  const p=S.pot, d=p.data; if(!d){ $('#plotPot').innerHTML='<p class="note" style="padding:20px">Starte den Versuch.</p>'; $('#stripPot').innerHTML=''; $('#morePot').innerHTML='<h2>Messwerte</h2><p class="note">Noch keine Messung.</p>'; return; }
+  const cs=d.map(x=>x.c), x0=cs[0], x1=cs[cs.length-1], span=x1-x0, ys=[...d.map(x=>x.dm)], ymax=niceCeil(Math.max(5,...ys.map(Math.abs))*1.15);
+  const ax=axes({x0:x0-span*.03,x1:x1+span*.03,y0:-ymax,y1:ymax,xs:p.series==='std'?.1:.04,ys:tickStep(ymax),xl:'Saccharosekonzentration (mol/L)',yl:'Massenänderung (%)'});
+  let s=svgO('Massenänderung der Kartoffelstreifen über der Konzentration')+ax.g+`<line x1="${ML}" x2="${ML+PW}" y1="${ax.Y(0)}" y2="${ax.Y(0)}" stroke="var(--axis)" stroke-width="2.2"/>`;
+  s+=`<path class="c-cur" d="${pathOf(ax,d.map(x=>[x.c,x.dm]))}"/>`+d.map(x=>`<circle class="pt" cx="${ax.X(x.c).toFixed(1)}" cy="${ax.Y(x.dm).toFixed(1)}" r="6"/>`).join('');
+  const ip=potInterp();
+  if(p.shown&&ip!==null) s+=`<line x1="${ax.X(ip)}" x2="${ax.X(ip)}" y1="${MT}" y2="${MT+PHT}" stroke="var(--s1)" stroke-width="2.5" stroke-dasharray="6 4"/><text class="lbl" x="${ax.X(ip)+8}" y="${MT+22}" fill="var(--s1)">≈ ${fmt(ip,2)}</text>`;
+  $('#plotPot').innerHTML=s+'</svg>';
+  $('#legPot').innerHTML='<li><i class="ln" style="border-color:var(--cur)"></i>Messwerte</li>'+(p.shown?'<li><i class="ln dash" style="border-color:var(--s1)"></i>Nulldurchgang durch lineare Interpolation</li>':'');
+  $('#stripPot').innerHTML=`<div class="stat"><span>Messpunkte</span><b>${d.length}</b></div><div class="stat"><span>max. Zunahme</span><b>${fmt(Math.max(...ys),1)} %</b></div><div class="stat"><span>max. Abnahme</span><b>${fmt(Math.min(...ys),1)} %</b></div>`;
+  $('#morePot').innerHTML=`<h2>Messwerte</h2><table class="t"><tr><th>c (mol/L)</th><th>Δm (%)</th><th>Beobachtung</th></tr>${d.map(x=>`<tr><td>${fmt(x.c,2)}</td><td>${(x.dm>0?'+':'')+fmt(x.dm,1)}</td><td>${x.dm>.8?'Streifen quillt, wird fest':(x.dm<-.8?'Streifen schrumpft, wird schlaff':'ungefähr unverändert')}</td></tr>`).join('')}</table>
+   <div class="status">Bei Konzentrationen unterhalb des isotonischen Punkts ist die Lösung hypotonisch: Wasser strömt in die Zellen, die Masse steigt. Oberhalb ist sie hypertonisch: Wasser strömt aus den Zellen, die Masse sinkt (Plasmolyse). Am Nullpunkt entspricht die Konzentration der Außenlösung dem Zellsaft.</div>
+   <h3>Fehlerquellen</h3><ul class="note"><li>Anhaftende Lösung beim Abtrocknen: Streifen unterschiedlich stark abtupfen.</li><li>Unterschiedliche Streifengröße oder Kartoffelsorte.</li><li>Verdunstung der Lösung, zu kurze oder unterschiedliche Einwirkzeit.</li><li>Messgenauigkeit der Waage. Eine Messreihe mit Wiederholungen verringert den Einfluss.</li></ul>`;
+}
+$('#segPot').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.pot.series=b.dataset.v; setSeg('segPot',S.pot.series); potRun(); });
+$('#potRun').addEventListener('click',()=>{ S.pot.seed=1+Math.floor(Math.random()*9999); potRun(); });
+$('#potNew').addEventListener('click',()=>{ S.pot.ct=Math.round((.23+Math.random()*.13)*100)/100; S.pot.seed=1+Math.floor(Math.random()*9999); $('#potFb').innerHTML=''; $('#potGuess').value=''; potRun(); });
+$('#potShow').addEventListener('click',()=>{ if(!S.pot.data) potRun(); S.pot.shown=true; potRender(); const ip=potInterp(); $('#potFb').innerHTML=ip===null?'<div class="fb tip">Kein Vorzeichenwechsel in den Messwerten. Wähle die andere Konzentrationsreihe.</div>':`<div class="fb tip">Zwischen den beiden Messpunkten um den Nullpunkt ergibt die lineare Interpolation etwa ${fmt(ip,2)} mol/L.</div>`; });
+$('#potCheck').addEventListener('click',()=>{ const g=parseFloat(String($('#potGuess').value).replace(',','.')); if(isNaN(g)){ $('#potFb').innerHTML='<div class="fb tip">Gib eine Zahl ein.</div>'; return; } if(!S.pot.data) potRun(); const dlt=Math.abs(g-S.pot.ct); $('#potFb').innerHTML=dlt<=.02?`<div class="fb ok"><b>Sehr gut.</b> Der Zellsaft der Kartoffel entspricht ${fmt(S.pot.ct,2)} mol/L. Du liegst nur ${fmt(dlt,2)} daneben.</div>`:`<div class="fb no"><b>Noch nicht ganz.</b> Der Zellsaft entspricht ${fmt(S.pot.ct,2)} mol/L. Suche den Nulldurchgang der Kurve. Du liegst ${fmt(dlt,2)} daneben.</div>`; });
+
+/* =============== 4 MEERWASSER =============== */
+const OSMS=31;
+function seaA(){
+  const a=S.sea, osmD=a.sal*OSMS, TBW=42, ICF=28, base=290, V=a.vol;
+  const osmN=(base*TBW+osmD*V)/(TBW+V), icfN=ICF*base/osmN, ecfN=TBW+V-icfN;
+  const load=osmD*V, urine=(load+600)/a.umax, net=V-urine;
+  const dI=(icfN/ICF-1)*100, dE=(ecfN/14-1)*100;
+  const verdict=net>=0?`<div class="fb ok"><b>Wasserbilanz positiv (${fmt(net,2)} L).</b> Die Niere kann die zugeführten Teilchen mit weniger Wasser ausscheiden, als getrunken wurde.</div>`:`<div class="fb no"><b>Wasserbilanz negativ (${fmt(net,2)} L).</b> Für die Ausscheidung der Teilchen braucht die Niere mehr Wasser, als im Getränk steckt. Der Körper trocknet aus.</div>`;
+  const bars=(lab,v,mx,col,unit,y)=>`<text class="tk" x="8" y="${y+16}">${lab}</text><rect x="175" y="${y}" width="${clamp(v/mx,0,1)*270}" height="22" rx="4" fill="${col}"/><text class="lbl" x="${175+clamp(v/mx,0,1)*270+6}" y="${y+16}">${fmt(v,unit==='L'?1:0)} ${unit}</text>`;
+  const svg=`<svg viewBox="0 0 600 230" role="img" aria-label="Vergleich der Zellvolumina und Osmolalitäten"><rect x="0" y="0" width="600" height="230" fill="var(--paper)"/>
+   ${bars('Körper vorher',base,1400,'var(--ref)','mOsm',8)}${bars('Körper nachher',osmN,1400,'var(--cur)','mOsm',40)}${bars('Getränk',osmD,1400,'var(--water)','mOsm/L',72)}${bars('max. Harn',a.umax,1400,'var(--s3)','mOsm/L',104)}
+   ${bars('Zellwasser vorher',ICF,30,'var(--ref)','L',142)}${bars('Zellwasser nachher',icfN,30,'var(--solute)','L',174)}</svg>`;
+  $('#seaA').innerHTML=`<h2>Meerwasser trinken (Modell)</h2>
+   <div class="fb tip" style="margin-top:0"><b>Nur ein Modell.</b> Meerwasser sollte nicht getrunken werden. Es entzieht dem Körper Wasser.</div>
+   <p class="lead" style="margin-top:10px">Ein Mensch (70 kg) hat etwa 42 L Körperwasser, davon 28 L in den Zellen. Die Körperflüssigkeit hat etwa 290 mOsm/L. Meerwasser hat etwa 1100 mOsm/L. Stelle ein, was getrunken wird.</p>
+   <div class="btnrow" style="margin-top:0"><button type="button" class="btn" data-sal="0.3">Leitungswasser</button><button type="button" class="btn" data-sal="8">Brackwasser (Ostsee)</button><button type="button" class="btn" data-sal="35">Meerwasser</button></div>
+   <div class="two" style="margin-top:6px"><div id="seaCtl">${slHTML('sea.sal')}${slHTML('sea.vol')}${slHTML('sea.umax')}</div><div><div class="plot">${svg}</div></div></div>
+   <div class="calc"><p>Teilchen im Getränk: ${fmt(osmD,0)} mOsm/L · ${fmt(V,1)} L = <span class="eq">${fmt(load,0)} mOsm</span></p>
+   <p>Osmolalität des Körpers danach: (${base} · ${TBW} + ${fmt(osmD,0)} · ${fmt(V,1)}) / (${TBW} + ${fmt(V,1)}) = <span class="eq">${fmt(osmN,0)} mOsm/L</span></p>
+   <p>Zellvolumen danach: ${fmt(icfN,1)} L (<span class="eq">${dI>0?'+':''}${fmt(dI,1)} %</span>), extrazelluläres Volumen ${dE>0?'+':''}${fmt(dE,0)} %</p>
+   <p>Harnwasser für Ausscheidung: (${fmt(load,0)} + 600 mOsm) / ${a.umax} mOsm/L = <span class="eq">${fmt(urine,2)} L</span></p></div>
+   ${verdict}
+   <ul class="note"><li>Die Körperflüssigkeit wird konzentrierter, Wasser strömt durch Osmose aus den Zellen. Die Zellen schrumpfen, es entsteht Durst.</li><li>Die Niere kann Harn höchstens bis etwa 1200 mOsm/L konzentrieren, Meerwasser ist mit etwa 1100 mOsm/L fast ebenso konzentriert. Zusätzlich müssen täglich etwa 600 mOsm Abfallstoffe ausgeschieden werden.</li><li>Meerwasser enthält Magnesiumsulfat, das abführend wirkt. Durchfall verstärkt den Wasserverlust.</li></ul>`;
+  syncInputs($('#seaCtl'));
+}
+const ORG={sw:{nm:'Süßwasserfisch (Karpfen)',body:300},mf:{nm:'Meeresknochenfisch (Dorsch)',body:350},hai:{nm:'Hai (Knorpelfisch)',body:1100},mensch:{nm:'Mensch',body:290}};
+const ENV={fresh:{nm:'Süßwasser',osm:10},brack:{nm:'Brackwasser',osm:250},sea:{nm:'Meerwasser',osm:1085}};
+const STRAT={
+ 'sw/fresh':'Das Körperinnere ist hyperosmotisch zum Wasser. Wasser dringt über Kiemen und Haut ein, Salze gehen verloren. Strategie: viel stark verdünnter Harn, kaum Trinken, aktive Salzaufnahme über die Kiemen (Chloridzellen) und mit der Nahrung.',
+ 'sw/brack':'Fast isotonisch, geringe Wasser- und Salzflüsse. Nur euryhaline Arten (zum Beispiel Aal, Lachs, Stichling) können ihre Regulation umstellen. Viele Süßwasserfische vertragen Brackwasser nur begrenzt.',
+ 'sw/sea':'Die Umgebung ist stark hyperosmotisch: Wasser geht verloren, Salz dringt ein. Die meisten Süßwasserfische sind darauf nicht eingestellt und sterben.',
+ 'mf/fresh':'Die Umgebung ist stark hypoosmotisch: Wasser dringt ein, Salz geht verloren. Die meisten Meeresfische sind darauf nicht eingestellt. Wanderfische wie Lachs und Aal können ihre Regulation umkehren.',
+ 'mf/brack':'Annähernd isoosmotisch, geringe Flüsse. Die Fische stellen ihre Regulation auf weniger Salzausscheidung um.',
+ 'mf/sea':'Das Körperinnere (etwa 350 mOsm/L) ist hypoosmotisch zum Meerwasser (etwa 1100 mOsm/L). Wasser geht verloren, Salz dringt ein. Strategie: Meerwasser trinken, das Salz aktiv über die Chloridzellen der Kiemen ausscheiden und nur wenig, konzentrierten Harn bilden.',
+ 'hai/sea':'Harnstoff und Trimethylaminoxid (TMAO) im Blut erhöhen die Osmolalität auf Meerwasserniveau. Es gibt kaum Wasserverlust, eher einen leichten Wassereinstrom. Überschüssiges Salz scheidet die Rektaldrüse aus.',
+ 'hai/fresh':'Die hohe Osmolalität führt zu starkem Wassereinstrom. Fast alle Haie sind auf Meerwasser angewiesen. Einzelne Arten (Bullenhai) vertragen Süßwasser zeitweise.',
+ 'hai/brack':'Der Wassereinstrom ist stärker als im Meer. Nur wenige Arten halten das dauerhaft aus.',
+ 'mensch/sea':'Die Körperflüssigkeit hat etwa 290 mOsm/L, die Niere kann Harn nur bis etwa 1200 mOsm/L konzentrieren. Beim Trinken von Meerwasser geht mehr Wasser verloren als aufgenommen wird (siehe Modell oben).',
+ 'mensch/fresh':'Trinkwasser ist stark hypotonisch zum Blut. Überschüssiges Wasser scheidet die Niere als verdünnten Harn aus.',
+ 'mensch/brack':'Brackwasser enthält deutlich weniger Salz als Meerwasser, ist aber trotzdem kein Trinkwasser. Die Niere müsste das Salz mit zusätzlichem Wasser ausscheiden.'
+};
+function seaB(){
+  const a=S.sea, o=ORG[a.org], e=ENV[a.env], d=e.osm-o.body, iso=Math.abs(d)<80;
+  const wDir=iso?0:(d>0?1:-1), sDir=iso?0:(d>0?1:-1), th=clamp(Math.abs(d)/900*14+2,2,16);
+  const bw=v=>clamp(v/1200,0,1)*220;
+  const arrow=(x1,x2,y,col,t)=>`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${col}" stroke-width="${t}" stroke-linecap="round" marker-end="url(#a${col.slice(-3).replace(/\W/g,'')})"/>`;
+  const svg=`<svg viewBox="0 0 600 230" role="img" aria-label="Wasser- und Salzfluss zwischen Organismus und Umgebung"><rect x="0" y="0" width="600" height="230" fill="var(--paper)"/>
+   <rect x="40" y="30" width="190" height="150" rx="22" fill="rgba(93,184,245,.16)" stroke="var(--ink-soft)" stroke-width="3"/><text class="al" x="135" y="60" text-anchor="middle">Körper</text><rect x="55" y="78" width="${bw(o.body).toFixed(0)}" height="28" rx="5" fill="var(--cur)"/><text class="lbl" x="135" y="130" text-anchor="middle">${o.body} mOsm/L</text>
+   <rect x="370" y="30" width="190" height="150" rx="22" fill="rgba(93,184,245,.3)" stroke="var(--ink-soft)" stroke-width="3"/><text class="al" x="465" y="60" text-anchor="middle">${e.nm}</text><rect x="385" y="78" width="${bw(e.osm).toFixed(0)}" height="28" rx="5" fill="var(--water)"/><text class="lbl" x="465" y="130" text-anchor="middle">${e.osm} mOsm/L</text>
+   <defs><marker id="amW" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2E9BE0"/></marker><marker id="amS" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L10 5L0 10z" fill="#E8553F"/></marker></defs>
+   ${wDir!==0?`<line x1="${wDir>0?250:350}" y1="85" x2="${wDir>0?350:250}" y2="85" stroke="#2E9BE0" stroke-width="${th}" stroke-linecap="round" marker-end="url(#amW)"/><text class="lbl" x="300" y="68" text-anchor="middle">Wasser</text>`:`<text class="lbl" x="300" y="90" text-anchor="middle">kaum Nettofluss</text>`}
+   ${sDir!==0?`<line x1="${sDir>0?350:250}" y1="140" x2="${sDir>0?250:350}" y2="140" stroke="#E8553F" stroke-width="${clamp(th*.7,2,12)}" stroke-linecap="round" marker-end="url(#amS)"/><text class="lbl" x="300" y="164" text-anchor="middle">Salz (Diffusion)</text>`:''}
+   <text class="tk" x="300" y="215" text-anchor="middle">Pfeile: passive Flüsse ohne Regulation</text></svg>`;
+  const key=a.org+'/'+a.env, txt=STRAT[key]||(iso?'Körper und Umgebung sind annähernd isoosmotisch.':(d>0?'Die Umgebung ist hyperosmotisch: Wasser geht verloren.':'Die Umgebung ist hypoosmotisch: Wasser dringt ein.'));
+  $('#seaB').innerHTML=`<h2>Osmoregulation im Tierreich</h2><p class="lead">Welche Wasser- und Salzflüsse treten auf, wenn ein Lebewesen in verschiedenen Umgebungen lebt?</p>
+   <label class="fl">Lebewesen</label>${segHTML('segOrg',[['sw','Süßwasser&shy;fisch'],['mf','Meeres&shy;knochenfisch'],['hai','Hai'],['mensch','Mensch']],a.org,'Lebewesen')}
+   <label class="fl">Umgebung</label>${segHTML('segEnv',[['fresh','Süßwasser'],['brack','Brackwasser'],['sea','Meerwasser']],a.env,'Umgebung')}
+   <div class="plot" style="margin-top:8px">${svg}</div>
+   <div class="status"><b>${o.nm} in ${e.nm}:</b> ${txt}</div>
+   <p class="note">Beispiel einzelliger Lebewesen: Das Pantoffeltierchen lebt im Süßwasser. Wasser dringt ständig ein, die kontraktile Vakuole pumpt es wieder hinaus. Salzdrüsen bei Meeresvögeln und Meeresschildkröten scheiden überschüssiges Salz aus. Die Osmolalitäten sind gerundete Lehrbuchwerte.</p>`;
+}
+$('#seaA').addEventListener('click',e=>{ const b=e.target.closest('[data-sal]'); if(b){ S.sea.sal=+b.dataset.sal; seaA(); } });
+$('#seaB').addEventListener('click',e=>{ const b=e.target.closest('#segOrg button,#segEnv button'); if(!b) return; if(b.parentElement.id==='segOrg') S.sea.org=b.dataset.v; else S.sea.env=b.dataset.v; seaB(); });
+
+/* =============== 5 SPALTÖFFNUNG =============== */
+$('#ctlSto').innerHTML=`<h2>Bedingungen</h2><label class="fl">Pflanzentyp</label>${segHTML('segPlant',[['c3','Normale Pflanze (C₃)'],['cam','CAM-Pflanze (Kaktus)']],S.sto.plant,'Pflanzentyp')}
+ <label class="fl">Steuerung</label>${segHTML('segSto',[['manual','Regler'],['day','Tagesverlauf']],S.sto.mode,'Steuerung')}
+ <div id="stoManual">${slHTML('sto.light')}${slHTML('sto.ci')}${slHTML('sto.aba')}</div>
+ <div id="stoDay" hidden>${slHTML('sto.hour')}${slHTML('sto.dry')}</div>
+ <h3>Vorlagen</h3><div class="btnrow" style="margin-top:2px"><button type="button" class="btn" data-sc="morning">Morgens, feucht</button><button type="button" class="btn" data-sc="noon">Mittags, trocken</button><button type="button" class="btn" data-sc="night">Nachts</button></div>`;
+const bump=(h,c,w)=>Math.exp(-Math.pow((h-c)/w,2));
+const lightAt=h=>Math.max(0,Math.sin(Math.PI*(h-6)/12));
+function stoParams(){
+  const s=S.sto; let L,Ci,A;
+  if(s.mode==='manual'){ L=s.light/100; Ci=s.ci/100; A=s.aba/100; }
+  else { L=lightAt(s.hour); Ci=.65-.35*L; A=(s.dry/100)*bump(s.hour,13.5,2.4); }
+  return {L,Ci,A};
+}
+function stoTarget(L,Ci,A,plant){ const lv=plant==='cam'?1-L:L; const drive=(.12+.88*lv)*(1-.6*Ci); return clamp(drive*(1-A*1.15),0,1); }
+function stoDrawing(ap){
+  const len=96, w=ap*40, th=34+ap*10, W=w+th, cy=150;
+  const half=(sg)=>{ const ix=sg*w*1.333, ox=sg*W*1.333; return `M300 ${cy-len} C${300+ix} ${cy-len/3} ${300+ix} ${cy+len/3} 300 ${cy+len} C${300+ox} ${cy+len/3} ${300+ox} ${cy-len/3} 300 ${cy-len}Z`; };
+  const inner=(sg)=>`M300 ${cy-len} C${300+sg*w*1.333} ${cy-len/3} ${300+sg*w*1.333} ${cy+len/3} 300 ${cy+len}`;
+  const pore=`M300 ${cy-len} C${300-w*1.333} ${cy-len/3} ${300-w*1.333} ${cy+len/3} 300 ${cy+len} C${300+w*1.333} ${cy+len/3} ${300+w*1.333} ${cy-len/3} 300 ${cy-len}Z`;
+  const K=Math.round(6+34*ap);
+  let dots=''; for(let i=0;i<K;i++){ const q=RPD[i+200], y=cy-len*.75+q[1]*len*1.5, bl=(1-Math.pow((y-cy)/len,2)), mid=(w+th*.5)*1.15*bl, off=(q[0]-.5)*th*.55; dots+=`<circle cx="${(300-mid+off).toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="#8E5BD6"/><circle cx="${(300+mid+off).toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="#8E5BD6"/>`; }
+  let chl=''; for(let i=0;i<5;i++){ const q=RPD[i+300], y=cy-len*.5+q[1]*len, bl=(1-Math.pow((y-cy)/len,2)), xo=(w+th*.45)*1.15*bl; chl+=`<ellipse cx="${(300-xo-2).toFixed(1)}" cy="${y.toFixed(1)}" rx="7" ry="4.5" fill="#2F8F4B"/><ellipse cx="${(300+xo+2).toFixed(1)}" cy="${y.toFixed(1)}" rx="7" ry="4.5" fill="#2F8F4B"/>`; }
+  const gas=ap>.04?`<line x1="300" y1="14" x2="300" y2="${(cy-len*.35).toFixed(1)}" stroke="#A8E6A0" stroke-width="${(3+ap*9).toFixed(1)}" stroke-linecap="round" marker-end="url(#ag)"/><text x="${(300+W*1.3+14).toFixed(0)}" y="34" font-size="14" font-weight="700" fill="#14532D">CO₂ rein</text><line x1="300" y1="${(cy+len*.35).toFixed(1)}" x2="300" y2="288" stroke="#7FD4FF" stroke-width="${(3+ap*9).toFixed(1)}" stroke-linecap="round" marker-end="url(#aw)"/><text x="${(300+W*1.3+14).toFixed(0)}" y="284" font-size="14" font-weight="700" fill="#0B3A57">H₂O raus</text>`:'';
+  return `<defs><marker id="ag" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto"><path d="M0 0L10 5L0 10z" fill="#A8E6A0"/></marker><marker id="aw" viewBox="0 0 10 10" refX="7" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7FD4FF"/></marker></defs>
+   <rect width="600" height="300" fill="#8CC58F"/>
+   <ellipse cx="300" cy="${cy}" rx="${(W*1.333+28).toFixed(1)}" ry="${len+22}" fill="#9ED3A0" stroke="#4D8A57" stroke-width="3"/>
+   <path d="${pore}" fill="#0B2A3A"/>
+   <path d="${half(-1)}" fill="#BFE5C2" stroke="#2F6B3A" stroke-width="3"/><path d="${half(1)}" fill="#BFE5C2" stroke="#2F6B3A" stroke-width="3"/>
+   <path d="${inner(-1)}" fill="none" stroke="#1F4A28" stroke-width="8" stroke-linecap="round"/><path d="${inner(1)}" fill="none" stroke="#1F4A28" stroke-width="8" stroke-linecap="round"/>
+   ${chl}${dots}${gas}
+   <text x="14" y="26" font-size="13" fill="#14391F" font-weight="700">Epidermiszelle</text><text x="586" y="26" font-size="13" fill="#14391F" text-anchor="end" font-weight="700">Epidermiszelle</text>
+   <text x="${(300-W*1.333-34).toFixed(0)}" y="${cy+4}" font-size="13" fill="#14391F" font-weight="700" text-anchor="end">Schließzelle</text>
+   <text x="300" y="${cy+4}" font-size="12" fill="#fff" text-anchor="middle" font-weight="700" opacity="${ap<.1?1:0}">zu</text>`;
+}
+function stoRender(){
+  const s=S.sto, {L,Ci,A}=stoParams(), tg=stoTarget(L,Ci,A,s.plant), ap=s.cur;
+  $('#stoSvg').innerHTML=stoDrawing(ap);
+  const turg=.3+1.7*ap, K=100+300*ap, pore=8*ap, water=ap, co2=s.plant==='c3'?ap*Math.max(L,.05):ap*(1-L);
+  $('#stripSto').innerHTML=`<div class="stat"><span>Porenweite</span><b>${fmt(pore,1)} µm</b></div><div class="stat"><span>Turgor</span><b>${fmt(turg,1)} MPa</b></div><div class="stat"><span>K⁺ (schem.)</span><b>${fmt(K,0)} mM</b></div>`;
+  const openOn=(s.plant==='c3'?L:1-L)>.3&&A<.35&&Ci<.8, closeOn=A>.3||tg<.15;
+  const O=['Blaulicht wird von Phototropinen in den Schließzellen wahrgenommen.','Die H⁺-ATPase der Zellmembran pumpt Protonen nach außen. Das Membranpotenzial wird negativer (Hyperpolarisation).','K⁺-Kanäle öffnen. K⁺ strömt zusammen mit Cl⁻ und Malat in die Schließzellen ein.','Die Teilchenkonzentration in den Schließzellen steigt, das Wasserpotenzial sinkt.','Wasser strömt durch Osmose ein, der Turgor steigt.','Die innen verdickte Zellwand und die ringförmig angeordneten Cellulose-Mikrofibrillen lassen die Zellen sich krümmen: Der Spalt öffnet sich.'];
+  const C=['Wassermangel: In den Wurzeln und Blättern wird Abscisinsäure (ABA) gebildet.','ABA bindet an Rezeptoren der Schließzellen. Die Ca²⁺-Konzentration im Zellplasma steigt, Anionenkanäle öffnen.','K⁺ und Anionen strömen aus den Schließzellen aus.','Das Wasserpotenzial in den Schließzellen steigt, Wasser strömt durch Osmose heraus, der Turgor sinkt.','Die Schließzellen strecken sich gerade, der Spalt schließt sich.'];
+  const dayChart=stoChart();
+  const tradeoff=ap>.7?'<b>Weit geöffnet:</b> viel CO₂ gelangt für die Fotosynthese ins Blatt, aber auch viel Wasser verdunstet.':(ap<.1?'<b>Geschlossen:</b> kaum Wasserverlust, aber auch fast keine CO₂-Aufnahme.':'<b>Teilweise geöffnet:</b> Kompromiss zwischen CO₂-Aufnahme und Wasserverlust.');
+  $('#moreSto').innerHTML=`<h2>Zielkonflikt der Pflanze</h2><div class="status">${tradeoff}</div>
+   <table class="t"><tr><th>Größe (relativ)</th><th>Wert</th></tr><tr><td>Wasserabgabe (Transpiration)</td><td>${fmt(water*100,0)} %</td></tr><tr><td>CO₂-Aufnahme für Fotosynthese</td><td>${fmt(co2*100,0)} %</td></tr></table>
+   <h3>Tagesverlauf der Öffnungsweite</h3><div class="plot">${dayChart}</div><ul class="legend"><li><i class="ln" style="border-color:var(--cur)"></i>${s.plant==='c3'?'C₃-Pflanze':'CAM-Pflanze'}</li><li><i class="ln dash" style="border-color:var(--ref)"></i>${s.plant==='c3'?'CAM-Pflanze':'C₃-Pflanze'}</li></ul>
+   <p class="note">Die Kurve gilt für die eingestellte Bodentrockenheit (Reiter Tagesverlauf). Bei Trockenheit schließt die C₃-Pflanze mittags (Mittagsdepression). CAM-Pflanzen öffnen die Spaltöffnungen nachts, speichern das CO₂ und halten sie am Tag geschlossen. Das spart Wasser.</p>
+   <h3>Öffnungsmechanismus</h3><ol class="steps">${O.map(t=>`<li class="${openOn?'on':''}">${t}</li>`).join('')}</ol>
+   <h3>Schließmechanismus</h3><ol class="steps">${C.map(t=>`<li class="${closeOn?'on':''}">${t}</li>`).join('')}</ol>
+   <p class="note">Die Zahlenwerte sind schematisch. Vereinfacht dargestellt ist der Schließzelltyp der Zweikeimblättrigen (Bohnentyp).</p>`;
+  $('#stoManual').hidden=s.mode!=='manual'; $('#stoDay').hidden=s.mode!=='day';
+  syncInputs($('#ctlSto')); setSeg('segPlant',s.plant); setSeg('segSto',s.mode);
+}
+function stoChart(){
+  const s=S.sto, ax=axes({x0:0,x1:24,y0:0,y1:1,xs:6,ys:.25,xl:'Uhrzeit',yl:'Öffnungsweite (relativ)'}), dry=s.mode==='day'?s.dry/100:.6;
+  const curve=pl=>{ const pts=[]; for(let h=0;h<=24;h+=.25){ const L=lightAt(h), Ci=.65-.35*L, A=dry*bump(h,13.5,2.4); pts.push([h,stoTarget(L,Ci,A,pl)]); } return pts; };
+  const other=s.plant==='c3'?'cam':'c3';
+  let g=svgO('Tagesverlauf der Öffnungsweite')+ax.g+'<g clip-path="url(#cpx)">';
+  g+=`<path class="c-ref" d="${pathOf(ax,curve(other))}"/><path class="c-cur" d="${pathOf(ax,curve(s.plant))}"/>`;
+  if(s.mode==='day') g+=`<line x1="${ax.X(s.hour)}" x2="${ax.X(s.hour)}" y1="${MT}" y2="${MT+PHT}" stroke="var(--s1)" stroke-width="2.5" stroke-dasharray="6 4"/>`;
+  return g+'</g></svg>';
+}
+let stoRaf=0;
+function stoAnimate(){
+  cancelAnimationFrame(stoRaf);
+  const step=()=>{ const s=S.sto, p=stoParams(), tg=stoTarget(p.L,p.Ci,p.A,s.plant), d=tg-s.cur; if(Math.abs(d)>.002){ s.cur+=d*.12; stoRender(); stoRaf=requestAnimationFrame(step); } else { s.cur=tg; stoRender(); } };
+  step();
+}
+$('#segPlant').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ S.sto.plant=b.dataset.v; stoAnimate(); } });
+$('#segSto').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ S.sto.mode=b.dataset.v; stoAnimate(); } });
+$('#ctlSto').addEventListener('click',e=>{ const b=e.target.closest('[data-sc]'); if(!b) return; const s=S.sto; s.mode='manual';
+  if(b.dataset.sc==='morning'){ s.light=60; s.ci=30; s.aba=0; } else if(b.dataset.sc==='noon'){ s.light=100; s.ci=50; s.aba=80; } else { s.light=0; s.ci=70; s.aba=0; }
+  stoAnimate(); });
+
+/* =============== Aufgaben =============== */
+const TASKS=[
+ {afb:'I',op:'Beschreibe',t:'Brownsche Bewegung und Ausgleich',x:'Beschreibe die Bewegung der Teilchen und die Verteilung links und rechts nach einiger Zeit (Membran „durchlässig“, alle Teilchen links). Nenne, was im Gleichgewicht mit den Teilchen geschieht.',setup:()=>{ S.dif.mem='open'; S.dif.init='left'; S.dif.trail=true; setTab('dif'); setSeg('segMem','open'); setSeg('segInit','left'); difInit(); },
+  sol:['Die Teilchen bewegen sich ungerichtet und zufällig (Brownsche Bewegung). Sie stoßen mit Wänden und Membran.','Zu Beginn ist links alles, rechts nichts. Durch die Zufallsbewegung wandern mehr Teilchen von links nach rechts als umgekehrt.','Gleichgewicht: etwa 50 % links und 50 % rechts. Die Teilchen bewegen sich weiter, aber es gibt keinen Nettotransport (dynamisches Gleichgewicht).','Höhere Temperatur beschleunigt den Ausgleich.']},
+ {afb:'II',op:'Erkläre',t:'Selektiv permeable Membran',x:'Wähle eine selektive Membran. Beschreibe, welche Teilchen sich ausgleichen, und erkläre, warum bei der Osmose Wasser wandert und nicht der gelöste Stoff.',setup:()=>{ S.dif.mem='semi'; S.dif.init='left'; setTab('dif'); setSeg('segMem','semi'); setSeg('segInit','left'); difInit(); },
+  sol:['Die kleinen Teilchen gleichen sich aus, die großen bleiben links, weil die Membran nur für kleine Teilchen durchlässig ist.','Osmose ist die Diffusion von Wasser durch eine semipermeable Membran. Die gelösten Teilchen können die Membran nicht passieren, Wasser schon.','Das Wasser strömt dorthin, wo mehr gelöste Teilchen sind (niedrigeres Wasserpotenzial), bis die Konzentrationen ausgeglichen sind oder ein Gegendruck entsteht.']},
+ {afb:'II',op:'Berechne, erkläre',t:'Diffusionszeiten',x:'Bestimme mit dem Rechner, wie lange Sauerstoff für 10 µm, 1 mm und 1 m braucht. Erkläre, was daraus für die Größe von Zellen und für Transportsysteme folgt.',setup:()=>{ S.dif.lx=-5; setTab('dif'); },
+  sol:['t = x² / (2D): Für Sauerstoff (D = 2·10⁻⁹ m²/s) ergibt sich etwa 25 ms für 10 µm, 4 min für 1 mm und viele Jahre für 1 m.','Die Zeit wächst mit dem Quadrat der Strecke: Zehnfache Strecke bedeutet hundertfache Zeit.','Folge: Diffusion ist nur über kurze Strecken effizient. Zellen sind klein, große Lebewesen brauchen Transportsysteme (Blutkreislauf, Leitbündel, Tracheen).']},
+ {afb:'II',op:'Beschreibe, erkläre',t:'Erythrozyten',x:'Lege einen Erythrozyten in Wasser, in 0,9-%ige und in 1,5-%ige NaCl-Lösung (etwa 0,51 Osmol/L). Beschreibe das Verhalten und erkläre es mit den Begriffen hypotonisch, isotonisch und hypertonisch.',setup:()=>{ S.cell.type='rbc'; S.cell.co=0; setTab('cell'); cellReset(); cellRender(); },
+  sol:['In Wasser (hypotonisch): Wasser strömt ein, die Zelle schwillt an und platzt (Hämolyse), weil die Membran die Dehnung nicht aushält.','In 0,9-%iger NaCl-Lösung (isotonisch): kein Nettowasserstrom, normale Scheibenform.','In 1,5-%iger Lösung (hypertonisch): Wasser strömt aus, die Zelle schrumpft und bekommt eine Stechapfelform (Krenation).','Begriffe beziehen sich auf die Außenlösung im Vergleich zum Zellinneren.']},
+ {afb:'II',op:'Erkläre',t:'Plasmolyse und Turgor',x:'Beobachte die Pflanzenzelle in Wasser, in isotonischer und in stark konzentrierter Lösung. Erkläre, warum die Zelle in Wasser nicht platzt, und erkläre mithilfe des Wasserpotenzials, warum eine Pflanze welkt.',setup:()=>{ S.cell.type='plant'; S.cell.co=.5; setTab('cell'); cellReset(); cellRender(); },
+  sol:['In Wasser: Wasser strömt in die Vakuole, der Protoplast drückt gegen die Zellwand. Die Zellwand ist wenig dehnbar und baut einen Gegendruck (Turgor) auf. Im Gleichgewicht ist Ψ innen = Ψ außen.','Isotonisch: Grenzplasmolyse, kein Turgor, der Protoplast liegt gerade noch an der Wand an.','Stark konzentriert: Wasser strömt aus, der Protoplast schrumpft und löst sich von der Wand (Plasmolyse).','Welken: Bei Wassermangel sinkt der Turgor, weil die Zellen Wasser verlieren. Das Gewebe verliert seine Festigkeit.','Ψ = Ψs + Ψp: Ψs ist negativ (gelöste Teilchen), Ψp ist positiv (Turgor).']},
+ {afb:'III',op:'Werte aus, beurteile',t:'Kartoffelversuch',x:'Führe den Versuch durch, trage die Massenänderung auf und bestimme die isotonische Konzentration. Nenne Fehlerquellen und beurteile die Aussagekraft.',setup:()=>{ setTab('pot'); potRun(); },
+  sol:['Die Kurve fällt von positiven zu negativen Werten. Der Nulldurchgang gibt die Konzentration an, bei der Zellsaft und Außenlösung gleich konzentriert sind (isotonischer Punkt, hier etwa 0,25 bis 0,30 mol/L).','Unterhalb des Punkts quellen die Streifen (hypotonisch), oberhalb schrumpfen sie (hypertonisch).','Fehlerquellen: unterschiedlich abgetupfte Streifen, ungleiche Größe, Verdunstung, Einwirkzeit, Waagengenauigkeit.','Aussagekraft: Der Wert gilt für das Gewebe als Mittelwert. Wiederholungen und eine feinere Reihe erhöhen die Genauigkeit.']},
+ {afb:'III',op:'Erkläre, beurteile',t:'Meerwasser trinken',x:'Erkläre, warum das Trinken von Meerwasser einen Menschen austrocknen lässt. Vergleiche mit der Strategie eines Meeresknochenfischs und beurteile, warum die Niere das Problem nicht löst.',setup:()=>{ S.sea.sal=35; S.sea.vol=1; S.sea.umax=1200; setTab('sea'); seaA(); },
+  sol:['Meerwasser (etwa 1100 mOsm/L) ist stark hypertonisch zur Körperflüssigkeit (etwa 290 mOsm/L). Wasser strömt aus den Zellen, sie schrumpfen, es entsteht Durst.','Die Niere kann Harn höchstens auf etwa 1200 mOsm/L konzentrieren. Für 1 L Meerwasser und die täglich nötige Ausscheidung von etwa 600 mOsm Abfallstoffen werden etwa 1,4 L Harn benötigt. Die Bilanz ist negativ (etwa −0,4 L).','Hinzu kommt die abführende Wirkung von Magnesiumsulfat.','Meeresknochenfische sind hypoosmotisch zum Meer. Sie trinken Meerwasser und scheiden das Salz aktiv über die Chloridzellen der Kiemen aus. Menschen haben kein solches Organ.']},
+ {afb:'III',op:'Erkläre, beurteile',t:'Spaltöffnungen',x:'Erkläre den Öffnungsmechanismus der Schließzellen und den Einfluss von Wassermangel. Beurteile den Zielkonflikt der Pflanze und vergleiche mit einer CAM-Pflanze.',setup:()=>{ S.sto.mode='manual'; S.sto.plant='c3'; S.sto.light=100; S.sto.ci=40; S.sto.aba=0; setTab('sto'); stoAnimate(); },
+  sol:['Öffnen: Blaulicht aktiviert die H⁺-ATPase, K⁺ (mit Cl⁻ und Malat) strömt ein, das Wasserpotenzial in den Schließzellen sinkt, Wasser strömt durch Osmose ein, der Turgor steigt. Wegen der ungleich verdickten Zellwand krümmen sich die Zellen und der Spalt öffnet sich.','Wassermangel: Abscisinsäure löst Ca²⁺-Anstieg und Öffnung von Anionenkanälen aus, K⁺ strömt aus, Wasser folgt, der Turgor sinkt und der Spalt schließt sich.','Zielkonflikt: Offene Spalten ermöglichen die CO₂-Aufnahme für die Fotosynthese, verursachen aber Wasserverlust durch Transpiration.','CAM-Pflanzen öffnen nachts (kühl, geringe Verdunstung) und speichern CO₂ als organische Säure. Tagsüber bleiben die Spalten geschlossen. Das spart Wasser, die Fotosyntheseleistung ist aber meist geringer.']}
+];
+$('#taskList').innerHTML=TASKS.map((t,i)=>`<details class="task"><summary><span class="badge">AFB ${t.afb}</span><span>Aufgabe ${i+1}: ${t.t}</span></summary><p><b>${t.op}:</b> ${t.x}</p><button type="button" class="btn" data-task="${i}">Versuch einrichten</button><details class="sol"><summary style="cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center">Lösungshinweise (Erwartungshorizont)</summary><ul>${t.sol.map(x=>`<li>${x}</li>`).join('')}</ul></details></details>`).join('');
+$('#taskList').addEventListener('click',e=>{ const b=e.target.closest('[data-task]'); if(b){ TASKS[+b.dataset.task].setup(); window.scrollTo({top:0,behavior:'smooth'}); } });
+
+/* =============== Ereignisse und Tabs =============== */
+document.addEventListener('input',e=>{ const el=e.target; if(!(el.matches&&el.matches('input[data-k]'))) return; const k=el.dataset.k; set(k,el.type==='checkbox'?el.checked:+el.value); const ns=k.split('.')[0];
+  if(ns==='dif'){ if(k==='dif.n') difInit(); else if(k==='dif.lx'){ const o=$('#o_dif\\.lx'); difMore(); } else syncInputs($('#ctlDif')); }
+  else if(ns==='cell') cellRender();
+  else if(ns==='sea') seaA();
+  else if(ns==='sto') stoAnimate();
+});
+document.addEventListener('change',e=>{ const el=e.target; if(el.matches&&el.matches('input[type=checkbox][data-k]')){ set(el.dataset.k,el.checked); if(el.dataset.k==='dif.trail') S.dif.trailPts=[]; } });
+document.addEventListener('click',e=>{ const c=e.target.closest('[data-collapse]'); if(c){ const el=$('#'+c.dataset.collapse); el.classList.toggle('collapsed'); c.setAttribute('aria-label',el.classList.contains('collapsed')?'Ansicht ausklappen':'Ansicht einklappen'); } });
+function setTab(t){
+  S.tab=t; $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['dif','cell','pot','sea','sto','task'].forEach(k=>{ $('#pane-'+k).hidden=k!==t; });
+  if(t==='dif'){ difMore(); syncInputs($('#ctlDif')); }
+  if(t==='cell'){ cellRender(); }
+  if(t==='pot'){ if(!S.pot.data) potRun(); else potRender(); }
+  if(t==='sea'){ seaA(); seaB(); }
+  if(t==='sto'){ stoAnimate(); }
+}
+$('#tabs').addEventListener('click',e=>{ const b=e.target.closest('.tab'); if(b){ setTab(b.dataset.tab); window.scrollTo({top:0}); } });
+
+/* Start */
+difInit(); syncInputs($('#ctlDif')); difMore();
+requestAnimationFrame(difLoop); requestAnimationFrame(cellLoop);
+})();
+</script>
+</body>
+</html>

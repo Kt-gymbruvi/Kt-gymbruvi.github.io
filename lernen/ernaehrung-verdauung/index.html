@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Erklär-Schaubild: Ernährung und Verdauung</title>
+<style>
+:root{
+  --bg:#e9eff0; --surface:#ffffff; --ink:#14272e; --muted:#51666d; --line:#c5d2d5;
+  --body:#f1ece4; --organ:#a9c9a4; --organ-stroke:#3f6b3a;
+  --helper:#c3b0e0; --helper-stroke:#5d4390; --juice:#1d6fd0;
+  --food:#f29a1f; --food-ink:#7a4300; --blood:#d6303a;
+  --accent:#2f5d3a; --accent-ink:#ffffff; --track:#c5d2d5; --focus:#0b57d0;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1a1b; --surface:#172527; --ink:#e8f1ee; --muted:#9db3ad; --line:#2f4547;
+    --body:#223437; --organ:#4d7a50; --organ-stroke:#a5d6a0;
+    --helper:#6b55a0; --helper-stroke:#cbb8f0; --juice:#6fb2ff;
+    --food:#ffb040; --food-ink:#ffe0a8; --blood:#ff6b73;
+    --accent:#8fd19a; --accent-ink:#0b1a10; --track:#2f4547; --focus:#8ab4f8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1a1b; --surface:#172527; --ink:#e8f1ee; --muted:#9db3ad; --line:#2f4547;
+  --body:#223437; --organ:#4d7a50; --organ-stroke:#a5d6a0;
+  --helper:#6b55a0; --helper-stroke:#cbb8f0; --juice:#6fb2ff;
+  --food:#ffb040; --food-ink:#ffe0a8; --blood:#ff6b73;
+  --accent:#8fd19a; --accent-ink:#0b1a10; --track:#2f4547; --focus:#8ab4f8;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);font-size:clamp(16px,1.1vw + 10px,21px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.45}
+.app{max-width:74rem;margin:0 auto;padding:1rem max(1rem,env(safe-area-inset-right)) 2.5rem max(1rem,env(safe-area-inset-left))}
+header{margin-bottom:1rem}
+.badge{display:inline-block;font-size:.8rem;padding:.15rem .65rem;border:1.5px solid var(--accent);border-radius:99px;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.1;margin:.4rem 0 .3rem;font-weight:700}
+h2{font-family:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;font-size:1.15rem;margin:0 0 .6rem}
+h3{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-size:1.3rem;margin:0 0 .3rem}
+.lead{margin:0 0 .4rem;color:var(--muted)}
+.how{margin:0;font-size:.92rem;max-width:62ch}
+.how b{display:inline-grid;place-items:center;width:1.35rem;height:1.35rem;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:.8rem;margin-right:.1rem}
+.grid{display:grid;gap:1rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem;min-width:0}
+@media (min-width:860px){
+  .grid{grid-template-columns:minmax(320px,33rem) minmax(0,1fr);grid-template-rows:repeat(6,max-content) 1fr;align-items:start}
+  .grid>.card{grid-column:2}
+  .grid>.stage{grid-column:1;grid-row:1/-1;position:sticky;top:.75rem}
+}
+.sbs{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.7rem}
+.btn{min-height:2.75rem;min-width:2.75rem;border:1.5px solid var(--accent);background:var(--surface);color:var(--ink);border-radius:10px;font:inherit;font-weight:600;padding:0 .9rem;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--bg)}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.sb{padding:0}
+.sb.done{background:var(--bg)}
+.sb[aria-current="step"]{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.cap{margin:.2rem 0 .8rem;min-height:4.4em}
+.cap strong{display:block;font-family:"Iowan Old Style",Palatino,Georgia,serif;font-size:1.1rem}
+.row{display:flex;flex-wrap:wrap;gap:.5rem}
+#dia{width:100%;height:auto;max-height:74vh;display:block}
+.body{fill:var(--body);stroke:var(--line);stroke-width:1.5}
+.shape{fill:var(--organ);stroke:var(--organ-stroke);stroke-width:2}
+.helper .shape{fill:var(--helper);stroke:var(--helper-stroke)}
+.t-out{fill:none;stroke:var(--organ-stroke);stroke-linecap:round;stroke-linejoin:round}
+.t-in{fill:none;stroke:var(--organ);stroke-linecap:round;stroke-linejoin:round}
+.hit{fill:transparent;stroke:transparent;stroke-linecap:round;stroke-linejoin:round}
+.halo{fill:none;stroke:var(--blood);stroke-linecap:round;stroke-linejoin:round;opacity:0;pointer-events:none}
+.lab{font:600 12px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+.leader{fill:none;stroke:var(--muted);stroke-width:1}
+.organ{cursor:pointer;outline:none}
+.organ.ghost{opacity:.15;pointer-events:none}
+.organ.ghost text,.organ.ghost .leader{display:none}
+.organ.active .shape,.organ.active .t-out{stroke:var(--food)}
+.organ.active .shape{stroke-width:3.5}
+.organ.sel .shape,.organ.sel .t-out{stroke:var(--ink)}
+.organ.sel .shape{stroke-width:3.5}
+.ring{display:none;fill:none;stroke:var(--focus);stroke-width:3;stroke-dasharray:5 3;pointer-events:none}
+.organ:focus-visible .ring{display:block}
+.drop{fill:var(--juice)}
+.drop.ghost,.duct.ghost{display:none}
+.duct{fill:none;stroke:var(--juice);stroke-width:2.5;stroke-linecap:round}
+#bolus{cursor:grab;touch-action:none}
+#bolus:active{cursor:grabbing}
+.bol{fill:var(--food);stroke:var(--food-ink);stroke-width:2.5}
+.bol-hi{fill:#fff;opacity:.55}
+@media (prefers-reduced-motion:no-preference){
+  .drop{animation:pulse 2.6s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.5}}
+  .fill{transition:width .2s}
+}
+.ctrl{margin-top:.6rem}
+.sl-l{display:block;font-weight:600;margin-bottom:.1rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2.75rem;background:transparent;margin:0;--lock:10%}
+input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:5px;background:linear-gradient(to right,var(--accent) var(--lock),var(--track) var(--lock))}
+input[type=range]::-moz-range-track{height:10px;border-radius:5px;background:linear-gradient(to right,var(--accent) var(--lock),var(--track) var(--lock))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--food);border:3px solid var(--food-ink);margin-top:-10px}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--food);border:3px solid var(--food-ink)}
+.hint{margin:.1rem 0 .5rem;font-size:.9rem;color:var(--muted);min-height:1.4em}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.6rem}
+.tile{background:var(--bg);border-radius:10px;padding:.55rem .75rem}
+.tile small{display:block;color:var(--muted);font-size:.8rem}
+.tile b{font-size:1.1rem}
+.now{margin:.7rem 0 .2rem}
+.ph{position:relative;height:10px;margin:.9rem .4rem .2rem;background:linear-gradient(90deg,var(--track),var(--organ));border-radius:5px}
+.ph i{position:absolute;top:-6px;width:4px;height:22px;background:var(--ink);border-radius:2px;transform:translateX(-50%);left:50%}
+.phl{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin:0 .1rem}
+.grp{margin:.8rem 0 0;font-weight:600;font-size:.95rem}
+.bar{display:grid;grid-template-columns:1fr auto;gap:.15rem .6rem;margin:.5rem 0}
+.bar .nm small{display:block;color:var(--muted)}
+.bar .pc{font-variant-numeric:tabular-nums;font-weight:600;align-self:center}
+.bar .tr{grid-column:1/-1;height:12px;border-radius:6px;background:var(--track);overflow:hidden}
+.fill{height:100%;width:0;background:var(--juice)}
+.res .fill{background:var(--blood)}
+.note{font-size:.85rem;color:var(--muted);margin:.4rem 0 0}
+.tag{display:inline-block;margin:.1rem 0 .5rem;padding:.1rem .6rem;border-radius:99px;font-size:.82rem;font-weight:600;border:1.5px solid var(--organ-stroke)}
+.tag.h{border-color:var(--helper-stroke)}
+.detail ul{margin:.3rem 0 .7rem;padding-left:1.2rem}
+.detail li{margin:.25rem 0}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:.25rem .8rem;margin:.6rem 0}
+.facts dt{font-weight:600}
+.facts dd{margin:0}
+.call{border-left:4px solid var(--food);background:var(--bg);padding:.55rem .8rem;border-radius:0 8px 8px 0;margin:.6rem 0}
+.call.s{border-left-color:var(--muted)}
+.call.t{border-left-color:var(--accent)}
+.call b{display:block;font-size:.85rem}
+.empty{color:var(--muted)}
+.inset{width:100%;max-width:26rem;height:auto;display:block;margin:.4rem 0;background:var(--bg);border-radius:8px}
+.legend ul{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.legend li{display:flex;gap:.7rem;align-items:center}
+.legend svg{flex:none}
+details summary{cursor:pointer;font-weight:600;min-height:2.75rem;display:flex;align-items:center}
+details ul{margin:.2rem 0 0;padding-left:1.2rem}
+details li{margin:.3rem 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.jsmsg{padding:1rem;border:2px solid var(--blood);border-radius:10px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="app">
+<header>
+  <span class="badge">Biologie · Jg. 7/8</span>
+  <h1>Ernährung und Verdauung</h1>
+  <p class="lead">Folge dem Weg eines Bissens durch den Körper.</p>
+  <p class="how"><b>1</b> Mit „Weiter“ baust du das Schaubild Schritt für Schritt auf. <b>2</b> Ziehe den orangen Punkt oder den Regler. <b>3</b> Tippe auf ein Organ für Details.</p>
+  <noscript><p class="jsmsg">Dieses Schaubild braucht JavaScript. Bitte aktiviere JavaScript in deinem Browser und lade die Seite neu.</p></noscript>
+</header>
+
+<main class="grid">
+  <section class="card steps" aria-labelledby="h-steps">
+    <h2 id="h-steps">Aufbau in Schritten</h2>
+    <div class="sbs" id="sbs" role="group" aria-label="Schritt wählen"></div>
+    <p class="cap" id="cap"></p>
+    <div class="row">
+      <button class="btn" id="prev" type="button">← Zurück</button>
+      <button class="btn pri" id="next" type="button">Weiter →</button>
+      <button class="btn" id="all" type="button">Alles zeigen</button>
+      <button class="btn" id="reset" type="button">Neu starten</button>
+    </div>
+  </section>
+
+  <section class="card stage" aria-label="Schaubild Verdauungssystem">
+    <svg id="dia" viewBox="0 0 360 560" role="group" aria-labelledby="dia-t dia-d">
+      <title id="dia-t">Schaubild des Verdauungssystems von vorn</title>
+      <desc id="dia-d">Kopf mit Mund, Speiseröhre, Magen, Leber, Gallenblase, Bauchspeicheldrüse, Dünndarm, Dickdarm, Enddarm und After. Ein orangefarbener Punkt zeigt den Weg des Bissens.</desc>
+      <defs><path id="dropP" d="M0 -8 C4 -2 6 1 6 4 A6 6 0 0 1 -6 4 C-6 1 -4 -2 0 -8Z"/></defs>
+
+      <ellipse class="body" cx="180" cy="52" rx="42" ry="46"/>
+      <path class="body" d="M150 100 C120 108 92 125 90 170 L90 480 C90 520 130 548 180 548 C230 548 270 520 270 480 L270 170 C268 125 240 108 210 100Z"/>
+
+      <g id="routes" fill="none" stroke="none" aria-hidden="true">
+        <path id="r-mund" data-seg="mund"/><path id="r-speise" data-seg="speise"/><path id="r-magen" data-seg="magen"/>
+        <path id="r-duenn" data-seg="duenn"/><path id="r-dick" data-seg="dick"/><path id="r-end" data-seg="end"/>
+      </g>
+
+      <g class="organ helper" data-id="leber" data-step="3" role="button" tabindex="0" aria-label="Leber – Details anzeigen">
+        <path class="shape" d="M98 178 C118 158 170 160 188 176 C190 200 172 220 140 220 C112 218 98 202 98 178Z"/>
+        <text class="lab" x="136" y="195" text-anchor="middle">Leber</text>
+      </g>
+      <g class="organ helper" data-id="galle" data-step="3" role="button" tabindex="0" aria-label="Gallenblase – Details anzeigen">
+        <ellipse class="shape" cx="150" cy="227" rx="9" ry="13"/>
+        <ellipse class="hit" cx="150" cy="227" rx="20" ry="22"/>
+        <path class="leader" d="M88 233 L139 229"/>
+        <text class="lab" x="84" y="237" text-anchor="end">Gallenblase</text>
+      </g>
+      <g class="organ helper" data-id="pankreas" data-step="3" role="button" tabindex="0" aria-label="Bauchspeicheldrüse – Details anzeigen">
+        <path class="shape" d="M150 252 C175 240 215 242 246 252 C244 266 190 268 152 262Z"/>
+        <path class="leader" d="M246 257 L270 257"/>
+        <text class="lab" x="274" y="256" style="font-size:11.5px"><tspan x="274">Bauchspeichel-</tspan><tspan x="274" dy="13">drüse</tspan></text>
+      </g>
+      <path class="duct" data-step="3" d="M152 239 C156 257 190 257 203 259"/>
+
+      <g class="organ" data-id="dick" data-step="5" role="button" tabindex="0" aria-label="Dickdarm – Details anzeigen">
+        <path class="halo" data-halo="dick" data-seg="dick" stroke-width="32"/>
+        <path class="t-out" data-seg="dick" stroke-width="23"/>
+        <path class="t-in" data-seg="dick" stroke-width="18"/>
+        <path class="hit" data-seg="dick" stroke-width="26"/>
+        <path class="leader" d="M259 362 L270 362"/>
+        <text class="lab" x="274" y="366">Dickdarm</text>
+      </g>
+      <g class="organ" data-id="duenn" data-step="4" role="button" tabindex="0" aria-label="Dünndarm – Details anzeigen">
+        <path class="halo" data-halo="duenn" data-seg="duenn" stroke-width="28"/>
+        <path class="t-out" data-seg="duenn" stroke-width="19"/>
+        <path class="t-in" data-seg="duenn" stroke-width="14"/>
+        <path class="hit" data-seg="duenn" stroke-width="22"/>
+        <path class="leader" d="M88 372 L131 368"/>
+        <text class="lab" x="84" y="376" text-anchor="end">Dünndarm</text>
+      </g>
+      <g class="organ" data-id="enddarm" data-step="6" role="button" tabindex="0" aria-label="Enddarm und After – Details anzeigen">
+        <path class="t-out" data-seg="end" stroke-width="17"/>
+        <path class="t-in" data-seg="end" stroke-width="12"/>
+        <circle class="shape" cx="180" cy="509" r="7"/>
+        <path class="hit" data-seg="end" stroke-width="26"/>
+        <path class="leader" d="M190 484 L270 484"/>
+        <text class="lab" x="274" y="488">Enddarm</text>
+        <path class="leader" d="M188 509 L270 509"/>
+        <text class="lab" x="274" y="513">After</text>
+      </g>
+      <g class="organ" data-id="speise" data-step="1" role="button" tabindex="0" aria-label="Speiseröhre – Details anzeigen">
+        <path class="t-out" data-seg="speise" stroke-width="15"/>
+        <path class="t-in" data-seg="speise" stroke-width="10"/>
+        <path class="hit" data-seg="speise" stroke-width="26"/>
+        <text class="lab" x="170" y="140" text-anchor="end">Speiseröhre</text>
+      </g>
+      <g class="organ" data-id="magen" data-step="2" role="button" tabindex="0" aria-label="Magen – Details anzeigen">
+        <path class="shape" d="M176 172 C215 165 258 186 252 220 C248 246 210 254 200 238 C194 228 200 218 190 210 C180 202 172 184 176 172Z"/>
+        <path class="leader" d="M255 205 L270 205"/>
+        <text class="lab" x="274" y="209">Magen</text>
+      </g>
+      <g class="organ" data-id="mund" data-step="0" role="button" tabindex="0" aria-label="Mund – Details anzeigen">
+        <ellipse class="shape" cx="180" cy="76" rx="17" ry="8"/>
+        <ellipse class="hit" cx="180" cy="76" rx="28" ry="18"/>
+        <path class="leader" d="M198 76 L230 80"/>
+        <text class="lab" x="234" y="84">Mund</text>
+      </g>
+
+      <use class="drop" data-step="0" href="#dropP" transform="translate(190 68) scale(.8)"/>
+      <use class="drop" data-step="2" href="#dropP" transform="translate(222 196)"/>
+      <use class="drop" data-step="2" href="#dropP" transform="translate(242 222)"/>
+      <use class="drop" data-step="3" href="#dropP" transform="translate(176 252)"/>
+      <use class="drop" data-step="3" href="#dropP" transform="translate(222 258)"/>
+      <use class="drop" data-step="4" href="#dropP" transform="translate(186 343) scale(.75)"/>
+      <use class="drop" data-step="4" href="#dropP" transform="translate(186 379) scale(.75)"/>
+
+      <g id="bolus" aria-hidden="true">
+        <circle r="24" fill="transparent"/>
+        <circle class="bol" r="10"/>
+        <circle class="bol-hi" cx="-3" cy="-3" r="3.5"/>
+      </g>
+    </svg>
+
+    <div class="ctrl">
+      <label class="sl-l" for="sl">Weg des Bissens</label>
+      <input id="sl" type="range" min="0" max="1000" step="1" value="0" aria-describedby="hint">
+      <p class="hint" id="hint" aria-live="polite">Ziehe den Regler oder den orangen Punkt im Bild.</p>
+      <button class="btn" id="play" type="button" aria-pressed="false">▶ Abspielen</button>
+    </div>
+  </section>
+
+  <section class="card live" aria-labelledby="h-live">
+    <h2 id="h-live">Gerade passiert</h2>
+    <div class="tiles">
+      <div class="tile"><small>Station</small><b id="st-name">–</b></div>
+      <div class="tile"><small>Zeit seit dem ersten Bissen</small><b id="st-time">–</b></div>
+      <div class="tile"><small>Säuregrad</small><b id="st-ph">–</b></div>
+    </div>
+    <div class="ph" aria-hidden="true"><i id="ph-m"></i></div>
+    <div class="phl" aria-hidden="true"><span>0 sauer</span><span>7 neutral</span><span>14 basisch</span></div>
+    <p class="now" id="st-now"></p>
+  </section>
+
+  <section class="card nutri" aria-labelledby="h-nut">
+    <h2 id="h-nut">Was mit den Nährstoffen passiert</h2>
+    <p class="grp">Durch Enzyme in Bausteine gespalten</p>
+    <div id="bars-enz"></div>
+    <p class="grp">In den Körper aufgenommen (Resorption)</p>
+    <div id="bars-res"></div>
+    <p class="note">Prozentwerte sind vereinfachte Modellwerte zur Veranschaulichung, keine Messwerte.</p>
+  </section>
+
+  <section class="card detail" id="detail" aria-labelledby="h-det">
+    <h2 id="h-det">Details zum Organ</h2>
+    <div id="det-body"></div>
+  </section>
+
+  <section class="card legend" aria-labelledby="h-leg">
+    <h2 id="h-leg">Legende</h2>
+    <ul>
+      <li><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><circle class="bol" cx="15" cy="12" r="8"/></svg><span><b>Orangefarbener Punkt:</b> der Bissen bzw. der Speisebrei (ziehbar)</span></li>
+      <li><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><rect class="shape" x="3" y="5" width="24" height="14" rx="7"/></svg><span><b>Grün:</b> Verdauungsorgan auf dem Weg der Nahrung</span></li>
+      <li><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><g class="helper"><ellipse class="shape" cx="15" cy="12" rx="11" ry="8"/></g></svg><span><b>Violett:</b> Hilfsorgan – die Nahrung kommt hier nicht vorbei</span></li>
+      <li><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><path class="drop" d="M15 3 C19 9 21 12 21 15 A6 6 0 0 1 9 15 C9 12 11 9 15 3Z"/></svg><span><b>Blaue Tropfen, blaue Balken:</b> Verdauungssäfte mit Enzymen</span></li>
+      <li><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><rect x="3" y="6" width="24" height="12" rx="6" style="fill:var(--blood)"/></svg><span><b>Rot:</b> Aufnahme in den Körper (Resorption)</span></li>
+      <li><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><rect class="shape" x="3" y="5" width="24" height="14" rx="7" style="stroke:var(--food);stroke-width:3.5"/></svg><span><b>Oranger Rand:</b> Hier befindet sich der Bissen gerade</span></li>
+    </ul>
+  </section>
+
+  <section class="card" aria-label="Hinweise zu Vereinfachungen">
+    <details>
+      <summary>Was ist hier vereinfacht?</summary>
+      <ul>
+        <li>Lage und Größe der Organe sind nicht maßstabsgetreu. Der Dünndarm ist in Wirklichkeit etwa 3–5 m lang, der Dickdarm nur etwa 1,5 m.</li>
+        <li>Zeiten, pH-Werte und Prozentwerte sind typische Richtwerte bzw. Modellwerte. Sie unterscheiden sich von Mensch zu Mensch und von Mahlzeit zu Mahlzeit.</li>
+        <li>Es sind nur die wichtigsten Enzyme genannt (Amylase, Pepsin, Trypsin, Lipase).</li>
+        <li>Die Fettverdauung ist stark vereinfacht: kleine Anteile beginnen schon im Magen, im Schaubild startet sie im Dünndarm.</li>
+        <li>Wir sehen den Körper von vorn: Die Leber liegt rechts im Körper, im Bild also links.</li>
+      </ul>
+    </details>
+  </section>
+</main>
+<div class="sr" id="sr" aria-live="polite"></div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+const wide = matchMedia("(min-width: 860px)");
+
+/* ---------- Daten ---------- */
+const SEG = {
+  mund:  { d: "M168 74 L180 78 L180 94", w: .10 },
+  speise:{ d: "M180 94 L180 176", w: .10 },
+  magen: { d: "M180 176 C200 182 228 192 232 214 C234 232 210 236 203 252", w: .25 },
+  duenn: { d: "M203 252 C214 262 214 276 205 286 L205 318 L140 332 L228 350 L138 368 L228 386 L150 404 L150 418 L118 428", w: .35 },
+  dick:  { d: "M118 428 L112 420 L112 295 L250 295 L250 410 Q250 440 215 440 Q180 440 180 462", w: .15 },
+  end:   { d: "M180 462 L180 505", w: .05 }
+};
+const ORDER = ["mund", "speise", "magen", "duenn", "dick", "end"];
+const NAMES = { mund: "Mund", speise: "Speiseröhre", magen: "Magen", duenn: "Dünndarm", dick: "Dickdarm", end: "Enddarm / After" };
+const ACT = { mund: "mund", speise: "speise", magen: "magen", duenn: "duenn", dick: "dick", end: "enddarm" };
+const NOW = {
+  mund: "Die Zähne zerkleinern den Bissen. Der Speichel enthält Amylase und beginnt die Stärkeverdauung.",
+  speise: "Muskelwellen (Peristaltik) schieben den Bissen Richtung Magen. Verdaut wird hier nichts.",
+  magen: "Salzsäure und Pepsin: Der Magen knetet den Brei und beginnt die Eiweißverdauung.",
+  duenn: "Galle, Bauchspeichel und Darmsaft: Hier werden alle Nährstoffe fertig gespalten und aufgenommen.",
+  dick: "Dem Brei wird Wasser entzogen. Darmbakterien zersetzen Ballaststoffe, der Brei wird fest.",
+  end: "Der Kot wird gesammelt und über den After ausgeschieden."
+};
+const TARGET = { mund: .05, speise: .15, magen: .34, duenn: .62, dick: .88, enddarm: .975 };
+
+const KT = [0, .10, .20, .45, .80, .95, 1];
+const K = {
+  C: [0, 10, 10, 10, 100, 100, 100],
+  E: [0, 0, 0, 30, 100, 100, 100],
+  F: [0, 0, 0, 0, 100, 100, 100],
+  R: [0, 0, 0, 0, 95, 95, 95],
+  W: [0, 0, 0, 0, 80, 99, 99]
+};
+const TH = [0, .017, .02, 3, 7, 31, 33];
+const PT = [0, .20, .26, .45, .52, .80, .95, 1];
+const PH = [7, 7, 2, 2, 7, 7.5, 6.5, 6.5];
+
+const BARS = [
+  { k: "C", g: "enz", n: "Kohlenhydrate (Stärke)", s: "wird zu Traubenzucker (Glucose)" },
+  { k: "E", g: "enz", n: "Eiweiße (Proteine)", s: "werden zu Aminosäuren" },
+  { k: "F", g: "enz", n: "Fette", s: "werden zu Fettsäuren und Glycerin" },
+  { k: "R", g: "res", n: "Nährstoffe aufgenommen", s: "durch die Darmwand ins Blut bzw. in die Lymphe" },
+  { k: "W", g: "res", n: "Wasser zurückgewonnen", s: "aus dem Verdauungsbrei" }
+];
+
+const STEPS = [
+  { t: "Mund", x: "Im Mund wird die Nahrung zerkleinert und mit Speichel vermischt. Das Enzym Amylase beginnt die Stärkeverdauung.", sel: "mund", maxT: .10, tg: .05 },
+  { t: "Speiseröhre", x: "Muskelwellen (Peristaltik) schieben den Bissen Richtung Magen. Verdaut wird hier nichts.", sel: "speise", maxT: .20, tg: .15 },
+  { t: "Magen", x: "Der Magen knetet den Brei. Salzsäure tötet Keime ab, Pepsin beginnt die Eiweißverdauung.", sel: "magen", maxT: .45, tg: .34 },
+  { t: "Hilfsorgane", x: "Leber, Gallenblase und Bauchspeicheldrüse liefern Verdauungssäfte. Die Nahrung selbst kommt dort nicht vorbei.", sel: "leber", maxT: .45, tg: .45 },
+  { t: "Dünndarm", x: "Hauptort der Verdauung und Aufnahme: Die Nährstoffe werden in kleine Bausteine gespalten und gehen in den Körper über.", sel: "duenn", maxT: .80, tg: .62 },
+  { t: "Dickdarm", x: "Dem Brei wird Wasser entzogen. Darmbakterien zersetzen Ballaststoffe, der Kot wird fest.", sel: "dick", maxT: .95, tg: .88 },
+  { t: "Enddarm und After", x: "Der Kot wird gesammelt und ausgeschieden. Die ganze Reise dauert etwa 1–3 Tage.", sel: "enddarm", maxT: 1, tg: .975 }
+];
+
+const ORG = {
+  mund: {
+    name: "Mund (Mundhöhle)", pts: [
+      "Die Zähne zerkleinern die Nahrung (mechanische Verdauung). So entsteht mehr Oberfläche, an der Verdauungssäfte angreifen können.",
+      "Speicheldrüsen geben Speichel ab. Er macht den Bissen gleitfähig und erleichtert das Schlucken.",
+      "Das Enzym Amylase im Speichel beginnt, Stärke in Malzzucker zu spalten (chemische Verdauung)."],
+    facts: [["Verdauungssaft", "Speichel (Enzym: Amylase)"], ["Menge", "ca. 1–1,5 Liter Speichel pro Tag"], ["Aufenthalt", "Sekunden bis wenige Minuten"]],
+    fehl: "Die Verdauung beginnt nicht erst im Magen, sondern schon im Mund.",
+    mach: "Kaue ein Stück Brot eine Minute lang, ohne zu schlucken. Es schmeckt allmählich süßer, weil die Stärke zu Zucker gespalten wird.",
+    simp: "Im Schaubild ist nur die Stärkeverdauung im Mund gezeigt."
+  },
+  speise: {
+    name: "Speiseröhre", pts: [
+      "Ein Muskelschlauch von etwa 25 cm Länge.",
+      "Wellenförmige Muskelbewegungen (Peristaltik) schieben den Bissen zum Magen.",
+      "Beim Schlucken verschließt der Kehldeckel die Luftröhre, damit nichts „in den falschen Hals“ gerät.",
+      "Hier findet keine Verdauung statt, nur Transport."],
+    facts: [["Länge", "ca. 25 cm"], ["Verdauungssaft", "nur Schleim (keine Enzyme)"], ["Aufenthalt", "ca. 10 Sekunden"]],
+    fehl: "Die Nahrung fällt nicht durch die Schwerkraft in den Magen, sondern wird aktiv transportiert. Deshalb kann man auch im Handstand schlucken."
+  },
+  magen: {
+    name: "Magen", pts: [
+      "Ein Muskelsack, der den Speisebrei kräftig durchknetet (mechanische Verdauung).",
+      "Der Magensaft enthält Salzsäure (pH etwa 1–2). Sie tötet viele Krankheitserreger ab und aktiviert das Enzym Pepsin.",
+      "Pepsin beginnt die Eiweißverdauung.",
+      "Eine Schleimschicht schützt die Magenwand vor der Säure.",
+      "Die Säure stoppt die Wirkung der Speichel-Amylase.",
+      "Der Magenpförtner gibt den Brei portionsweise an den Dünndarm weiter."],
+    facts: [["Fassungsvermögen", "ca. 1–1,5 Liter"], ["Verdauungssaft", "Magensaft (Salzsäure, Pepsin)"], ["Aufenthalt", "ca. 2–6 Stunden, bei fettreichem Essen länger"]],
+    fehl: "Im Magen wird nicht alles verdaut, und kaum Nährstoffe gehen ins Blut. Die Hauptarbeit passiert im Dünndarm.",
+    simp: "Kleine Mengen Fett werden schon im Magen angespalten – das ist hier weggelassen. Die Prozentwerte sind Modellwerte."
+  },
+  leber: {
+    name: "Leber", helper: true, pts: [
+      "Größte Drüse des Körpers.",
+      "Sie bildet Galle (etwa ½ bis 1 Liter pro Tag).",
+      "Das Blut aus dem Darm fließt zuerst durch die Leber: Sie verarbeitet und speichert Nährstoffe und baut Giftstoffe ab."],
+    facts: [["Verdauungssaft", "Galle (enthält keine Enzyme)"]],
+    fehl: "Leber, Gallenblase und Bauchspeicheldrüse liegen nicht auf dem Weg der Nahrung. Sie liefern nur Säfte.",
+    simp: "Wir sehen den Körper von vorn: Die Leber liegt rechts im Körper, im Bild also links."
+  },
+  galle: {
+    name: "Gallenblase", helper: true, pts: [
+      "Sie speichert die Galle aus der Leber und macht sie konzentrierter.",
+      "Bei fettreichem Essen zieht sie sich zusammen und gibt Galle über den Gallengang in den Zwölffingerdarm ab.",
+      "Galle zerteilt große Fetttropfen in winzige Tröpfchen (Emulgieren), ähnlich wie Spülmittel bei fettigem Geschirr. So kann das Enzym Lipase besser angreifen."],
+    facts: [["Verdauungssaft", "Galle (enthält keine Enzyme)"]],
+    fehl: "Galle ist kein Enzym: Sie spaltet Fett nicht, sie zerteilt es nur fein."
+  },
+  pankreas: {
+    name: "Bauchspeicheldrüse", helper: true, pts: [
+      "Sie bildet den Bauchspeichel (ca. 1–1,5 Liter pro Tag) und gibt ihn in den Zwölffingerdarm ab.",
+      "Er enthält Enzyme für alle drei Nährstoffgruppen: Amylase (Kohlenhydrate), Proteasen wie Trypsin (Eiweiße) und Lipase (Fette).",
+      "Außerdem neutralisiert er die Magensäure, damit die Enzyme im Dünndarm arbeiten können."],
+    facts: [["Verdauungssaft", "Bauchspeichel (Amylase, Trypsin, Lipase)"]],
+    fehl: "Bauchspeichel und Mundspeichel sind verschiedene Säfte mit verschiedenen Aufgaben.",
+    zus: "Die Bauchspeicheldrüse bildet auch Hormone wie Insulin. Das gehört zum Thema Blutzucker, nicht zur Verdauung."
+  },
+  duenn: {
+    name: "Dünndarm", inset: true, pts: [
+      "Etwa 3–5 m lang – der längste Abschnitt des Darms. „Dünn“ bezieht sich nur auf den Durchmesser.",
+      "Am Anfang (Zwölffingerdarm) fließen Galle und Bauchspeichel ein. Die Darmwand liefert zusätzlich Darmsaft.",
+      "Hier wird fertig verdaut: Stärke → Traubenzucker (Glucose), Eiweiße → Aminosäuren, Fette → Fettsäuren und Glycerin.",
+      "Resorption: Die Bausteine gehen durch die Darmwand in den Körper. Darmfalten, Darmzotten und Mikrovilli vergrößern die Oberfläche enorm.",
+      "Auch Vitamine, Mineralstoffe und der größte Teil des Wassers werden hier aufgenommen."],
+    facts: [["Länge", "ca. 3–5 m"], ["Verdauungssäfte", "Galle, Bauchspeichel, Darmsaft"], ["Oberfläche", "grob 30–40 m² nach neueren Schätzungen (ältere Bücher nennen oft 200 m²)"], ["Aufenthalt", "ca. 3–5 Stunden"]],
+    fehl: "Dünn heißt nicht kurz. Fast alle Nährstoffe werden im Dünndarm aufgenommen, nicht im Dickdarm.",
+    simp: "Zucker und Aminosäuren gelangen ins Blut, Fettbausteine überwiegend in die Lymphe. Im Schaubild steht beides zusammen unter „in den Körper aufgenommen“."
+  },
+  dick: {
+    name: "Dickdarm", pts: [
+      "Etwa 1,5 m lang und weiter als der Dünndarm.",
+      "Hier kommen Unverdauliches (Ballaststoffe) und Reste der Verdauungssäfte an.",
+      "Der Dickdarm entzieht dem Brei Wasser und Mineralstoffe. Dadurch wird er zu Kot eingedickt.",
+      "Darmbakterien (Darmflora) zersetzen Ballaststoffe und bilden teilweise Vitamine, z. B. Vitamin K.",
+      "Ballaststoffe sind nicht „nutzlos“: Sie fördern die Darmbewegung und sind Nahrung für die Darmbakterien."],
+    facts: [["Länge", "ca. 1,5 m"], ["Verdauungssäfte", "kaum eigene – Darmbakterien helfen"], ["Wasser", "nur etwa 0,1–0,2 Liter verlassen den Körper mit dem Kot"], ["Aufenthalt", "ca. 10–30 Stunden"]],
+    fehl: "Im Dickdarm werden kaum noch Nährstoffe aufgenommen. Er gewinnt vor allem Wasser zurück."
+  },
+  enddarm: {
+    name: "Enddarm und After", pts: [
+      "Der Enddarm (Mastdarm) sammelt den Kot.",
+      "Wird er gedehnt, entsteht Stuhldrang. Schließmuskeln am After halten dicht, bis man zur Toilette geht.",
+      "Kot besteht aus unverdaulichen Resten (Ballaststoffe), Wasser, abgestoßenen Darmzellen und vielen Bakterien."],
+    facts: [["Gesamte Reise", "ca. 1–3 Tage, sehr unterschiedlich"]],
+    fehl: "Kot besteht nicht einfach aus „Essensresten“. Ein beträchtlicher Teil sind Darmbakterien."
+  }
+};
+
+/* ---------- Zustand ---------- */
+let t = 0, maxT = STEPS[0].maxT, step = 0, sel = null;
+let anim = null, animRes = null, playing = false, quiet = false, lastStation = null, drag = false, hintTimer = null;
+
+const svg = $("#dia"), bolus = $("#bolus"), slider = $("#sl"), sr = $("#sr"), hintEl = $("#hint");
+
+/* ---------- Geometrie ---------- */
+let acc = 0;
+ORDER.forEach(k => { SEG[k].t0 = acc; acc += SEG[k].w; SEG[k].t1 = acc; });
+SEG.end.t1 = 1;
+$$("[data-seg]").forEach(p => p.setAttribute("d", SEG[p.dataset.seg].d));
+ORDER.forEach(k => { SEG[k].el = $("#r-" + k); SEG[k].len = SEG[k].el.getTotalLength(); });
+const SAMP = [];
+ORDER.forEach(k => {
+  const s = SEG[k], n = Math.max(4, Math.round(s.len / 3));
+  for (let i = 0; i <= n; i++) {
+    const p = s.el.getPointAtLength(s.len * i / n);
+    SAMP.push({ t: s.t0 + (s.t1 - s.t0) * i / n, x: p.x, y: p.y });
+  }
+});
+const segAt = v => { for (const k of ORDER) if (v < SEG[k].t1 || k === "end") return k; };
+const ptAt = v => {
+  const k = segAt(v), s = SEG[k];
+  const u = Math.min(1, Math.max(0, (v - s.t0) / (s.t1 - s.t0)));
+  return s.el.getPointAtLength(u * s.len);
+};
+const lerp = (xs, ys, v) => {
+  if (v <= xs[0]) return ys[0];
+  for (let i = 1; i < xs.length; i++) {
+    if (v <= xs[i]) { const f = (v - xs[i - 1]) / (xs[i] - xs[i - 1]); return ys[i - 1] + (ys[i] - ys[i - 1]) * f; }
+  }
+  return ys[ys.length - 1];
+};
+const de = n => String(n).replace(".", ",");
+const fmtH = h => {
+  const m = h * 60;
+  if (m < 1) return "weniger als 1 Min.";
+  if (m < 60) return "ca. " + Math.round(m) + " Min.";
+  if (h < 24) return "ca. " + (h < 5 ? de(Math.round(h * 2) / 2) : Math.round(h)) + " Std.";
+  return "ca. " + Math.round(h) + " Std. (≈ " + de((h / 24).toFixed(1)) + " Tage)";
+};
+const phWord = p => p < 4 ? "stark sauer" : p < 6.8 ? "schwach sauer" : p <= 7.2 ? "neutral" : "schwach basisch";
+
+/* ---------- Aufbau der Balken ---------- */
+const barEls = {};
+BARS.forEach(b => {
+  const d = document.createElement("div");
+  d.className = "bar " + b.g;
+  d.innerHTML = `<div class="nm"><b>${b.n}</b><small>${b.s}</small></div><div class="pc">0 %</div><div class="tr" role="progressbar" aria-label="${b.n}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill"></div></div>`;
+  $("#bars-" + b.g).appendChild(d);
+  barEls[b.k] = { pc: $(".pc", d), tr: $(".tr", d), fill: $(".fill", d) };
+});
+
+/* ---------- Schrittleiste ---------- */
+const sbs = $("#sbs");
+STEPS.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "btn sb"; b.textContent = i + 1;
+  b.setAttribute("aria-label", `Schritt ${i + 1} von ${STEPS.length}: ${s.t}`);
+  b.addEventListener("click", () => goStep(i));
+  sbs.appendChild(b);
+});
+const sbBtns = $$(".sb");
+
+/* ---------- Fokusrahmen für Organe ---------- */
+$$(".organ").forEach(o => {
+  const bb = o.getBBox(), r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r.setAttribute("class", "ring");
+  r.setAttribute("x", bb.x - 5); r.setAttribute("y", bb.y - 5);
+  r.setAttribute("width", bb.width + 10); r.setAttribute("height", bb.height + 10);
+  r.setAttribute("rx", 6);
+  o.appendChild(r);
+  o.addEventListener("click", () => pick(o.dataset.id));
+  o.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(o.dataset.id); } });
+});
+
+/* ---------- Zeichnen ---------- */
+function say(msg) { sr.textContent = ""; setTimeout(() => { sr.textContent = msg; }, 30); }
+function hint(msg, keep) {
+  hintEl.textContent = msg;
+  clearTimeout(hintTimer);
+  if (!keep) hintTimer = setTimeout(() => { hintEl.textContent = "Ziehe den Regler oder den orangen Punkt im Bild."; }, 4000);
+}
+function draw() {
+  const p = ptAt(t);
+  bolus.setAttribute("transform", `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
+  slider.value = Math.round(t * 1000);
+  const k = segAt(t), s = SEG[k];
+  const u = Math.min(1, Math.max(0, (t - s.t0) / (s.t1 - s.t0)));
+
+  BARS.forEach(b => {
+    const v = Math.round(lerp(KT, K[b.k], t)), e = barEls[b.k];
+    e.fill.style.width = v + "%"; e.pc.textContent = v + " %"; e.tr.setAttribute("aria-valuenow", v);
+  });
+  const ph = lerp(PT, PH, t), phR = Math.round(ph * 2) / 2;
+  $("#ph-m").style.left = (ph / 14 * 100) + "%";
+  $("#st-ph").textContent = "pH ≈ " + de(phR) + " · " + phWord(ph);
+  const tm = fmtH(lerp(KT, TH, t));
+  $("#st-time").textContent = tm;
+  $("#st-name").textContent = NAMES[k];
+  $("#st-now").textContent = NOW[k];
+  slider.setAttribute("aria-valuetext", NAMES[k] + ", " + tm);
+
+  $$("[data-halo]").forEach(h => { h.style.opacity = (h.dataset.halo === k) ? (.2 + .55 * u).toFixed(2) : 0; });
+  $$(".organ").forEach(o => o.classList.toggle("active", o.dataset.id === ACT[k]));
+
+  if (k !== lastStation) {
+    lastStation = k;
+    if (!quiet) say("Station: " + NAMES[k] + ". " + NOW[k]);
+  }
+}
+function setT(v) { t = Math.max(0, Math.min(maxT, v)); draw(); }
+
+/* ---------- Bewegung ---------- */
+function cancelAnim() {
+  if (anim) { cancelAnimationFrame(anim); anim = null; }
+  if (animRes) { const r = animRes; animRes = null; r(); }
+}
+function userStop() { cancelAnim(); playing = false; updPlay(); }
+function animateTo(target, dur) {
+  cancelAnim();
+  target = Math.max(0, Math.min(target, maxT));
+  if (reduce.matches || !dur || Math.abs(target - t) < .001) { setT(target); return Promise.resolve(); }
+  return new Promise(res => {
+    animRes = res;
+    const a = t, t0 = performance.now();
+    const f = now => {
+      const x = Math.min(1, (now - t0) / dur), e = x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+      setT(a + (target - a) * e);
+      if (x < 1) anim = requestAnimationFrame(f);
+      else { anim = null; animRes = null; res(); }
+    };
+    anim = requestAnimationFrame(f);
+  });
+}
+function updPlay() {
+  const b = $("#play");
+  b.textContent = playing ? "❚❚ Pause" : "▶ Abspielen";
+  b.setAttribute("aria-pressed", playing ? "true" : "false");
+}
+function play() {
+  if (playing) { userStop(); return; }
+  if (t >= maxT - .001) {
+    if (step === STEPS.length - 1) setT(0);
+    else { hint("Der freigeschaltete Abschnitt ist zu Ende. Tippe auf „Weiter“, um den nächsten Teil aufzubauen."); return; }
+  }
+  cancelAnim(); playing = true; updPlay();
+  let last = performance.now();
+  const f = now => {
+    if (!playing) return;
+    setT(t + (now - last) / 18000); last = now;
+    if (t >= maxT - .0005) { playing = false; updPlay(); anim = null; return; }
+    anim = requestAnimationFrame(f);
+  };
+  anim = requestAnimationFrame(f);
+}
+
+/* ---------- Schritte und Auswahl ---------- */
+function applyStep() {
+  $$("[data-step]").forEach(el => {
+    const g = step < +el.dataset.step;
+    el.classList.toggle("ghost", g);
+    if (el.classList.contains("organ")) {
+      if (g) el.removeAttribute("tabindex"); else el.setAttribute("tabindex", "0");
+      el.setAttribute("aria-hidden", g ? "true" : "false");
+    }
+  });
+  maxT = STEPS[step].maxT;
+  slider.style.setProperty("--lock", (maxT * 100) + "%");
+  sbBtns.forEach((b, i) => {
+    if (i === step) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    b.classList.toggle("done", i < step);
+  });
+  const s = STEPS[step];
+  $("#cap").innerHTML = `<strong>Schritt ${step + 1} von ${STEPS.length}: ${s.t}</strong>${s.x}`;
+  $("#prev").disabled = step === 0;
+  $("#next").disabled = step === STEPS.length - 1;
+  if (t > maxT) setT(maxT);
+}
+function goStep(i) {
+  userStop();
+  step = Math.max(0, Math.min(STEPS.length - 1, i));
+  applyStep();
+  const s = STEPS[step];
+  select(s.sel, false);
+  quiet = true;
+  say(`Schritt ${step + 1} von ${STEPS.length}: ${s.t}. ${s.x}`);
+  animateTo(s.tg, 800).then(() => { quiet = false; lastStation = segAt(t); });
+}
+function pick(id) {
+  const o = $(`.organ[data-id="${id}"]`);
+  if (!o || o.classList.contains("ghost")) return;
+  userStop();
+  select(id, true);
+  if (TARGET[id] != null) animateTo(TARGET[id], 500);
+}
+function select(id, user) {
+  sel = id;
+  $$(".organ").forEach(o => o.classList.toggle("sel", o.dataset.id === id));
+  showDetail(id);
+  if (user) {
+    say("Details zu " + ORG[id].name + " werden unten angezeigt.");
+    if (!wide.matches) $("#detail").scrollIntoView({ block: "nearest", behavior: reduce.matches ? "auto" : "smooth" });
+  }
+}
+function insetSvg() {
+  return `<svg class="inset" viewBox="0 0 300 175" role="img" aria-label="Schema einer Darmzotte: Der Darminnenraum liegt oben, in der Zotte verläuft eine Blutkapillare. Zucker und Aminosäuren gehen ins Blut, Fettbausteine überwiegend in die Lymphe.">
+    <defs><marker id="arw" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8Z" style="fill:var(--blood)"/></marker></defs>
+    <rect x="0" y="0" width="300" height="175" style="fill:var(--bg)"/>
+    <path d="M10 128 L10 88 Q10 72 32 72 Q54 72 54 88 L54 128Z M246 128 L246 88 Q246 72 268 72 Q290 72 290 88 L290 128Z" class="shape" style="stroke-width:1.5"/>
+    <rect x="0" y="128" width="300" height="47" class="shape" style="stroke-width:1.5"/>
+    <path d="M100 130 L100 56 Q100 28 150 28 Q200 28 200 56 L200 130Z" class="shape"/>
+    <path d="M132 128 L132 56 Q150 44 168 56 L168 128" fill="none" stroke-width="4" stroke-linecap="round" style="stroke:var(--blood)"/>
+    <path d="M150 128 L150 70" fill="none" stroke-width="3" stroke-dasharray="5 4" stroke-linecap="round" style="stroke:var(--blood)"/>
+    <path d="M62 52 L98 62 M62 82 L98 82 M238 52 L202 62 M238 82 L202 82" fill="none" stroke-width="2.5" marker-end="url(#arw)" style="stroke:var(--blood)"/>
+    <text class="lab" x="150" y="16" text-anchor="middle">Darminnenraum (Speisebrei)</text>
+    <text class="lab" x="150" y="152" text-anchor="middle">Darmwand</text>
+    <text class="lab" x="150" y="168" text-anchor="middle" style="font-size:10.5px">Zotten vergrößern die Oberfläche</text>
+    <text class="lab" x="30" y="40" text-anchor="middle" style="font-size:11px">Zucker,</text>
+    <text class="lab" x="30" y="53" text-anchor="middle" style="font-size:11px">Aminosäuren</text>
+    <text class="lab" x="268" y="40" text-anchor="middle" style="font-size:11px">Fett-</text>
+    <text class="lab" x="268" y="53" text-anchor="middle" style="font-size:11px">bausteine</text>
+    <text class="lab" x="116" y="106" text-anchor="end" style="font-size:11px">Blut-</text>
+    <text class="lab" x="116" y="119" text-anchor="end" style="font-size:11px">gefäß</text>
+    <text class="lab" x="184" y="112" style="font-size:11px">Lymphe</text>
+  </svg>`;
+}
+function showDetail(id) {
+  const body = $("#det-body");
+  if (!id || !ORG[id]) {
+    body.innerHTML = `<p class="empty">Noch kein Organ gewählt. Tippe im Schaubild auf ein Organ oder auf „Weiter“. Hier erscheinen dann Aufgaben, Verdauungssäfte und typische Fehlvorstellungen.</p>`;
+    return;
+  }
+  const o = ORG[id];
+  let h = `<h3>${o.name}</h3><p class="tag ${o.helper ? "h" : ""}">${o.helper ? "Hilfsorgan: Die Nahrung kommt hier nicht vorbei" : "Verdauungsorgan: Station auf dem Weg der Nahrung"}</p>`;
+  h += `<ul>${o.pts.map(x => `<li>${x}</li>`).join("")}</ul>`;
+  if (o.inset) h += insetSvg();
+  h += `<dl class="facts">${o.facts.map(f => `<dt>${f[0]}</dt><dd>${f[1]}</dd>`).join("")}</dl>`;
+  if (o.fehl) h += `<div class="call"><b>Typische Fehlvorstellung</b>${o.fehl}</div>`;
+  if (o.mach) h += `<div class="call t"><b>Zum Ausprobieren</b>${o.mach}</div>`;
+  if (o.zus) h += `<div class="call t"><b>Zusatzwissen</b>${o.zus}</div>`;
+  if (o.simp) h += `<div class="call s"><b>Vereinfachung im Schaubild</b>${o.simp}</div>`;
+  body.innerHTML = h;
+}
+
+/* ---------- Bedienelemente ---------- */
+$("#prev").addEventListener("click", () => goStep(step - 1));
+$("#next").addEventListener("click", () => goStep(step + 1));
+$("#all").addEventListener("click", () => {
+  userStop(); step = STEPS.length - 1; applyStep();
+  hint("Alle Organe sind sichtbar, der ganze Weg ist freigeschaltet.");
+  say("Alle Organe sind sichtbar. Der ganze Weg ist freigeschaltet.");
+});
+$("#reset").addEventListener("click", () => {
+  userStop(); step = 0; sel = null; applyStep(); select(null);
+  $$(".organ").forEach(o => o.classList.remove("sel"));
+  quiet = true; say("Neu gestartet. Schritt 1 von " + STEPS.length + ": Mund.");
+  animateTo(0, 500).then(() => { quiet = false; lastStation = segAt(t); });
+});
+$("#play").addEventListener("click", play);
+if (reduce.matches) $("#play").hidden = true;
+
+slider.addEventListener("input", () => {
+  userStop();
+  let v = slider.value / 1000;
+  if (v > maxT + .0005) { v = maxT; hint("Dieser Abschnitt ist noch gesperrt. Tippe auf „Weiter“, um ihn aufzubauen."); }
+  setT(v);
+});
+
+/* Ziehen des Punktes im Bild */
+function svgPt(e) {
+  const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY;
+  return p.matrixTransform(svg.getScreenCTM().inverse());
+}
+bolus.addEventListener("pointerdown", e => {
+  userStop(); drag = true; bolus.setPointerCapture(e.pointerId); e.preventDefault();
+});
+bolus.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const q = svgPt(e);
+  let best = null, bd = Infinity;
+  for (const s of SAMP) {
+    if (Math.abs(s.t - t) > .25) continue;
+    const d = (s.x - q.x) ** 2 + (s.y - q.y) ** 2;
+    if (d < bd) { bd = d; best = s; }
+  }
+  if (!best) return;
+  if (best.t > maxT + .001) hint("Dieser Abschnitt ist noch gesperrt. Tippe auf „Weiter“, um ihn aufzubauen.");
+  setT(best.t);
+});
+const endDrag = () => { drag = false; };
+bolus.addEventListener("pointerup", endDrag);
+bolus.addEventListener("pointercancel", endDrag);
+
+/* ---------- Start ---------- */
+applyStep();
+select(null);
+draw();
+})();
+</script>
+</body>
+</html>

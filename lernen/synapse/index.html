@@ -1,0 +1,1362 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reizweiterleitung an der Synapse</title>
+<meta name="description" content="Chemische Synapse (motorische Endplatte): Ablauf Schritt für Schritt, Synapsengifte, Gegengifte mit Bewertung und Frequenzdiagramm der postsynaptischen Aktionspotenziale.">
+<style>
+:root{
+  --bg:#EDF1F6; --panel:#FFFFFF; --panel-2:#F3F6FA; --ink:#17202E; --ink-soft:#4B586C; --line:#CBD4E1; --nav:#1B2A4A; --nav-ink:#FFFFFF;
+  --focus:#0B57D0;
+  --sc-bg1:#FFF4BE; --sc-bg2:#D4ECE6; --sc-pre1:#EAF7F8; --sc-pre2:#B7DCE5; --sc-post1:#C3D4EB; --sc-post2:#D4EBE6; --sc-cleft:#FFF3B8; --sc-mem:#2F6DB5; --sc-memL:#C9E6F8; --sc-ves1:#FFF5D2; --sc-ves2:#F0D69A; --sc-vesS:#CDAE5C; --sc-ach1:#FFD9EA; --sc-ach2:#E0488A; --sc-achS:#F59E3F; --sc-g1:#8ED08E; --sc-g2:#2E9B4F; --sc-gS:#1D6A33; --sc-y1:#E2EA79; --sc-y2:#A3B530; --sc-yS:#5E6C14; --sc-lum:#C2E6F7; --sc-ache:#3FAF5B; --sc-acheS:#1F7A3A; --sc-arr1:#FFFBD2; --sc-arr2:#F4D24E; --sc-arrS:#D9B93A; --sc-sq:#1D4E89; --sc-cur:#F2A900;
+  --ach:#E4571B; --ca:#2260D6; --na:#8A3FB5; --ache:#C92A66; --cht:#2B8A3E; --rec:#7A4FB0; --ap:#E8A400;
+  --tox:#C0302B; --tox-bg:#FBE2DF; --ant:#0B7F70; --ant-bg:#D6F1EC; --warn:#7A5600; --warn-bg:#FFF0C7; --info:#2A4FB0; --info-bg:#E2E9FB;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1520; --panel:#162131; --panel-2:#1C2A3D; --ink:#E8EDF5; --ink-soft:#A5B2C6; --line:#2C3C54; --nav:#DCE6F7; --nav-ink:#0E1520; --focus:#8AB4FF;
+    --sc-bg1:#1B2433; --sc-bg2:#0F2F35; --sc-pre1:#2E6272; --sc-pre2:#1F4655; --sc-post1:#34456C; --sc-post2:#244048; --sc-cleft:#4B4526; --sc-mem:#86B8F2; --sc-memL:#1B2B45; --sc-ves1:#7D6D40; --sc-ves2:#5E5230; --sc-vesS:#D6B968; --sc-ach1:#FFD0E4; --sc-ach2:#E0488A; --sc-achS:#FFB35C; --sc-g1:#6FCF86; --sc-g2:#2E9B4F; --sc-gS:#A8E8B6; --sc-y1:#D9E463; --sc-y2:#97AC2B; --sc-yS:#E4F08B; --sc-lum:#8EC5E6; --sc-ache:#4CC26C; --sc-acheS:#A8E8B6; --sc-arr1:#FFF3A6; --sc-arr2:#E8B92E; --sc-arrS:#FFE27A; --sc-sq:#DCE6F7; --sc-cur:#FFC53D;
+    --ach:#FF8A4C; --ca:#6EA0FF; --na:#C58AE6; --ache:#FF7BA8; --cht:#5FD07A; --rec:#B58CF0; --ap:#FFC53D;
+    --tox:#FF8F85; --tox-bg:#4A1E1C; --ant:#4FD1BF; --ant-bg:#10382F; --warn:#F2C25B; --warn-bg:#3A2F12; --info:#9DB7FF; --info-bg:#1E2C5C;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1520; --panel:#162131; --panel-2:#1C2A3D; --ink:#E8EDF5; --ink-soft:#A5B2C6; --line:#2C3C54; --nav:#DCE6F7; --nav-ink:#0E1520; --focus:#8AB4FF;
+  --sc-bg1:#1B2433; --sc-bg2:#0F2F35; --sc-pre1:#2E6272; --sc-pre2:#1F4655; --sc-post1:#34456C; --sc-post2:#244048; --sc-cleft:#4B4526; --sc-mem:#86B8F2; --sc-memL:#1B2B45; --sc-ves1:#7D6D40; --sc-ves2:#5E5230; --sc-vesS:#D6B968; --sc-ach1:#FFD0E4; --sc-ach2:#E0488A; --sc-achS:#FFB35C; --sc-g1:#6FCF86; --sc-g2:#2E9B4F; --sc-gS:#A8E8B6; --sc-y1:#D9E463; --sc-y2:#97AC2B; --sc-yS:#E4F08B; --sc-lum:#8EC5E6; --sc-ache:#4CC26C; --sc-acheS:#A8E8B6; --sc-arr1:#FFF3A6; --sc-arr2:#E8B92E; --sc-arrS:#FFE27A; --sc-sq:#DCE6F7; --sc-cur:#FFC53D;
+  --ach:#FF8A4C; --ca:#6EA0FF; --na:#C58AE6; --ache:#FF7BA8; --cht:#5FD07A; --rec:#B58CF0; --ap:#FFC53D;
+  --tox:#FF8F85; --tox-bg:#4A1E1C; --ant:#4FD1BF; --ant-bg:#10382F; --warn:#F2C25B; --warn-bg:#3A2F12; --info:#9DB7FF; --info-bg:#1E2C5C;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1000px; margin:0 auto; padding:14px clamp(12px,3vw,24px) 4px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.55rem,5vw,2.3rem); line-height:1.08; margin:0; letter-spacing:-.02em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:72ch; }
+.tabs{ max-width:1000px; margin:8px auto 0; padding:0 clamp(12px,3vw,24px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em 1em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+
+/* Schema-Betrachter (angeheftet) */
+.viewer{ position:sticky; top:0; z-index:20; max-width:1000px; margin:10px auto 0; padding:0 clamp(12px,3vw,24px); }
+.vbox{ background:var(--panel); border:2px solid var(--ink); border-radius:14px; overflow:hidden; box-shadow:0 6px 0 -2px color-mix(in srgb,var(--ink) 16%,transparent); }
+.vbar{ display:flex; gap:6px; padding:6px 8px; border-bottom:1px solid var(--line); align-items:center; background:var(--panel-2); }
+.vbar .btn{ min-height:40px; padding:.1em .7em; font-size:.9rem; min-width:40px; }
+.vbar .lbl{ flex:1; min-width:0; font-weight:700; font-size:.92rem; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.vbar .lbl small{ display:block; font-weight:400; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; }
+.vwrap{ display:flex; justify-content:center; background:var(--panel); }
+.viewer.collapsed .vwrap,.viewer.collapsed .vinfo{ display:none; }
+#schema{ display:block; width:100%; height:auto; max-height:min(54vh,500px); }
+@media (max-width:700px){ #schema{ max-height:38vh; } .vinfo{ font-size:.8rem; padding:4px 10px; min-height:28px; } .vbar .lbl{ font-size:.85rem; } }
+.vinfo{ padding:6px 12px; font-size:.88rem; min-height:32px; border-top:1px solid var(--line); background:var(--panel); color:var(--ink-soft); }
+.vinfo b{ color:var(--ink); }
+.vinfo .tg{ display:inline-block; border-radius:99px; padding:0 9px; font-weight:700; font-size:.78rem; margin-right:4px; }
+.tg.tox{ background:var(--tox-bg); color:var(--tox); } .tg.ant{ background:var(--ant-bg); color:var(--ant); }
+
+.wrap{ max-width:1000px; margin:0 auto; padding:12px clamp(12px,3vw,24px) 40px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.25rem; margin:0 0 8px; line-height:1.2; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.05rem; margin:14px 0 4px; line-height:1.25; }
+.lead{ margin:0 0 10px; max-width:74ch; }
+.note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; max-width:80ch; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.4em .9em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); border-color:var(--nav); }
+.seg{ display:inline-flex; flex-wrap:wrap; border:2px solid var(--line); border-radius:10px; overflow:hidden; }
+.seg button{ border:0; background:var(--panel); padding:.35em .85em; font-weight:700; cursor:pointer; min-height:42px; border-right:1px solid var(--line); }
+.seg button:last-child{ border-right:0; }
+.seg button[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); }
+input[type=range]{ width:100%; accent-color:var(--nav); min-height:34px; }
+select,input[type=text]{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+label.fl{ display:block; font-weight:700; font-size:.9rem; color:var(--ink-soft); margin:8px 0 3px; }
+.ck{ display:flex; gap:8px; align-items:center; min-height:40px; cursor:pointer; }
+.ck input{ width:22px; height:22px; accent-color:var(--nav); flex:none; }
+.grid2{ display:grid; gap:10px; grid-template-columns:1fr; }
+@media (min-width:700px){ .grid2{ grid-template-columns:1fr 1fr; } }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--ant-bg); color:var(--ant); } .fb.no{ background:var(--tox-bg); color:var(--tox); } .fb.tip{ background:var(--warn-bg); color:var(--warn); } .fb.info{ background:var(--info-bg); color:var(--info); }
+.warn{ background:var(--warn-bg); color:var(--warn); border-radius:12px; padding:10px 14px; margin:8px 0; font-size:.93rem; }
+.badge{ display:inline-block; font-size:.78rem; font-weight:700; border-radius:99px; padding:1px 10px; border:1px solid var(--line); background:var(--panel-2); margin-right:4px; white-space:nowrap; }
+.badge.ok{ background:var(--ant-bg); color:var(--ant); border-color:transparent; } .badge.no{ background:var(--tox-bg); color:var(--tox); border-color:transparent; } .badge.tip{ background:var(--warn-bg); color:var(--warn); border-color:transparent; } .badge.info{ background:var(--info-bg); color:var(--info); border-color:transparent; }
+
+/* Schrittliste */
+.steps{ list-style:none; margin:8px 0 0; padding:0; position:relative; }
+.stp{ display:flex; gap:12px; padding:0 0 12px; position:relative; }
+.stp::before{ content:""; position:absolute; left:17px; top:36px; bottom:0; width:3px; background:var(--line); }
+.stp:last-child::before{ display:none; }
+.stp .n{ flex:none; width:36px; height:36px; border-radius:50%; background:var(--panel); border:3px solid var(--nav); font-family:var(--display); font-weight:800; display:grid; place-items:center; cursor:pointer; z-index:1; }
+.stp .b{ flex:1; min-width:0; border:2px solid var(--line); border-radius:12px; padding:8px 12px; background:var(--panel); cursor:pointer; text-align:left; }
+.stp.cur .b{ border-color:var(--nav); box-shadow:0 0 0 2px var(--nav) inset; }
+.stp.cur .n{ background:var(--nav); color:var(--nav-ink); }
+.stp.bad .n{ border-color:var(--tox); } .stp.bad.cur .n{ background:var(--tox); border-color:var(--tox); color:#fff; }
+.stp h3{ margin:0 0 2px; font-size:1.02rem; }
+.stp p{ margin:2px 0; font-size:.93rem; }
+.stp .key{ font-size:.85rem; color:var(--ink-soft); }
+.st-chip{ display:inline-block; font-size:.76rem; font-weight:700; border-radius:99px; padding:0 9px; margin-left:6px; vertical-align:2px; }
+.st-chip.ok{ background:var(--panel-2); color:var(--ink-soft); border:1px solid var(--line); }
+.st-chip.schwach{ background:var(--warn-bg); color:var(--warn); } .st-chip.aus{ background:var(--tox-bg); color:var(--tox); } .st-chip.dauer{ background:var(--tox-bg); color:var(--tox); } .st-chip.folge{ background:var(--panel-2); color:var(--ink-soft); border:1px dashed var(--ink-soft); }
+.st-chip.ang{ background:var(--tox); color:#fff; }
+.bar{ height:6px; border-radius:3px; background:var(--panel-2); overflow:hidden; margin-top:4px; max-width:260px; }
+.bar i{ display:block; height:100%; background:var(--nav); }
+.stp.bad .bar i{ background:var(--tox); }
+
+/* Karten für Gifte/Gegengifte */
+.cgrid{ display:grid; gap:10px; grid-template-columns:1fr; }
+@media (min-width:640px){ .cgrid{ grid-template-columns:1fr 1fr; } }
+.opt{ text-align:left; border:2px solid var(--line); border-radius:14px; padding:10px 12px; background:var(--panel); cursor:pointer; display:block; width:100%; }
+.opt b{ font-family:var(--display); font-size:1.02rem; display:block; }
+.opt span{ display:block; font-size:.88rem; color:var(--ink-soft); }
+.opt.tox[aria-pressed="true"]{ border-color:var(--tox); box-shadow:0 0 0 2px var(--tox) inset; background:var(--tox-bg); }
+.opt.ant[aria-pressed="true"]{ border-color:var(--ant); box-shadow:0 0 0 2px var(--ant) inset; background:var(--ant-bg); }
+.rate{ border-radius:12px; padding:10px 14px; margin-top:8px; border-left:8px solid var(--line); background:var(--panel-2); }
+.rate h3{ margin:0 0 2px; }
+.rate.gut{ border-color:var(--ant); background:var(--ant-bg); } .rate.teil{ border-color:#C58A00; background:var(--warn-bg); } .rate.stuetz{ border-color:var(--info); background:var(--info-bg); } .rate.nutz{ border-color:var(--ink-soft); } .rate.schad{ border-color:var(--tox); background:var(--tox-bg); }
+.kpi{ display:grid; gap:8px; grid-template-columns:repeat(3,1fr); margin:8px 0; }
+.kpi div{ border:1px solid var(--line); border-radius:12px; padding:6px 10px; background:var(--panel); }
+.kpi b{ display:block; font-family:var(--display); font-size:1.35rem; line-height:1.1; }
+.kpi small{ color:var(--ink-soft); font-size:.8rem; line-height:1.2; display:block; }
+@media (max-width:420px){ .kpi b{ font-size:1.15rem; } }
+.tbl{ width:100%; border-collapse:collapse; font-size:.9rem; }
+.tbl th,.tbl td{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+.tscroll{ overflow-x:auto; max-width:100%; }
+.mx{ border-collapse:separate; border-spacing:3px; font-size:.82rem; }
+.mx th{ font-weight:700; padding:2px 4px; text-align:left; vertical-align:bottom; }
+.mx thead th{ text-align:center; font-size:.76rem; }
+.mx td button{ width:44px; height:44px; border:2px solid transparent; border-radius:8px; font-weight:800; cursor:pointer; font-size:.9rem; }
+.mx .gut{ background:var(--ant-bg); color:var(--ant); } .mx .teil{ background:var(--warn-bg); color:var(--warn); } .mx .stuetz{ background:var(--info-bg); color:var(--info); } .mx .nutz{ background:var(--panel-2); color:var(--ink-soft); } .mx .schad{ background:var(--tox-bg); color:var(--tox); }
+.mx td button[aria-pressed="true"]{ border-color:var(--ink); }
+.mxl{ display:flex; flex-wrap:wrap; gap:6px 12px; font-size:.84rem; margin-top:6px; }
+.chart{ width:100%; display:block; }
+.chart text{ fill:var(--ink); font-family:var(--body); }
+.chart .ax{ stroke:var(--line); } .chart .tx2{ fill:var(--ink-soft); }
+.legendrow{ display:flex; flex-wrap:wrap; gap:4px 14px; font-size:.86rem; margin:4px 0; }
+.legendrow i{ display:inline-block; width:22px; height:0; border-top:3px solid; vertical-align:middle; margin-right:5px; }
+details.task{ border-top:1px solid var(--line); padding:6px 0; }
+details.task>summary,details.mode>summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+ul.plain{ margin:4px 0 0; padding-left:1.2em; } ul.plain li{ margin:3px 0; }
+.gl dt{ font-family:var(--display); font-weight:800; margin-top:10px; } .gl dd{ margin:2px 0 0; max-width:75ch; }
+.legend{ display:grid; gap:8px 14px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); font-size:.92rem; }
+.legend div{ display:flex; gap:10px; align-items:flex-start; } .legend b{ font-family:var(--display); }
+.sw{ flex:none; width:18px; height:18px; border-radius:5px; border:2px solid var(--ink); margin-top:2px; }
+.case{ border:2px solid var(--line); border-radius:14px; padding:10px 14px; margin-bottom:10px; background:var(--panel); }
+.sym{ background:var(--panel-2); border-radius:10px; padding:8px 12px; font-size:.95rem; }
+@media print{ .tabs,.btnrow,.viewer .vbar{ display:none !important; } .viewer{ position:static; } }
+
+/* ===== Schema (Lehrbuchstil) ===== */
+.sv text{ font-family:var(--body); fill:var(--ink); }
+.sv .lab{ font-size:12.5px; font-weight:700; } .sv .lab2{ font-size:10px; fill:var(--ink-soft); }
+.sv .leader{ stroke:var(--ink); stroke-width:1; fill:none; }
+.sv .mem{ fill:none; stroke:var(--sc-mem); stroke-width:11; stroke-linejoin:round; } .sv .memL{ fill:none; stroke:var(--sc-memL); stroke-width:7; stroke-linejoin:round; }
+.sv .cleftF{ fill:var(--sc-cleft); }
+.sv .ves{ fill:url(#gVes); stroke:var(--sc-vesS); stroke-width:1.6; }
+.sv .ach{ fill:url(#gAch); stroke:var(--sc-achS); stroke-width:1.2; transition:opacity .6s, transform 1.2s ease-in-out; }
+.sv .chy{ fill:var(--sc-y2); stroke:var(--sc-yS); stroke-width:1.3; } .sv .chyT{ fill:var(--sc-y1); stroke:var(--sc-yS); stroke-width:1.3; }
+.sv .chyC{ fill:var(--sc-yS); } .sv .chyL{ fill:var(--sc-lum); stroke:var(--sc-yS); stroke-width:1; }
+.sv .cht{ fill:var(--sc-g2); stroke:var(--sc-gS); } .sv .chyT.cht{ fill:var(--sc-g1); }
+.sv .vgc .chy{ fill:var(--sc-y2); } 
+.sv .chg{ fill:var(--sc-g2); stroke:var(--sc-gS); stroke-width:1.4; } .sv .chgT{ fill:var(--sc-g1); stroke:var(--sc-gS); stroke-width:1.4; } .sv .chgL{ fill:var(--sc-lum); stroke:var(--sc-gS); }
+.sv .rcp{ fill:var(--sc-y1); stroke:var(--sc-yS); stroke-width:1.2; }
+.sv .naA,.sv .caArrow{ stroke:var(--ink); stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.sv .ionP rect,.sv .naP rect{ fill:#fff; stroke:#C8CED8; stroke-width:1; } .sv .ionP text,.sv .naP text{ fill:#1B1B1B; font-size:11.5px; font-weight:700; }
+.sv .ion{ fill:var(--ca); stroke:#fff; stroke-width:1; } .sv .ion.cal{ stroke:var(--ant); stroke-width:1.6; }
+.sv .snare{ stroke:var(--ink); stroke-width:1.8; fill:none; }
+.sv .omega{ fill:url(#gVes); stroke:var(--sc-mem); stroke-width:2.4; }
+.sv .ache{ fill:var(--sc-ache); stroke:var(--sc-acheS); stroke-width:1.4; stroke-linejoin:round; }
+.sv .fragP{ fill:url(#gAch); stroke:var(--sc-achS); stroke-width:1.1; }
+.sv .warr{ fill:url(#gArr); stroke:var(--sc-arrS); stroke-width:1.6; stroke-linejoin:round; }
+.sv .sq rect{ fill:var(--sc-sq); stroke:var(--panel); stroke-width:1.4; transition:fill .3s; } .sv .sq text{ fill:var(--nav-ink); font-size:13px; font-weight:800; }
+.sv .sq text{ fill:#fff; } :root[data-theme="dark"] .sv .sq text{ fill:#0E1520; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .sv .sq text{ fill:#0E1520; } }
+.sv.c1 .sq1 rect,.sv.c2 .sq2 rect,.sv.c3 .sq3 rect,.sv.c4 .sq4 rect,.sv.c5 .sq5 rect,.sv.c6 .sq6 rect,.sv.c7 .sq7 rect,.sv.c8 .sq8 rect,.sv.c9 .sq9 rect{ fill:var(--sc-cur); }
+.sv.c1 .sq1 text,.sv.c2 .sq2 text,.sv.c3 .sq3 text,.sv.c4 .sq4 text,.sv.c5 .sq5 text,.sv.c6 .sq6 text,.sv.c7 .sq7 text,.sv.c8 .sq8 text,.sv.c9 .sq9 text{ fill:#1B1B1B !important; }
+.sv.f1-aus .sq1 rect,.sv.f2-aus .sq2 rect,.sv.f3-aus .sq3 rect,.sv.f4-aus .sq4 rect,.sv.f5-aus .sq5 rect,.sv.f6-aus .sq6 rect,.sv.f7-aus .sq7 rect,.sv.f8-aus .sq8 rect,.sv.f9-aus .sq9 rect{ fill:var(--tox); }
+.sv.f1-aus .sq1 text,.sv.f2-aus .sq2 text,.sv.f3-aus .sq3 text,.sv.f4-aus .sq4 text,.sv.f5-aus .sq5 text,.sv.f6-aus .sq6 text,.sv.f7-aus .sq7 text,.sv.f8-aus .sq8 text,.sv.f9-aus .sq9 text{ fill:#fff !important; }
+.sv .gbox{ fill:var(--panel); stroke:var(--ink); stroke-width:1.6; } .sv .gaugeF{ fill:var(--ap-c,#F2A900); transform-box:fill-box; transform-origin:bottom; transform:scaleY(.04); transition:transform .8s; }
+.sv .thrl{ stroke:var(--tox); stroke-width:1.6; stroke-dasharray:3 2; } .sv .thrT{ fill:var(--tox); }
+.sv .hi{ opacity:0; transition:opacity .4s; } .sv .hi ellipse{ fill:none; stroke:var(--sc-cur); stroke-width:3.5; stroke-dasharray:6 4; }
+.sv.c1 .h1,.sv.c2 .h2,.sv.c3 .h3,.sv.c4 .h4,.sv.c5 .h5,.sv.c6 .h6,.sv.c7 .h7,.sv.c8 .h8,.sv.c9 .h9{ opacity:1; }
+/* Gifte und Gegengifte */
+.sv .ov,.sv .av{ display:none; }
+.sv.p-TTX .ov-TTX,.sv.p-CTX .ov-CTX,.sv.p-MG .ov-MG,.sv.p-BoNT .ov-BoNT,.sv.p-CUR .ov-CUR,.sv.p-BGT .ov-BGT,.sv.p-SUX .ov-SUX,.sv.p-OP .ov-OP{ display:block; }
+.sv.a-NEO .av-NEO,.sv.a-ATR .av-ATR,.sv.a-OXI .av-OXI,.sv.a-AS .av-AS,.sv.a-CAL .av-CAL,.sv.a-BEA .av-BEA,.sv.a-ACH .av-ACH{ display:block; }
+.sv .tx{ fill:var(--tox) !important; font-size:11px; font-weight:800; } .sv .tx-s{ fill:var(--tox); stroke:var(--panel); stroke-width:1.2; }
+.sv .ax-t{ fill:var(--ant) !important; font-size:11px; font-weight:800; } .sv .ax-s{ fill:var(--ant); stroke:var(--panel); stroke-width:1.2; }
+.sv .rline{ stroke:var(--tox); stroke-width:1.4; fill:none; }
+.sv .xmark{ stroke:var(--tox); stroke-width:4; stroke-linecap:round; fill:none; } .sv .ptx{ fill:#fff !important; font-size:9px; font-weight:800; }
+.sv .dashb{ fill:var(--panel); fill-opacity:.7; stroke:var(--ant); stroke-width:1.6; stroke-dasharray:4 3; } .sv .beab{ fill:var(--ant-bg); stroke:var(--ant); stroke-width:1.6; }
+.sv .abody{ stroke:var(--ant); stroke-width:2.6; fill:none; stroke-linecap:round; } .sv .acx{ stroke:var(--ant); stroke-width:1.8; }
+/* Zustände der Bauteile */
+.sv .apA,.sv .apX,.sv .epsp,.sv .apP{ opacity:0; }
+.sv.s0 .apA,.sv.p1 .apA{ opacity:1; }
+.sv.c1 .apA{ animation:ap1 1.2s ease-out both; }
+.sv.f1-aus.s0 .apA,.sv.f1-aus.p1 .apA{ opacity:.35; } .sv.f1-aus.c1 .apA{ animation:none; opacity:.35; }
+.sv.f1-aus.s0 .apX,.sv.f1-aus.p1 .apX{ opacity:1; }
+.sv .caA,.sv .caI,.sv .caO{ opacity:0; }
+.sv.s0 .caA,.sv.c2 .caA{ opacity:1; }
+.sv.s0 .caI,.sv.p2 .caI{ opacity:1; } .sv.p9 .caI{ opacity:0; }
+.sv.c2 .caI{ animation:ca2 1.3s ease-out both; }
+.sv.w2 .caI .b{ opacity:0; }
+.sv.f2-aus .caI{ opacity:0 !important; animation:none !important; } .sv.f2-aus.p2 .caO,.sv.f2-aus.s0 .caO{ opacity:1; } .sv.f2-aus .caA{ opacity:.25 !important; }
+.sv .vF{ display:none; }
+.sv.s0 .vD.fz .vI{ display:none; } .sv.s0 .vD.fz .vF{ display:block; }
+.sv.p3:not(.f3-aus) .vI{ display:none; } .sv.p3:not(.f3-aus) .vF{ display:block; }
+.sv.p3.w3 .vD.k2 .vI,.sv.p3.w3 .vD.k3 .vI{ display:block; } .sv.p3.w3 .vD.k2 .vF,.sv.p3.w3 .vD.k3 .vF{ display:none; }
+.sv.c3 .vF{ animation:pop .9s ease-out both; }
+.sv .vFd{ opacity:1; } .sv.p4 .vFd,.sv.s0 .vFd{ opacity:0; }
+.sv .achR{ opacity:0; } .sv.s0 .achR{ opacity:1; transform:translate(var(--dx),var(--dy)); }
+.sv.p4:not(.f4-aus) .achR{ opacity:1; } .sv.p5:not(.f5-aus) .achR{ transform:translate(var(--dx),var(--dy)); }
+.sv.w4 .achR:not(.keep){ opacity:0 !important; } .sv.s0.w4 .achR:not(.keep){ opacity:1 !important; }
+.sv.p6:not(.f6-aus) .achR:not(.keep){ opacity:0; }
+.sv.p8:not(.x8) .achR{ opacity:0; }
+.sv .chO{ display:none; } .sv .chC{ display:block; }
+.sv.s0 .chn.mixO .chO{ display:block; } .sv.s0 .chn.mixO .chyC{ display:none; }
+.sv.p6:not(.f6-aus) .chO{ display:block; } .sv.p6:not(.f6-aus) .chyC{ display:none; }
+.sv.p8:not(.x8) .chO{ display:none; } .sv.p8:not(.x8) .chyC{ display:block; }
+.sv .achB{ opacity:0; } .sv.s0 .chn.mixO .achB{ opacity:1; } .sv.p6:not(.f6-aus) .achB{ opacity:1; } .sv.p8:not(.x8) .achB{ opacity:0; }
+.sv .naP{ opacity:0; } .sv.s0 .naP.mixO{ opacity:1; } .sv.p6:not(.f6-aus) .naP{ opacity:1; } .sv.p8:not(.x8) .naP{ opacity:0; }
+.sv.c6 .chO{ animation:fade .9s ease-out both; }
+.sv.s0 .epsp,.sv.p7:not(.f6-aus) .epsp{ opacity:1; } .sv.p8:not(.x8) .epsp{ opacity:0; } .sv.c7 .epsp{ animation:epsp 1.1s ease-out both; }
+.sv.g-spike .apP{ opacity:1; animation:spk 1.2s ease-out both; } .sv .spk{ stroke:var(--sc-cur); stroke-width:3.4; fill:none; stroke-linejoin:round; }
+.sv .frag{ opacity:0; } .sv.s0 .frag,.sv.p8:not(.x8):not(.f8-aus) .frag{ opacity:1; } .sv.c8 .frag{ animation:fade 1s ease-out both; }
+.sv .fragIn{ opacity:1; } .sv.p9 .fragIn{ opacity:0; } .sv .dotIn{ opacity:0; } .sv.p9:not(.f9-aus) .dotIn{ opacity:1; }
+.sv .fragT{ opacity:0; } .sv.c9:not(.f9-aus) .fragT{ opacity:1; animation:ft 2.2s ease-in-out both; }
+@keyframes ap1{ from{ opacity:0; transform:translate(-24px,-40px); } to{ opacity:1; transform:none; } }
+@keyframes ca2{ from{ opacity:0; transform:translate(var(--ox),var(--oy)); } to{ opacity:1; transform:none; } }
+@keyframes pop{ from{ opacity:0; transform:scale(.6); } to{ opacity:1; transform:none; } }
+@keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes epsp{ from{ opacity:0; transform:scale(.7); } 50%{ opacity:1; } to{ opacity:1; transform:none; } }
+@keyframes spk{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+@keyframes ft{ from{ opacity:0; transform:translate(var(--ox),var(--oy)); } 15%{ opacity:1; } to{ opacity:1; transform:none; } }
+.sv .vF,.sv .apA,.sv .epsp,.sv .apP,.sv .caI,.sv .fragT,.sv .frag{ transform-box:fill-box; transform-origin:center; }
+/* Animationsmodus */
+.sv.mv *{ animation:none !important; } .sv.mv .ach{ transition:none; } .sv.mv .gaugeF{ transition:none; }
+#mvL{ pointer-events:none; }
+.sv.mv3 .vI{ display:none; } .sv.mv4 .vFd{ opacity:0; } .sv.mv5 .achR{ opacity:0 !important; }
+.sv.mv6 .achR:not(.keep){ opacity:0 !important; } .sv.mv8 .achR,.sv.mv8 .achB{ opacity:0 !important; } .sv.mv9 .caI{ opacity:0 !important; }
+.sv .mvW{ fill:none; stroke:var(--ap); stroke-width:11; stroke-linecap:round; }
+.sv .mvG{ fill:none; stroke:var(--ap); stroke-width:22; stroke-linecap:round; opacity:.28; }
+.sv .mvE{ fill:none; stroke:var(--ap); stroke-width:9; stroke-linecap:round; opacity:.55; }
+.sv .mvFl{ fill:none; stroke:var(--ap); stroke-width:3.5; }
+.sv .naI{ fill:var(--na); stroke:#fff; stroke-width:1; }
+.sv .acet{ fill:var(--sc-ves2); stroke:var(--sc-vesS); stroke-width:1.2; }
+.sv .zip{ stroke:var(--sc-cur); stroke-width:3; fill:none; }
+.sv text.mvT{ font-size:11px; font-weight:800; fill:var(--ink); paint-order:stroke; stroke:var(--panel); stroke-width:3px; }
+.vtl{ display:flex; gap:6px; align-items:center; padding:5px 8px; border-bottom:1px solid var(--line); background:var(--panel-2); }
+.segs{ flex:1; display:flex; gap:3px; min-width:0; }
+.sg{ flex:1; min-width:0; height:30px; border:1px solid var(--line); border-radius:7px; background:var(--panel); padding:0; position:relative; overflow:hidden; cursor:pointer; font-weight:700; font-size:.8rem; color:var(--ink-soft); }
+.sg i{ position:absolute; left:0; bottom:0; height:5px; width:0; background:var(--sc-cur); }
+.sg span{ position:relative; }
+.sg.cur{ border-color:var(--nav); color:var(--ink); box-shadow:0 0 0 1px var(--nav) inset; }
+.sg.bad i{ background:var(--tox); } .sg.bad{ color:var(--tox); }
+.vtl .spd{ min-height:32px; padding:0 .6em; font-size:.85rem; white-space:nowrap; }
+.vinfo .cap{ color:var(--ink); }
+@media (max-width:700px){ .sg{ height:26px; font-size:.72rem; } }
+@media (prefers-reduced-motion: reduce){ .sv *{ transition:none !important; animation:none !important; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Reizweiterleitung an der Synapse</h1>
+  <p>Chemische Synapse an der motorischen Endplatte: Ablauf in neun Schritten, Synapsengifte, Gegengifte mit Bewertung und das Frequenzdiagramm der postsynaptischen Aktionspotenziale.</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab" role="tab" data-tab="flow" aria-selected="true">Ablauf</button>
+  <button type="button" class="tab" role="tab" data-tab="tox" aria-selected="false">Gift</button>
+  <button type="button" class="tab" role="tab" data-tab="anti" aria-selected="false">Gegengift</button>
+  <button type="button" class="tab" role="tab" data-tab="meas" aria-selected="false">Messung</button>
+  <button type="button" class="tab" role="tab" data-tab="train" aria-selected="false">Üben</button>
+  <button type="button" class="tab" role="tab" data-tab="info" aria-selected="false">Info und Aufgaben</button>
+</nav>
+
+<div class="viewer" id="viewer">
+  <div class="vbox">
+    <div class="vbar" role="toolbar" aria-label="Schritte steuern">
+      <button type="button" class="btn" data-v="prev" aria-label="Vorheriger Schritt">◀</button>
+      <button type="button" class="btn" data-v="play" aria-label="Alle Schritte abspielen" aria-pressed="false">▶</button>
+      <button type="button" class="btn" data-v="next" aria-label="Nächster Schritt">▶|</button>
+      <div class="lbl" id="vlbl" aria-live="polite"></div>
+      <button type="button" class="btn" data-v="fold" aria-pressed="false" aria-label="Schema ein- oder ausklappen">▲</button>
+    </div>
+    <div class="vtl"><div class="segs" id="segs" role="group" aria-label="Schritte abspielen"></div><button type="button" class="btn spd" data-v="speed" aria-label="Tempo ändern">Tempo 1×</button></div>
+    <div class="vwrap"><div id="schemaHost" style="width:100%"></div></div>
+    <div class="vinfo" id="vinfo" aria-live="polite"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="pane-flow"></section>
+  <section id="pane-tox" hidden></section>
+  <section id="pane-anti" hidden></section>
+  <section id="pane-meas" hidden></section>
+  <section id="pane-train" hidden></section>
+  <section id="pane-info" hidden></section>
+</main>
+
+<script>
+(function(){
+'use strict';
+/* =============== Hilfen =============== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const pct=x=>Math.round(clamp(x,0,1)*100)+' %';
+
+/* =============== Die neun Schritte (Nummerierung wie in der Lehrbuchabbildung) =============== */
+const STEPS=[
+ {n:1,t:'Aktionspotenzial erreicht die Endigung',where:'Axonende (Präsynapse)',
+  d:'Das Aktionspotenzial läuft über die Axonmembran bis in die Endigung. Spannungsgesteuerte Na⁺-Kanäle öffnen nacheinander, die Membran depolarisiert.',key:'Na⁺-Kanäle des Axons'},
+ {n:2,t:'Ca²⁺-Einstrom',where:'Präsynaptische Membran',
+  d:'Die Depolarisation öffnet spannungsgesteuerte Ca²⁺-Kanäle. Ca²⁺ strömt aus dem Spalt in die Endigung, denn außen ist die Konzentration viel höher.',key:'Ca²⁺-Kanäle'},
+ {n:3,t:'Vesikel verschmelzen mit der Membran',where:'Präsynaptische Membran',
+  d:'Ca²⁺ aktiviert den Ca-Sensor Synaptotagmin. SNARE-Proteine ziehen Vesikel und präsynaptische Membran zusammen, die Vesikel verschmelzen mit ihr (Exozytose).',key:'SNARE-Proteine, Vesikel'},
+ {n:4,t:'Freisetzung des Transmitters',where:'Präsynaptische Membran',
+  d:'Die verschmolzenen Vesikel entleeren ihren Inhalt: Acetylcholin (ACh) gelangt in den synaptischen Spalt.',key:'Acetylcholin (ACh)'},
+ {n:5,t:'Diffusion durch den Spalt',where:'Synaptischer Spalt',
+  d:'ACh diffundiert durch den nur etwa 20 bis 50 nm breiten synaptischen Spalt. Die Strecke ist so kurz, dass es nur Bruchteile einer Millisekunde dauert.',key:'Diffusion'},
+ {n:6,t:'ACh bindet, Na⁺-Kanäle öffnen',where:'Postsynaptische Membran',
+  d:'ACh bindet an die nikotinischen Rezeptoren, die zugleich ligandengesteuerte Na⁺-Kanäle sind. Die Kanäle öffnen, Na⁺ strömt ein (K⁺ strömt aus).',key:'nikotinischer ACh-Rezeptor'},
+ {n:7,t:'EPSP und postsynaptisches Aktionspotenzial',where:'Postsynaptische Membran (Muskelfaser)',
+  d:'Der Na⁺-Einstrom depolarisiert die Membran: Endplattenpotenzial (EPP, an Nervenzellen EPSP). Überschreitet es den Schwellenwert, öffnen spannungsgesteuerte Na⁺-Kanäle und ein Aktionspotenzial läuft über die Muskelfaser.',key:'Schwellenwert, Na⁺-Kanäle'},
+ {n:8,t:'Abbau des ACh',where:'Synaptischer Spalt',
+  d:'Die Acetylcholinesterase (AChE) spaltet ACh in Acetat und Cholin. Die Rezeptorkanäle schließen, das EPP klingt ab. Ohne Abbau bliebe die Membran dauerhaft depolarisiert.',key:'Acetylcholinesterase (AChE)'},
+ {n:9,t:'Wiederaufnahme und Recycling',where:'Präsynapse',
+  d:'Cholin wird über einen Na⁺-abhängigen Transporter in die Endigung aufgenommen. Dort entsteht mit Acetyl-CoA neues ACh, das in Vesikel verpackt wird. Die Vesikelmembran wird per Endozytose recycelt, Ca²⁺ wird abgepumpt.',key:'Cholin-Transporter, Cholin-Acetyltransferase'}
+];
+
+/* =============== Gifte =============== */
+const POISONS=[
+ {id:'TTX',name:'Tetrodotoxin (TTX)',q:'Kugelfisch (Fugu), Kaliforniermolch',step:1,art:'blockiert Natriumkanäle',
+  w:'TTX verschließt von außen die Pore spannungsgesteuerter Na⁺-Kanäle. In der Endigung kommt kein (oder nur ein schwaches) Aktionspotenzial an. Auch die Na⁺-Kanäle der Muskelfaser sind betroffen.',
+  s:'Kribbeln um den Mund, Taubheit, aufsteigende Lähmung, Atemlähmung bei vollem Bewusstsein.'},
+ {id:'CTX',name:'ω-Conotoxin',q:'Gift der Kegelschnecken',step:2,art:'bindet fest an Ca²⁺-Kanäle',
+  w:'ω-Conotoxin bindet spezifisch an präsynaptische spannungsgesteuerte Ca²⁺-Kanäle und verschließt sie. Das Aktionspotenzial kommt an, aber es strömt kein Ca²⁺ ein. Vesikel verschmelzen nicht.',
+  s:'Lähmung der Muskeln, Taubheit, Atemlähmung.'},
+ {id:'MG',name:'Magnesium-Überdosis',q:'Medikament (Magnesiumsulfat) in zu hoher Dosis',step:2,art:'konkurriert mit Ca²⁺',
+  w:'Mg²⁺ konkurriert mit Ca²⁺ um den Eintritt durch die Ca²⁺-Kanäle (kompetitive Hemmung). Je mehr Mg²⁺, desto weniger Ca²⁺ strömt ein, desto weniger ACh wird freigesetzt.',
+  s:'Erloschene Reflexe, Muskelschwäche, flache Atmung.'},
+ {id:'BoNT',name:'Botulinumtoxin',q:'Bakterium Clostridium botulinum (verdorbene Konserven); in sehr kleiner Dosis als Medikament',step:3,art:'zerschneidet SNARE-Proteine',
+  w:'Das Toxin gelangt in die Nervenendigung und spaltet dort SNARE-Proteine (je nach Typ zum Beispiel SNAP-25). Vesikel und Membran können nicht mehr verschmelzen. Der Block hält Wochen bis Monate, bis neue SNARE-Proteine gebildet sind.',
+  s:'Doppelbilder, hängende Lider, Schluckstörung, absteigende schlaffe Lähmung, Atemlähmung.'},
+ {id:'CUR',name:'Curare (Tubocurarin)',q:'Pfeilgift südamerikanischer Pflanzen; Muskelrelaxantien vom Curare-Typ in der Narkose',step:6,art:'konkurriert mit ACh um den Rezeptor',
+  w:'Curare besetzt die ACh-Bindestellen des nikotinischen Rezeptors, öffnet den Kanal aber nicht (kompetitiver Antagonist). ACh kann nicht mehr binden, es entsteht kein ausreichendes EPP.',
+  s:'Schlaffe Lähmung, zuerst Augen- und Gesichtsmuskeln, zuletzt das Zwerchfell.'},
+ {id:'BGT',name:'α-Bungarotoxin',q:'Gift des Vielbindigen Kraits (Schlange)',step:6,art:'bindet fast irreversibel an den Rezeptor',
+  w:'α-Bungarotoxin bindet an den nikotinischen ACh-Rezeptor und löst sich kaum wieder. Bei Gleichgewicht verdrängt auch viel ACh das Toxin nicht. Die gebundenen Rezeptoren fallen aus.',
+  s:'Hängende Lider, Schluckstörung, schlaffe Lähmung, Atemlähmung. Oft kaum Schmerz an der Bissstelle.'},
+ {id:'SUX',name:'Succinylcholin',q:'Muskelrelaxans in der Narkose (bei Enzymmangel oder Überdosis ein Gift)',step:6,art:'ACh-ähnlicher Dauerreiz',
+  w:'Succinylcholin öffnet wie ACh die Rezeptorkanäle, wird aber nicht von der AChE abgebaut, sondern langsam von der Plasma-Cholinesterase. Die Membran bleibt depolarisiert, die Na⁺-Kanäle der Muskelfaser sind inaktiviert: Depolarisationsblock.',
+  s:'Zuerst kurze Muskelzuckungen, dann schlaffe Lähmung.'},
+ {id:'OP',name:'Organophosphat (E 605, Sarin)',q:'Insektizid (E 605, Parathion), Nervenkampfstoff (Sarin)',step:8,art:'hemmt die Acetylcholinesterase',
+  w:'Organophosphate phosphorylieren die Acetylcholinesterase und hemmen sie dauerhaft. ACh wird nicht mehr abgebaut, es häuft sich im Spalt an, die Membran bleibt depolarisiert, die Na⁺-Kanäle der Muskelfaser sind inaktiviert.',
+  s:'Speichelfluss, Schwitzen, enge Pupillen, Muskelzuckungen, danach Lähmung, Atemnot.'}
+];
+const POI=Object.fromEntries(POISONS.map(p=>[p.id,p]));
+
+/* =============== Gegengifte (Maßnahmen) =============== */
+const ANTIS=[
+ {id:'NEO',name:'Neostigmin',k:'reversibler Acetylcholinesterase-Hemmer',w:'Hemmt die AChE vorübergehend. ACh bleibt länger und in höherer Konzentration im Spalt.'},
+ {id:'ATR',name:'Atropin',k:'Antagonist an muskarinischen ACh-Rezeptoren',w:'Blockiert muskarinische ACh-Rezeptoren (zum Beispiel an Herz, Drüsen, glatter Muskulatur). Die Muskelendplatte besitzt nikotinische Rezeptoren.'},
+ {id:'OXI',name:'Obidoxim',k:'Reaktivator der Acetylcholinesterase',w:'Entfernt den Phosphatrest von der blockierten AChE und stellt sie wieder her. Nur wirksam, solange das Enzym nicht „gealtert“ ist.'},
+ {id:'AS',name:'Antiserum (Antitoxin)',k:'Antikörper gegen ein bestimmtes Gift',w:'Antikörper binden freie Giftmoleküle im Blut. Schon gebundenes Gift wird kaum noch erreicht.'},
+ {id:'CAL',name:'Calciumgluconat',k:'Calcium-Salz zur Infusion',w:'Erhöht die Ca²⁺-Konzentration im Blut und im Spalt. Das Ca²⁺ kann mit Konkurrenten um die Ca²⁺-Kanäle mithalten.'},
+ {id:'BEA',name:'Künstliche Beatmung',k:'unterstützende Maßnahme (Intensivmedizin)',w:'Sichert Atmung und Sauerstoffversorgung, solange die Atemmuskeln ausfallen. Sie wirkt nicht an der Synapse.'},
+ {id:'ACH',name:'Acetylcholin spritzen',k:'Überträgerstoff selbst',w:'Zusätzliches ACh soll fehlende oder blockierte Übertragung ausgleichen. Es wird innerhalb von Millisekunden abgebaut.'}
+];
+const ANT=Object.fromEntries(ANTIS.map(a=>[a.id,a]));
+const TIMENAMES=['früh','verzögert','sehr spät'];
+const TIMEHINT=['kurz nach der Vergiftung','nach einer Weile','nach sehr langer Zeit'];
+const CAT={gut:{t:'Sinnvoll',cls:'ok',sym:'++'},teil:{t:'Teilweise sinnvoll',cls:'tip',sym:'+'},stuetz:{t:'Lebensrettend, aber nur unterstützend',cls:'info',sym:'L'},nutz:{t:'Nicht sinnvoll: wirkt hier nicht',cls:'',sym:'0'},schad:{t:'Gefährlich: verschlimmert die Vergiftung',cls:'no',sym:'–'}};
+
+/* Bewertung [Kategorie, Begründung] je Gift und Gegengift */
+const BEA_T='Die Atemmuskeln fallen aus, das Herz schlägt weiter. Beatmung hält den Menschen am Leben, bis das Gift abgebaut oder ausgeschieden ist. Sie ist wichtig, ändert aber nichts an der Synapse.';
+const RATE={
+ TTX:{
+  NEO:['teil','Mehr ACh pro Impuls hilft nur, solange überhaupt noch Aktionspotenziale in der Endigung ankommen. Bei niedriger bis mittlerer Dosis verbessert das die Übertragung, bei hoher Dosis bleibt der Na⁺-Kanal-Block entscheidend.'],
+  ATR:['nutz','Atropin wirkt an muskarinischen Rezeptoren. Das Problem liegt hier bei den Na⁺-Kanälen der Axone.'],
+  OXI:['nutz','Obidoxim reaktiviert nur Acetylcholinesterase, die durch Phosphorsäureester blockiert ist. Hier ist das Enzym gesund.'],
+  AS:['nutz','Gegen Tetrodotoxin gibt es kein zugelassenes Antiserum. Antikörper helfen immer nur gegen genau ein Gift.'],
+  CAL:['nutz','Ca²⁺ ändert nichts an verschlossenen Na⁺-Kanälen. Der Block liegt vor dem Ca²⁺-Einstrom.'],
+  BEA:['stuetz',BEA_T],
+  ACH:['nutz','Es fehlt nicht ACh, sondern der Impuls in der Endigung. Zusätzliches ACh wird in Millisekunden abgebaut und wirkt außerdem an Herz und Gefäßen.']},
+ CTX:{
+  NEO:['teil','Wenn noch etwas ACh freigesetzt wird, verstärkt Neostigmin dessen Wirkung. Bei hoher Dosis wird fast nichts mehr freigesetzt, dann hilft es nicht.'],
+  ATR:['nutz','Atropin wirkt an muskarinischen Rezeptoren, nicht an der Endplatte und nicht an Ca²⁺-Kanälen.'],
+  OXI:['nutz','Die Acetylcholinesterase ist hier nicht blockiert, es gibt nichts zu reaktivieren.'],
+  AS:['nutz','Gegen Conotoxine gibt es kein Antiserum.'],
+  CAL:['nutz','Das Toxin verschließt die Kanalpore selbst. Mehr Ca²⁺ außen hebt den Block nicht auf. Anders ist das bei Mg²⁺, das nur konkurriert.'],
+  BEA:['stuetz',BEA_T],
+  ACH:['nutz','Nicht ACh fehlt im Spalt, sondern es wird weniger freigesetzt. Gespritztes ACh wird in Millisekunden abgebaut.']},
+ MG:{
+  NEO:['teil','Verstärkt die Wirkung des noch freigesetzten ACh. Das lindert, beseitigt die Ursache (zu viel Mg²⁺) aber nicht.'],
+  ATR:['nutz','Atropin wirkt an muskarinischen Rezeptoren, nicht am Ca²⁺-Einstrom.'],
+  OXI:['nutz','Die Acetylcholinesterase ist nicht blockiert.'],
+  AS:['nutz','Es gibt kein Antiserum gegen Magnesium.'],
+  CAL:['gut','Ca²⁺ konkurriert mit Mg²⁺ um die Ca²⁺-Kanäle. Mehr Ca²⁺ verdrängt Mg²⁺ und stellt den Ca²⁺-Einstrom und damit die ACh-Freisetzung wieder her. Das ist die ursächliche Behandlung.'],
+  BEA:['stuetz',BEA_T],
+  ACH:['nutz','Gespritztes ACh wird sofort abgebaut und beseitigt die Ursache nicht.']},
+ BoNT:{
+  NEO:['teil','Wenn noch etwas ACh freigesetzt wird, kann es länger wirken. Das lindert leicht. Wo gar nichts freigesetzt wird, hilft es nicht.'],
+  ATR:['nutz','Atropin wirkt an muskarinischen Rezeptoren. Der Block liegt in den SNARE-Proteinen der Endigung.'],
+  OXI:['nutz','Die Acetylcholinesterase ist nicht blockiert.'],
+  AS:['gut','Das Antitoxin bindet freies Toxin im Blut, bevor es in Nervenendigungen gelangt. Schon aufgenommenes Toxin bleibt wirksam. Je früher, desto mehr Funktion bleibt erhalten.'],
+  CAL:['nutz','Die SNARE-Proteine sind zerschnitten. Auch viel Ca²⁺ kann Vesikel dann nicht mehr mit der Membran verschmelzen lassen.'],
+  BEA:['stuetz',BEA_T+' Beim Botulismus kann das Wochen dauern.'],
+  ACH:['nutz','Es wird nicht weniger ACh abgebaut, sondern weniger freigesetzt. Gespritztes ACh wirkt nur Millisekunden.']},
+ CUR:{
+  NEO:['gut','Neostigmin hemmt die AChE. ACh bleibt länger im Spalt und in höherer Konzentration und verdrängt das konkurrierende Curare vom Rezeptor. In der Praxis gibt man dazu oft Atropin, um muskarinische Nebenwirkungen zu dämpfen.'],
+  ATR:['nutz','Atropin allein hilft der Endplatte nicht: Deren Rezeptoren sind nikotinisch. Es dämpft nur muskarinische Nebenwirkungen anderer Maßnahmen.'],
+  OXI:['nutz','Die AChE ist nicht blockiert. Obidoxim hat hier nichts zu reaktivieren.'],
+  AS:['nutz','Gegen Curare gibt es kein Antiserum.'],
+  CAL:['nutz','Ca²⁺ ändert nichts an den blockierten ACh-Bindestellen.'],
+  BEA:['stuetz',BEA_T],
+  ACH:['nutz','Viel ACh könnte Curare zwar verdrängen, wird aber in Millisekunden abgebaut und wirkt zusätzlich an Herz und Gefäßen (Blutdruckabfall). Neostigmin erreicht dasselbe viel sicherer, indem es den Abbau hemmt.']},
+ BGT:{
+  NEO:['teil','Das Toxin bleibt gebunden und lässt sich durch mehr ACh nicht verdrängen. Neostigmin verlängert aber die ACh-Wirkung an den noch freien Rezeptoren, ähnlich wie bei Myasthenia gravis, wo Rezeptoren fehlen. Das lindert bei niedriger bis mittlerer Dosis, bei hoher Dosis reicht es nicht. Die Ursache beseitigt nur das Antiserum.'],
+  ATR:['nutz','Atropin wirkt an muskarinischen Rezeptoren, nicht an der Endplatte.'],
+  OXI:['nutz','Die AChE ist nicht blockiert.'],
+  AS:['gut','Das Antiserum (Antikörper gegen das Toxin) bindet freies Toxin im Blut. Es kann die Zahl der blockierten Rezeptoren begrenzen. Schon gebundenes Toxin löst sich kaum: früh geben.'],
+  CAL:['nutz','Ca²⁺ wirkt in der Präsynapse, der Block liegt am Rezeptor.'],
+  BEA:['stuetz',BEA_T],
+  ACH:['nutz','Wegen der festen Toxinbindung hilft auch zusätzliches ACh nicht.']},
+ SUX:{
+  NEO:['schad','Succinylcholin wird von der Plasma-Cholinesterase abgebaut, und Neostigmin hemmt auch diese. Das Gift bleibt länger im Körper. Zusätzlich bleibt ACh länger im Spalt. Der Depolarisationsblock wird tiefer und dauert länger.'],
+  ATR:['nutz','Atropin wirkt an muskarinischen Rezeptoren, nicht an der Endplatte.'],
+  OXI:['nutz','Die AChE ist nicht blockiert.'],
+  AS:['nutz','Es gibt kein Antiserum gegen Succinylcholin.'],
+  CAL:['nutz','Ca²⁺ ändert nichts an der Dauerdepolarisation der Muskelfaser.'],
+  BEA:['stuetz',BEA_T+' Hier genügt das meist kurz: Die Plasma-Cholinesterase baut Succinylcholin nach Minuten ab. Bei Enzymmangel dauert es länger.'],
+  ACH:['nutz','Der Rezeptor ist schon dauerhaft aktiviert. Weiteres ACh ändert daran nichts.']},
+ OP:{
+  NEO:['schad','Neostigmin hemmt die AChE zusätzlich. ACh wird noch weniger abgebaut, die Dauerdepolarisation wird stärker. Hier muss die Esterase wieder aktiviert, nicht weiter gehemmt werden.'],
+  ATR:['teil','Atropin lindert die Überstimulation muskarinischer Synapsen (Speichelfluss, Bronchialsekret, langsamer Puls) und rettet damit Leben. An der Muskelendplatte wirkt es nicht, die Lähmung bleibt.'],
+  OXI:['gut','Obidoxim reaktiviert die blockierte AChE. Der Abbau von ACh läuft wieder, die Endplatte erholt sich. Das wirkt nur, solange das Enzym nicht „gealtert“ ist, also früh. Üblich ist die Kombination mit Atropin.'],
+  AS:['nutz','Es gibt kein Antiserum gegen Organophosphate.'],
+  CAL:['nutz','Ca²⁺ ändert nichts am blockierten ACh-Abbau.'],
+  BEA:['stuetz',BEA_T],
+  ACH:['nutz','Ohne funktionierende AChE bleibt zusätzliches ACh erhalten und kann die Dauerdepolarisation verstärken. Ein Nutzen entsteht nicht.']}
+};
+/* =============== Modell der Synapse (vereinfachte Simulation) =============== */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const SIM={dt:0.25,P0:0.35,Aq:17,tauN:40,fF:0.12,tauF:100,kE:0.9,kd:0.004,tauM:3,G:145,thr:25,Vh:18,kh:4,tauhI:12,tauhR:3,ref:3,N0:40,kdOn:0.002,kdOff:0.002};
+function baseParams(){ return {naBlock:0,caBlock:0,mg:0,snareBlock:0,E:1,recBlock:0,cur:0,sux:0,ca_up:1,bolus:0,suxOnset:250}; }
+/* Gifte: Dosisstufen 0 niedrig, 1 mittel, 2 hoch */
+const DOSE={
+  TTX:{key:'naBlock',v:[0.385,0.45,0.55]},
+  CTX:{key:'caBlock',v:[0.15,0.35,0.55]},
+  MG:{key:'mg',v:[0.25,0.55,1.2]},
+  BoNT:{key:'snareBlock',v:[0.45,0.72,0.9]},
+  CUR:{key:'cur',v:[0.8,2.0,4]},
+  BGT:{key:'recBlock',v:[0.35,0.53,0.7]},
+  SUX:{key:'sux',v:[0.38,0.45,1.5]},
+  OP:{key:'Eblock',v:[0.5,0.88,0.99]}
+};
+const TIMEF={AS:[0.3,0.8,1],OXI:[0.85,0.45,0.05]};
+function makeParams(poison,dose,anti,timing){
+  const p=baseParams();
+  if(poison){ const d=DOSE[poison]; const val=d.v[dose]; if(d.key==='Eblock') p.E=1-val; else p[d.key]=val; }
+  if(anti==='NEO'){ p.E*=0.15; if(poison==='SUX') p.sux*=2.5; }
+  if(anti==='OXI'&&poison==='OP'){ p.E=p.E+(1-p.E)*TIMEF.OXI[timing]; }
+  if(anti==='AS'){ if(poison==='BoNT') p.snareBlock*=TIMEF.AS[timing]; if(poison==='BGT') p.recBlock*=TIMEF.AS[timing]; }
+  if(anti==='CAL') p.ca_up=4;
+  if(anti==='ACH') p.bolus=8;
+  return p;
+}
+function derived(p){
+  const avail=1-p.naBlock; const v=Math.max(0,Math.min(1,(avail-0.3)/0.4));
+  const Cfac=(1-p.caBlock)/(1+p.mg/p.ca_up);
+  return {v,Cfac,S:1-p.snareBlock,R:1-p.recBlock,Keff:1+p.cur,thrScale:1/(1-0.9*p.naBlock),kdeg:SIM.kE*p.E+SIM.kd};
+}
+/* Reizzeiten: konstant (f Hz) oder Rampe (f0 -> f1) in ms */
+function stimTimes(proto){
+  const out=[]; const T=proto.T/1000;
+  if(proto.type==='const'){ const f=proto.f; for(let k=0;;k++){ const t=(k+0.5)/f; if(t>=T) break; out.push(t*1000); } }
+  else if(proto.type==='single'){ out.push(proto.t0||2); }
+  else { const f0=proto.f0,f1=proto.f1; for(let k=0;;k++){ // phi(t)=f0 t + (f1-f0) t^2/(2T) = k+0.5
+      const a=(f1-f0)/(2*T), b=f0, c=-(k+0.5); let t; if(Math.abs(a)<1e-9) t=-c/b; else t=(-b+Math.sqrt(b*b-4*a*c))/(2*a); if(t>=T) break; out.push(t*1000); } }
+  return out;
+}
+function freqAt(proto,tms){ const t=tms/1000,T=proto.T/1000; if(proto.type==='const') return proto.f; if(proto.type==='ramp') return proto.f0+(proto.f1-proto.f0)*t/T; return 0; }
+/* Hauptsimulation. opts: dt, burn (ms Einschwingen), keepTrace */
+function simulate(p,proto,opts){
+  opts=opts||{}; const dt=opts.dt||SIM.dt, d=derived(p); const burn=opts.burn||0; const T=proto.T;
+  const stim=stimTimes(proto).map(t=>t+burn); const N=Math.round((T+burn)/dt);
+  let a=0,n=1,F=0,D=0,V=0,h=1,prevV=0,refUntil=-1e9,si=0; let bolusDone=false;
+  const res={stim:stim.map(t=>t-burn),ap:[],Q:[],trace:null,a:null,Vmax:0,aPeak:0};
+  const keep=opts.keepTrace; if(keep){ res.trace=new Float32Array(N); res.a=new Float32Array(N); res.t0=burn; res.dt=dt; }
+  const eDec=Math.exp(-d.kdeg*dt), eN=1-Math.exp(-dt/SIM.tauN), eF=Math.exp(-dt/SIM.tauF), eHi=1-Math.exp(-dt/SIM.tauhI), eHr=1-Math.exp(-dt/SIM.tauhR); const rnd=mulberry32(opts.seed||12345);
+  const delay=opts.delay||0; const pend=[];
+  const thr=SIM.thr*d.thrScale;
+  for(let i=0;i<N;i++){
+    const t=i*dt;
+    while(si<stim.length&&stim[si]<=t+1e-9){ pend.push(stim[si]+delay); si++; }
+    while(pend.length&&pend[0]<=t+1e-9){ pend.shift();
+      let pr=SIM.P0*d.v*Math.pow(Math.max(0,d.Cfac),3)*d.S*(1+F); pr=Math.min(pr,0.9);
+      const nr=Math.round(n*SIM.N0); let k=0; if(opts.det) k=nr*pr; else for(let j=0;j<nr;j++) if(rnd()<pr) k++; const Q=k/SIM.N0; n=Math.max(0,n-Q); F+=SIM.fF*d.v; a+=Q*SIM.Aq; res.Q.push(Q); }
+    if(p.bolus&&!bolusDone&&t>=(burn+200)){ a+=p.bolus; bolusDone=true; }
+    a*=eDec; n+=(1-n)*eN; F*=eF;
+    let s=0; if(p.sux){ s=p.sux*(opts.noOnset?1:(1-Math.exp(-(t-burn>0?t-burn:0)/p.suxOnset))); }
+    const at=a+s; const act=at*at/(at*at+d.Keff*d.Keff);
+    D+=dt*(SIM.kdOn*act*(1-D)-SIM.kdOff*D); if(D<0)D=0;
+    V+=dt*(SIM.G*act*d.R*(1-D)-V)/SIM.tauM;
+    const hinf=1/(1+Math.exp((V-SIM.Vh)/SIM.kh)); h+=(hinf-h)*(hinf<h?eHi:eHr);
+    if(V>=thr&&prevV<thr&&h>=0.5&&t>refUntil){ if(t>=burn||opts.countBurn){ res.ap.push(t-burn); } refUntil=t+SIM.ref; h=0.12; }
+    prevV=V; if(t>=burn){ if(V>res.Vmax) res.Vmax=V; if(a+s>res.aPeak) res.aPeak=a+s; }
+    if(keep){ res.trace[i]=V; res.a[i]=a+s; }
+  }
+  return res;
+}
+/* Fensterfrequenz (Hz) */
+function windows(times,T,w){ const n=Math.ceil(T/w); const out=new Array(n).fill(0); times.forEach(t=>{ const k=Math.min(n-1,Math.floor(t/w)); out[k]++; }); return out.map(c=>c*1000/w); }
+
+/* =============== Analyse: Einzelreiz und Messung =============== */
+const VR=-80, THR_MV=-55;
+const vdisp=v=>v<=55?v:55+8*Math.tanh((v-55)/40);
+const SC_CACHE={};
+let NORMREF=null;
+function normRef(){ if(!NORMREF){ const r=simulate(makeParams(null,0,null,0),{type:'single',T:45,t0:2},{dt:0.05,burn:200,keepTrace:true,delay:0.7,det:true,noOnset:true}); NORMREF={V:r.Vmax,a:r.aPeak,Q:r.Q[0]}; } return NORMREF; }
+const sstat=(f,lo=0.8,hi=0.2)=>f>=lo?'ok':f>=hi?'schwach':'aus';
+function singleImpulse(par){
+  const key=JSON.stringify(par); if(SC_CACHE[key]) return SC_CACHE[key];
+  const nr=normRef(), d=derived(par);
+  const r=simulate(par,{type:'single',T:45,t0:2},{dt:0.05,burn:200,keepTrace:true,delay:0.7,det:true,noOnset:true});
+  const dt=0.05, i0=Math.round(200/dt), n=Math.round(45/dt);
+  const t=[],V=[],A=[],pre=[],ca=[];
+  const apT=r.ap.length?r.ap[0]:null;
+  const vAt=(i)=>r.trace[i0+i];
+  for(let i=0;i<n;i+=2){ const ms=i*dt; t.push(ms); V.push(vAt(i)); A.push(r.a[i0+i]);
+    const x=ms-2; const sh=x<0?0:(x<0.35?x/0.35:Math.exp(-(x-0.35)/0.5)-0.18*Math.exp(-(x-0.35)/2)); pre.push(-70+110*d.v*clamp(sh,-0.1,1.05));
+    const cx=(ms-2.7)/0.55; ca.push(d.v*d.Cfac*Math.exp(-cx*cx)); }
+  const vEnd=vAt(n-1);
+  const plateau=vEnd>15;
+  const fired=r.ap.length>0;
+  const q=(r.Q[0]||0)/nr.Q;
+  // Kennzahlen je Schritt (0 bis 8): Anteil der normalen Funktion
+  const f=[d.v, d.v*d.Cfac, q, q, r.aPeak/nr.a, r.Vmax/nr.V, 0, par.E, 1];
+  const fid20=runSet(par,{type:'const',f:20,T:3000},false).fid;
+  f[6]=fid20;
+  const raw=[sstat(f[0]),sstat(f[1]),sstat(f[2]),sstat(f[3]),sstat(f[4]),plateau?'dauer':sstat(f[5]),0,0,0];
+  raw[6]=plateau?'dauer':(fid20>=0.85?'ok':fid20>=0.15?'schwach':'aus');
+  raw[7]=f[7]>=0.8?'ok':f[7]>=0.2?'schwach':'aus';
+  raw[8]=(par.E<0.5)?'schwach':'ok';
+  const st=raw.slice();
+  // Folgen: der erste ausgefallene Schritt der Kette (1 bis 6) macht alle späteren zur Folge
+  let firstAus=-1; for(let i=0;i<=5;i++){ if(raw[i]==='aus'){ firstAus=i; break; } }
+  if(firstAus>=0){ for(let j=firstAus+1;j<=6;j++) st[j]='folge'; }
+  if(firstAus>=0&&firstAus<=3){ st[7]='folge'; st[8]='folge'; }
+  else if(st[7]==='aus'||raw[7]==='schwach'){ st[8]=raw[8]; }
+  const res={t,V,A,pre,ca,apT,f,st,plateau,fired,Vmax:r.Vmax,d,
+    reach:(()=>{ for(let i=0;i<6;i++) if(raw[i]==='aus') return i+1; return 6; })()};
+  SC_CACHE[key]=res; return res;
+}
+const STLABEL={ok:'normal',schwach:'abgeschwächt',aus:'fällt aus',dauer:'dauerhaft aktiv',folge:'bleibt aus (Folge)'};
+function stLabel(i,s,poisonId){ if(s==='schwach'&&i===6) return 'unzuverlässig (nicht jeder Reiz löst ein AP aus)'; if(s==='schwach'&&i===7) return 'gehemmt'; if(s==='aus'&&i===7) return 'blockiert'; if(s==='schwach'&&i===8) return 'weniger Cholin'; if(s==='dauer'&&(i===5||i===6)) return 'Dauerdepolarisation'; return STLABEL[s]; }
+
+/* =============== Messung (Frequenz) =============== */
+const MEAS_CACHE={};
+function protoOf(S){ return S.proto==='ramp'?{type:'ramp',f0:5,f1:100,T:3000}:{type:'const',f:S.freq,T:3000}; }
+function runSet(par,proto,keep){
+  const key=JSON.stringify([par,proto,!!keep]); if(MEAS_CACHE[key]) return MEAS_CACHE[key];
+  const r=simulate(par,proto,{dt:0.25,seed:7,keepTrace:!!keep,delay:0}); const out={stim:r.stim,ap:r.ap,fid:r.stim.length?r.ap.length/r.stim.length:0,hz:windows(r.ap,proto.T,250),pre:windows(r.stim,proto.T,250),trace:r.trace,a:r.a,dt:0.25,Vmax:r.Vmax};
+  // Übertragungsgrenze: erstes Fenster, ab dem die Treue unter 50 % fällt
+  let lim=null; if(proto.type==='ramp'){ for(let i=0;i<out.hz.length;i++){ if(out.pre[i]>0&&out.hz[i]/out.pre[i]<0.5){ lim=freqAt(proto,(i)*250); break; } } } out.limit=lim;
+  if(Object.keys(MEAS_CACHE).length>60) for(const k of Object.keys(MEAS_CACHE).slice(0,20)) delete MEAS_CACHE[k];
+  MEAS_CACHE[key]=out; return out;
+}
+function measure(S,keepTrace){
+  const proto=protoOf(S); const pN=makeParams(null,0,null,0);
+  const pG=S.poison?makeParams(S.poison,S.dose,null,0):null;
+  const pA=(S.anti&&S.poison)?makeParams(S.poison,S.dose,S.anti,S.timing):(S.anti?makeParams(null,0,S.anti,S.timing):null);
+  const out={proto,normal:runSet(pN,proto,false),poison:pG?runSet(pG,proto,false):null,anti:pA?runSet(pA,proto,false):null};
+  out.active=pA?'anti':pG?'poison':'normal';
+  const act=out.active==='anti'?pA:out.active==='poison'?pG:pN; out.activeTrace=runSet(act,proto,true);
+  return out;
+}
+
+/* =============== Diagramme (SVG, Breite in px) =============== */
+const f1d=x=>x.toFixed(1);
+function pathOf(pts){ return pts.map((p,i)=>(i?'L':'M')+f1d(p[0])+' '+f1d(p[1])).join(''); }
+function renderTimeline(sig,W,cur){
+  const L=58,R=10,PH=64,G=10,TOP=44,BOT=24; const H=TOP+4*(PH+G)+BOT-G+4; const T=45; const xs=ms=>L+(W-L-R)*ms/T;
+  const panels=[
+   {name:'Endigung: Potenzial',unit:'mV',lo:-80,hi:40,data:sig.pre,col:'var(--ink)',ticks:[-70,0],fmt:v=>v},
+   {name:'Ca²⁺-Einstrom',unit:'rel.',lo:0,hi:1.1,data:sig.ca,col:'var(--ca)',ticks:[0,1],fmt:v=>v},
+   {name:'ACh im Spalt',unit:'Einh.',lo:0,hi:8,data:sig.A.map(a=>Math.min(a,8)),col:'var(--ach)',ticks:[0,4,8],fmt:v=>v},
+   {name:'Muskelmembran',unit:'mV',lo:-80,hi:40,data:null,col:'var(--ink)',ticks:[-80,-55,0,30],fmt:v=>v}
+  ];
+  const sp=ms=>{ const x=ms; return x<0?0:(x<0.4?x/0.4:Math.exp(-(x-0.4)/0.8)); };
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Zeitverlauf einer Erregungsübertragung in vier Kurven: Aktionspotenzial der Endigung, Ca²⁺-Einstrom, ACh im Spalt und Potenzial der Muskelmembran">`;
+  const stepT=[2.0,2.4,2.9,3.2,3.5,4.2,sig.apT!=null?sig.apT+0.3:6.5,9.0,44];
+  panels.forEach((p,i)=>{
+    const y0=TOP+i*(PH+G), ys=v=>y0+PH-(clamp(v,p.lo,p.hi)-p.lo)/(p.hi-p.lo)*PH;
+    s+=`<rect x="${L}" y="${y0}" width="${W-L-R}" height="${PH}" fill="var(--panel-2)" stroke="var(--line)"/>`;
+    p.ticks.forEach(v=>{ s+=`<line x1="${L}" x2="${W-R}" y1="${f1d(ys(v))}" y2="${f1d(ys(v))}" stroke="var(--line)" stroke-dasharray="2 3"/><text x="${L-4}" y="${f1d(ys(v)+3)}" text-anchor="end" font-size="9" class="tx2">${v}</text>`; });
+    s+=`<text x="${L-30}" y="${y0+PH/2}" font-size="10" font-weight="700" text-anchor="middle" transform="rotate(-90 ${L-30} ${y0+PH/2})">${p.unit}</text>`;
+    s+=`<text x="${W-R-6}" y="${y0+13}" font-size="10.5" font-weight="700" text-anchor="end">${p.name}</text>`;
+    let pts;
+    if(i<3) pts=sig.t.map((tm,k)=>[xs(tm),ys(p.data[k])]);
+    else{ pts=sig.t.map((tm,k)=>{ let v=VR+vdisp(sig.V[k]); if(sig.apT!=null){ const x=tm-sig.apT; if(x>=0&&x<6){ const spv=VR+112*Math.max(0,sp(x))-4*Math.max(0,Math.min(1,(x-1.2)/1.5))*(x<3?1:0); v=Math.max(v,spv); } } return [xs(tm),ys(v)]; }); }
+    if(i===3) s+=`<line x1="${L}" x2="${W-R}" y1="${f1d(ys(THR_MV))}" y2="${f1d(ys(THR_MV))}" stroke="var(--tox)" stroke-width="1.4" stroke-dasharray="5 3"/><text x="${L+6}" y="${f1d(ys(THR_MV)+12)}" font-size="9.5" style="fill:var(--tox)">Schwelle</text>`;
+    s+=`<path d="${pathOf(pts)}" fill="none" stroke="${p.col}" stroke-width="2" stroke-linejoin="round"/>`;
+  });
+  const yb=TOP+4*(PH+G)-G;
+  for(let ms=0;ms<=45;ms+=5){ s+=`<text x="${f1d(xs(ms))}" y="${yb+14}" font-size="9.5" text-anchor="middle" class="tx2">${ms}</text>`; }
+  s+=`<text x="${W-R}" y="${yb+23}" font-size="9.5" text-anchor="end" class="tx2">Zeit in ms (Schritt 9 läuft danach über Sekunden weiter)</text>`;
+  stepT.forEach((tm,k)=>{ const x=xs(tm), bad=['aus','folge','dauer'].includes(sig.st[k]), isC=cur===k+1; const sx=L+(W-L-R)*(k+0.5)/9;
+    s+=`<path d="M${f1d(sx)} 22 L${f1d(x)} ${TOP-2} V${yb}" fill="none" stroke="${isC?'var(--ap)':'var(--ink-soft)'}" stroke-width="${isC?2.5:1}" stroke-dasharray="${isC?'':'2 3'}" opacity="${isC?1:.6}"/>`; });
+  stepT.forEach((tm,k)=>{ const bad=['aus','folge','dauer'].includes(sig.st[k]), isC=cur===k+1; const sx=L+(W-L-R)*(k+0.5)/9;
+    s+=`<g><rect x="${f1d(sx-10)}" y="2" width="20" height="20" rx="3" fill="${isC?'var(--ap)':bad?'var(--tox)':'var(--nav)'}"/><text x="${f1d(sx)}" y="17" text-anchor="middle" font-size="12" font-weight="800" style="fill:${isC?'#1B1B1B':bad?'#fff':'var(--nav-ink)'}">${k+1}</text></g>`; });
+  return s+'</svg>';
+}
+function niceMax(v){ return v<=25?25:v<=50?50:v<=100?100:v<=150?150:200; }
+function renderFreq(m,W){
+  const L=58,R=10,TOP=10,H=210,B=34; const T=3000; const ph=H-TOP-B; const xs=ms=>L+(W-L-R)*ms/T;
+  let ymax=niceMax(Math.max(...m.normal.pre,...(m.poison?m.poison.hz:[0]),...(m.anti?m.anti.hz:[0]),10));
+  const ys=v=>TOP+ph-(clamp(v,0,ymax)/ymax)*ph;
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Frequenz der Aktionspotenziale an der postsynaptischen Membran über die Zeit">`;
+  const nt=ymax<=25?5:ymax<=50?10:25; for(let v=0;v<=ymax;v+=nt){ s+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${f1d(ys(v))}" y2="${f1d(ys(v))}"/><text x="${L-5}" y="${f1d(ys(v)+3)}" font-size="10" text-anchor="end" class="tx2">${v}</text>`; }
+  for(let t=0;t<=3;t+=0.5){ s+=`<text x="${f1d(xs(t*1000))}" y="${TOP+ph+15}" font-size="10" text-anchor="middle" class="tx2">${t}</text>`; }
+  s+=`<text x="${(L+W-R)/2}" y="${H-5}" font-size="10.5" text-anchor="middle" class="tx2">Zeit in s</text><text x="12" y="${TOP+ph/2}" font-size="10.5" text-anchor="middle" class="tx2" transform="rotate(-90 12 ${TOP+ph/2})">Aktionspotenziale pro s (Hz)</text>`;
+  const line=(hz,col,dash,w,mk)=>{ const pts=hz.map((v,i)=>[xs(i*250+125),ys(v)]); let o=`<path d="${pathOf(pts)}" fill="none" stroke="${col}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''} stroke-linejoin="round"/>`; if(mk) pts.forEach(p=>{ o+=`<circle cx="${f1d(p[0])}" cy="${f1d(p[1])}" r="3.2" fill="${col}"/>`; }); return o; };
+  s+=line(m.normal.pre,'var(--ink-soft)','2 4',2,false);
+  s+=line(m.normal.hz,'var(--ink)','',1.5,false);
+  if(m.poison) s+=line(m.poison.hz,'var(--tox)','',3,true);
+  if(m.anti) s+=line(m.anti.hz,'var(--ant)','',3,true);
+  return s+'</svg>';
+}
+function renderRaster(m,W){
+  const L=58,R=10; const T=3000; const xs=ms=>L+(W-L-R)*ms/T;
+  const rows=[['Reiz',m.normal.stim,'var(--ink-soft)']]; if(m.poison) rows.push(['Gift',m.poison.ap,'var(--tox)']); if(m.anti) rows.push(['Gegengift',m.anti.ap,'var(--ant)']); if(!m.poison&&!m.anti) rows.push(['normal',m.normal.ap,'var(--ink)']);
+  const RH=22, H=rows.length*RH+4;
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Einzelne Aktionspotenziale als Striche: Reiz und Antwort">`;
+  rows.forEach((r,i)=>{ const y=2+i*RH; s+=`<rect x="${L}" y="${y}" width="${W-L-R}" height="${RH-3}" fill="var(--panel-2)"/>`; s+=`<text x="${L-5}" y="${y+RH/2+3}" font-size="10" text-anchor="end">${r[0]}</text>`; let d=''; r[1].forEach(t=>{ const x=f1d(xs(t)); d+=`M${x} ${y+3}V${y+RH-6}`; }); s+=`<path d="${d}" stroke="${r[2]}" stroke-width="1.6" fill="none"/>`; });
+  return s+'</svg>';
+}
+function renderTrace(m,W,t0,span){
+  const L=58,R=10,TOP=8,H=150,B=20; const ph=H-TOP-B; const xs=ms=>L+(W-L-R)*(ms-t0)/span; const ys=v=>TOP+ph-(clamp(v,-90,45)+90)/135*ph;
+  const tr=m.activeTrace; const dt=tr.dt; const col=m.active==='anti'?'var(--ant)':m.active==='poison'?'var(--tox)':'var(--ink)';
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Membranpotenzial der postsynaptischen Membran">`;
+  [-80,-55,0].forEach(v=>{ s+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${f1d(ys(v))}" y2="${f1d(ys(v))}" ${v===-55?'stroke-dasharray="5 3" style="stroke:var(--tox)"':''}/><text x="${L-5}" y="${f1d(ys(v)+3)}" font-size="9.5" text-anchor="end" class="tx2">${v}</text>`; });
+  s+=`<text x="${W-R-2}" y="${f1d(ys(-55)-3)}" font-size="9.5" text-anchor="end" style="fill:var(--tox)">Schwelle</text><text x="11" y="${TOP+ph/2}" font-size="10" text-anchor="middle" class="tx2" transform="rotate(-90 11 ${TOP+ph/2})">mV</text>`;
+  const px=W-L-R; const i0=Math.floor(t0/dt), i1=Math.min(tr.trace.length,Math.ceil((t0+span)/dt)); const per=Math.max(1,Math.floor((i1-i0)/px));
+  const apSet=tr.apTimes; const pts=[];
+  const N=Math.min(px*2,Math.floor(span/(dt*per)));
+  const spike=x=>x<0?-1e9:(x<0.5?112*x/0.5:112*Math.exp(-(x-0.5)/0.9));
+  // Hüllkurve: je Spalte Maximum
+  const up=[],lo=[];
+  for(let c=0;c<px;c++){ const a=i0+Math.floor(c*(i1-i0)/px), b=i0+Math.floor((c+1)*(i1-i0)/px); let mx=-1e9,mn=1e9; for(let i=a;i<Math.max(b,a+1)&&i<tr.trace.length;i++){ const v=VR+vdisp(tr.trace[i]); if(v>mx) mx=v; if(v<mn) mn=v; } up.push([L+c,ys(mx)]); lo.push([L+c,ys(mn)]); }
+  const aps=tr.ap.filter(t=>t>=t0-3&&t<=t0+span);
+  let d=pathOf(up); d+=lo.slice().reverse().map(p=>'L'+f1d(p[0])+' '+f1d(p[1])).join('')+'Z';
+  s+=`<path d="${d}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="1.2"/>`;
+  aps.forEach(t=>{ const x=xs(t); s+=`<path d="M${f1d(x-1.2)} ${f1d(ys(-30))} L${f1d(x)} ${f1d(ys(30))} L${f1d(x+1.8)} ${f1d(ys(-60))}" fill="none" stroke="${col}" stroke-width="2.2"/>`; });
+  const step=span>1000?500:span>300?100:span>100?25:10; for(let t=Math.ceil(t0/step)*step;t<=t0+span+1e-6;t+=step){ s+=`<text x="${f1d(xs(t))}" y="${H-6}" font-size="10" text-anchor="middle" class="tx2">${span>1000?(t/1000)+' s':t+' ms'}</text>`; }
+  return s+'</svg>';
+}
+/* =============== Schema (SVG) im Stil der Lehrbuchabbildung =============== */
+const GCV=[[-10,400,100,418,225,375,320,305],[320,305,410,238,485,195,570,165]];
+const GP=[]; GCV.forEach(c=>{ for(let i=0;i<=100;i++){ const t=i/100,m=1-t; GP.push([m*m*m*c[0]+3*m*m*t*c[2]+3*m*t*t*c[4]+t*t*t*c[6], m*m*m*c[1]+3*m*m*t*c[3]+3*m*t*t*c[5]+t*t*t*c[7]]); } });
+const GC=[0]; for(let i=1;i<GP.length;i++) GC.push(GC[i-1]+Math.hypot(GP[i][0]-GP[i-1][0],GP[i][1]-GP[i-1][1]));
+const GL=GC[GC.length-1], CLEFT=28;
+function gat(u){ const d=clamp(u,0,1)*GL; let i=1; while(i<GC.length-1&&GC[i]<d) i++; const f=(d-GC[i-1])/((GC[i]-GC[i-1])||1);
+  const x=GP[i-1][0]+(GP[i][0]-GP[i-1][0])*f, y=GP[i-1][1]+(GP[i][1]-GP[i-1][1])*f; const a=Math.atan2(GP[i][1]-GP[i-1][1],GP[i][0]-GP[i-1][0]);
+  const nx=Math.sin(a), ny=-Math.cos(a); return {x,y,a,deg:a*180/Math.PI,nx,ny,pre:{x:x+nx*CLEFT,y:y+ny*CLEFT}}; }
+const r1=x=>Math.round(x*10)/10;
+function pl(pts){ return pts.map((p,i)=>(i?'L':'M')+r1(p[0])+' '+r1(p[1])).join(' '); }
+function csamp(u0,u1,n,off){ const o=[]; for(let i=0;i<=n;i++){ const g=gat(u0+(u1-u0)*i/n); o.push(off?[g.x+g.nx*off,g.y+g.ny*off]:[g.x,g.y]); } return o; }
+const FR=(u,pre,dy)=>{ const g=gat(u), p=pre?g.pre:g; return `translate(${r1(p.x)},${r1(p.y+(dy||0))}) rotate(${r1(g.deg)})`; };
+const absAt=(u,pre,lx,ly)=>{ const g=gat(u), p=pre?g.pre:g, c=Math.cos(g.a), s=Math.sin(g.a); return [p.x+lx*c-ly*s, p.y+lx*s+ly*c]; };
+const sqr=(n,x,y)=>`<g class="sq sq${n}"><rect x="${r1(x-10)}" y="${r1(y-10)}" width="20" height="20" rx="3"/><text x="${r1(x)}" y="${r1(y+4.6)}" text-anchor="middle">${n}</text></g>`;
+const adot=(x,y,cls,extra)=>`<circle class="ach ${cls||''}" cx="${r1(x)}" cy="${r1(y)}" r="3.5" ${extra||''}/>`;
+const WAVY='M0 8 q10 -10 20 0 t20 0 t20 0 L60 -3 L92 14 L60 31 L60 20 q-10 10 -20 0 t-20 0 t-20 0 Z';
+const wavy=(x,y,deg,cls,sc)=>`<g class="${cls}"><g transform="translate(${r1(x)},${r1(y)}) rotate(${r1(deg)}) scale(${sc||1}) translate(-46,-14)"><path class="warr" d="${WAVY}"/></g></g>`;
+function cylPost(){ return `<path class="chy" d="M-13 -3 V21 A13 5 0 0 0 13 21 V-3 Z"/><ellipse class="chyT" cx="0" cy="-3" rx="13" ry="5"/>`; }
+function postChan(u,mixO,withPill){
+  const g=gat(u); const pill=withPill?`<g class="naP${mixO?' mixO':''}" transform="translate(40,16) rotate(${r1(-g.deg)})"><rect x="-17" y="-10" width="34" height="19" rx="9.5"/><text x="0" y="3.5" text-anchor="middle">Na⁺</text></g>`:'';
+  return `<g class="chn${mixO?' mixO':''}" transform="${FR(u)}">${cylPost()}
+   <ellipse class="chyC" cx="0" cy="-3" rx="7.5" ry="3"/>
+   <g class="chO"><ellipse class="chyL" cx="0" cy="-3" rx="7.5" ry="3"/><path class="naA" d="M0 -30 V26 M-4.5 19 L0 27 L4.5 19"/></g>
+   <path class="rcp" d="M-17 -3 q-2 -7 5 -8 q5 0 5 6 Z"/><path class="rcp" d="M17 -3 q2 -7 -5 -8 q-5 0 -5 6 Z"/>
+   <circle class="ach achB" cx="-13" cy="-13" r="3.5"/><circle class="ach achB" cx="13" cy="-13" r="3.5"/>${pill}</g>`;
+}
+function caChan(x,y){
+  return `<g transform="translate(${x},${y})"><path class="chg" d="M-12 -11 V13 A12 5 0 0 0 12 13 V-11 Z"/><ellipse class="chgT" cx="0" cy="-11" rx="12" ry="5"/><ellipse class="chgL" cx="0" cy="-11" rx="6.5" ry="2.6"/></g>
+  <g class="caA"><path d="M${x} ${y-44} V${y+30} M${x-4.5} ${y+23} L${x} ${y+31} L${x+4.5} ${y+23}" class="caArrow"/><g class="ionP"><rect x="${x-50}" y="${y-40}" width="38" height="19" rx="9.5"/><text x="${x-31}" y="${y-26.5}" text-anchor="middle">Ca²⁺</text></g></g>
+  <g class="caO"><circle class="ion" cx="${x-6}" cy="${y-26}" r="4"/><circle class="ion" cx="${x+7}" cy="${y-32}" r="4"/></g>
+  <g class="caI" style="--ox:0px;--oy:-56px"><circle class="ion" cx="${x-6}" cy="${y+26}" r="4"/><circle class="ion b" cx="${x+7}" cy="${y+36}" r="4"/></g>`;
+}
+const VU=[0.58,0.68,0.78], CU=[0.30,0.44,0.60,0.72,0.84], AU=[0.24,0.37,0.52], DD=[[-16,11],[4,8],[18,10]];
+let POSTD='';
+function buildSchema(){
+  const defs=`<defs>
+   <linearGradient id="gBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sc-bg1)"/><stop offset="1" style="stop-color:var(--sc-bg2)"/></linearGradient>
+   <radialGradient id="gPre" cx=".5" cy=".5" r=".7"><stop offset="0" style="stop-color:var(--sc-pre1)"/><stop offset="1" style="stop-color:var(--sc-pre2)"/></radialGradient>
+   <linearGradient id="gPost" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--sc-post1)"/><stop offset="1" style="stop-color:var(--sc-post2)"/></linearGradient>
+   <radialGradient id="gVes" cx=".4" cy=".35" r=".7"><stop offset="0" style="stop-color:var(--sc-ves1)"/><stop offset="1" style="stop-color:var(--sc-ves2)"/></radialGradient>
+   <radialGradient id="gAch" cx=".4" cy=".35" r=".7"><stop offset="0" style="stop-color:var(--sc-ach1)"/><stop offset="1" style="stop-color:var(--sc-ach2)"/></radialGradient>
+   <linearGradient id="gArr" x1="0" y1="0" x2="1" y2="0"><stop offset="0" style="stop-color:var(--sc-arr1)"/><stop offset="1" style="stop-color:var(--sc-arr2)"/></linearGradient>
+  </defs>`;
+  let s=`<svg id="schema" class="sv s0" viewBox="0 0 560 586" role="img" aria-label="Schema einer chemischen Synapse nach Lehrbuchvorlage: oben die Präsynapse mit Vesikeln und Ca²⁺-Kanälen, in der Mitte der diagonale synaptische Spalt, unten die postsynaptische Membran mit ACh-Rezeptoren und Na⁺-Kanälen. Neun nummerierte Schritte.">${defs}`;
+  s+=`<rect width="560" height="586" fill="url(#gBg)"/><g transform="translate(0,52)">`;
+  // Postsynaptische Zelle und Spalt
+  const post=csamp(0,1,60,0), preC=csamp(0,1,60,CLEFT);
+  s+=`<path d="${pl(post)} L570 540 L-10 540 Z" fill="url(#gPost)"/>`;
+  s+=`<path d="${pl(post)} ${preC.slice().reverse().map(p=>'L'+r1(p[0])+' '+r1(p[1])).join(' ')} Z" class="cleftF"/>`;
+  // Präsynaptische Endigung (Umriss)
+  const g0=gat(0.2), g1=gat(0.9);
+  const bottom=csamp(0.2,0.9,50,CLEFT).map(p=>'L'+r1(p[0])+' '+r1(p[1])).join(' ');
+  const bulb=`M72 -70 C70 50 94 100 98 170 C102 240 98 318 ${r1(g0.pre.x)} ${r1(g0.pre.y)} ${bottom} C${r1(g1.pre.x+8)} ${r1(g1.pre.y-20)} 528 110 496 58 C468 22 410 16 356 26 C308 35 262 52 220 40 C206 36 210 8 210 -70 Z`;
+  s+=`<path d="${bulb}" fill="url(#gPre)"/>`;
+  s+=`<path d="${bulb}" class="mem"/><path d="${bulb}" class="memL"/>`;
+  const postD=pl(post); POSTD=postD;
+  s+=`<path d="${postD}" class="mem"/><path d="${postD}" class="memL"/>`;
+  // Axon: Na-Kanäle
+  s+=`<g class="axc"><g transform="translate(72,16) rotate(90)">${cylPost()}</g><g transform="translate(210,2) rotate(-90)">${cylPost()}</g></g>`;
+  // Leere Vesikel und Transmittervesikel
+  [[150,118,17],[198,112,16],[318,96,17]].forEach(([x,y,r])=>{ s+=`<circle class="ves" cx="${x}" cy="${y}" r="${r}"/>`; });
+  const rv=[[140,178,14,[[-4,-3],[3,-2],[0,5]]],[248,150,22,[[-8,-7],[7,-6],[-6,7],[8,8]]],[330,182,20,[[2,2]]],[408,124,21,[[-7,-6],[8,-3],[0,9]]]];
+  rv.forEach(([x,y,r,ds])=>{ s+=`<circle class="ves" cx="${x}" cy="${y}" r="${r}"/>`+ds.map(d=>adot(x+d[0],y+d[1])).join(''); });
+  // Cholin-Transporter
+  s+=`<g transform="${FR(0.255,true)}"><path class="chy cht" d="M-10 -9 V9 A10 4 0 0 0 10 9 V-9 Z"/><ellipse class="chyT cht" cx="0" cy="-9" rx="10" ry="4"/><path d="M0 8 V-20 M-4 -14 L0 -21 L4 -14" class="naA" style="stroke-width:1.6"/></g>`;
+  // Recycling-Vesikel (9)
+  [[158,328,16],[206,308,20],[256,296,15]].forEach(([x,y,r],i)=>{ s+=`<g class="rec9"><circle class="ves" cx="${x}" cy="${y}" r="${r}"/><g class="fragIn">${i===1?`<path class="fragP" d="M${x-9} ${y+1} a5 5 0 0 1 10 0 Z" transform="rotate(15 ${x-4} ${y})"/><path class="fragP" d="M${x+3} ${y+8} a5 5 0 0 1 10 0 Z" transform="rotate(-30 ${x+8} ${y+8})"/><path class="fragP" d="M${x-6} ${y-9} a4.5 4.5 0 0 1 9 0 Z"/>`:''}</g><g class="dotIn">${i===1?[[-7,-5],[6,-6],[-2,6]].map(d=>adot(x+d[0],y+d[1])).join(''):i===0?[[-4,-2],[4,3]].map(d=>adot(x+d[0],y+d[1])).join(''):adot(x,y)}</g></g>`; });
+  s+=`<g class="fragT" style="--ox:-4px;--oy:50px"><path class="fragP" d="M146 336 a5 5 0 0 1 10 0 Z"/><path class="fragP" d="M170 340 a5 5 0 0 1 10 0 Z" transform="rotate(25 175 340)"/></g>`;
+  // Ca-Kanäle oben
+  s+=caChan(385,26)+caChan(435,24);
+  // Andockende Vesikel
+  VU.forEach((u,i)=>{ const r=15; const sn='M0 -2 l-2.6 -3 l5.2 -3 l-5.2 -3 l2.6 -3';
+    s+=`<g class="vD k${i+1}${i>0?' fz':''}" transform="${FR(u,true)}">
+     <g class="vI"><circle class="ves" cx="0" cy="${-(r+4)}" r="${r}"/><path class="snare" d="${sn}"/>${[[-5,-5],[5,-4],[0,3]].map(d=>adot(d[0],-(r+4)+d[1])).join('')}</g>
+     <g class="vF"><rect x="${r1(-0.72*r)}" y="-6.5" width="${r1(1.44*r)}" height="13" class="cleftF"/><path class="omega" d="M${r1(-0.72*r)} 0 A${r} ${r} 0 1 1 ${r1(0.72*r)} 0"/><g class="vFd">${[[-4,-9],[4,-12]].map(d=>adot(d[0],d[1])).join('')}</g></g>
+    </g>`; });
+  // freigesetztes ACh im Spalt
+  VU.forEach(u=>{ s+=`<g transform="${FR(u,true)}">`+[[-6,12],[6,14],[-1,18]].map((d,k)=>adot(d[0],d[1],'achR'+(k===2?' keep':''),`style="--dx:${DD[k][0]}px;--dy:${DD[k][1]}px"`)).join('')+`</g>`; });
+  // postsynaptische Kanäle (Überblick: rechte zwei offen)
+  CU.forEach((u,i)=>{ s+=postChan(u,i>=3,i>=3); });
+  [0.06,0.97].forEach(u=>{ s+=`<g class="vgc" transform="${FR(u)} scale(.85)">${cylPost()}</g>`; });
+  // AChE und Spaltprodukte
+  AU.forEach(u=>{ s+=`<g transform="${FR(u)}"><path class="ache" d="M-11 -1 L11 -1 L0 -19 Z"/><g class="frag"><path class="fragP" d="M-22 -22 a5 5 0 0 1 10 0 Z" transform="rotate(-20 -17 -22)"/><path class="fragP" d="M10 -27 a5 5 0 0 1 10 0 Z" transform="rotate(25 15 -27)"/><path class="fragP" d="M-6 -33 a4.5 4.5 0 0 1 9 0 Z"/></g></g>`; });
+  // EPSP-Pfeile, AP-Pfeil
+  const ea=absAt(0.91,false,0,36), eb=absAt(0.07,false,0,38);
+  s+=wavy(ea[0],ea[1],gat(0.91).deg,'epsp',0.9)+wavy(eb[0],eb[1],gat(0.07).deg+180,'epsp',0.8);
+  s+=wavy(150,18,62,'apA',1);
+  s+=`<g class="apX"><path d="M170 58 L196 84 M196 58 L170 84" class="xmark"/></g>`;
+  s+=`<g class="apP"><g transform="translate(${r1(ea[0]-6)},${r1(ea[1]-44)})"><path d="M0 0 l6 -15 l6 24 l6 -11" class="spk"/></g></g><g class="apP"><g transform="translate(${r1(eb[0]-4)},${r1(eb[1]-48)})"><path d="M0 0 l6 -15 l6 24 l6 -11" class="spk"/></g></g>`;
+  // Potenzialanzeige
+  const ty=396+64*(1-0.45);
+  s+=`<rect x="530" y="396" width="16" height="64" rx="3" class="gbox"/><rect class="gaugeF" id="gaugeF" x="531" y="397" width="14" height="62" rx="2"/><line x1="526" x2="550" y1="${ty}" y2="${ty}" class="thrl"/><text class="lab2 thrT" x="523" y="${r1(ty+3.5)}" text-anchor="end">Schwelle</text><text class="lab2" x="538" y="389" text-anchor="middle">Potenzial</text><text class="lab2" id="apLab" x="556" y="478" text-anchor="end"></text>`;
+  s+=`<g id="mvL"></g>`;
+  // Hervorhebungen
+  const E=(x,y,rx,ry,rot)=>`<ellipse cx="${r1(x)}" cy="${r1(y)}" rx="${rx}" ry="${ry}"${rot!=null?` transform="rotate(${rot} ${r1(x)} ${r1(y)})"`:''}/>`;
+  const p68=gat(.68), p62=gat(.62), p5=gat(.5), p37=gat(.37);
+  const hi=[['h1',E(146,32,84,50)],['h2',E(410,22,66,46)],['h3',E(p68.pre.x-14,p68.pre.y-8,104,46,-33)],['h4',E(p68.pre.x+8,p68.pre.y+18,104,22,-33)],['h5',E(p62.x-6,p62.y-18,120,22,-33)],['h6',E(p62.x+8,p62.y+4,140,32,-33)],['h7',E(p5.x+96,p5.y+62,190,34,-28)],['h8',E(p37.x,p37.y-8,86,34,-24)],['h9',E(206,316,92,46)]];
+  s+=hi.map(([c,e])=>`<g class="hi ${c}">${e}</g>`).join('');
+  // Gifte
+  s+=`<g class="ov ov-TTX"><g transform="translate(72,16) rotate(90)"><path class="tx-s" d="M-8 -16 L8 -16 L0 -4 Z"/></g><g transform="translate(210,2) rotate(-90)"><path class="tx-s" d="M-8 -16 L8 -16 L0 -4 Z"/></g>${[0.06,0.97].map(u=>`<g transform="${FR(u)}"><path class="tx-s" d="M-7 -20 L7 -20 L0 -6 Z"/></g>`).join('')}<text class="tx" x="4" y="34">TTX blockiert</text><text class="tx" x="4" y="46">Na⁺-Kanäle</text></g>`;
+  s+=`<g class="ov ov-CTX">${[[385,26],[435,24]].map(([x,y])=>`<path class="tx-s" d="M${x-8} ${y-22} L${x+8} ${y-22} L${x} ${y-6} Z"/>`).join('')}<text class="tx" x="556" y="-8" text-anchor="end">ω-Conotoxin verschließt</text><text class="tx" x="556" y="4" text-anchor="end">die Ca²⁺-Kanäle</text></g>`;
+  s+=`<g class="ov ov-MG">${[[385,26],[435,24]].map(([x,y])=>`<circle class="tx-s" cx="${x-8}" cy="${y-24}" r="5.5"/><circle class="tx-s" cx="${x+9}" cy="${y-28}" r="5.5"/>`).join('')}<text class="tx" x="556" y="-8" text-anchor="end">Mg²⁺ konkurriert</text><text class="tx" x="556" y="4" text-anchor="end">mit Ca²⁺ um die Kanäle</text></g>`;
+  s+=`<g class="ov ov-BoNT">${VU.map(u=>`<g transform="${FR(u,true)}"><path d="M-7 -8 L7 -22 M7 -8 L-7 -22" class="xmark"/></g>`).join('')}<path d="M236 246 L292 256" class="rline"/><text class="tx" x="150" y="236">Botulinumtoxin</text><text class="tx" x="150" y="248">zerschneidet SNARE</text></g>`;
+  const rtx=(a,b)=>`<text class="tx" x="330" y="420" text-anchor="middle">${a}</text><text class="tx" x="330" y="432" text-anchor="middle">${b}</text>`;
+  s+=`<g class="ov ov-CUR">${CU.map(u=>`<g transform="${FR(u)}"><path class="tx-s" d="M-6 -23 L6 -23 L0 -12 Z"/></g>`).join('')}${rtx('Curare besetzt die','ACh-Bindestellen')}</g>`;
+  s+=`<g class="ov ov-BGT">${CU.map(u=>`<g transform="${FR(u)}"><rect class="tx-s" x="-15" y="-20" width="30" height="7" rx="2"/></g>`).join('')}${rtx('α-Bungarotoxin sitzt','fest am Rezeptor')}</g>`;
+  s+=`<g class="ov ov-SUX">${CU.map(u=>`<g transform="${FR(u)}"><path class="tx-s" d="M0 -24 l7 7 l-7 7 l-7 -7 Z"/></g>`).join('')}${rtx('Succinylcholin:','Dauerreiz am Rezeptor')}</g>`;
+  s+=`<g class="ov ov-OP">${AU.map(u=>`<g transform="${FR(u)}"><circle class="tx-s" cx="0" cy="-11" r="6.5"/><text x="0" y="-8" text-anchor="middle" class="ptx">P</text></g>`).join('')}<text class="tx" x="150" y="420">E 605 / Sarin hemmt</text><text class="tx" x="150" y="432">die AChE</text></g>`;
+  // Gegengifte
+  s+=`<g class="av av-NEO">${AU.map(u=>`<g transform="${FR(u)}"><rect class="ax-s" x="-8" y="-9" width="16" height="5" rx="2"/></g>`).join('')}<text class="ax-t" x="330" y="452" text-anchor="middle">Neostigmin hemmt die AChE</text></g>`;
+  s+=`<g class="av av-OXI">${AU.map(u=>`<g transform="${FR(u)}"><circle class="ax-s" cx="14" cy="-9" r="4.8"/></g>`).join('')}<text class="ax-t" x="330" y="452" text-anchor="middle">Obidoxim reaktiviert die AChE</text></g>`;
+  s+=`<g class="av av-ATR"><rect x="196" y="456" width="266" height="22" rx="6" class="dashb"/><text class="ax-t" x="329" y="471" text-anchor="middle">Atropin: nur an muskarinischen Rezeptoren</text></g>`;
+  s+=`<g class="av av-AS">${[[92,372],[262,300],[336,252]].map(([x,y])=>`<g transform="translate(${x},${y})"><path d="M0 10 v-10 M0 0 l-6 -9 M0 0 l6 -9" class="abody"/><rect class="tx-s" x="-3" y="-14" width="6" height="6"/></g>`).join('')}<text class="ax-t" x="330" y="452" text-anchor="middle">Antikörper binden das Gift</text></g>`;
+  s+=`<g class="av av-CAL">${[[385,26],[435,24]].map(([x,y])=>`<circle class="ion cal" cx="${x-20}" cy="${y-18}" r="4"/><circle class="ion cal" cx="${x+22}" cy="${y-16}" r="4"/><circle class="ion cal" cx="${x+4}" cy="${y-30}" r="4"/>`).join('')}<text class="ax-t" x="556" y="20" text-anchor="end">Ca²⁺ erhöht</text></g>`;
+  s+=`<g class="av av-BEA"><rect x="404" y="486" width="146" height="22" rx="6" class="beab"/><text class="ax-t" x="477" y="501" text-anchor="middle">Beatmung läuft</text></g>`;
+  s+=`<g class="av av-ACH">${[[300,262],[318,252],[336,262],[354,250],[372,238]].map(([x,y])=>`<circle class="ach acx" cx="${x}" cy="${y}" r="3.5"/>`).join('')}<text class="ax-t" x="340" y="232" text-anchor="middle">ACh gespritzt</text></g>`;
+  // Beschriftungen mit Hilfslinien
+  const ld=(x1,y1,x2,y2)=>`<path class="leader" d="M${x1} ${y1} L${x2} ${y2}"/>`;
+  const t=(x,y,txt,anc)=>`<text class="lab" x="${x}" y="${y}"${anc?` text-anchor="${anc}"`:''}>${txt}</text>`;
+  s+=`<g class="lbls">`;
+  s+=t(410,-34,'Ca²⁺-Ionenkanäle','middle')+ld(396,-28,388,-12)+ld(424,-28,432,-14);
+  s+=t(4,154,'Vesikel mit')+t(4,168,'Transmitter')+ld(70,164,124,172);
+  s+=t(4,300,'präsynaptische')+t(4,314,'Membran')+ld(62,320,122,364);
+  s+=t(4,94,'Axon')+ld(34,88,68,70);
+  s+=t(4,348,'synaptischer')+t(4,362,'Spalt')+ld(52,368,62,392);
+  s+=t(4,508,'Acetylcholin-')+t(4,522,'esterase')+ld(88,504,138,398);
+  s+=t(176,500,'postsynaptische')+t(176,514,'Membran')+ld(216,486,238,364);
+  s+=t(330,380,'Na⁺-Ionenkanal','middle')+t(330,394,'geschlossen','middle')+ld(330,368,342,314);
+  s+=t(440,350,'Na⁺-Ionenkanal')+t(440,364,'offen')+ld(466,336,474,232)+ld(452,336,412,268);
+  s+=t(512,130,'Rezeptor','middle')+ld(516,136,484,192);
+  s+=t(554,282,'EPSP (EPP)','end')+t(8,474,'EPSP (EPP)');
+  s+=`</g>`;
+  // Nummern
+  const nx7a=ea, nx7b=eb;
+  s+=sqr(1,118,22)+sqr(2,410,72)+sqr(3,300,214)+sqr(4,372,246)+sqr(5,330,318)+sqr(6,508,236)+sqr(7,nx7a[0]-28,nx7a[1]+10)+sqr(7,nx7b[0]+34,nx7b[1]+2)+sqr(8,250,376)+sqr(9,184,288);
+  return s+'</g></svg>';
+}
+function schemaState(){
+  const sig=singleImpulse(makeParams(S.poison,S.dose,S.anti,S.timing));
+  const st=sig.st, k=S.step;
+  const settled=k===0||A.f>=SETTLE;
+  const cls=['sv']; if(k===0) cls.push('s0');
+  for(let i=1;i<k;i++) cls.push('p'+i);
+  if(k>0&&settled) cls.push('p'+k);
+  if(k>0){ cls.push('c'+k,'mv'); if(!settled) cls.push('mv'+k); }
+  st.forEach((s,i)=>{ if(s==='aus'||s==='folge') cls.push('f'+(i+1)+'-aus'); if(s==='schwach') cls.push('w'+(i+1)); });
+  if(st[7]==='aus'||sig.plateau) cls.push('x8');
+  if(S.poison) cls.push('p-'+S.poison); if(S.anti) cls.push('a-'+S.anti);
+  const lv=Math.min(1,vdisp(sig.Vmax)/60);
+  let level=0.04, spike=false;
+  if(k>=6) level=Math.max(0.04,lv);
+  if(k===7&&settled&&sig.fired&&!sig.plateau&&st[6]==='ok') spike=true;
+  if(k>=8){ const E=makeParams(S.poison,S.dose,S.anti,S.timing).E; level=sig.plateau?Math.max(0.05,lv):(E<0.5?Math.max(0.05,lv*0.5):0.05); }
+  if(spike) cls.push('g-spike');
+  return {cls:cls.join(' '),level,sig};
+}
+function updateSchema(){
+  const el=$('#schema'); if(!el) return; const sc=schemaState();
+  if(el.getAttribute('class')!==sc.cls) el.setAttribute('class',sc.cls);
+  const an=S.step>0?animFrame(S.step,A.f,sc.sig):{svg:'',gauge:sc.level,cap:''};
+  if(reduceMotion()&&S.step>0) an.svg='';
+  const L=$('#mvL'); if(L&&A.svg!==an.svg){ L.innerHTML=an.svg; A.svg=an.svg; }
+  $('#gaugeF').style.transform=`scaleY(${r1(an.gauge*1000)/1000})`;
+  A.cap=an.cap;
+  const showAP=S.step>7||(S.step===7&&A.f>=0.45);
+  const lab=$('#apLab'); if(lab) lab.textContent=showAP?(sc.sig.fired?(sc.sig.plateau?'AP, dann Dauerdepol.':'AP wird ausgelöst'):(sc.sig.plateau?'Dauerdepol., kein AP':'kein AP')):'';
+  return sc;
+}
+/* =============== Animation der Schritte =============== */
+const SETTLE=0.86;
+const DUR=[3.8,4,4,3.4,3.8,4.6,4.6,4.4,5];
+const SPEEDS=[1,0.5,0.25,2], SPEEDNAME=['1×','0,5×','0,25×','2×'];
+const A={f:1,raf:0,mode:null,last:0,sp:0,rm:0,svg:'',cap:'',vinfo:''};
+const P1L='M72 -70 C70 50 94 100 98 170', P1R='M210 -70 C210 8 206 36 220 40 C262 52 308 35 356 26 C410 16 468 22 496 58';
+const CAC=[[385,26],[435,24]], REC=[[158,328],[206,308],[256,296]];
+const ST0=[[-6,12],[6,14],[-1,18]], VIN=[[-4,-9],[4,-12],[0,-6]];
+const QF={ok:1,dauer:1,schwach:.5,aus:0,folge:0};
+const sg=(f,a,b)=>clamp((f-a)/(b-a),0,1);
+const ez=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const lp=(a,b,t)=>a+(b-a)*t;
+const lp2=(p,q,t)=>[lp(p[0],q[0],t),lp(p[1],q[1],t)];
+const bump=t=>Math.min(1,t*6,(1-t)*6);
+const opA=o=>o<0.999?` opacity="${Math.round(Math.max(0,o)*100)/100}"`:'';
+const dotS=(p,cls,r,o)=>`<circle class="${cls}" cx="${r1(p[0])}" cy="${r1(p[1])}" r="${r||3.5}"${opA(o==null?1:o)}/>`;
+const halfS=(p,rot,o)=>`<path class="fragP" d="M-5 0 a5 5 0 0 1 10 0 Z" transform="translate(${r1(p[0])},${r1(p[1])}) rotate(${rot})"${opA(o)}/>`;
+const dashS=(d,pos,len,cls,o)=>`<path d="${d}" pathLength="100" class="${cls}" style="stroke-dasharray:${r1(len)} 400;stroke-dashoffset:${r1(len-pos)}"${opA(o==null?1:o)}/>`;
+const txtS=(x,y,t,o,anc)=>`<text class="mvT" x="${r1(x)}" y="${r1(y)}"${anc?` text-anchor="${anc}"`:''}${opA(o)}>${t}</text>`;
+const released=st=>!(st[3]==='aus'||st[3]==='folge');
+const relKs=st=>st[3]==='schwach'?[2]:[0,1,2];
+const achEnd=(i,kk)=>absAt(VU[i],true,ST0[kk][0]+DD[kk][0],ST0[kk][1]+DD[kk][1]);
+const siteAt=(j,sd)=>absAt(CU[j],false,sd?13:-13,-13);
+function gaugeEnds(sig){
+  const st=sig.st, lv=Math.max(0.04,Math.min(1,vdisp(sig.Vmax)/60));
+  const fire=sig.fired&&!sig.plateau&&st[6]==='ok';
+  const g6=sig.plateau?lv:Math.min(lv,0.38);
+  const g7=sig.plateau?lv:fire?Math.min(lv,0.3):lv;
+  const E=pa().E; const g8=sig.plateau?Math.max(0.05,lv):(E<0.5?Math.max(0.05,lv*0.5):0.05);
+  const g9=sig.plateau?g8:0.04;
+  return {lv,fire,g6,g7,g8,g9};
+}
+function gaugeAt(k,f,G){
+  if(k<=5) return 0.04;
+  if(k===6) return lp(0.04,G.g6,ez(sg(f,.45,.95)));
+  if(k===7){ if(G.fire){ if(f<.35) return lp(G.g6,0.5,ez(sg(f,0,.35))); if(f<.45) return lp(0.5,1,sg(f,.35,.45)); if(f<.7) return lp(1,0.08,ez(sg(f,.45,.7))); return lp(0.08,G.g7,ez(sg(f,.7,1))); }
+    return lp(G.g6,G.g7,ez(sg(f,0,.4))); }
+  if(k===8) return lp(G.g7,G.g8,ez(sg(f,.35,.85)));
+  return lp(G.g8,G.g9,ez(sg(f,.6,1)));
+}
+const CAPS={
+ 1:{ok:[[0,'Ein Aktionspotenzial läuft über das Axon zur Endigung.'],[.3,'Na⁺-Kanäle öffnen nacheinander, Na⁺ strömt ein, die Membran wird depolarisiert.'],[.7,'Die Depolarisation erreicht die ganze Membran der Endigung.']],
+    aus:[[0,'Ein Aktionspotenzial läuft über das Axon.'],[.3,'Die Na⁺-Kanäle sind blockiert: Das Aktionspotenzial erlischt, bevor es die Endigung erreicht.']]},
+ 2:{ok:[[0,'Die Depolarisation öffnet spannungsgesteuerte Ca²⁺-Kanäle.'],[.25,'Ca²⁺ strömt in die Endigung, denn außen ist die Konzentration viel höher.'],[.6,'Die Ca²⁺-Ionen gelangen zu den Vesikeln an der Membran.']],
+    aus:[[0,'Ca²⁺-Ionen erreichen die Kanäle.'],[.3,'Die Kanäle sind blockiert: Ca²⁺ kann nicht einströmen.']],
+    folge:[[0,'Ohne Aktionspotenzial öffnen die Ca²⁺-Kanäle nicht. Kein Ca²⁺ strömt ein.']]},
+ 3:{ok:[[0,'Ca²⁺ bindet an den Ca-Sensor der Vesikel (Synaptotagmin).'],[.28,'SNARE-Proteine ziehen Vesikel und Membran zusammen.'],[.6,'Vesikel und präsynaptische Membran verschmelzen (Exozytose).']],
+    aus:[[0,'Ca²⁺ bindet an den Ca-Sensor der Vesikel.'],[.3,'Die SNARE-Proteine sind zerstört: Die Vesikel können nicht verschmelzen.']],
+    folge:[[0,'Ohne Ca²⁺-Einstrom verschmelzen die Vesikel nicht mit der Membran.']]},
+ 4:{ok:[[0,'Die verschmolzenen Vesikel öffnen sich zum synaptischen Spalt.'],[.3,'Acetylcholin (ACh) gelangt in den Spalt.']],
+    schwach:[[0,'Nur wenige Vesikel öffnen sich.'],[.3,'Es gelangt nur wenig ACh in den Spalt.']],
+    folge:[[0,'Kein Vesikel hat sich geöffnet: Es wird kein ACh freigesetzt.']]},
+ 5:{ok:[[0,'ACh-Moleküle bewegen sich zufällig durch den Spalt (Diffusion).'],[.45,'Der Spalt ist nur 20 bis 50 nm breit. In Wirklichkeit dauert das weniger als 1 ms.']],
+    folge:[[0,'Im Spalt ist kein ACh, das diffundieren könnte.']]},
+ 6:{ok:[[0,'ACh bindet an die nikotinischen Rezeptoren.'],[.42,'Die Rezeptorkanäle öffnen: Na⁺ strömt in die Muskelfaser.'],[.8,'Die Membran unter den Rezeptoren wird depolarisiert.']],
+    schwach:[[0,'ACh erreicht die Rezeptoren, ein Teil der Bindestellen ist besetzt.'],[.42,'Nur ein Teil der Kanäle öffnet, wenig Na⁺ strömt ein.']],
+    aus:[[0,'ACh erreicht die Rezeptoren, aber die Bindestellen sind besetzt.'],[.42,'ACh kann nicht binden: Die Kanäle bleiben geschlossen.']],
+    dauer:[[0,'ACh und der Giftstoff binden an die Rezeptoren.'],[.42,'Die Kanäle öffnen, Na⁺ strömt ein.'],[.8,'Die Kanäle bleiben dauerhaft offen.']],
+    folge:[[0,'Kein ACh erreicht die Rezeptoren: Die Kanäle bleiben geschlossen.']]},
+ 7:{fire:[[0,'Die Depolarisation (Endplattenpotenzial, EPSP) breitet sich aus.'],[.35,'Der Schwellenwert wird überschritten.'],[.45,'Spannungsgesteuerte Na⁺-Kanäle öffnen: Ein Aktionspotenzial läuft über die Muskelfaser.']],
+    nofire:[[0,'Die Depolarisation (Endplattenpotenzial, EPSP) breitet sich aus.'],[.35,'Der Schwellenwert wird nicht erreicht: Es entsteht kein Aktionspotenzial.']],
+    plateauAP:[[0,'Die Depolarisation breitet sich aus, ein Aktionspotenzial entsteht.'],[.4,'Danach bleibt die Membran depolarisiert. Die Na⁺-Kanäle sind inaktiviert (Depolarisationsblock).']],
+    plateau:[[0,'Die Membran bleibt dauerhaft depolarisiert.'],[.4,'Die Na⁺-Kanäle sind inaktiviert: Es entsteht kein Aktionspotenzial (Depolarisationsblock).']],
+    folge:[[0,'Ohne Na⁺-Einstrom entsteht kein Endplattenpotenzial und kein Aktionspotenzial.']]},
+ 8:{ok:[[0,'ACh löst sich von den Rezeptoren und trifft auf die Acetylcholinesterase (AChE).'],[.36,'Die AChE spaltet ACh in Acetat und Cholin.'],[.66,'Die Rezeptorkanäle schließen, die Membran repolarisiert.']],
+    schwach:[[0,'ACh trifft auf die Acetylcholinesterase (AChE).'],[.36,'Die gehemmte AChE spaltet nur einen Teil des ACh.'],[.66,'Der Rest bindet erneut an die Rezeptoren.']],
+    aus:[[0,'ACh trifft auf die Acetylcholinesterase, aber das Enzym ist gehemmt.'],[.4,'ACh bleibt im Spalt und bindet erneut: Die Kanäle bleiben offen.']],
+    folge:[[0,'Im Spalt ist kein ACh, das abgebaut werden müsste.']]},
+ 9:{ok:[[0,'Cholin wird über einen Transporter zurück in die Endigung aufgenommen.'],[.42,'Aus Cholin und Acetyl-CoA entsteht neues ACh. Es wird in Vesikel verpackt.'],[.68,'Ca²⁺ wird abgepumpt. Die Synapse ist bereit für den nächsten Impuls.']],
+    schwach:[[0,'Es entsteht weniger Cholin, weil die AChE gehemmt ist.'],[.42,'Aus dem wenigen Cholin entsteht neues ACh.'],[.68,'Ca²⁺ wird abgepumpt.']],
+    folge:[[0,'Ohne freigesetztes ACh gibt es nichts zurückzuholen.']]}
+};
+function capKey(k,st,sig,G){
+  const s=st[k-1];
+  if(k===7){ if(s==='folge') return 'folge'; if(sig.plateau) return sig.fired?'plateauAP':'plateau'; return G.fire?'fire':'nofire'; }
+  const c=CAPS[k];
+  if(c[s]) return s;
+  if(s==='folge') return c.aus?'aus':'ok';
+  if(s==='schwach'||s==='dauer') return 'ok';
+  return c.aus?'aus':'ok';
+}
+function capAt(k,f,sig,G){ const arr=CAPS[k][capKey(k,sig.st,sig,G)]; let t=arr[0][1]; arr.forEach(([a,x])=>{ if(f>=a) t=x; }); return t; }
+function animFrame(k,f,sig){
+  const st=sig.st, G=gaugeEnds(sig);
+  const out={gauge:gaugeAt(k,f,G),cap:capAt(k,f,sig,G),svg:''};
+  let s='';
+  if(k===1){
+    const q=QF[st[0]], dead=q===0;
+    const pos=dead?72*ez(sg(f,0,.75)):120*ez(sg(f,0,.8));
+    const o=dead?1-sg(f,.4,.75):(q<1?.5:1);
+    if(o>0&&pos>0) s+=dashS(P1L,pos,34,'mvG',o)+dashS(P1L,pos,16,'mvW',o)+dashS(P1R,pos,34,'mvG',o)+dashS(P1R,pos,16,'mvW',o);
+    for(let i=0;i<3;i++){ const t=sg(f,.16+i*.07,.48+i*.07); if(t<=0||t>=1) continue; const o2=bump(t);
+      [[[48,6+i*6],[96,10+i*5]],[[234,-8+i*6],[186,-4+i*5]]].forEach(([a,b])=>{ const p=dead?lp2(a,lp2(a,b,.42),Math.sin(t*Math.PI)):lp2(a,b,ez(t)); s+=dotS(p,'naI',3.6,o2); }); }
+    const tl=sg(f,.16,.72); if(tl>0&&tl<1) s+=txtS(22,-4,'Na⁺',bump(tl))+txtS(250,-18,'Na⁺',bump(tl));
+  }
+  if(k===2){
+    const sx=st[1];
+    CAC.forEach(([x,y],c)=>{ for(let i=0;i<4;i++){
+      const ti=.04+i*.09+c*.04; const pass=(sx==='ok'||sx==='dauer')||(sx==='schwach'&&i%2===0);
+      const a=[x+[-28,-10,12,30][i],y-46-(i%2)*8], mouth=[x,y-14], thr=[x+(i%2?5:-5),y+22];
+      const tgt=absAt(VU[(c*2+i)%3],true,(i%2?9:-9),-32);
+      const t1=sg(f,ti,ti+.32), t2=sg(f,ti+.32,ti+.7); let p;
+      if(sx==='folge') p=a;
+      else if(pass){ p=t1<.5?lp2(a,mouth,ez(t1*2)):lp2(mouth,thr,ez((t1-.5)*2)); if(t2>0) p=lp2(thr,tgt,ez(t2)); }
+      else p=lp2(a,[x+(a[0]-x)*.3,y-22],Math.sin(t1*Math.PI));
+      s+=dotS(p,'ion',4);
+    } });
+  }
+  if(k===3&&f<SETTLE){
+    const s1=st[1], s2=st[2]; const caIn=s1==='ok'||s1==='dauer'||s1==='schwach';
+    VU.forEach((u,i)=>{
+      const fuse=s2==='ok'||s2==='dauer'||(s2==='schwach'&&i===0);
+      let g=`<g transform="${FR(u,true)}">`;
+      if(caIn){ const o=1-sg(f,.22,.42); if(o>0) (s1==='schwach'?[-9]:[-9,9]).forEach(lx=>{ g+=dotS(lp2([lx,-32],[lx*.5,-8],ez(sg(f,0,.3))),'ion',4,o); }); }
+      let dy=0,sx=1,sy=1;
+      if(fuse){ const t=ez(sg(f,.28+i*.05,.8)); dy=11*t; sy=1-.4*t; sx=1+.18*t; }
+      else if(s2==='aus'){ dy=4*Math.sin(sg(f,.3,.75)*Math.PI*2); }
+      g+=`<g transform="translate(0,${r1(-19+dy)}) scale(${r1(sx*100)/100},${r1(sy*100)/100})"><circle class="ves" cx="0" cy="0" r="15"/>`+VIN.map((d,j)=>adot([-5,5,0][j],[-5,-4,3][j])).join('')+`</g>`;
+      const zt=sg(f,.12,.55), zs=fuse?1-ez(sg(f,.28+i*.05,.8)):1;
+      if(zs>0.05) g+=`<g transform="scale(1,${r1(zs*100)/100})"><path class="snare${fuse&&zt>0&&zt<1?' zip':''}" d="M0 -2 l-2.6 -3 l5.2 -3 l-5.2 -3 l2.6 -3"/></g>`;
+      s+=g+'</g>';
+    });
+  }
+  if(k===4&&f<SETTLE&&released(st)){
+    VU.forEach((u,i)=>{ let g=`<g transform="${FR(u,true)}">`;
+      relKs(st).forEach(kk=>{ const t=ez(sg(f,.08+kk*.1+i*.05,.62+kk*.08)); const a=VIN[kk], b=ST0[kk], m=[a[0]*.3,1]; const p=t<.5?lp2(a,m,t*2):lp2(m,b,(t-.5)*2); g+=adot(p[0],p[1]); });
+      s+=g+'</g>'; });
+  }
+  if(k===5&&f<SETTLE&&released(st)){
+    VU.forEach((u,i)=>{ let g=`<g transform="${FR(u,true)}">`;
+      relKs(st).forEach(kk=>{ const t=ez(sg(f,.04,.8)); const a=ST0[kk], b=[a[0]+DD[kk][0],a[1]+DD[kk][1]]; const p=lp2(a,b,t); const am=4*Math.sin(Math.PI*t);
+        p[0]+=am*Math.sin(f*31+i*2+kk*5); p[1]=clamp(p[1]+am*.8*Math.cos(f*27+i*3+kk*7),4,25); g+=adot(p[0],p[1]); });
+      s+=g+'</g>'; });
+  }
+  if(k===6&&released(st)){
+    const rs=st[5], bindAll=rs==='ok'||rs==='dauer', half=rs==='schwach';
+    const src=[]; const ks=relKs(st);
+    for(let r=0;r<(ks.length===3?10:4);r++){ const i=r%3, kk=ks.length===3?(r<3?0:r<6?1:2):2; const p=achEnd(i,kk); src.push(r>=9?[p[0]+6,p[1]-3]:p); }
+    const sites=[]; for(let j=0;j<5;j++) for(let sd=0;sd<2;sd++) sites.push({j,p:siteAt(j,sd)});
+    const n=src.length; const pick=n===10?sites:[1,3,6,8].map(x=>sites[x]);
+    src.sort((a,b)=>a[0]-b[0]); pick.sort((a,b)=>a.p[0]-b.p[0]);
+    const open=new Set();
+    if(f<SETTLE) src.forEach((a,r)=>{ const site=pick[r]; const bind=bindAll||(half&&site.j%2===0); const t=sg(f,.02+r*.028,.38+r*.022);
+      let p; if(bind){ p=lp2(a,site.p,ez(t)); const am=2.5*Math.sin(Math.PI*t); p[0]+=am*Math.sin(f*29+r); }
+      else p=lp2(a,site.p,.85*Math.sin(Math.PI*t));
+      s+=dotS(p,'ach'); });
+    pick.forEach(x=>{ if(bindAll||(half&&x.j%2===0)) open.add(x.j); });
+    open.forEach(j=>{ let g=`<g transform="${FR(CU[j])}">`;
+      if(f>=.4&&f<SETTLE) g+=`<ellipse class="chyL" cx="0" cy="-3" rx="7.5" ry="3"/>`;
+      for(let nn=0;nn<3;nn++){ const t=sg(f,.42+nn*.13+j*.02,.66+nn*.13+j*.02); if(t>0&&t<1) g+=dotS([0,lp(-30,30,ez(t))],'naI',3.4,bump(t)); }
+      s+=g+'</g>'; });
+  }
+  if(k===7){
+    const relOK=released(st)&&!(st[5]==='aus'||st[5]==='folge');
+    const amp=relOK?Math.min(1,G.lv/0.45):0.15;
+    const w=lp(4,24,ez(sg(f,0,.35))); let oE=amp;
+    if(G.fire) oE*=1-.6*sg(f,.5,.85); if(sig.plateau) oE*=.75+.25*Math.sin(f*14);
+    if(oE>0.03) s+=dashS(POSTD,57+w,2*w,'mvE',oE);
+    if(G.fire||(sig.plateau&&sig.fired)){
+      const t=sg(f,.42,.82), o=1-sg(f,.82,.95);
+      if(t>0&&o>0){ const pl=lp(57,1,ez(t)), pr=lp(57,99,ez(t)); s+=dashS(POSTD,pl+10,10,'mvW',o)+dashS(POSTD,pr,10,'mvW',o); }
+      [0.06,0.97].forEach(u=>{ let g=`<g transform="${FR(u)} scale(.85)">`; for(let nn=0;nn<2;nn++){ const tt=sg(f,.7+nn*.08,.9+nn*.08); if(tt>0&&tt<1) g+=dotS([0,lp(-28,22,ez(tt))],'naI',3.6,bump(tt)); } s+=g+'</g>'; });
+      const fl=sg(f,.33,.6); if(fl>0&&fl<1) s+=`<rect x="524" y="390" width="28" height="76" rx="5" class="mvFl"${opA(bump(fl))}/>`;
+    }
+  }
+  if(k===8&&f<SETTLE&&released(st)){
+    const bound=!(st[5]==='aus'||st[5]==='folge'); const es=st[7];
+    const src=[];
+    if(bound){ for(let j=0;j<5;j++) for(let sd=0;sd<2;sd++) src.push(siteAt(j,sd)); relKs(st).forEach(kk=>VU.forEach((u,i)=>src.push(achEnd(i,kk)))); }
+    else relKs(st).forEach(kk=>VU.forEach((u,i)=>src.push(achEnd(i,kk))));
+    src.sort((a,b)=>a[0]-b[0]); const n=src.length;
+    src.forEach((a,r)=>{
+      const m=Math.min(2,Math.floor(r*3/n)), idx=r-Math.ceil(m*n/3);
+      const at=absAt(AU[m],false,-6+(idx%3)*6,-12-Math.floor(idx/3)*3);
+      const t0=.02+r*.018, t1=t0+.26, t=sg(f,t0,t1);
+      const split=es==='ok'||(es==='schwach'&&r%2===0);
+      if(t<1){ s+=dotS(lp2(a,at,ez(t)),'ach'); return; }
+      if(split){ const sp=ez(sg(f,t1+.04,t1+.24)), o=1-sg(f,.78,.86);
+        if(sp<=0){ s+=dotS(at,'ach'); return; }
+        const pc=lp2(at,absAt(AU[m],false,15,-27),sp), pa=lp2(at,absAt(AU[m],false,-17,-22),sp);
+        s+=halfS(pc,lp(0,25,sp),o)+halfS(pa,lp(180,-20,sp),o); }
+      else { const tb=ez(sg(f,t1+.05,t1+.3)); s+=dotS(lp2(at,a,tb),'ach'); }
+    });
+  }
+  if(k===9&&f<SETTLE&&released(st)&&st[8]!=='folge'){
+    const nC=st[8]==='schwach'?2:3; const Tout=absAt(0.255,true,0,16), Tin=absAt(0.255,true,0,-28);
+    for(let m=0;m<nC;m++){
+      const a=absAt(AU[m],false,15,-27);
+      const t1=sg(f,.02+m*.08,.28+m*.08), t2=sg(f,.28+m*.08,.4+m*.08), t3=sg(f,.42+m*.05,.7+m*.05);
+      let p=lp2(a,Tout,ez(t1)); if(t2>0) p=lp2(Tout,Tin,ez(t2)); if(t3>0) p=lp2(Tin,REC[m],ez(t3));
+      if(t3<.6) s+=halfS(p,0,1);
+      else s+=dotS(p,'ach');
+      const ta=sg(f,.42+m*.05,.6+m*.05); if(ta>0&&ta<1){ const q=lp2([REC[m][0]+26,REC[m][1]-30],p,ez(ta)); s+=`<rect class="acet" x="${r1(q[0]-3.5)}" y="${r1(q[1]-3.5)}" width="7" height="7" rx="1.5"${opA(bump(ta))}/>`; }
+    }
+    const tl=sg(f,.02,.42); if(tl>0&&tl<1) s+=txtS(Tin[0]+18,Tin[1]+4,'Cholin',bump(tl));
+    const tl2=sg(f,.42,.7); if(tl2>0&&tl2<1) s+=txtS(150,268,'Acetyl-CoA',bump(tl2));
+    CAC.forEach(([x,y],c)=>{ [[x-6,y+26],[x+7,y+36]].forEach((a,i)=>{ const t=sg(f,.6+(c*2+i)*.05,.88+(c*2+i)*.03); const pmp=[x+24,y+2], outp=[x+26,y-34];
+      const p=t<.6?lp2(a,pmp,ez(t/.6)):lp2(pmp,outp,ez((t-.6)/.4)); s+=dotS(p,'ion',4,1-sg(t,.85,1)); }); });
+  }
+  out.svg=s; return out;
+}
+function setSegs(){
+  const h=$('#segs'); if(!h) return; const sig=schemaState().sig;
+  if(!h.children.length) h.innerHTML=STEPS.map(x=>`<button type="button" class="sg" data-v="seg" data-n="${x.n}" aria-label="Schritt ${x.n} abspielen: ${esc(x.t)}"><i></i><span>${x.n}</span></button>`).join('');
+  $$('.sg',h).forEach((b,i)=>{ const n=i+1; const w=S.step===0?0:n<S.step?100:n>S.step?0:Math.round(A.f*100);
+    b.firstChild.style.width=w+'%'; b.classList.toggle('cur',n===S.step); const bs=sig.st[i]; b.classList.toggle('bad',!!(S.poison||S.anti)&&(bs==='aus'||bs==='folge'||bs==='dauer')); });
+}
+function frame(){ updateSchema(); setSegs(); updVinfo(); }
+function tick(now){
+  A.raf=0; const dt=Math.min(0.1,(now-A.last)/1000); A.last=now;
+  A.f+=dt*SPEEDS[A.sp]/DUR[S.step-1];
+  if(A.f>=1){
+    if(A.mode==='all'&&S.step<9){ S.step++; A.f=0; stepChanged(); }
+    else { A.f=1; frame(); stopPlay(); return; }
+  }
+  frame(); A.raf=requestAnimationFrame(tick);
+}
+function runAnim(mode){
+  A.mode=mode; setPlayBtn(true);
+  if(reduceMotion()){ A.f=1; frame();
+    if(mode==='all'){ A.rm=setTimeout(function nx(){ if(S.step>=9){ stopPlay(); return; } S.step++; A.f=1; stepChanged(); A.rm=setTimeout(nx,3500); },3500); }
+    else setPlayBtn(false);
+    return; }
+  A.last=performance.now(); if(!A.raf) A.raf=requestAnimationFrame(tick);
+}
+function stepChanged(){ updateViewer(); if(S.tab==='flow'||S.tab==='tox'){ $$('.stp').forEach(el=>{ const n=+el.querySelector('.n').dataset.n; el.classList.toggle('cur',n===S.step); }); } fillCharts(); }
+function playStep(n){ stopPlay(); S.step=clamp(n,0,9); A.f=S.step===0?1:0; stepChanged(); if(S.step>0) runAnim('one'); }
+/* =============== Zustand =============== */
+const S={tab:'flow',step:0,play:false,poison:null,dose:1,anti:null,timing:0,freq:20,proto:'const',zoom:false,zoomAt:0,trSel:'poison',case:null,score:{ok:0,pts:0,n:0},timer:null};
+const DOSENAME=['niedrig','mittel','hoch'];
+function pa(){ return makeParams(S.poison,S.dose,S.anti,S.timing); }
+function curSig(){ return singleImpulse(pa()); }
+function rating(){ if(!S.poison||!S.anti) return null; return RATE[S.poison][S.anti]; }
+function chartW(id){ const el=$(id); const w=el?el.clientWidth:0; return Math.max(300,Math.round(w||340)); }
+const chip=(i,s)=>`<span class="st-chip ${s}">${esc(stLabel(i,s))}</span>`;
+
+/* =============== Fälle (Üben) =============== */
+const CASESX=[
+ {p:'OP',t:'Ein Landwirt hat beim Befüllen der Spritze ein Insektizid verschüttet. Er schwitzt stark, hat starken Speichelfluss und sehr enge Pupillen. Seine Muskeln zucken, nach einer Stunde ist er gelähmt und hat Atemnot.'},
+ {p:'BoNT',t:'Nach dem Verzehr von selbst eingemachten Bohnen aus einem Glas mit gewölbtem Deckel sieht ein Patient doppelt, seine Lider hängen, das Schlucken fällt schwer. Die Lähmung breitet sich von oben nach unten aus. Fieber hat er nicht.'},
+ {p:'CUR',t:'Nach einer Operation soll der Patient wieder selbst atmen. Während der Narkose hat er ein Muskelrelaxans vom Curare-Typ erhalten. Die Atemmuskulatur arbeitet noch nicht. Das Gehirn ist wach.'},
+ {p:'SUX',t:'Zur Narkoseeinleitung wird Succinylcholin gegeben. Kurze Muskelzuckungen, dann schlaffe Lähmung. Bei einer Patientin mit seltenem Enzymmangel hält die Lähmung viel länger an als üblich.'},
+ {p:'TTX',t:'Nach dem Verzehr von selbst zubereitetem Kugelfisch kribbeln Lippen und Zunge, kurz darauf folgen Gliederlähmung und Atemnot. Der Patient ist bei vollem Bewusstsein.'},
+ {p:'BGT',t:'Ein Wanderer wird nachts im Schlaf von einer Schlange gebissen. Die Bissstelle schmerzt kaum. Nach Stunden hängen die Lider, das Schlucken fällt schwer, später kommt Atemnot. Die Pupillen sind nicht eng.'},
+ {p:'MG',t:'Eine Patientin erhält in der Klinik Magnesiumsulfat in hoher Dosierung. Die Reflexe sind erloschen, die Atmung ist flach, die Muskeln sind schlaff.'},
+ {p:'CTX',t:'Ein Taucher wird von einer Kegelschnecke gestochen. Die Einstichstelle wird taub, dann breiten sich Schwäche und Lähmung aus. Das Atmen fällt schwer.'}
+];
+const BESTANTI={TTX:'BEA',CTX:'BEA',MG:'CAL',BoNT:'AS',CUR:'NEO',BGT:'AS',SUX:'BEA',OP:'OXI'};
+
+/* =============== Aufgaben, Glossar =============== */
+const ITASKS=[
+ {afb:'I',t:'Ablauf benennen',p:6,op:'Nenne',text:'Nenne die neun Schritte der Erregungsübertragung an der Synapse in der richtigen Reihenfolge und ordne jedem Schritt eine Struktur zu.',load:'flow',sol:['1 Aktionspotenzial in der Endigung (Na⁺-Kanäle)','2 Ca²⁺-Einstrom (Ca²⁺-Kanäle)','3 Vesikel verschmelzen mit der Membran (SNARE-Proteine)','4 Freisetzung von ACh in den Spalt','5 Diffusion des ACh durch den Spalt','6 Bindung an nikotinische Rezeptoren, Na⁺-Kanäle öffnen','7 EPSP (EPP), bei Überschreiten der Schwelle Aktionspotenzial','8 Abbau des ACh durch AChE','9 Cholin-Wiederaufnahme und Recycling (Reihenfolge je 0,5 P, Strukturen insgesamt 1,5 P)']},
+ {afb:'II',t:'Wirkort eines Gifts',p:6,op:'Erkläre',text:'Erkläre am Schema, an welchem Schritt Curare angreift und wie die Lähmung zustande kommt. Begründe, warum das Aktionspotenzial der Endigung unverändert bleibt.',load:'tox:CUR',sol:['Schritt 6: Curare besetzt die ACh-Bindestellen der nikotinischen Rezeptoren (kompetitive Hemmung). (2 P)','Es öffnen zu wenige Kanäle, das EPP bleibt unter dem Schwellenwert, in der Muskelfaser entsteht kein Aktionspotenzial. (2 P)','Schritte 1 bis 5 laufen normal, denn Curare wirkt nicht präsynaptisch. (2 P)']},
+ {afb:'II',t:'Gegengift begründen',p:7,op:'Erkläre … und begründe',text:'Curare-Vergiftung: Erkläre, warum Neostigmin hilft, Atropin allein aber nicht. Vergleiche das Frequenzdiagramm ohne und mit Neostigmin.',load:'anti:CUR:NEO',sol:['Neostigmin hemmt die AChE, ACh bleibt länger und in höherer Konzentration im Spalt. (2 P)','Das verdrängt das konkurrierende Curare vom Rezeptor, die Übertragung wird wieder zuverlässig. (2 P)','Atropin wirkt an muskarinischen Rezeptoren, die Endplatte hat nikotinische. (2 P)','Im Diagramm steigt die Antwortfrequenz mit Neostigmin deutlich an. (1 P)']},
+ {afb:'II',t:'Kompetitiv oder fest gebunden',p:6,op:'Vergleiche',text:'Vergleiche Curare und α-Bungarotoxin. Warum hilft Neostigmin im ersten Fall ursächlich, im zweiten nur lindernd?',load:'anti:BGT:NEO',sol:['Beide besetzen den nikotinischen Rezeptor. (1 P)','Curare bindet reversibel und konkurriert mit ACh, mehr ACh verschiebt das Gleichgewicht. (2 P)','α-Bungarotoxin bindet fast irreversibel, auch viel ACh verdrängt es nicht. Neostigmin lindert nur, indem es die ACh-Wirkung an den übrigen Rezeptoren verlängert. (2 P)','Die Ursache beseitigt ein Antiserum, das freies Toxin bindet. (1 P)']},
+ {afb:'III',t:'Organophosphat-Vergiftung bewerten',p:8,op:'Beurteile',text:'Beurteile die Maßnahmen Neostigmin, Atropin und Obidoxim bei einer Organophosphat-Vergiftung. Berücksichtige den Zeitpunkt der Gabe.',load:'anti:OP:OXI',sol:['Neostigmin: gefährlich, hemmt die AChE zusätzlich. (2 P)','Atropin: lindert muskarinische Symptome, wirkt aber nicht an der Endplatte. (2 P)','Obidoxim: reaktiviert die AChE und beseitigt die Ursache, aber nur früh, bevor das Enzym „altert“. (3 P)','Beatmung sichert das Überleben. (1 P)']},
+ {afb:'III',t:'Frequenzabhängigkeit deuten',p:7,op:'Erkläre',text:'Bei mittlerer Dosis eines Organophosphats überträgt die Synapse bei 20 Hz noch zuverlässig, bei 50 Hz nicht mehr. Erkläre diesen Unterschied.',load:'meas:OP',sol:['Bei 20 Hz liegen 50 ms zwischen den Impulsen, das ACh wird auch mit gehemmter AChE zwischendurch abgebaut. (2 P)','Bei 50 Hz kommt der nächste Impuls, bevor das ACh abgebaut ist, ACh summiert sich, die Membran bleibt depolarisiert. (3 P)','Die Na⁺-Kanäle der Muskelfaser sind dann inaktiviert: Depolarisationsblock, keine Aktionspotenziale. (2 P)']},
+ {afb:'III',t:'Eine Maßnahme kritisch prüfen',p:6,op:'Beurteile',text:'Ein Mitschüler schlägt vor, jede Lähmung mit Acetylcholin-Injektion zu behandeln. Beurteile den Vorschlag.',load:null,sol:['ACh wird in Millisekunden von der AChE abgebaut, die Wirkung wäre kurz. (2 P)','Es wirkt auch an muskarinischen Rezeptoren: Blutdruckabfall, langsamer Puls. (2 P)','Bei Vergiftungen mit blockierter AChE oder Dauerdepolarisation wäre es nutzlos oder schädlich. (2 P)']},
+ {afb:'III',t:'Modell und Wirklichkeit',p:6,op:'Beurteile',text:'Beurteile, welche Vereinfachungen das Modell dieser App enthält und wie weit man seinen Ergebnissen für die Praxis trauen darf.',load:null,sol:['Vereinfachungen: eine Synapse statt vieler, feste Dosisstufen, vereinfachte Zeitfenster, keine Wechselwirkungen mit Giften an anderen Orten. (3 P)','Das Modell zeigt Prinzipien (Wirkort, kompetitiv oder irreversibel, Frequenzabhängigkeit), liefert aber keine Therapieempfehlung. (2 P)','Reale Vergiftungen werden ärztlich behandelt, Dosierung und Zeitfenster sind patientenabhängig. (1 P)']}
+];
+const GLOS=[
+ ['Endplattenpotenzial (EPP)','Depolarisation der Muskelmembran an der motorischen Endplatte durch ACh. An Nervenzellen heißt das Gegenstück EPSP.'],
+ ['Schwellenwert','Potenzial, ab dem spannungsgesteuerte Na⁺-Kanäle öffnen und ein Aktionspotenzial entsteht.'],
+ ['Sicherheitsfaktor','An der motorischen Endplatte ist das EPP normalerweise deutlich größer als nötig. Deshalb merkt man einen Ausfall erst, wenn viele Rezeptoren oder viel Freisetzung fehlen.'],
+ ['Exozytose, SNARE-Proteine','Vesikel verschmelzen mit der Zellmembran. SNARE-Proteine ziehen beide Membranen zusammen. Synaptotagmin ist der Ca²⁺-Sensor.'],
+ ['nikotinisch, muskarinisch','Zwei Typen von ACh-Rezeptoren. Nikotinisch: ligandengesteuerter Ionenkanal (Muskelendplatte). Muskarinisch: G-Protein-gekoppelt (Herz, Drüsen, glatte Muskulatur).'],
+ ['Agonist, Antagonist','Agonisten aktivieren den Rezeptor (ACh, Succinylcholin). Antagonisten besetzen ihn und verhindern die Aktivierung (Curare, Atropin).'],
+ ['kompetitive Hemmung','Hemmstoff und natürlicher Stoff konkurrieren um dieselbe Bindestelle. Mehr Substrat oder Überträgerstoff kann die Hemmung überwinden.'],
+ ['irreversible Hemmung','Der Hemmstoff bindet (fast) dauerhaft. Mehr Überträgerstoff hilft nicht, nur neue Rezeptoren oder Enzyme.'],
+ ['Depolarisationsblock','Bleibt die Membran dauerhaft depolarisiert, sind die Na⁺-Kanäle inaktiviert. Es entstehen keine Aktionspotenziale mehr, obwohl die Zelle „erregt“ ist.'],
+ ['Reaktivator, „Alterung“','Oxime lösen den Phosphatrest von der AChE. Nach einiger Zeit verändert sich der Komplex („Alterung“), dann geht das nicht mehr.'],
+ ['Antiserum','Antikörper-Präparat gegen ein bestimmtes Gift. Es bindet freies Gift, schon gebundenes Gift erreicht es kaum.'],
+ ['Übertragungstreue','Anteil der präsynaptischen Impulse, auf die an der Muskelmembran ein Aktionspotenzial folgt. Normal etwa 100 %.']
+];
+/* =============== Hilfen für Reiter =============== */
+function kpiHTML(m){
+  const f=x=>x?Math.round(x.fid*100)+' %':'–';
+  let h=`<div class="kpi"><div><b>${f(m.normal)}</b><small>normale Synapse</small></div>`;
+  h+=`<div><b style="color:${m.poison?'var(--tox)':'inherit'}">${f(m.poison)}</b><small>mit Gift</small></div>`;
+  h+=`<div><b style="color:${m.anti?'var(--ant)':'inherit'}">${f(m.anti)}</b><small>mit Gegengift</small></div></div>`;
+  h+=`<p class="note">Zahlen: Übertragungstreue, also der Anteil der Reize, auf die eine postsynaptische Erregung folgt.${m.proto.type==='ramp'?' Übertragungsgrenze: '+['normal','poison','anti'].filter(k=>m[k]).map(k=>({normal:'normal ',poison:'mit Gift ',anti:'mit Gegengift '}[k])+(m[k].limit==null?'über 100 Hz':'ab etwa '+Math.round(m[k].limit)+' Hz')).join(', ')+'.':''}</p>`;
+  return h;
+}
+function legendHTML(m){
+  let h='<div class="legendrow"><span><i style="border-color:var(--ink-soft);border-top-style:dotted"></i>Reizfrequenz (Prä)</span><span><i style="border-color:var(--ink)"></i>normal</span>';
+  if(m.poison) h+='<span><i style="border-color:var(--tox)"></i>mit Gift</span>';
+  if(m.anti) h+='<span><i style="border-color:var(--ant)"></i>mit Gegengift</span>';
+  return h+'</div>';
+}
+function freqCard(title,withRaster){
+  const m=measure(S);
+  let h=`<h3>${title}</h3><p class="note">Der Reiz an der Präsynapse ist <b>${S.proto==='ramp'?'eine Rampe von 5 auf 100 Hz in 3 s':S.freq+' Hz konstant'}</b> (Reiz in der Messung-Ansicht änderbar).</p>${legendHTML(m)}<div class="chartbox" data-chart="freq"></div>`;
+  if(withRaster) h+=`<div class="chartbox" data-chart="raster"></div>`;
+  return h+kpiHTML(m);
+}
+function fillCharts(){
+  const m=measure(S);
+  $$('[data-chart]').forEach(el=>{ const W=Math.max(280,Math.round(el.clientWidth||320)); const k=el.dataset.chart;
+    if(k==='timeline') el.innerHTML=renderTimeline(curSig(),W,S.step);
+    else if(k==='freq') el.innerHTML=renderFreq(m,W);
+    else if(k==='raster') el.innerHTML=renderRaster(m,W);
+    else if(k==='trace') el.innerHTML=renderTrace(m,W,S.zoom?S.zoomAt:0,S.zoom?100:3000);
+    else if(k==='case'&&S.case){ const mm=S.case.m; el.innerHTML=renderFreq(mm,W)+renderRaster(mm,W); }
+  });
+}
+function stepStatusList(sig){
+  return `<ul class="steps">`+STEPS.map((s,i)=>{ const st=sig.st[i], bad=['aus','folge','dauer','schwach'].includes(st); const isA=S.poison&&POI[S.poison].step===s.n;
+    return `<li class="stp${S.step===s.n?' cur':''}${bad&&st!=='schwach'?' bad':''}"><button type="button" class="n" data-act="step" data-n="${s.n}" aria-label="Schritt ${s.n} zeigen">${s.n}</button><button type="button" class="b" data-act="step" data-n="${s.n}"><h3>${esc(s.t)}${isA?'<span class="st-chip ang">Angriffspunkt</span>':''}${S.poison||S.anti?chip(i,st):''}</h3><p>${esc(s.d)}</p><span class="key">${esc(s.where)} · ${esc(s.key)}</span>${S.poison||S.anti?`<div class="bar" aria-hidden="true"><i style="width:${Math.round(clamp(sig.f[i],0,1)*100)}%"></i></div>`:''}</button></li>`; }).join('')+'</ul>';
+}
+
+/* =============== Reiter: Ablauf =============== */
+function renderFlow(){
+  const sig=curSig();
+  let h=`<div class="card"><h2>Neun Schritte der Erregungsübertragung</h2><p class="lead">Tippe einen Schritt an: Das Schema oben spielt ihn als Animation ab, die Zeile darunter erklärt, was gerade passiert. Mit ▶ läuft der ganze Ablauf durch. Mit „Tempo“ wird die Animation langsamer. Ist unter „Gift“ ein Gift gewählt, siehst du hier, welche Schritte gestört sind.</p>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="playall">Ablauf abspielen</button><button type="button" class="btn" data-act="step" data-n="0">Zurück zum Überblick</button></div>${stepStatusList(sig)}</div>`;
+  h+=`<div class="card"><h2>Zeitlicher Verlauf eines einzelnen Impulses</h2><p class="lead">Dieselben Schritte als Kurven. Die Nummern oben sind mit dem Zeitpunkt verbunden, an dem der Schritt beginnt. Der gewählte Schritt ist hervorgehoben.</p><div class="chartbox" data-chart="timeline"></div><p class="note">Die Zeitachse ist vereinfacht (Millisekunden). Schritt 9 läuft danach über Sekunden weiter. Rote Nummern: gestörter Schritt.</p></div>`;
+  $('#pane-flow').innerHTML=h;
+}
+
+/* =============== Reiter: Gift =============== */
+function renderTox(){
+  const sig=curSig(); const P=S.poison?POI[S.poison]:null;
+  let h=`<div class="card"><h2>Gift wählen</h2><p class="lead">Wähle ein Gift und eine Dosis. Das Schema zeigt die Wirkstelle. Die Schritte darunter zeigen, was ausfällt, und das Diagramm zeigt die Folge für die Muskelmembran.</p><div class="cgrid">`;
+  POISONS.forEach(p=>{ h+=`<button type="button" class="opt tox" data-act="poison" data-id="${p.id}" aria-pressed="${S.poison===p.id}"><b>${esc(p.name)}</b><span>Schritt ${p.step}: ${esc(p.art)}</span></button>`; });
+  h+=`</div><div class="btnrow"><button type="button" class="btn" data-act="poison" data-id="">Kein Gift (normale Synapse)</button></div>`;
+  if(P){
+    h+=`<h3>Dosis</h3><div class="seg" role="group" aria-label="Dosis">${DOSENAME.map((n,i)=>`<button type="button" data-act="dose" data-n="${i}" aria-pressed="${S.dose===i}">${n}</button>`).join('')}</div>
+    <h3>${esc(P.name)}</h3><p style="margin:2px 0"><b>Vorkommen:</b> ${esc(P.q)}</p><p style="margin:6px 0"><b>Wirkung an der Synapse:</b> ${esc(P.w)}</p><p style="margin:6px 0"><b>Symptome:</b> ${esc(P.s)}</p>
+    <p class="note">Dosisstufen sind Modellwerte und sagen nichts über echte Mengen aus.</p>`;
+  } else h+=`<p class="note">Kein Gift gewählt: Alle neun Schritte laufen normal.</p>`;
+  h+='</div>';
+  h+=`<div class="card"><h2>Welche Schritte fallen aus?</h2><p class="lead">Der Balken zeigt, wie viel von der normalen Funktion des Schritts übrig ist. „Folge“ heißt: Der Schritt davor ist ausgefallen, deshalb kann dieser nicht ablaufen.</p>${stepStatusList(sig)}</div>`;
+  h+=`<div class="card"><h2>Folge an der postsynaptischen Membran</h2>${freqCard('Frequenz der Aktionspotenziale',false)}<p class="note">Die graue Linie zeigt die normale Synapse. Die rote Linie zeigt die Antwort mit dem Gift.</p>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="goto" data-tab="anti">Gegengift wählen</button><button type="button" class="btn" data-act="goto" data-tab="meas">Messung anpassen</button></div></div>`;
+  $('#pane-tox').innerHTML=h;
+}
+
+/* =============== Reiter: Gegengift =============== */
+function ratingHTML(){
+  if(!S.anti) return `<p class="note">Wähle ein Gegengift, dann erscheint die Bewertung.</p>`;
+  if(!S.poison) return `<div class="fb tip">Wähle zuerst unter „Gift“ ein Gift. Ohne Vergiftung wird die Wirkung von ${esc(ANT[S.anti].name)} allein gezeigt, eine Bewertung gibt es nur im Zusammenhang mit einem Gift.</div>`;
+  const r=rating(); const c=CAT[r[0]]; const m=measure(S);
+  const a=Math.round(m.poison.fid*100), b=Math.round(m.anti.fid*100); const d=b-a;
+  let eff=`Im Modell ändert sich die Übertragungstreue von <b>${a} %</b> auf <b>${b} %</b>${d>=5?' (besser)':d<=-5?' (schlechter)':' (kaum verändert)'}.`;
+  if(r[0]==='stuetz') eff+=' Die Beatmung wirkt nicht an der Synapse, deshalb ändert die Kurve sich nicht. Für das Überleben ist sie trotzdem entscheidend.';
+  if(r[0]==='teil'&&S.poison==='OP'&&S.anti==='ATR') eff+=' An der Endplatte ändert Atropin nichts. Der Nutzen liegt bei den muskarinischen Symptomen (Speichel, Bronchien, Herz).';
+  let tm='';
+  if((S.anti==='AS'&&(S.poison==='BoNT'||S.poison==='BGT'))||(S.anti==='OXI'&&S.poison==='OP')) tm=`<p style="margin:6px 0"><b>Zeitpunkt „${TIMENAMES[S.timing]}“:</b> ${S.timing===0?'Das Gegengift greift früh, solange viel Gift oder blockiertes Enzym noch erreichbar ist.':S.timing===1?'Nur ein Teil des Gifts ist noch erreichbar, die Wirkung ist deutlich geringer.':'Das Gift ist gebunden oder das Enzym „gealtert“, das Gegengift kommt zu spät.'}</p>`;
+  return `<div class="rate ${r[0]}"><h3>${esc(ANT[S.anti].name)} bei ${esc(POI[S.poison].name)}: ${c.t}</h3><p style="margin:4px 0">${esc(r[1])}</p>${tm}<p style="margin:6px 0">${eff}</p></div>`;
+}
+function matrixHTML(){
+  let h=`<div class="tscroll"><table class="mx"><thead><tr><th></th>${ANTIS.map(a=>`<th>${esc(a.name.replace(' (Antitoxin)','').replace(' spritzen','').replace('Künstliche ',''))}</th>`).join('')}</tr></thead><tbody>`;
+  POISONS.forEach(p=>{ h+=`<tr><th scope="row">${esc(p.name.split(' (')[0])}</th>${ANTIS.map(a=>{ const c=RATE[p.id][a.id][0]; return `<td><button type="button" class="${c}" data-act="pair" data-p="${p.id}" data-a="${a.id}" aria-pressed="${S.poison===p.id&&S.anti===a.id}" aria-label="${esc(p.name)} mit ${esc(a.name)}: ${CAT[c].t}">${CAT[c].sym}</button></td>`; }).join('')}</tr>`; });
+  return h+`</tbody></table></div><div class="mxl"><span><b>++</b> sinnvoll</span><span><b>+</b> teilweise</span><span><b>L</b> lebensrettend, unterstützend</span><span><b>0</b> wirkungslos</span><span><b>–</b> gefährlich</span></div><p class="note">Tippe ein Feld an, um die Kombination im Schema und im Diagramm zu sehen.</p>`;
+}
+function renderAnti(){
+  const needTime=(S.anti==='AS'&&(S.poison==='BoNT'||S.poison==='BGT'))||(S.anti==='OXI'&&S.poison==='OP');
+  let h=`<div class="card"><h2>Gegengift wählen</h2><p class="lead">${S.poison?`Gewähltes Gift: <b>${esc(POI[S.poison].name)}</b> (Dosis ${DOSENAME[S.dose]}). `:'Noch kein Gift gewählt. '}Entscheide dich für eine Maßnahme. Das Schema zeigt, wo sie angreift, das Diagramm zeigt die Wirkung, und eine Bewertung erklärt, ob sie sinnvoll ist.</p>`;
+  if(!S.poison) h+=`<div class="btnrow"><button type="button" class="btn primary" data-act="goto" data-tab="tox">Zuerst ein Gift wählen</button></div>`;
+  h+=`<div class="cgrid">`;
+  ANTIS.forEach(a=>{ h+=`<button type="button" class="opt ant" data-act="anti" data-id="${a.id}" aria-pressed="${S.anti===a.id}"><b>${esc(a.name)}</b><span>${esc(a.k)}</span></button>`; });
+  h+=`</div><div class="btnrow"><button type="button" class="btn" data-act="anti" data-id="">Kein Gegengift</button></div>`;
+  if(S.anti) h+=`<p style="margin:6px 0"><b>So wirkt es:</b> ${esc(ANT[S.anti].w)}</p>`;
+  if(needTime) h+=`<h3>Zeitpunkt der Gabe</h3><div class="seg" role="group" aria-label="Zeitpunkt">${TIMENAMES.map((n,i)=>`<button type="button" data-act="timing" data-n="${i}" aria-pressed="${S.timing===i}">${n}</button>`).join('')}</div><p class="note">${TIMEHINT[S.timing]}. Die Zeitfenster sind im Modell vereinfacht.</p>`;
+  h+=ratingHTML()+'</div>';
+  h+=`<div class="card"><h2>Wirkung an der Muskelmembran</h2>${freqCard('Frequenz der Aktionspotenziale',true)}</div>`;
+  h+=`<div class="card"><h2>Welches Gegengift passt zu welchem Gift?</h2>${matrixHTML()}</div>`;
+  $('#pane-anti').innerHTML=h;
+}
+
+/* =============== Reiter: Messung =============== */
+function renderMeas(){
+  const m=measure(S);
+  let h=`<div class="card"><h2>Messung an der Muskelmembran</h2><p class="lead">Reize die Präsynapse mit einer festen Frequenz oder mit einer Rampe und lies ab, wie viele Aktionspotenziale die Muskelmembran beantwortet. Gift und Gegengift stellst du in den anderen Reitern ein.</p>
+  <div class="seg" role="group" aria-label="Reizprotokoll"><button type="button" data-act="proto" data-v="const" aria-pressed="${S.proto==='const'}">Konstante Frequenz</button><button type="button" data-act="proto" data-v="ramp" aria-pressed="${S.proto==='ramp'}">Rampe 5 bis 100 Hz</button></div>`;
+  h+=`<label class="fl" for="fr">Reizfrequenz: <b>${S.freq} Hz</b>${S.proto==='ramp'?' (bei Rampe nicht verwendet)':''}</label><input type="range" id="fr" data-f="freq" min="5" max="100" step="5" value="${S.freq}" ${S.proto==='ramp'?'disabled':''}>
+  <p class="note">Aktuell: Gift ${S.poison?`<b>${esc(POI[S.poison].name)}</b>, Dosis ${DOSENAME[S.dose]}`:'<b>keines</b>'}, Gegengift ${S.anti?`<b>${esc(ANT[S.anti].name)}</b>`:'<b>keines</b>'}.</p></div>`;
+  h+=`<div class="card"><h2>Frequenz der Aktionspotenziale</h2>${legendHTML(m)}<div class="chartbox" data-chart="freq"></div><div class="chartbox" data-chart="raster"></div>${kpiHTML(m)}</div>`;
+  h+=`<div class="card"><h2>Membranpotenzial</h2><p class="lead">Gezeigt wird ${m.active==='anti'?'die Situation mit Gegengift':m.active==='poison'?'die Situation mit Gift':'die normale Synapse'}. Die gestrichelte Linie ist der Schwellenwert.</p>
+  <div class="seg" role="group" aria-label="Ausschnitt"><button type="button" data-act="zoom" data-v="0" aria-pressed="${!S.zoom}">Übersicht (3 s)</button><button type="button" data-act="zoom" data-v="1" aria-pressed="${S.zoom}">Zoom (100 ms)</button></div>`;
+  if(S.zoom) h+=`<label class="fl" for="za">Beginn des Ausschnitts: <b>${S.zoomAt} ms</b></label><input type="range" id="za" data-f="zoomAt" min="0" max="2900" step="50" value="${S.zoomAt}">`;
+  h+=`<div class="chartbox" data-chart="trace"></div><p class="note">Spitzen über der Schwelle sind Aktionspotenziale. Bleibt die Kurve dauerhaft hoch, ist die Membran dauerhaft depolarisiert (Depolarisationsblock).</p></div>`;
+  h+=`<div class="card"><h2>Protokoll</h2><p class="lead">Kopiere die Messung als Text für dein Heft oder Protokoll.</p><div class="btnrow"><button type="button" class="btn" data-act="copy">Messprotokoll kopieren</button></div></div>`;
+  $('#pane-meas').innerHTML=h;
+}
+function protocolText(){
+  const m=measure(S); const f=x=>x?Math.round(x.fid*100)+' %':'–';
+  const L=['Messprotokoll Synapse (Modell)','Reiz: '+(S.proto==='ramp'?'Rampe 5 bis 100 Hz in 3 s':S.freq+' Hz konstant'),'Gift: '+(S.poison?POI[S.poison].name+', Dosis '+DOSENAME[S.dose]:'keines'),'Gegengift: '+(S.anti?ANT[S.anti].name+(S.poison&&RATE[S.poison][S.anti]?' ('+CAT[RATE[S.poison][S.anti][0]].t+')':''):'keines'),'Übertragungstreue normal: '+f(m.normal),'Übertragungstreue mit Gift: '+f(m.poison),'Übertragungstreue mit Gegengift: '+f(m.anti)];
+  if(S.poison){ const sig=curSig(); L.push('Schritte: '+STEPS.map((s,i)=>s.n+' '+stLabel(i,sig.st[i])).join('; ')); }
+  L.push('Hinweis: vereinfachtes Lernmodell, keine Therapieempfehlung.'); return L.join('\n');
+}
+
+/* =============== Reiter: Üben =============== */
+function newCase(){
+  const idx=Math.floor(Math.random()*CASESX.length); const c=CASESX[idx];
+  const dose=1+(Math.random()<0.4?1:0); const proto={type:'ramp',f0:5,f1:100,T:3000};
+  const m={proto,normal:runSet(makeParams(null,0,null,0),proto,false),poison:runSet(makeParams(c.p,dose,null,0),proto,false),anti:null};
+  S.case={idx,p:c.p,t:c.t,dose,m,stage:'diag',gp:null,ga:null,fbP:null,fbA:null,scored:false};
+}
+function renderTrain(){
+  let h=`<div class="card"><h2>Notfall-Fälle</h2><p class="lead">Lies den Fall und sieh dir die Messung an der Muskelmembran an. Erkenne das Gift und wähle dann die passende Maßnahme. Das Schema bleibt verborgen, bis du fertig bist.</p>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="newcase">${S.case?'Nächster Fall':'Fall starten'}</button>${S.score.n?`<span class="badge info">${S.score.pts} von ${S.score.n*5} Punkten in ${S.score.n} Fall${S.score.n>1?'en':''}</span>`:''}</div>
+  <div class="warn">Alle Fälle sind erfunden und stark vereinfacht. Das ist keine Anleitung für Notfälle. Bei einer echten Vergiftung gilt: Notruf 112 und Giftnotruf.</div></div>`;
+  const c=S.case;
+  if(c){
+    h+=`<div class="card"><h3 style="margin-top:0">Der Fall</h3><div class="sym">${esc(c.t)}</div><h3>Messung bei Reizung mit steigender Frequenz</h3><div class="legendrow"><span><i style="border-color:var(--ink-soft);border-style:dotted"></i>Reiz</span><span><i style="border-color:var(--ink)"></i>gesunde Synapse</span><span><i style="border-color:var(--tox)"></i>Patient</span></div><div class="chartbox" data-chart="case"></div></div>`;
+    h+=`<div class="card"><h3 style="margin-top:0">1. Welches Gift?</h3><div role="radiogroup" aria-label="Gift wählen">${POISONS.map(p=>`<label class="ck"><input type="radio" name="gp" value="${p.id}" data-f="gp" ${c.gp===p.id?'checked':''} ${c.fbP?'disabled':''}> ${esc(p.name)}</label>`).join('')}</div>
+    <div class="btnrow"><button type="button" class="btn primary" data-act="checkp" ${c.fbP?'disabled':''}>Diagnose prüfen</button></div>`;
+    if(c.fbP) h+=`<div class="fb ${c.fbP.ok?'ok':'no'}" role="status">${c.fbP.ok?'Richtig: ':'Nicht ganz. Es war '}<b>${esc(POI[c.p].name)}</b>. ${esc(POI[c.p].w)} Angriffspunkt ist Schritt ${POI[c.p].step}.</div>`;
+    h+='</div>';
+    if(c.fbP){
+      h+=`<div class="card"><h3 style="margin-top:0">2. Welche Maßnahme?</h3><div role="radiogroup" aria-label="Maßnahme wählen">${ANTIS.map(a=>`<label class="ck"><input type="radio" name="ga" value="${a.id}" data-f="ga" ${c.ga===a.id?'checked':''} ${c.fbA?'disabled':''}> ${esc(a.name)}</label>`).join('')}</div>
+      <div class="btnrow"><button type="button" class="btn primary" data-act="checka" ${c.fbA?'disabled':''}>Maßnahme prüfen</button></div>`;
+      if(c.fbA){ const r=RATE[c.p][c.ga]; const cat=CAT[r[0]]; const best=BESTANTI[c.p];
+        h+=`<div class="rate ${r[0]}"><h3>${esc(ANT[c.ga].name)}: ${cat.t}</h3><p style="margin:4px 0">${esc(r[1])}</p><p style="margin:6px 0"><b>Beste Wahl hier:</b> ${esc(ANT[best].name)}${best==='BEA'?' (unterstützend, ein ursächliches Gegengift gibt es nicht)':''}.${c.p==='OP'?' Üblich ist zusätzlich Atropin gegen die muskarinischen Symptome.':''}</p><p style="margin:6px 0"><b>Punkte für diesen Fall:</b> ${c.pts} von 5.</p></div>`;
+        h+=`<div class="btnrow"><button type="button" class="btn" data-act="showcase">Am Schema ansehen</button></div>`; }
+      h+='</div>';
+    }
+  }
+  $('#pane-train').innerHTML=h;
+}
+
+/* =============== Reiter: Info und Aufgaben =============== */
+function renderInfo(){
+  const sw=[['--pre','Präsynapse (Axonendigung)'],['--cleft','Synaptischer Spalt'],['--post','Postsynapse (Muskelfaser)'],['--ach','Acetylcholin (ACh), Vesikelinhalt'],['--ca','Ca²⁺-Kanäle und Ca²⁺-Ionen'],['--na','Na⁺-Kanäle und Na⁺-Ionen'],['--rec','nikotinischer ACh-Rezeptor (Kationenkanal)'],['--ache','Acetylcholinesterase (AChE)'],['--cht','Cholin-Transporter und Cholin'],['--tox','Gift (rot)'],['--ant','Gegengift (grün)'],['--ap','Aktionspotenzial (gelb)']];
+  let h=`<div class="card"><h2>Legende zum Schema</h2><div class="legend">${sw.map(([v,t])=>`<div><span class="sw" style="background:var(${v})"></span><span>${t}</span></div>`).join('')}</div><p class="note">Die Nummern 1 bis 9 im Schema entsprechen den Schritten. Der gelbe Balken rechts unten zeigt das Membranpotenzial der Muskelfaser mit dem Schwellenwert. Die Darstellung folgt einer Lehrbuchabbildung: Wellenpfeile stehen für Aktionspotenzial (1) und EPSP (7).</p></div>`;
+  h+=`<div class="card"><h2>Begriffe</h2><dl class="gl">${GLOS.map(([t,d])=>`<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl></div>`;
+  h+=`<div class="card"><h2>Annahmen und Grenzen des Modells</h2><ul class="plain"><li>Es wird eine einzelne Synapse der motorischen Endplatte simuliert, nicht eine ganze Muskelfaser oder ein Nerv.</li><li>Die Freisetzung von ACh ist zufällig (Quanten), die Rechnung ist aber mit festem Startwert wiederholbar.</li><li>Dosisstufen und Zeitfenster der Gegengifte sind Modellannahmen. Sie sollen Prinzipien zeigen, keine echten Mengen oder Zeiten.</li><li>Atropin wirkt an muskarinischen Rezeptoren. Weil nur die Endplatte simuliert wird, zeigt das Diagramm dafür keine Wirkung. Die Bewertung berücksichtigt den Nutzen an anderen Synapsen.</li><li>Mitochondrien, Ionenpumpen, Nervenleitung im Axon und Wechselwirkungen mit anderen Giften sind nicht enthalten.</li><li>Die Zuordnung der Gifte und Gegengifte ist auf Schulbuchniveau vereinfacht. Die App ersetzt keine medizinische Beratung und gibt keine Therapieempfehlung.</li></ul></div>`;
+  h+=`<div class="card"><h2>Aufgaben</h2><p class="note">Die Punktzahlen sind ein Vorschlag. Notengebung und Bewertungsmaßstab richten sich nach den Beschlüssen eurer Fachkonferenz.</p>`;
+  ITASKS.forEach((t,i)=>{ h+=`<details class="task"><summary><span class="badge">AFB ${t.afb}</span>${i+1}. ${esc(t.t)} <span class="badge">${t.p} P</span></summary><p><b>${t.op}:</b> ${esc(t.text)}</p>${t.load?`<div class="btnrow"><button type="button" class="btn" data-act="itask" data-load="${t.load}">Passende Einstellung laden</button></div>`:''}<details><summary style="cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:700">Erwartungshorizont</summary><div class="sol"><ul class="plain">${t.sol.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></details></details>`; });
+  h+='</div>';
+  h+=`<div class="card"><details class="mode"><summary>Hinweise für die Lehrkraft</summary><p><b>Einsatz:</b> Einstieg mit dem Ablauf (Reiter Ablauf), Erarbeitung eines Gifts je Gruppe (Reiter Gift), Bewertung der Gegengifte im Plenum (Matrix im Reiter Gegengift), Transfer mit den Notfall-Fällen.</p>
+  <p><b>Typische Fehlvorstellungen:</b> „Ein Gegengift hebt jedes Gift auf“; „mehr ACh hilft immer“; „Atropin hilft an der Muskelendplatte“; „der Muskel fällt aus, weil das Aktionspotenzial im Nerv fehlt“. Das Frequenzdiagramm macht sichtbar, ob und ab welcher Frequenz die Übertragung zusammenbricht.</p>
+  <p><b>Einordnung:</b> Die Zuordnung zu Kompetenzbereichen (Fachwissen, Erkenntnisgewinnung, Bewertung) und zu den Themenschwerpunkten des Zentralabiturs musst du am aktuellen Kerncurriculum und an den Vorgaben auf nibis.de prüfen.</p>
+  <p><b>Bewertung:</b> Die Punktevorschläge sind unverbindlich. Notengebung bleibt deine Verantwortung und folgt den Fachkonferenzbeschlüssen.</p></details></div>`;
+  $('#pane-info').innerHTML=h;
+}
+
+/* =============== Steuerung =============== */
+function setStep(n){ S.step=clamp(n,0,9); A.f=1; refresh(false); }
+function setPlayBtn(on){ S.play=on; const b=$('[data-v="play"]'); if(b){ b.setAttribute('aria-pressed',on?'true':'false'); b.textContent=on?'⏸':'▶'; b.setAttribute('aria-label',on?'Anhalten':'Ablauf abspielen'); } }
+function stopPlay(){ if(A.raf){ cancelAnimationFrame(A.raf); A.raf=0; } if(A.rm){ clearTimeout(A.rm); A.rm=0; } A.mode=null; setPlayBtn(false); }
+function startPlay(){ stopPlay();
+  if(S.step===0||(S.step>=9&&A.f>=1)){ S.step=1; A.f=0; stepChanged(); }
+  else if(A.f>=1){ S.step++; A.f=0; stepChanged(); }
+  runAnim('all'); }
+function reduceMotion(){ return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function updVinfo(){
+  const k=S.step; const sig=schemaState().sig;
+  let tags=''; if(S.poison) tags+=`<span class="tg tox">Gift: ${esc(POI[S.poison].name)}, ${DOSENAME[S.dose]}</span>`; if(S.anti) tags+=`<span class="tg ant">Gegengift: ${esc(ANT[S.anti].name)}</span>`;
+  let txt=''; if(k>0){ const st=sig.st[k-1]; if(S.poison||S.anti) txt=` <b>${esc(stLabel(k-1,st))}.</b> ${S.poison&&POI[S.poison].step===k?'Hier greift das Gift an. ':''}`; txt+=` <span class="cap">${esc(A.cap)}</span>`; }
+  const h=tags+txt+(!tags&&k===0?'Normale Synapse ohne Gift. Tippe ▶ für den ganzen Ablauf oder eine Nummer für einen einzelnen Schritt.':'');
+  if(h!==A.vinfo){ $('#vinfo').innerHTML=h; A.vinfo=h; }
+}
+function updateViewer(){
+  const k=S.step;
+  const lbl=$('#vlbl'); if(k===0) lbl.innerHTML=`Überblick<small>▶ spielt alle Schritte ab</small>`; else lbl.innerHTML=`Schritt ${k}: ${esc(STEPS[k-1].t)}<small>${esc(STEPS[k-1].where)}</small>`;
+  frame();
+}
+function refresh(full){
+  updateViewer(); if(full!==false) renderTab(); else { if(S.tab==='flow'||S.tab==='tox'){ $$('.stp').forEach(el=>{ const n=+el.querySelector('.n').dataset.n; el.classList.toggle('cur',n===S.step); }); } fillCharts(); }
+}
+function renderTab(){ ({flow:renderFlow,tox:renderTox,anti:renderAnti,meas:renderMeas,train:renderTrain,info:renderInfo}[S.tab])(); requestAnimationFrame(fillCharts); }
+function setFold(c){ const v=$('#viewer'); v.classList.toggle('collapsed',c); const b=$('[data-v="fold"]'); b.setAttribute('aria-pressed',c); b.textContent=c?'▼':'▲'; }
+function showTab(t){
+  if(t==='meas'&&window.innerWidth<700){ S.autoFold=true; setFold(true); } else if(S.autoFold){ S.autoFold=false; setFold(false); }
+  S.tab=t; $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['flow','tox','anti','meas','train','info'].forEach(k=>{ $('#pane-'+k).hidden=k!==t; });
+  $('#viewer').hidden=(t==='train'||t==='info'); if(t==='train'||t==='info') stopPlay();
+  updateViewer(); renderTab(); window.scrollTo({top:0});
+}
+function applyLoad(l){
+  stopPlay(); S.poison=null; S.anti=null; S.step=0; A.f=1; S.timing=0; S.dose=1;
+  if(l==='flow'){ showTab('flow'); return; }
+  const p=l.split(':'); if(p[0]==='tox'){ S.poison=p[1]; showTab('tox'); }
+  else if(p[0]==='anti'){ S.poison=p[1]; S.anti=p[2]; showTab('anti'); }
+  else if(p[0]==='meas'){ S.poison=p[1]; S.freq=50; S.proto='const'; showTab('meas'); }
+}
+document.addEventListener('click',e=>{
+  const v=e.target.closest('[data-v]'); if(v){ const k=v.dataset.v;
+    if(k==='next'){ playStep(S.step>=9?1:S.step+1); } else if(k==='prev'){ playStep(S.step<=1?9:S.step-1); }
+    else if(k==='play'){ if(S.play) stopPlay(); else startPlay(); }
+    else if(k==='seg'){ const n=+v.dataset.n; if(A.mode==='all'){ stopPlay(); S.step=n; A.f=0; stepChanged(); runAnim('all'); } else playStep(n); }
+    else if(k==='speed'){ A.sp=(A.sp+1)%SPEEDS.length; v.textContent='Tempo '+SPEEDNAME[A.sp]; }
+    else if(k==='fold'){ const c=$('#viewer').classList.toggle('collapsed'); v.setAttribute('aria-pressed',c); v.textContent=c?'▼':'▲'; }
+    return; }
+  const tb=e.target.closest('.tab'); if(tb){ showTab(tb.dataset.tab); return; }
+  const a=e.target.closest('[data-act]'); if(!a) return; const act=a.dataset.act;
+  switch(act){
+    case 'step': playStep(+a.dataset.n); if(a.dataset.n!=='0') window.scrollTo({top:0,behavior:reduceMotion()?'auto':'smooth'}); break;
+    case 'playall': window.scrollTo({top:0}); stopPlay(); S.step=1; A.f=0; stepChanged(); runAnim('all'); break;
+    case 'poison': S.poison=a.dataset.id||null; S.timing=0; stopPlay(); S.step=S.poison?POI[S.poison].step:0; A.f=S.step?0:1; updateViewer(); renderTab(); if(S.step) runAnim('one'); break;
+    case 'dose': S.dose=+a.dataset.n; updateViewer(); renderTab(); break;
+    case 'anti': S.anti=a.dataset.id||null; S.timing=0; if(S.anti&&S.poison){ const r=RATE[S.poison][S.anti]; } updateViewer(); renderTab(); break;
+    case 'timing': S.timing=+a.dataset.n; updateViewer(); renderTab(); break;
+    case 'pair': S.poison=a.dataset.p; S.anti=a.dataset.a; S.timing=0; updateViewer(); renderTab(); window.scrollTo({top:0}); break;
+    case 'goto': showTab(a.dataset.tab); break;
+    case 'proto': S.proto=a.dataset.v; renderTab(); break;
+    case 'zoom': S.zoom=a.dataset.v==='1'; renderTab(); break;
+    case 'copy': { const t=protocolText(); const done=()=>{ a.textContent='Kopiert'; setTimeout(()=>a.textContent='Messprotokoll kopieren',1500); }; if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done,()=>{}); else { const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(err){} ta.remove(); } break; }
+    case 'newcase': newCase(); renderTrain(); requestAnimationFrame(fillCharts); break;
+    case 'checkp': { const c=S.case; if(!c.gp) { c.fbP=null; break; } c.fbP={ok:c.gp===c.p}; S.score.n++; c.pts=c.fbP.ok?2:0; renderTrain(); requestAnimationFrame(fillCharts); break; }
+    case 'checka': { const c=S.case; if(!c.ga) break; const cat=RATE[c.p][c.ga][0]; const add={gut:3,teil:2,stuetz:(c.p==='TTX'||c.p==='CTX'||c.p==='SUX')?3:1,nutz:0,schad:0}[cat]; c.fbA={cat}; c.pts+=add; S.score.pts+=c.pts; renderTrain(); requestAnimationFrame(fillCharts); break; }
+    case 'showcase': { const c=S.case; S.poison=c.p; S.dose=c.dose; S.anti=c.ga; S.timing=0; S.step=POI[c.p].step; A.f=1; showTab('anti'); break; }
+    case 'itask': applyLoad(a.dataset.load); break;
+  }
+});
+document.addEventListener('change',e=>{
+  const t=e.target, f=t.dataset&&t.dataset.f; if(!f) return;
+  if(f==='gp'&&S.case) S.case.gp=t.value; if(f==='ga'&&S.case) S.case.ga=t.value;
+});
+document.addEventListener('input',e=>{
+  const t=e.target, f=t.dataset&&t.dataset.f; if(!f) return;
+  if(f==='freq'){ S.freq=+t.value; const lb=$('label[for="fr"] b'); if(lb) lb.textContent=S.freq+' Hz'; const m=measure(S); fillCharts(); const k=$('#pane-meas .kpi'); if(k) k.outerHTML=kpiHTML(m).split('<p class="note">')[0]; }
+  if(f==='zoomAt'){ S.zoomAt=+t.value; const lb=$('label[for="za"] b'); if(lb) lb.textContent=S.zoomAt+' ms'; fillCharts(); }
+});
+let rsz=null; window.addEventListener('resize',()=>{ clearTimeout(rsz); rsz=setTimeout(fillCharts,120); });
+
+/* =============== Start =============== */
+(function init(){
+  $('#schemaHost').innerHTML=buildSchema();
+  showTab('flow');
+})();
+})();
+</script>
+</body>
+</html>

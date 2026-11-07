@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Herzfrequenz und Aktivität</title>
+<style>
+:root{
+  --bg:#EDF2F5; --paper:#FFFFFF; --ink:#1B2A3A; --muted:#55687A;
+  --grid:#C9D8E3; --grid-strong:#9FB8CA; --blood:#C0283A; --line:#D5E0E8;
+  --z1:#DCEBDD; --z2:#F3E9C8; --z3:#F6D7C4; --z4:#F1C0C4;
+  --btn:#1B2A3A; --btn-ink:#FFFFFF;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --head:"Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121A22; --paper:#1A2531; --ink:#E6EEF4; --muted:#9DB0C0;
+    --grid:#26364A; --grid-strong:#3A5068; --blood:#FF5A6A; --line:#2C3D50;
+    --z1:#1F3527; --z2:#3A3420; --z3:#40291F; --z4:#462128;
+    --btn:#E6EEF4; --btn-ink:#121A22;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121A22; --paper:#1A2531; --ink:#E6EEF4; --muted:#9DB0C0;
+  --grid:#26364A; --grid-strong:#3A5068; --blood:#FF5A6A; --line:#2C3D50;
+  --z1:#1F3527; --z2:#3A3420; --z3:#40291F; --z4:#462128;
+  --btn:#E6EEF4; --btn-ink:#121A22;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.55}
+main{max-width:980px;margin:0 auto;padding:1.25rem 1rem 3rem}
+h1,h2,h3{font-family:var(--head);font-weight:700;line-height:1.05;margin:0}
+h1{font-size:clamp(2.4rem,7vw,4rem);letter-spacing:-.01em}
+h2{font-size:1.9rem;margin-bottom:.6rem}
+h3{font-size:1.35rem;margin:1rem 0 .35rem}
+p{margin:.4rem 0 .8rem;max-width:72ch}
+.lead{color:var(--muted);font-size:1.08rem}
+section{margin-top:2.2rem}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1rem}
+
+/* Hero: live readout */
+.hero{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:end;margin-top:.5rem}
+.readout{display:flex;align-items:center;gap:.6rem;font-family:var(--head)}
+.readout .num{font-size:clamp(3.5rem,13vw,6.5rem);font-weight:700;color:var(--blood);line-height:.85;font-variant-numeric:tabular-nums}
+.readout .unit{font-size:1.1rem;color:var(--muted);line-height:1.1}
+.heart{width:44px;height:44px;fill:var(--blood);transform-origin:center}
+.beating .heart{animation:beat var(--beat,1s) infinite}
+@keyframes beat{0%{transform:scale(1)}12%{transform:scale(1.22)}24%{transform:scale(1)}36%{transform:scale(1.1)}55%,100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){.beating .heart{animation:none}}
+.phase-now{font-size:1rem;color:var(--muted);font-family:var(--body)}
+
+/* Controls */
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.9rem 1.2rem;margin-bottom:1rem}
+label{display:block;font-weight:700;font-size:.95rem}
+.val{font-weight:400;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--blood)}
+select,input[type=number],input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--grid-strong);border-radius:4px;padding:.35rem .5rem;width:100%}
+.seg{display:flex;border:1px solid var(--grid-strong);border-radius:4px;overflow:hidden;margin-top:.25rem}
+.seg button{flex:1;border:0;background:transparent;color:var(--ink);padding:.4rem;font:inherit;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink)}
+button{font-family:var(--body)}
+.btn{border:0;border-radius:4px;background:var(--btn);color:var(--btn-ink);padding:.55rem .9rem;font-size:1rem;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--grid-strong)}
+.btn.red{background:var(--blood);color:#fff}
+:focus-visible{outline:3px solid var(--blood);outline-offset:2px}
+
+.builder{display:flex;flex-wrap:wrap;gap:.5rem;align-items:end;margin:.6rem 0}
+.builder > div{flex:1 1 160px}
+.presets{display:flex;flex-wrap:wrap;gap:.4rem;margin:.4rem 0 .8rem}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem;margin:.6rem 0}
+.chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:3px;padding:.2rem .3rem .2rem .55rem;font-size:.9rem;border:1px solid var(--grid-strong);background:var(--bg)}
+.chip button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:1.05rem;line-height:1;padding:0 .25rem}
+.chip i{width:.7rem;height:.7rem;border-radius:50%;display:inline-block}
+
+.chart-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--paper)}
+#chart{display:block;width:100%;min-width:520px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1rem;font-size:.85rem;color:var(--muted);margin-top:.5rem}
+.legend span::before{content:"";display:inline-block;width:.8rem;height:.8rem;border-radius:2px;margin-right:.3rem;vertical-align:-1px;background:var(--c)}
+.play-row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:.7rem}
+.play-row select{width:auto}
+
+/* Info */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.tag{font-size:.78rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.formula{font-family:var(--head);font-size:1.45rem;padding:.4rem .7rem;border-left:4px solid var(--blood);background:var(--bg);display:inline-block;margin:.3rem 0 .6rem}
+dl.mis{margin:0}
+dl.mis dt{font-weight:700;margin-top:.9rem}
+dl.mis dt::before{content:"„";color:var(--blood)}
+dl.mis dt::after{content:"“";color:var(--blood)}
+dl.mis dd{margin:.2rem 0 0 0;padding-left:.8rem;border-left:2px solid var(--grid)}
+ol.tasks{padding-left:1.3rem}
+ol.tasks li{margin:.45rem 0}
+.afb{font-family:var(--head);font-weight:700;color:var(--blood);margin-right:.3rem}
+.note{font-size:.92rem;color:var(--muted);border-top:1px solid var(--line);padding-top:.6rem;margin-top:1rem}
+
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:.35rem .4rem;border-bottom:1px solid var(--line)}
+th{font-weight:700}
+td.num{font-variant-numeric:tabular-nums;text-align:right}
+.tbl{overflow-x:auto}
+.empty{color:var(--muted);font-style:italic}
+footer{margin-top:2.5rem;font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.hero{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<main>
+  <header>
+    <h1>Herzfrequenz und Aktivität</h1>
+    <p class="lead">Stelle eine Abfolge von Aktivitäten zusammen und beobachte, wie sich die Herzfrequenz anpasst – und wie lange die Erholung dauert. Danach vergleichst du das Modell mit deinen eigenen Messwerten.</p>
+  </header>
+
+  <div class="hero">
+    <div class="readout" id="readout" aria-live="polite">
+      <svg class="heart" viewBox="0 0 32 29" aria-hidden="true"><path d="M16 29 2.8 15.6C-.9 11.8-.9 5.7 2.8 2.2 6.4-1 11.8-.5 14.9 3l1.1 1.3L17.1 3c3.1-3.5 8.5-4 12.1-.8 3.7 3.5 3.7 9.6 0 13.4z"/></svg>
+      <div>
+        <div class="num" id="hrNum">75</div>
+      </div>
+      <div class="unit">Schläge<br>pro Minute<br><span class="phase-now" id="phaseNow">Ruhe</span></div>
+    </div>
+  </div>
+
+  <!-- SIMULATOR -->
+  <section aria-labelledby="sim-h">
+    <h2 id="sim-h">Modell: Belastungsverlauf</h2>
+    <div class="sheet">
+      <div class="controls">
+        <div>
+          <label for="age">Alter <span class="val" id="ageV">15 Jahre</span></label>
+          <input type="range" id="age" min="10" max="60" value="15">
+        </div>
+        <div>
+          <label for="rest">Ruhe-Herzfrequenz <span class="val" id="restV">75 /min</span></label>
+          <input type="range" id="rest" min="45" max="100" value="75">
+        </div>
+        <div>
+          <label id="fitL">Trainingszustand</label>
+          <div class="seg" role="group" aria-labelledby="fitL">
+            <button type="button" id="fit0" aria-pressed="true">untrainiert</button>
+            <button type="button" id="fit1" aria-pressed="false">trainiert</button>
+          </div>
+        </div>
+      </div>
+
+      <h3>Vorlagen</h3>
+      <div class="presets">
+        <button class="btn ghost" data-preset="treppe">Treppen-Versuch</button>
+        <button class="btn ghost" data-preset="stunde">Sportstunde</button>
+        <button class="btn ghost" data-preset="intervall">Intervalllauf</button>
+        <button class="btn ghost" data-preset="leer">Leeren</button>
+      </div>
+
+      <h3>Phase hinzufügen</h3>
+      <div class="builder">
+        <div>
+          <label for="act">Aktivität</label>
+          <select id="act"></select>
+        </div>
+        <div>
+          <label for="dur">Dauer</label>
+          <select id="dur">
+            <option value="0.5">30 Sekunden</option>
+            <option value="1">1 Minute</option>
+            <option value="2" selected>2 Minuten</option>
+            <option value="3">3 Minuten</option>
+            <option value="5">5 Minuten</option>
+            <option value="8">8 Minuten</option>
+          </select>
+        </div>
+        <div style="flex:0 0 auto"><button class="btn" id="add">Phase hinzufügen</button></div>
+      </div>
+      <div class="chips" id="chips" aria-label="Ablauf"></div>
+
+      <div class="chart-wrap"><svg id="chart" viewBox="0 0 760 360" role="img" aria-label="Diagramm: Herzfrequenz über die Zeit"></svg></div>
+      <div class="legend" id="legend"></div>
+
+      <div class="play-row">
+        <button class="btn red" id="play">Ablauf abspielen</button>
+        <label for="speed" style="font-weight:400">Tempo</label>
+        <select id="speed">
+          <option value="30">1 Minute = 2 s</option>
+          <option value="60" selected>1 Minute = 1 s</option>
+          <option value="120">1 Minute = 0,5 s</option>
+        </select>
+      </div>
+      <p class="note">Vereinfachtes Modell: Die Herzfrequenz nähert sich je Aktivität einem Zielwert an (Anstieg schneller als Abfall). Maximale Herzfrequenz geschätzt mit 220 − Alter – eine grobe Faustformel, individuelle Werte weichen deutlich ab. Werte dienen der Veranschaulichung, nicht der Trainingssteuerung.</p>
+    </div>
+  </section>
+
+  <!-- MESSPROTOKOLL -->
+  <section aria-labelledby="mess-h">
+    <h2 id="mess-h">Eigene Messung</h2>
+    <div class="sheet">
+      <p>Puls am Handgelenk (Daumenseite) mit Zeige- und Mittelfinger tasten, 15 Sekunden zählen, mal 4 nehmen. Nicht mit dem Daumen messen – der hat einen eigenen Puls.</p>
+      <div class="builder">
+        <div>
+          <label for="mLabel">Zeitpunkt / Aktivität</label>
+          <input type="text" id="mLabel" placeholder="z. B. nach 2 min Treppe" maxlength="40">
+        </div>
+        <div>
+          <label for="mBeats">Schläge in 15 s</label>
+          <input type="number" id="mBeats" min="5" max="60" placeholder="z. B. 22">
+        </div>
+        <div style="flex:0 0 auto"><button class="btn" id="mAdd">Messwert eintragen</button></div>
+      </div>
+      <p id="mErr" class="note" style="color:var(--blood);border:0;display:none"></p>
+      <div class="tbl"><table>
+        <thead><tr><th>#</th><th>Zeitpunkt / Aktivität</th><th style="text-align:right">15 s</th><th style="text-align:right">pro Minute</th><th></th></tr></thead>
+        <tbody id="mBody"></tbody>
+      </table></div>
+      <div class="chart-wrap" style="margin-top:.8rem"><svg id="mChart" viewBox="0 0 760 240" role="img" aria-label="Säulendiagramm der eigenen Messwerte"></svg></div>
+      <div class="play-row"><button class="btn ghost" id="mClear">Messwerte löschen</button></div>
+      <p class="note">Werte bleiben nur in diesem Browser gespeichert. Keine Namen eintragen. Wer sich unwohl fühlt oder gesundheitliche Einschränkungen hat, misst nur in Ruhe oder protokolliert für die Gruppe.</p>
+    </div>
+  </section>
+
+  <!-- FACHWISSEN -->
+  <section aria-labelledby="fw-h">
+    <h2 id="fw-h">Warum schlägt das Herz schneller?</h2>
+    <div class="two">
+      <div class="sheet">
+        <h3 style="margin-top:0">Der Bedarf der Muskeln</h3>
+        <p>Arbeitende Muskeln brauchen mehr Sauerstoff und Glucose und erzeugen mehr Kohlenstoffdioxid. Das Blut muss diese Stoffe schneller transportieren. Das Herz kann dafür häufiger schlagen und pro Schlag mehr Blut auswerfen.</p>
+        <div class="formula">Herzminutenvolumen = Herzfrequenz × Schlagvolumen</div>
+        <p>Beispiel Ruhe: 70 /min × 70 ml ≈ 4,9 l pro Minute.</p>
+      </div>
+      <div class="sheet">
+        <h3 style="margin-top:0">Steuerung</h3>
+        <p>Den Grundtakt gibt der Sinusknoten im rechten Vorhof vor. Das vegetative Nervensystem verstellt diesen Takt: Der Sympathikus (unterstützt durch Adrenalin) beschleunigt, der Parasympathikus (Vagusnerv) bremst. Schon die Erwartung einer Belastung kann die Herzfrequenz anheben.</p>
+        <h3>Trainiert vs. untrainiert</h3>
+        <p>Ausdauertraining vergrößert das Schlagvolumen. Deshalb reicht in Ruhe und bei gleicher Belastung eine niedrigere Herzfrequenz, und die Erholung verläuft meist schneller.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEHLKONZEPTE -->
+  <section aria-labelledby="fk-h">
+    <h2 id="fk-h">Typische Vorstellungen – und was stimmt</h2>
+    <div class="sheet">
+      <dl class="mis">
+        <dt>Das Herz pumpt Luft in den Körper.</dt>
+        <dd>Das Herz pumpt Blut. Sauerstoff wird in der Lunge aufgenommen und im Blut an Hämoglobin gebunden transportiert. <em>Gegenstrategie:</em> Lungen- und Körperkreislauf an einem Schema nachfahren lassen, Stationen von Sauerstoff benennen.</dd>
+        <dt>Je höher der Puls, desto fitter bin ich.</dt>
+        <dd>Eher umgekehrt: Trainierte haben meist eine niedrigere Ruhe-Herzfrequenz, weil ihr Herz pro Schlag mehr Blut auswirft. <em>Gegenstrategie:</em> Im Modell „trainiert“ und „untrainiert“ bei gleichem Ablauf vergleichen.</dd>
+        <dt>Nach dem Sport ist der Puls sofort wieder normal.</dt>
+        <dd>Die Erholung dauert Minuten; der Körper muss z. B. Sauerstoffspeicher auffüllen und Wärme abgeben. <em>Gegenstrategie:</em> Erholungsphase im Protokoll mehrfach messen (1, 2, 3 Minuten danach).</dd>
+        <dt>Die Muskeln sagen dem Herzen direkt, wie schnell es schlagen soll.</dt>
+        <dd>Das Herz erzeugt seinen Takt selbst (Sinusknoten); Nerven und Hormone passen ihn an. <em>Gegenstrategie:</em> Regelkreis-Skizze mit Sympathikus und Parasympathikus.</dd>
+        <dt>Puls und Blutdruck sind dasselbe.</dt>
+        <dd>Der Puls gibt die Schläge pro Minute an, der Blutdruck den Druck in den Gefäßen (in mmHg). <em>Gegenstrategie:</em> Beide Größen mit Einheit gegenüberstellen.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- AUFGABEN -->
+  <section aria-labelledby="af-h">
+    <h2 id="af-h">Arbeitsaufträge</h2>
+    <div class="sheet">
+      <ol class="tasks">
+        <li><span class="afb">I</span>Beschreibe den Verlauf der Herzfrequenz im Treppen-Versuch von der Ruhephase bis zum Ende der Erholung.</li>
+        <li><span class="afb">I</span>Nenne die Größen, aus denen sich das Herzminutenvolumen zusammensetzt.</li>
+        <li><span class="afb">II</span>Erkläre, warum die Herzfrequenz bei Belastung steigt. Verwende die Begriffe Sauerstoffbedarf, Muskelzelle und Blut.</li>
+        <li><span class="afb">II</span>Vergleiche den Verlauf bei „trainiert“ und „untrainiert“ für denselben Ablauf und erkläre die Unterschiede.</li>
+        <li><span class="afb">II</span>Vergleiche deine Messwerte mit dem Modell und nenne mögliche Messfehler.</li>
+        <li><span class="afb">III</span>Beurteile die Aussage: „Wer nach dem Sport den höchsten Puls hat, hat sich am meisten angestrengt.“</li>
+        <li><span class="afb">III</span>Entwickle eine Hypothese zum Einfluss der Belastungsdauer auf die Erholungszeit und plane ein Experiment, um sie zu überprüfen.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>Modellwerte vereinfacht, für den Unterricht. Keine medizinische Aussage über einzelne Personen.</footer>
+</main>
+
+<script>
+(function(){
+  const ACTS = [
+    {id:"liegen",  name:"Liegen",            f:0.00, c:"#7FA7C9"},
+    {id:"sitzen",  name:"Sitzen",            f:0.03, c:"#8FB4A0"},
+    {id:"stehen",  name:"Stehen",            f:0.08, c:"#A9C28A"},
+    {id:"gehen",   name:"Gehen",             f:0.25, c:"#D9C25B"},
+    {id:"treppe",  name:"Treppensteigen",    f:0.50, c:"#E59A55"},
+    {id:"joggen",  name:"Joggen",            f:0.60, c:"#E0794C"},
+    {id:"laufen",  name:"Schnelles Laufen",  f:0.80, c:"#D4544A"},
+    {id:"sprint",  name:"Sprint",            f:0.95, c:"#B02A3E"}
+  ];
+  const byId = Object.fromEntries(ACTS.map(a=>[a.id,a]));
+  const PRESETS = {
+    treppe:[["sitzen",2],["treppe",2],["sitzen",5]],
+    stunde:[["sitzen",2],["gehen",3],["joggen",5],["sprint",0.5],["gehen",3],["sitzen",4]],
+    intervall:[["stehen",1],["laufen",1],["gehen",1],["laufen",1],["gehen",1],["laufen",1],["sitzen",4]],
+    leer:[]
+  };
+  const $ = id=>document.getElementById(id);
+  const state = {age:15, rest:75, trained:false, phases:PRESETS.treppe.map(p=>({act:p[0],min:p[1]}))};
+
+  // Store
+  function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+  function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  const saved = load("hf-sim",null);
+  if(saved && Array.isArray(saved.phases)){Object.assign(state,saved);}
+
+  // Fill selects
+  ACTS.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=a.name;$("act").appendChild(o)});
+  $("act").value="joggen";
+  $("legend").innerHTML='<span style="--c:var(--blood)">Herzfrequenz</span><span style="--c:var(--grid-strong)">geschätzte max. Herzfrequenz</span>';
+
+  // Model
+  function simulate(){
+    const hfmax = 220 - state.age;
+    const tauUp = state.trained ? 18 : 28;
+    const tauDown = state.trained ? 45 : 75;
+    let hr = state.rest; const pts=[]; let t=0;
+    pts.push({t:0,hr});
+    state.phases.forEach(p=>{
+      const a = byId[p.act];
+      const f = a.f >= 0.9 ? a.f : a.f * (state.trained ? 0.85 : 1);
+      const target = state.rest + f * (hfmax - state.rest);
+      const secs = Math.round(p.min*60);
+      for(let s=0;s<secs;s++){
+        const tau = target > hr ? tauUp : tauDown;
+        hr += (target-hr)*(1-Math.exp(-1/tau));
+        t++; pts.push({t,hr});
+      }
+    });
+    return {pts,hfmax,total:t};
+  }
+
+  // Chart
+  const W=760,H=360,L=48,R=14,T=16,B=40, YMIN=40, YMAX=220;
+  let sim=null;
+  function x(t,total){return L+(W-L-R)*(t/Math.max(total,60))}
+  function y(v){return T+(H-T-B)*(1-(v-YMIN)/(YMAX-YMIN))}
+  function draw(cursorT){
+    sim = simulate();
+    const total = Math.max(sim.total,60);
+    let s='';
+    // phase bands
+    let t0=0;
+    state.phases.forEach(p=>{
+      const a=byId[p.act], d=Math.round(p.min*60);
+      const x0=x(t0,total), x1=x(t0+d,total);
+      s+=`<rect x="${x0}" y="${T}" width="${x1-x0}" height="${H-T-B}" fill="${a.c}" opacity=".16"/>`;
+      if(x1-x0>34) s+=`<text x="${(x0+x1)/2}" y="${T+14}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--body)">${a.name.replace("Schnelles ","Schn. ")}</text>`;
+      t0+=d;
+    });
+    // mm grid
+    for(let v=YMIN; v<=YMAX; v+=10){
+      const strong = v%40===0;
+      s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="${strong?'var(--grid-strong)':'var(--grid)'}" stroke-width="${strong?1:.5}"/>`;
+      if(strong) s+=`<text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--body)">${v}</text>`;
+    }
+    const mins = total/60, step = mins>16?2:1;
+    for(let m=0;m<=mins+1e-9;m+=0.5){
+      const whole = Math.abs(m-Math.round(m))<1e-9;
+      s+=`<line x1="${x(m*60,total)}" x2="${x(m*60,total)}" y1="${T}" y2="${H-B}" stroke="${whole?'var(--grid-strong)':'var(--grid)'}" stroke-width="${whole?1:.5}"/>`;
+      if(whole && m%step===0) s+=`<text x="${x(m*60,total)}" y="${H-B+16}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--body)">${m}</text>`;
+    }
+    s+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--body)">Zeit in Minuten</text>`;
+    s+=`<text x="12" y="${(T+H-B)/2}" transform="rotate(-90 12 ${(T+H-B)/2})" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--body)">Herzfrequenz in Schlägen/min</text>`;
+    // hfmax
+    s+=`<line x1="${L}" x2="${W-R}" y1="${y(sim.hfmax)}" y2="${y(sim.hfmax)}" stroke="var(--grid-strong)" stroke-width="2" stroke-dasharray="6 5"/>`;
+    s+=`<text x="${W-R-4}" y="${y(sim.hfmax)-6}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--body)">HFmax ≈ ${sim.hfmax}</text>`;
+    // curve
+    if(sim.pts.length>1){
+      const d = sim.pts.filter((p,i)=>i%3===0||i===sim.pts.length-1).map((p,i)=>(i?'L':'M')+x(p.t,total).toFixed(1)+' '+y(p.hr).toFixed(1)).join(' ');
+      s+=`<path d="${d}" fill="none" stroke="var(--blood)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+    } else {
+      s+=`<text x="${(L+W-R)/2}" y="${(T+H-B)/2}" text-anchor="middle" font-size="15" fill="var(--muted)" font-family="var(--body)">Füge eine Phase hinzu, um den Verlauf zu sehen.</text>`;
+    }
+    if(cursorT!=null){
+      const p = sim.pts[Math.min(cursorT,sim.pts.length-1)];
+      s+=`<line x1="${x(p.t,total)}" x2="${x(p.t,total)}" y1="${T}" y2="${H-B}" stroke="var(--ink)" stroke-width="1.5"/>`;
+      s+=`<circle cx="${x(p.t,total)}" cy="${y(p.hr)}" r="6" fill="var(--blood)" stroke="var(--paper)" stroke-width="2"/>`;
+    }
+    $("chart").innerHTML=s;
+    if(cursorT==null) setReadout(sim.pts[sim.pts.length-1].hr, state.phases.length?byId[state.phases[state.phases.length-1].act].name+" (Ende)":"Ruhe", false);
+  }
+  function setReadout(hr,label,beating){
+    $("hrNum").textContent=Math.round(hr);
+    $("phaseNow").textContent=label;
+    const r=$("readout");
+    r.style.setProperty("--beat",(60/hr).toFixed(2)+"s");
+    r.classList.toggle("beating",beating);
+  }
+  function chips(){
+    const c=$("chips"); c.innerHTML="";
+    if(!state.phases.length){c.innerHTML='<span class="empty">Noch keine Phasen.</span>';return}
+    state.phases.forEach((p,i)=>{
+      const a=byId[p.act]; const el=document.createElement("span"); el.className="chip";
+      const dur = p.min<1? (p.min*60)+" s" : p.min+" min";
+      el.innerHTML=`<i style="background:${a.c}"></i>${a.name}, ${dur}<button aria-label="${a.name} entfernen" data-i="${i}">×</button>`;
+      c.appendChild(el);
+    });
+  }
+  function refresh(){
+    stop();
+    $("ageV").textContent=state.age+" Jahre";
+    $("restV").textContent=state.rest+" /min";
+    $("age").value=state.age; $("rest").value=state.rest;
+    $("fit0").setAttribute("aria-pressed",!state.trained);
+    $("fit1").setAttribute("aria-pressed",state.trained);
+    chips(); draw(null); save("hf-sim",state);
+  }
+
+  // Playback
+  let raf=null,startTs=0;
+  function stop(){if(raf){cancelAnimationFrame(raf);raf=null}$("play").textContent="Ablauf abspielen"}
+  function play(){
+    if(raf){stop();draw(null);return}
+    if(!state.phases.length) return;
+    $("play").textContent="Anhalten";
+    const speed=+$("speed").value; startTs=performance.now();
+    const ends=[];let acc=0;state.phases.forEach(p=>{acc+=Math.round(p.min*60);ends.push(acc)});
+    function frame(ts){
+      const t=Math.floor((ts-startTs)/1000*speed);
+      if(t>=sim.total){draw(sim.total);setReadout(sim.pts[sim.total].hr,"Ende des Ablaufs",false);raf=null;$("play").textContent="Ablauf abspielen";return}
+      draw(t);
+      const idx=ends.findIndex(e=>t<e);
+      setReadout(sim.pts[t].hr,byId[state.phases[idx].act].name,true);
+      raf=requestAnimationFrame(frame);
+    }
+    raf=requestAnimationFrame(frame);
+  }
+
+  $("age").addEventListener("input",e=>{state.age=+e.target.value;refresh()});
+  $("rest").addEventListener("input",e=>{state.rest=+e.target.value;refresh()});
+  $("fit0").onclick=()=>{state.trained=false;refresh()};
+  $("fit1").onclick=()=>{state.trained=true;refresh()};
+  $("add").onclick=()=>{
+    const total=state.phases.reduce((a,p)=>a+p.min,0);
+    if(total+ +$("dur").value>40){alert("Der Ablauf ist auf 40 Minuten begrenzt.");return}
+    state.phases.push({act:$("act").value,min:+$("dur").value});refresh()};
+  $("chips").addEventListener("click",e=>{const b=e.target.closest("button[data-i]");if(b){state.phases.splice(+b.dataset.i,1);refresh()}});
+  document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{state.phases=PRESETS[b.dataset.preset].map(p=>({act:p[0],min:p[1]}));refresh()});
+  $("play").onclick=play;
+
+  // Messprotokoll
+  let meas = load("hf-mess",[]); if(!Array.isArray(meas)) meas=[];
+  function renderMeas(){
+    const tb=$("mBody");
+    if(!meas.length){tb.innerHTML='<tr><td colspan="5" class="empty">Noch keine Messwerte. Beginne mit einer Messung in Ruhe.</td></tr>'}
+    else tb.innerHTML=meas.map((m,i)=>`<tr><td>${i+1}</td><td>${esc(m.label)}</td><td class="num">${m.beats}</td><td class="num"><strong>${m.beats*4}</strong></td><td><button class="btn ghost" style="padding:.15rem .5rem" data-del="${i}" aria-label="Messwert ${i+1} löschen">×</button></td></tr>`).join("");
+    // bars
+    const W2=760,H2=240,l=48,r=14,t=14,b=46,ymin=40,ymax=220;
+    const yy=v=>t+(H2-t-b)*(1-(Math.max(v,ymin)-ymin)/(ymax-ymin));
+    let s='';
+    for(let v=ymin;v<=ymax;v+=20){s+=`<line x1="${l}" x2="${W2-r}" y1="${yy(v)}" y2="${yy(v)}" stroke="${v%40===0?'var(--grid-strong)':'var(--grid)'}" stroke-width="${v%40===0?1:.5}"/>`;if(v%40===0)s+=`<text x="${l-6}" y="${yy(v)+4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--body)">${v}</text>`}
+    if(!meas.length){s+=`<text x="${(l+W2-r)/2}" y="${H2/2}" text-anchor="middle" font-size="15" fill="var(--muted)" font-family="var(--body)">Hier erscheinen deine Messwerte als Säulen.</text>`}
+    const n=meas.length, slot=(W2-l-r)/Math.max(n,1), bw=Math.min(60,slot*.6);
+    meas.forEach((m,i)=>{const cx=l+slot*(i+.5),v=m.beats*4;
+      s+=`<rect x="${cx-bw/2}" y="${yy(v)}" width="${bw}" height="${H2-b-yy(v)}" fill="var(--blood)" opacity=".85"/>`;
+      s+=`<text x="${cx}" y="${yy(v)-5}" text-anchor="middle" font-size="12" fill="var(--ink)" font-family="var(--body)">${v}</text>`;
+      s+=`<text x="${cx}" y="${H2-b+16}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--body)">${i+1}</text>`});
+    s+=`<text x="${(l+W2-r)/2}" y="${H2-8}" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--body)">Messung Nr. (siehe Tabelle) – Schläge pro Minute</text>`;
+    $("mChart").innerHTML=s;
+    save("hf-mess",meas);
+  }
+  function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+  $("mAdd").onclick=()=>{
+    const beats=parseInt($("mBeats").value,10), label=$("mLabel").value.trim()||("Messung "+(meas.length+1));
+    const err=$("mErr");
+    if(!(beats>=5&&beats<=60)){err.textContent="Trage die Anzahl der Schläge in 15 Sekunden ein (zwischen 5 und 60).";err.style.display="block";return}
+    err.style.display="none";
+    meas.push({label,beats});$("mBeats").value="";$("mLabel").value="";renderMeas();
+  };
+  $("mBody").addEventListener("click",e=>{const b=e.target.closest("[data-del]");if(b){meas.splice(+b.dataset.del,1);renderMeas()}});
+  $("mClear").onclick=()=>{if(meas.length&&confirm("Alle Messwerte löschen?")){meas=[];renderMeas()}};
+
+  refresh(); renderMeas();
+})();
+</script>
+</body>
+</html>

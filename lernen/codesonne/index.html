@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Codesonne und Translation</title>
+<meta name="description" content="Interaktive Codesonne, Schritt-für-Schritt-Translation am Ribosom, Mutationen und Training. Biologie Oberstufe.">
+<style>
+:root{
+  --bg:#EFEDF6; --panel:#FFFFFF; --panel-2:#F4F2FA; --ink:#1B1932; --ink-soft:#55536F; --line:#D2CEE3;
+  --stage:#121734; --stage-2:#1B2253; --stage-ink:#E9EBFF; --stage-soft:#A9B0DC; --gap:#121734;
+  --btn:#1B1932; --btn-ink:#FFFFFF; --focus:#0B57D0; --accent:#F2A93B;
+  --bU:#D6403F; --bC:#2F6FDB; --bA:#1E9A5C; --bG:#E0A020;
+  --np:#E9C46A; --po:#7BC8A4; --ba:#6FA8F0; --sa:#F08A8A; --st:#0B0F26; --rf:#F2A93B; --trna:#8E96D8;
+  --good:#17693B; --good-bg:#DCF1E4; --bad:#A3241B; --bad-bg:#FBE0DC; --note:#6B4A00; --note-bg:#FFF2CF;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D0F20; --panel:#171A33; --panel-2:#1E2240; --ink:#E9EBFF; --ink-soft:#A9B0DC; --line:#2F3566;
+    --stage:#0A0D22; --stage-2:#151B45; --gap:#0A0D22; --btn:#E9EBFF; --btn-ink:#0D0F20; --focus:#8AB4FF;
+    --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D0F20; --panel:#171A33; --panel-2:#1E2240; --ink:#E9EBFF; --ink-soft:#A9B0DC; --line:#2F3566;
+  --stage:#0A0D22; --stage-2:#151B45; --gap:#0A0D22; --btn:#E9EBFF; --btn-ink:#0D0F20; --focus:#8AB4FF;
+  --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note:#F2C25B; --note-bg:#3A2F12;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1320px; margin:0 auto; padding:16px clamp(12px,3vw,28px) 6px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.6rem,4.8vw,2.4rem); line-height:1.1; margin:0; letter-spacing:-.015em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:70ch; }
+.tabs{ max-width:1320px; margin:6px auto 0; padding:0 clamp(12px,3vw,28px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em .95em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.layout{ max-width:1320px; margin:0 auto; padding:12px clamp(12px,3vw,28px) 24px; display:grid; grid-template-columns:minmax(0,1fr); gap:14px; align-items:start; }
+.sun{ display:none; }
+body[data-tab="sonne"] .sun{ display:block; }
+body[data-tab="sonne"] .content{ display:none; }
+.tab-sonne{ display:inline-block; }
+@media (min-width:1000px){
+  .layout{ grid-template-columns:minmax(0,520px) minmax(0,1fr); }
+  .sun{ display:block !important; position:sticky; top:calc(env(safe-area-inset-top,0px) + 8px); }
+  body[data-tab="sonne"] .content{ display:block; }
+  .tab-sonne{ display:none; }
+}
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.2rem; margin:0 0 8px; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.02rem; margin:12px 0 4px; }
+.lead{ margin:0 0 10px; max-width:70ch; }
+.note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.45em .95em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.linkbtn{ border:0; background:none; font-weight:700; text-decoration:underline; cursor:pointer; padding:6px 2px; min-height:40px; }
+select, textarea, .txtin{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+textarea{ font-family:var(--mono); letter-spacing:.04em; resize:vertical; min-height:84px; }
+label.fl{ display:block; font-weight:700; font-size:.92rem; color:var(--ink-soft); margin:8px 0 3px; }
+.seg{ display:flex; border:2px solid var(--line); border-radius:10px; overflow:hidden; }
+.seg button{ flex:1; border:0; background:var(--panel); padding:.35em .6em; font-weight:700; font-size:.92rem; cursor:pointer; min-height:46px; }
+.seg button+button{ border-left:2px solid var(--line); }
+.seg button[aria-pressed="true"]{ background:var(--btn); color:var(--btn-ink); }
+.mono{ font-family:var(--mono); }
+
+/* Bühne */
+.stage{ background:radial-gradient(120% 100% at 50% 45%,var(--stage-2) 0%,var(--stage) 70%); color:var(--stage-ink); border-radius:16px; padding:10px; }
+.stage svg{ display:block; width:100%; height:auto; }
+.stage .note, .stage .hint{ color:var(--stage-soft); }
+.zoomrow{ display:flex; gap:6px; flex-wrap:wrap; margin:0 0 8px; }
+.zoomrow button{ border:2px solid var(--line); background:transparent; color:var(--stage-ink); border-color:rgba(169,176,220,.45); border-radius:10px; padding:.2em .8em; font-weight:700; cursor:pointer; min-height:44px; min-width:44px; }
+.zoomrow button[aria-pressed="true"]{ background:var(--stage-ink); color:var(--stage); border-color:var(--stage-ink); }
+.zoomrow .zl{ align-self:center; font-size:.85rem; color:var(--stage-soft); margin-right:4px; }
+
+/* Codesonne */
+.sec path{ stroke:var(--gap); stroke-width:1.2; cursor:pointer; transition:opacity .2s; }
+.sec text{ pointer-events:none; font-family:var(--body); font-weight:700; text-anchor:middle; dominant-baseline:central; }
+.sec.dim{ opacity:.22; }
+.sec.same path{ stroke:var(--accent); stroke-width:2.6; }
+.sec.sel path{ stroke:#fff; stroke-width:3.4; }
+.sec.start path{ stroke:var(--accent); stroke-width:2.2; }
+.l1{ fill:#fff; font-size:30px; } .l2{ fill:#fff; font-size:21px; } .l3{ fill:#fff; font-size:12.5px; } .l4{ font-size:12px; fill:#0B0F26; }
+.l4.st{ fill:#fff; }
+.sunlegend{ display:flex; flex-wrap:wrap; gap:4px 12px; list-style:none; padding:0; margin:8px 0 0; font-size:.82rem; color:var(--stage-soft); }
+.sunlegend i{ display:inline-block; width:14px; height:14px; border-radius:4px; margin-right:6px; vertical-align:-2px; }
+.codonbig{ display:flex; gap:6px; margin:6px 0; }
+.nt{ font-family:var(--mono); font-weight:700; display:inline-grid; place-items:center; border-radius:6px; }
+.codonbig .nt{ width:2.2em; height:2.2em; font-size:1.4rem; }
+.nt.U{ background:var(--bU); color:#fff; } .nt.C{ background:var(--bC); color:#fff; } .nt.A{ background:var(--bA); color:#fff; } .nt.G{ background:var(--bG); color:#1B1932; }
+.pick{ display:grid; grid-template-columns:auto repeat(4,1fr); gap:6px; align-items:center; margin:4px 0; }
+.pick span{ font-size:.88rem; font-weight:700; color:var(--ink-soft); min-width:5.2em; }
+.pick button{ min-height:46px; border-radius:10px; border:2px solid transparent; font-family:var(--mono); font-weight:800; font-size:1.2rem; cursor:pointer; }
+.pick button.U{ background:var(--bU); color:#fff; } .pick button.C{ background:var(--bC); color:#fff; } .pick button.A{ background:var(--bA); color:#fff; } .pick button.G{ background:var(--bG); color:#1B1932; }
+.pick button[aria-pressed="true"]{ outline:3px solid var(--ink); outline-offset:2px; }
+.info{ background:var(--panel-2); border-radius:12px; padding:10px 14px; margin:10px 0; min-height:7em; }
+.info h3{ margin:0 0 4px; }
+.info p{ margin:4px 0; }
+.chips{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0; }
+.chip{ font-family:var(--mono); font-weight:700; border:2px solid var(--line); background:var(--panel); border-radius:8px; padding:.15em .5em; cursor:pointer; min-height:36px; }
+.chip.aa{ font-family:var(--body); border-color:transparent; cursor:default; color:#0B0F26; }
+.c-np{ background:var(--np); } .c-po{ background:var(--po); } .c-ba{ background:var(--ba); } .c-sa{ background:var(--sa); } .c-st{ background:var(--st); color:#fff !important; }
+.props{ margin:0; padding-left:1.2em; } .props li{ margin:3px 0; font-size:.96rem; }
+
+/* Translation */
+.steprow{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0; }
+.stepinfo{ background:var(--panel-2); border-left:6px solid var(--accent); border-radius:10px; padding:10px 14px; margin:10px 0; }
+.stepinfo h3{ margin:0 0 4px; } .stepinfo p{ margin:4px 0; }
+.counter{ font-weight:700; font-size:.92rem; color:var(--ink-soft); }
+.trna{ transition:transform .75s cubic-bezier(.4,0,.2,1), opacity .5s ease; }
+#gMrna{ transition:transform .75s cubic-bezier(.4,0,.2,1); }
+.sub{ transition:transform .7s ease, opacity .5s ease; }
+.st-txt{ font-family:var(--body); font-weight:700; }
+.pep{ display:flex; flex-wrap:wrap; gap:4px; margin:6px 0; min-height:34px; }
+.pep .chip.aa{ min-height:30px; padding:.05em .45em; font-size:.88rem; }
+.pep .chip.aa.new{ outline:3px solid var(--accent); }
+.mseq{ font-family:var(--mono); letter-spacing:.08em; word-break:break-all; line-height:1.9; }
+.mseq .cdn{ padding:0 .12em; border-radius:4px; margin-right:.2em; }
+.mseq .cdn.cur{ background:var(--accent); color:#1B1932; }
+.mseq .dimn{ opacity:.55; }
+.chal{ background:var(--note-bg); color:var(--note); border-radius:10px; padding:10px 12px; margin:8px 0; }
+.chal .opts{ display:grid; gap:8px; margin-top:8px; }
+.chal .opt{ text-align:left; background:var(--panel); color:var(--ink); border:2px solid var(--line); border-radius:10px; padding:.5em .8em; cursor:pointer; min-height:46px; font-weight:700; }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--good-bg); color:var(--good); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--note-bg); color:var(--note); }
+
+/* Mutation */
+.nrow{ font-family:var(--mono); display:flex; flex-wrap:wrap; gap:3px 0; line-height:1; margin:6px 0; }
+.nrow .g{ display:inline-flex; margin-right:7px; }
+.nrow .nt{ width:1.7em; height:1.9em; font-size:1rem; border-radius:4px; margin-right:1px; }
+.nrow .nt.dimn{ opacity:.45; }
+.nrow button.nt{ border:0; cursor:pointer; padding:0; }
+.nrow .nt.selp{ outline:3px solid var(--ink); outline-offset:1px; }
+.nrow .nt.chg{ outline:3px solid var(--accent); outline-offset:1px; }
+.cls{ border-radius:12px; padding:10px 14px; margin:10px 0; background:var(--note-bg); color:var(--note); }
+.cls b{ font-family:var(--display); font-size:1.08rem; display:block; }
+.cls.ok{ background:var(--good-bg); color:var(--good); } .cls.no{ background:var(--bad-bg); color:var(--bad); }
+.pcmp{ display:grid; gap:4px; }
+.pcmp .lab{ font-size:.85rem; font-weight:700; color:var(--ink-soft); margin-top:6px; }
+.pcmp .chip.aa.diff{ outline:3px solid var(--accent); }
+.posbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+/* Training */
+.q{ text-align:center; padding:10px 0; }
+.q .big{ display:inline-flex; gap:6px; }
+.q .big .nt{ width:2.4em; height:2.4em; font-size:1.7rem; }
+.q .aaq{ font-family:var(--display); font-weight:800; font-size:1.6rem; }
+.score{ display:flex; gap:12px; flex-wrap:wrap; font-weight:700; color:var(--ink-soft); font-size:.92rem; }
+.multi{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:10px 0; }
+.multi button{ font-family:var(--mono); font-weight:800; font-size:1.05rem; border:2px solid var(--line); background:var(--panel); border-radius:10px; min-height:50px; cursor:pointer; }
+.multi button[aria-pressed="true"]{ background:var(--btn); color:var(--btn-ink); border-color:var(--btn); }
+.multi button.ok{ background:var(--good-bg); color:var(--good); border-color:var(--good); }
+.multi button.no{ background:var(--bad-bg); color:var(--bad); border-color:var(--bad); }
+
+/* Aufgaben */
+details.task{ border-top:1px solid var(--line); padding:8px 0; }
+details.task summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:10px; }
+details.task .badge{ flex:none; font-size:.8rem; font-weight:700; border-radius:99px; padding:2px 10px; background:var(--panel-2); border:1px solid var(--line); }
+details.task p{ margin:6px 0; max-width:75ch; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+details.task ul{ margin:4px 0 0; padding-left:1.2em; }
+details.teacher{ max-width:1320px; margin:0 auto 40px; padding:0 clamp(12px,3vw,28px); }
+details.teacher > .inner{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:6px 16px 14px; }
+details.teacher summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; }
+details.teacher li, details.teacher p{ font-size:.95rem; max-width:80ch; }
+@media (prefers-reduced-motion:reduce){ .trna,#gMrna,.sub,.sec path{ transition:none; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body data-tab="trans">
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Codesonne und Translation</h1>
+  <p>Biologie Oberstufe. Vom Triplett zur Aminosäure: Codesonne lesen, die Translation am Ribosom verfolgen, Mutationen untersuchen und trainieren.</p>
+</header>
+
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab tab-sonne" role="tab" data-tab="sonne" aria-selected="false">Codesonne</button>
+  <button type="button" class="tab" role="tab" data-tab="trans" aria-selected="true">Translation</button>
+  <button type="button" class="tab" role="tab" data-tab="mut" aria-selected="false">Mutationen</button>
+  <button type="button" class="tab" role="tab" data-tab="train" aria-selected="false">Training</button>
+  <button type="button" class="tab" role="tab" data-tab="task" aria-selected="false">Aufgaben</button>
+</nav>
+
+<main class="layout">
+  <!-- Codesonne -->
+  <section class="card sun" id="sunCard" aria-label="Codesonne">
+    <h2>Codesonne</h2>
+    <p class="note" style="margin-top:0">Lies von innen nach außen: 1. Base (innen), 2. Base (Mitte), 3. Base (außen). Ganz außen steht die Aminosäure. Tippe auf einen Bereich oder wähle die Basen unten.</p>
+    <div class="stage">
+      <div class="zoomrow" id="zoomRow" role="group" aria-label="Ausschnitt"><span class="zl">Ausschnitt:</span></div>
+      <svg id="sunSvg" viewBox="0 0 640 640" role="img" aria-label="Codesonne des genetischen Codes"></svg>
+      <ul class="sunlegend" id="sunLegend"></ul>
+    </div>
+    <div class="pick" id="pick1"><span>1. Base</span></div>
+    <div class="pick" id="pick2"><span>2. Base</span></div>
+    <div class="pick" id="pick3"><span>3. Base</span></div>
+    <div class="info" id="sunInfo" aria-live="polite"></div>
+    <details>
+      <summary style="cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center">Eigenschaften des genetischen Codes</summary>
+      <ul class="props">
+        <li><b>Triplett-Code:</b> Drei Basen (ein Codon) codieren eine Aminosäure. Es gibt 4³ = 64 Codons.</li>
+        <li><b>Eindeutig:</b> Jedes Codon codiert nur eine Aminosäure (oder Stopp).</li>
+        <li><b>Degeneriert (redundant):</b> Für die meisten der 20 Aminosäuren gibt es mehrere Codons. Oft unterscheiden sie sich nur in der 3. Base.</li>
+        <li><b>Kommafrei und nicht überlappend:</b> Die Codons folgen lückenlos aufeinander, jede Base gehört zu genau einem Codon.</li>
+        <li><b>Start und Stopp:</b> AUG ist das Startcodon (Methionin). UAA, UAG und UGA sind Stoppcodons ohne Aminosäure.</li>
+        <li><b>Fast universell:</b> Der Code gilt in fast allen Lebewesen. Es gibt kleine Abweichungen, zum Beispiel in Mitochondrien.</li>
+      </ul>
+    </details>
+  </section>
+
+  <div class="content" id="content">
+    <!-- Translation -->
+    <section id="pane-trans">
+      <div class="card">
+        <h2>1. mRNA wählen</h2>
+        <label class="fl" for="selPreset">Beispiel</label>
+        <select id="selPreset"></select>
+        <label class="fl" for="selType">Die Eingabe ist</label>
+        <select id="selType">
+          <option value="mrna">mRNA (5′→3′)</option>
+          <option value="codogen">codogener Strang der DNA (Matrize, 3′→5′)</option>
+          <option value="coding">codierender Strang der DNA (5′→3′)</option>
+        </select>
+        <label class="fl" for="taSeq">Sequenz (A, C, G, U oder T)</label>
+        <textarea id="taSeq" spellcheck="false" autocapitalize="characters" autocomplete="off" maxlength="400"></textarea>
+        <div class="btnrow"><button type="button" class="btn primary" id="btnApply">Übernehmen und starten</button></div>
+        <p class="note" id="applyMsg" aria-live="polite"></p>
+        <div id="derived"></div>
+      </div>
+
+      <div class="card">
+        <h2>2. Translation am Ribosom</h2>
+        <div class="stage">
+          <svg id="transSvg" viewBox="0 0 640 300" role="img" aria-label="Ribosom mit mRNA und tRNA"></svg>
+        </div>
+        <div class="steprow">
+          <button type="button" class="btn" id="btnPrev">Zurück</button>
+          <button type="button" class="btn primary" id="btnNext">Weiter</button>
+          <button type="button" class="btn" id="btnPlay" aria-pressed="false">Automatisch</button>
+          <span class="counter" id="counter"></span>
+        </div>
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;min-height:44px"><input type="checkbox" id="chkChal" style="width:22px;height:22px"> Ich wähle die passende tRNA selbst aus</label>
+        <div id="chal" class="chal" hidden></div>
+        <div class="stepinfo" aria-live="polite"><h3 id="stTitle"></h3><p id="stText"></p><p id="stMerke" class="note"></p></div>
+        <h3>Nächstes Codon an der A-Stelle</h3>
+        <div id="codonCard"></div>
+        <h3>Wachsendes Polypeptid</h3>
+        <div class="pep" id="pep" aria-live="polite"></div>
+        <h3>mRNA mit Leseraster</h3>
+        <div class="mseq" id="mseq"></div>
+      </div>
+    </section>
+
+    <!-- Mutationen -->
+    <section id="pane-mut" hidden>
+      <div class="card">
+        <h2>Mutationen untersuchen</h2>
+        <p class="lead">Die Grundlage ist die mRNA aus dem Bereich Translation. Tippe auf eine Base, wähle die Art der Mutation und beobachte, wie sich das Protein verändert.</p>
+        <div class="seg" id="segMut" role="group" aria-label="Art der Mutation">
+          <button type="button" data-m="sub" aria-pressed="true">Substitution</button>
+          <button type="button" data-m="ins" aria-pressed="false">Insertion</button>
+          <button type="button" data-m="del" aria-pressed="false">Deletion</button>
+        </div>
+        <div class="pick" id="mutPick" style="margin-top:10px"><span id="mutPickLbl">neue Base</span></div>
+        <div class="posbar"><button type="button" class="btn" id="posPrev" aria-label="Eine Base nach links">◀</button><button type="button" class="btn" id="posNext" aria-label="Eine Base nach rechts">▶</button><span class="counter" id="posInfo"></span></div>
+        <div class="btnrow"><button type="button" class="btn" id="btnSichel">Beispiel Sichelzellanämie</button><button type="button" class="btn" id="btnMutReset">Zurücksetzen</button></div>
+        <h3>Ursprüngliche mRNA</h3>
+        <div class="nrow" id="rowOrig" aria-label="Ursprüngliche mRNA"></div>
+        <h3>Mutierte mRNA</h3>
+        <div class="nrow" id="rowMut" aria-label="Mutierte mRNA"></div>
+        <div class="cls" id="clsBox" aria-live="polite"></div>
+        <div class="pcmp" id="pcmp"></div>
+      </div>
+    </section>
+
+    <!-- Training -->
+    <section id="pane-train" hidden>
+      <div class="card">
+        <h2>Training</h2>
+        <div class="seg" id="segTrain" role="group" aria-label="Übungsart">
+          <button type="button" data-t="c2a" aria-pressed="true">Codon zu Aminosäure</button>
+          <button type="button" data-t="a2c" aria-pressed="false">Aminosäure zu Codons</button>
+          <button type="button" data-t="anti" aria-pressed="false">Anticodon</button>
+        </div>
+        <div id="trainBox" style="margin-top:10px"></div>
+        <div class="score" id="trainScore"></div>
+      </div>
+    </section>
+
+    <!-- Aufgaben -->
+    <section id="pane-task" hidden>
+      <div class="card">
+        <h2>Aufgaben</h2>
+        <p class="note" style="margin-top:0">„Versuch einrichten“ stellt die Simulation passend ein. Die Lösungshinweise sind aufklappbar.</p>
+        <div id="taskList"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<details class="teacher">
+  <summary>Hinweise für die Lehrkraft</summary>
+  <div class="inner">
+    <h3>Modellannahmen und Vereinfachungen</h3>
+    <ul>
+      <li>Es gilt der Standardcode. Die Anordnung der Codesonne kann im Schulbuch abweichen (Reihenfolge der Basen, Drehsinn). Die Lernenden sollten immer von innen nach außen lesen.</li>
+      <li>Die Translation ist als Elongationszyklus aus Codon-Erkennung, Peptidbindung und Translokation dargestellt. Die Initiation ist vereinfacht: die kleine Untereinheit sucht das erste AUG, die Start-tRNA trägt Methionin. Elongations- und Terminationsfaktoren sind nur als „Release-Faktor“ angedeutet.</li>
+      <li>Die tRNA ist schematisch. Wackelpaarung (Wobble), Aktivierung der tRNA durch Synthetasen, Spleißen und Polyribosomen werden nicht abgebildet.</li>
+      <li>Das Training akzeptiert dreibuchstabige und einbuchstabige Abkürzungen sowie deutsche Namen. Kleine Tippfehler werden toleriert.</li>
+      <li>Ein Beispiel mit Hämoglobin ist gekürzt und vereinfacht (Stoppcodon ergänzt).</li>
+    </ul>
+    <h3>Einsatz und Anforderungsbereiche</h3>
+    <ul>
+      <li>Die Aufgaben sind mit Anforderungsbereichen (I bis III) und Operatoren gekennzeichnet, die Lösungshinweise können als Erwartungshorizont dienen. Punktezuteilung und Notengebung liegen in deiner Verantwortung und folgen den Fachkonferenzbeschlüssen.</li>
+      <li>Vorschlag für 90 Minuten: Codesonne lesen und Training (20 Minuten), Translation schrittweise mit „Ich wähle die tRNA selbst aus“ (30 Minuten), Mutationen (25 Minuten), Sicherung (15 Minuten).</li>
+      <li>Differenzierung: Unterstützung mit automatischem Ablauf und Aufgaben 1 bis 4. Erweiterung mit Auswahlmodus, Frameshift-Mutationen, Aufgaben 6 und 7.</li>
+    </ul>
+    <h3>Typische Fehlvorstellungen</h3>
+    <ul>
+      <li>„Das Anticodon ist gleich dem Codon.“ Es ist komplementär zum Codon.</li>
+      <li>„Jede Aminosäure hat genau ein Codon.“ Der Code ist degeneriert, aber eindeutig.</li>
+      <li>„Das Ribosom liest von 3′ nach 5′.“ Die mRNA wird von 5′ nach 3′ gelesen.</li>
+      <li>„Das erste Triplett der mRNA ist immer das Startcodon.“ Die Translation beginnt am ersten AUG hinter der 5′-Region.</li>
+      <li>„Mutationen sind immer schädlich.“ Stille Mutationen verändern das Protein nicht.</li>
+    </ul>
+    <h3>Hinweise</h3>
+    <p>Die Zuordnung zum Kerncurriculum Niedersachsen und zu den Zentralabitur-Vorgaben bitte auf nibis.de prüfen. Die Seite speichert keine Daten.</p>
+  </div>
+</details>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- Genetischer Code ---------- */
+const BASES=['U','C','A','G'];
+const AASTR='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+const CODE={};
+BASES.forEach((x,i)=>BASES.forEach((y,j)=>BASES.forEach((z,k)=>{ CODE[x+y+z]=AASTR[16*i+4*j+k]; })));
+const AA={F:['Phenylalanin','Phe','np'],L:['Leucin','Leu','np'],I:['Isoleucin','Ile','np'],M:['Methionin','Met','np'],V:['Valin','Val','np'],S:['Serin','Ser','po'],P:['Prolin','Pro','np'],T:['Threonin','Thr','po'],A:['Alanin','Ala','np'],Y:['Tyrosin','Tyr','po'],H:['Histidin','His','ba'],Q:['Glutamin','Gln','po'],N:['Asparagin','Asn','po'],K:['Lysin','Lys','ba'],D:['Asparaginsäure','Asp','sa'],E:['Glutaminsäure','Glu','sa'],C:['Cystein','Cys','po'],W:['Tryptophan','Trp','np'],R:['Arginin','Arg','ba'],G:['Glycin','Gly','np'],'*':['Stopp','Stopp','st']};
+const CLS={np:'unpolar',po:'polar, ungeladen',ba:'basisch (positiv geladen)',sa:'sauer (negativ geladen)',st:'Stoppsignal'};
+const BYAA={}; Object.keys(CODE).forEach(c=>{ (BYAA[CODE[c]]=BYAA[CODE[c]]||[]).push(c); });
+const COMP={A:'U',U:'A',G:'C',C:'G'};
+const antiOf=c=>c.split('').map(x=>COMP[x]).join('');
+const rev=s=>s.split('').reverse().join('');
+const aaName=a=>a==='*'?'Stopp':`${AA[a][0]} (${AA[a][1]}, ${a})`;
+const ntSpan=(b,cls)=>`<span class="nt ${b}${cls?' '+cls:''}">${b}</span>`;
+const tcol=b=>b==='G'?'#1B1932':'#fff';
+const bcol=b=>`var(--b${b})`;
+
+/* ---------- Zustand ---------- */
+const S={tab:'trans',sel:[null,null,null],zoom:'all',
+  rna:'',type:'mrna',tr:null,i:0,play:false,timer:0,chal:false,solved:{},
+  mut:{m:'sub',pos:null,base:'A'},
+  train:{mode:'c2a',q:null,ok:0,n:0,streak:0}};
+
+/* ---------- Codesonne ---------- */
+const CX=320,CY=320,RR=[46,102,158,214,290];
+const pt=(r,a)=>{ const t=a*Math.PI/180; return [CX+r*Math.sin(t),CY-r*Math.cos(t)]; };
+function sector(r0,r1,a0,a1){
+  const [x0,y0]=pt(r1,a0),[x1,y1]=pt(r1,a1),[x2,y2]=pt(r0,a1),[x3,y3]=pt(r0,a0), lg=(a1-a0)>180?1:0;
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r1} ${r1} 0 ${lg} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}L${x2.toFixed(2)} ${y2.toFixed(2)}A${r0} ${r0} 0 ${lg} 0 ${x3.toFixed(2)} ${y3.toFixed(2)}Z`;
+}
+function radialText(r,a,cls,txt){
+  const [x,y]=pt(r,a), rot=(a>180&&a<360)?a+90:a-90;
+  return `<text class="${cls}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)})">${txt}</text>`;
+}
+function buildSun(){
+  let g='';
+  BASES.forEach((a,i)=>{
+    const a0=90*i, a1=a0+90;
+    g+=`<g class="sec" data-r="1" data-a="${a}"><path d="${sector(RR[0],RR[1],a0,a1)}" fill="${bcol(a)}" fill-opacity=".9"/>${(()=>{const [x,y]=pt(74,(a0+a1)/2);return `<text class="l1" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${a}</text>`;})()}</g>`;
+    BASES.forEach((b,j)=>{
+      const b0=a0+22.5*j, b1=b0+22.5;
+      g+=`<g class="sec" data-r="2" data-a="${a}" data-b="${b}"><path d="${sector(RR[1],RR[2],b0,b1)}" fill="${bcol(b)}" fill-opacity=".55"/>${(()=>{const [x,y]=pt(130,(b0+b1)/2);return `<text class="l2" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${b}</text>`;})()}</g>`;
+      BASES.forEach((c,k)=>{
+        const c0=b0+5.625*k, c1=c0+5.625, cod=a+b+c, aa=CODE[cod], cl=AA[aa][2], mid=(c0+c1)/2;
+        g+=`<g class="sec" data-r="3" data-a="${a}" data-b="${b}" data-c="${c}"><path d="${sector(RR[2],RR[3],c0,c1)}" fill="${bcol(c)}" fill-opacity=".38"/>${(()=>{const [x,y]=pt(186,mid);return `<text class="l3" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${c}</text>`;})()}</g>`;
+        g+=`<g class="sec${cod==='AUG'?' start':''}" data-r="4" data-a="${a}" data-b="${b}" data-c="${c}"><path d="${sector(RR[3],RR[4],c0,c1)}" fill="var(--${cl})"/>${radialText(252,mid,'l4'+(aa==='*'?' st':''),aa==='*'?'Stopp':AA[aa][1])}</g>`;
+      });
+    });
+  });
+  g+=`<circle cx="${CX}" cy="${CY}" r="${RR[0]-2}" fill="var(--stage-2)" stroke="var(--gap)" stroke-width="2"/><text x="${CX}" y="${CY-6}" text-anchor="middle" fill="#E9EBFF" font-size="15" font-weight="700" font-family="var(--body)">mRNA</text><text x="${CX}" y="${CY+14}" text-anchor="middle" fill="#A9B0DC" font-size="12" font-family="var(--body)">5′ → 3′</text>`;
+  $('#sunSvg').innerHTML=g;
+}
+const ZOOMS={all:[0,0,640,640],U:[312,24,304,304],C:[312,312,304,304],A:[24,312,304,304],G:[24,24,304,304]};
+let vbCur=ZOOMS.all.slice(), vbRaf=0;
+function setZoom(z){
+  S.zoom=z; $$('#zoomRow button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.z===z));
+  const from=vbCur.slice(), to=ZOOMS[z], t0=performance.now(), dur=window.matchMedia('(prefers-reduced-motion: reduce)').matches?1:320;
+  cancelAnimationFrame(vbRaf);
+  const step=t=>{ const k=clamp((t-t0)/dur,0,1), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; vbCur=from.map((v,i)=>v+(to[i]-v)*e); $('#sunSvg').setAttribute('viewBox',vbCur.map(v=>v.toFixed(1)).join(' ')); if(k<1) vbRaf=requestAnimationFrame(step); };
+  vbRaf=requestAnimationFrame(step);
+}
+function setSel(a,b,c){ S.sel=[a||null,b||null,c||null]; updateSun(); }
+function setCodon(cod){ if(cod&&cod.length===3) setSel(cod[0],cod[1],cod[2]); else setSel(null,null,null); }
+function updateSun(){
+  const [a,b,c]=S.sel, full=a&&b&&c, aa=full?CODE[a+b+c]:null;
+  $$('#sunSvg .sec').forEach(el=>{
+    const r=+el.dataset.r, ea=el.dataset.a, eb=el.dataset.b, ec=el.dataset.c;
+    let on=true;
+    if(a){ if(r===1) on=ea===a; else on=ea===a&&(!b||eb===b)&&(r<3||!c||ec===c); }
+    const same=full&&(r===3||r===4)&&CODE[ea+eb+ec]===aa&&!(ea===a&&eb===b&&ec===c);
+    const isSel=full&&r>=3&&ea===a&&eb===b&&ec===c;
+    el.classList.toggle('dim',!on&&!same); el.classList.toggle('same',!!same&&r===4); el.classList.toggle('sel',!!isSel||(!!a&&r===1&&ea===a&&!b)||(!!b&&r===2&&ea===a&&eb===b&&!c));
+  });
+  [1,2,3].forEach((n,idx)=>{ $$('#pick'+n+' button').forEach(bt=>bt.setAttribute('aria-pressed',S.sel[idx]===bt.dataset.b)); });
+  const box=$('#sunInfo');
+  if(!a) box.innerHTML='<h3>Bereit zum Lesen</h3><p>Tippe in der Codesonne auf einen Bereich oder wähle die drei Basen eines Codons. Du siehst dann die Aminosäure und alle Codons, die für sie codieren.</p>';
+  else if(!b) box.innerHTML=`<h3>1. Base: ${a}</h3><p>Wähle als Nächstes die 2. Base. Alle Codons, die mit ${a} beginnen, liegen im markierten Viertel.</p>`;
+  else if(!c) box.innerHTML=`<h3>Beginn: ${a}${b}</h3><p>Diese vier Codons beginnen mit ${a}${b}. Die 3. Base entscheidet:</p><div class="chips">${BASES.map(x=>{const cd=a+b+x,ac=CODE[cd];return `<button type="button" class="chip" data-codon="${cd}">${cd} ${ac==='*'?'Stopp':AA[ac][1]}</button>`;}).join('')}</div>`;
+  else {
+    const cod=a+b+c, info=AA[aa], same=BYAA[aa].filter(x=>x!==cod);
+    const special=cod==='AUG'?'Startcodon: Hier beginnt die Translation.':(aa==='*'?'Stoppcodon: Hier endet die Translation. Es gibt keine tRNA für dieses Codon.':'');
+    box.innerHTML=`<div class="codonbig">${cod.split('').map(x=>ntSpan(x)).join('')}</div>
+      <h3 style="margin-top:0">${aa==='*'?'Stoppcodon':esc(info[0])+' ('+info[1]+', '+aa+')'}</h3>
+      <ul class="props"><li>Lesen: 1. Base ${a}, 2. Base ${b}, 3. Base ${c}</li>${aa==='*'?'':`<li>Eigenschaft: ${CLS[info[2]]}</li>`}${special?`<li><b>${special}</b></li>`:''}${aa==='*'?'':`<li>Anticodon der tRNA (3′→5′): <span class="mono"><b>${antiOf(cod)}</b></span>, in 5′→3′-Schreibweise ${rev(antiOf(cod))}</li>`}</ul>
+      <p style="margin-bottom:2px"><b>${aa==='*'?'Alle Stoppcodons':'Weitere Codons für dieselbe Aminosäure ('+same.length+')'}:</b></p><div class="chips">${same.map(x=>`<button type="button" class="chip" data-codon="${x}">${x}</button>`).join('')||'<span class="note">Keine weiteren: Diese Aminosäure hat nur ein Codon.</span>'}</div>`;
+  }
+}
+function buildSunUI(){
+  buildSun();
+  $('#zoomRow').insertAdjacentHTML('beforeend',[['all','Ganz'],['U','U'],['C','C'],['A','A'],['G','G']].map(z=>`<button type="button" data-z="${z[0]}" aria-pressed="${z[0]==='all'}" ${z[0]==='all'?'':`aria-label="Nur Codons mit ${z[0]} als 1. Base"`}>${z[1]}</button>`).join(''));
+  [1,2,3].forEach(n=>{ $('#pick'+n).insertAdjacentHTML('beforeend',BASES.map(b=>`<button type="button" class="${b}" data-b="${b}" data-n="${n}" aria-pressed="false">${b}</button>`).join('')); });
+  $('#sunLegend').innerHTML=[['np','unpolar'],['po','polar'],['ba','basisch'],['sa','sauer'],['st','Stopp']].map(x=>`<li><i style="background:var(--${x[0]});${x[0]==='st'?'border:1px solid #A9B0DC':''}"></i>${x[1]}</li>`).join('')+'<li><i style="background:transparent;border:2px solid var(--accent)"></i>gleiche Aminosäure bzw. Start</li>';
+  $('#zoomRow').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) setZoom(b.dataset.z); });
+  $('#sunSvg').addEventListener('click',e=>{
+    const el=e.target.closest('.sec'); if(!el) return; const r=+el.dataset.r, a=el.dataset.a, b=el.dataset.b, c=el.dataset.c;
+    if(r===1){ setSel(a,null,null); if(window.matchMedia('(max-width:999px)').matches) setZoom(a); }
+    else if(r===2) setSel(a,b,null); else setSel(a,b,c);
+  });
+  [1,2,3].forEach(n=>$('#pick'+n).addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const s=S.sel.slice(); s[n-1]=(s[n-1]===b.dataset.b)?null:b.dataset.b; if(n===1){ s[1]=s[1]; } for(let k=0;k<3;k++){ if(k>0&&!s[k-1]) s[k]=null; } setSel(s[0],s[1],s[2]); }));
+  $('#sunInfo').addEventListener('click',e=>{ const b=e.target.closest('[data-codon]'); if(b) setCodon(b.dataset.codon); });
+}
+
+/* ---------- Eingabe und Aufbereitung ---------- */
+const PRESETS=[
+ {id:'kurz',nm:'Kurzes Beispiel (mRNA)',type:'mrna',seq:'GGCGCCAUGUUUGGCCAUAAGGAAUGACGC'},
+ {id:'hbb',nm:'Hämoglobin, β-Kette (Anfang, vereinfacht)',type:'mrna',seq:'GCAUCAAUGGUGCAUCUGACUCCUGAGGAGAAGUCUGCCGUUACUGCCCUGUGGGGCAAGUAAGC'},
+ {id:'cod',nm:'Codogener Strang (3′→5′)',type:'codogen',seq:'TACAAACCGGTATTTACT'},
+ {id:'sinn',nm:'Codierender Strang (5′→3′)',type:'coding',seq:'ATGTTTGGCCATAAATGA'},
+ {id:'leer',nm:'Eigene Sequenz eingeben',type:'mrna',seq:''}
+];
+const MAXNT=180;
+function toMRNA(text,type){
+  let t=text.toUpperCase().replace(/[^ACGTU]/g,'');
+  if(type==='codogen') return t.replace(/U/g,'T').split('').map(x=>({A:'U',T:'A',G:'C',C:'G'}[x])).join('');
+  return t.replace(/T/g,'U');
+}
+function translateFrom(rna,s){
+  const aas=[],codons=[];
+  for(let i=s;i+3<=rna.length;i+=3){ const c=rna.substr(i,3), a=CODE[c]; codons.push(c); if(a==='*') return {aas,codons,stop:true,end:i+3}; aas.push(a); }
+  return {aas,codons,stop:false,end:s+codons.length*3};
+}
+function groupSeq(rna,s,end){
+  let h='';
+  for(let i=0;i<rna.length;i++){
+    const inside=s>=0&&i>=s&&i<end;
+    if(inside&&(i-s)%3===0) h+=(i>s?'</span>':'')+'<span class="cdn" data-m="'+((i-s)/3)+'">';
+    if(s>=0&&i===end&&end>s) h+='</span>';
+    h+=`<span class="${inside?'':'dimn'}">${rna[i]}</span>`;
+  }
+  if(s>=0&&end>=rna.length&&end>s) h+='</span>';
+  return h;
+}
+
+/* ---------- Schritte der Translation ---------- */
+const STEP_TXT={
+ scan:()=>['Initiation: Startcodon suchen','Die kleine Untereinheit des Ribosoms lagert sich an die mRNA an und wandert in 5′→3′-Richtung, bis sie das erste Startcodon AUG findet.','Merke: Die Translation beginnt nicht am ersten Nucleotid der mRNA, sondern am ersten AUG.'],
+ init:(T)=>['Initiation: Start-tRNA und große Untereinheit','Die Start-tRNA mit dem Anticodon UAC trägt Methionin und paart mit dem Startcodon AUG. Dann lagert sich die große Untereinheit an. Das Ribosom ist vollständig, die Start-tRNA sitzt in der P-Stelle.','Merke: Jede Polypeptidkette beginnt zunächst mit Methionin.'],
+ recog:(T,st)=>{ const c=T.codons[st.m], a=T.aas[st.m]; return ['Elongation 1: Codon-Erkennung',`Das Codon ${c} liegt in der A-Stelle. Eine tRNA mit dem komplementären Anticodon ${antiOf(c)} (trägt ${AA[a][0]}) lagert sich per Basenpaarung an.`,'Merke: Das Anticodon ist komplementär zum Codon, nicht gleich. Dadurch wird der Code in Aminosäuren übersetzt.']; },
+ bond:(T,st)=>['Elongation 2: Peptidbindung',`Das Ribosom knüpft eine Peptidbindung: Die Aminosäurekette wird von der tRNA in der P-Stelle auf die Aminosäure in der A-Stelle übertragen. Die Kette ist jetzt ${st.m+1} Aminosäuren lang.`,'Merke: Die Kette wächst immer am Carboxy-Ende (C-Terminus).'],
+ transloc:(T,st)=>['Elongation 3: Translokation','Das Ribosom rückt um ein Codon (3 Nucleotide) in 5′→3′-Richtung weiter. Die leere tRNA wandert in die E-Stelle und verlässt das Ribosom. Die A-Stelle ist wieder frei.','Merke: A-Stelle (Ankunft), P-Stelle (Peptidkette), E-Stelle (Exit).'],
+ stopA:(T)=>['Termination: Stoppcodon',`In der A-Stelle liegt das Stoppcodon ${T.codons[T.codons.length-1]}. Es gibt keine tRNA mit passendem Anticodon. Stattdessen bindet ein Freisetzungsfaktor (Release-Faktor).`,'Merke: Stoppcodons codieren keine Aminosäure.'],
+ release:(T)=>['Termination: Freisetzung',`Das fertige Polypeptid mit ${T.aas.length} Aminosäuren wird von der letzten tRNA gelöst und freigesetzt. Ribosom, tRNA und mRNA trennen sich.`,'Merke: Danach faltet sich das Polypeptid zur funktionsfähigen räumlichen Struktur.'],
+ noend:(T)=>['Kein Stoppcodon','Im Leseraster folgt kein Stoppcodon mehr. Das Ribosom erreicht das Ende der mRNA. In der Zelle würde die Translation nicht regulär beendet.','Merke: Ein fehlendes Stoppcodon kann zu verlängerten oder abgebauten Proteinen führen.']
+};
+function buildSteps(rna){
+  const s=rna.indexOf('AUG'); if(s<0) return null;
+  const tr=translateFrom(rna,s), N=tr.aas.length-1, steps=[];
+  const T={rna,s,codons:tr.codons,aas:tr.aas,stop:tr.stop,end:tr.end,N};
+  steps.push({k:'scan',idxP:0,P:null,A:null,E:null,large:false,hi:-1,codon:'AUG'});
+  steps.push({k:'init',idxP:s,P:0,Pb:true,Pc:true,A:null,E:null,large:true,hi:0,codon:tr.codons.length>1?tr.codons[1]:null});
+  for(let m=1;m<=N;m++){
+    steps.push({k:'recog',m,idxP:s+3*(m-1),P:m-1,Pb:true,Pc:true,A:m,Ab:true,Ac:false,E:null,large:true,hi:m,codon:T.codons[m]});
+    steps.push({k:'bond',m,idxP:s+3*(m-1),P:m-1,Pb:false,Pc:false,A:m,Ab:true,Ac:true,E:null,large:true,hi:m,codon:T.codons[m]});
+    steps.push({k:'transloc',m,idxP:s+3*m,P:m,Pb:true,Pc:true,A:null,E:m-1,large:true,hi:m+1<T.codons.length?m+1:-1,codon:T.codons[m+1]||null});
+  }
+  if(tr.stop){
+    const sc=T.codons[T.codons.length-1];
+    steps.push({k:'stopA',idxP:s+3*N,P:N,Pb:true,Pc:true,A:null,rf:true,E:N>0?N-1:null,large:true,hi:N+1,codon:sc});
+    steps.push({k:'release',idxP:s+3*N,P:N,Pb:false,Pc:false,A:null,rf:true,E:null,large:true,split:true,hi:N+1,codon:sc,released:true});
+  } else steps.push({k:'noend',idxP:s+3*N,P:N,Pb:true,Pc:true,A:null,E:N>0?N-1:null,large:true,hi:-1,codon:null});
+  T.steps=steps; return T;
+}
+
+/* ---------- Translation: Zeichnung ---------- */
+const XS={E:248,P:320,A:392};
+function buildTransSVG(T){
+  const len=T.rna.length;
+  let mr='';
+  for(let i=0;i<len;i++){
+    const b=T.rna[i], inCod=i>=T.s&&i<T.end, op=inCod?1:.5;
+    mr+=`<g opacity="${op}"><rect x="${i*24+1}" y="178" width="22" height="30" rx="4" fill="${bcol(b)}"/><text x="${i*24+12}" y="199" text-anchor="middle" font-size="17" font-weight="700" font-family="var(--mono)" fill="${tcol(b)}">${b}</text></g>`;
+  }
+  mr+=`<rect x="${T.s*24-1}" y="175" width="74" height="36" rx="6" fill="none" stroke="var(--accent)" stroke-width="3"/>`;
+  if(T.stop) mr+=`<rect x="${(T.end-3)*24-1}" y="175" width="74" height="36" rx="6" fill="none" stroke="#FF6B6B" stroke-width="3"/>`;
+  mr+=`<text x="-8" y="199" text-anchor="end" font-size="15" fill="#A9B0DC" font-weight="700">5′</text><text x="${len*24+8}" y="199" font-size="15" fill="#A9B0DC" font-weight="700">3′</text>`;
+  let tr='';
+  for(let m=0;m<=T.N;m++){
+    const cod=T.codons[m], anti=antiOf(cod), aa=T.aas[m], cl=AA[aa][2];
+    tr+=`<g class="trna" id="tr${m}" style="transform:translate(${XS.A+140}px,-24px);opacity:0">
+      <g class="chain"></g>
+      <g class="beadg"><circle cx="0" cy="92" r="15" fill="var(--${cl})" stroke="#fff" stroke-width="2"/><text x="0" y="96" text-anchor="middle" font-size="11" font-weight="700" fill="#0B0F26">${AA[aa][1]}</text></g>
+      <path d="M0 107V134" stroke="var(--trna)" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="-27" cy="121" r="8" fill="var(--trna)"/><circle cx="27" cy="121" r="8" fill="var(--trna)"/>
+      <rect x="-36" y="132" width="72" height="30" rx="9" fill="var(--trna)"/>
+      ${anti.split('').map((x,k)=>`<rect x="${-35+k*24}" y="135" width="22" height="24" rx="4" fill="${bcol(x)}"/><text x="${-24+k*24}" y="153" text-anchor="middle" font-size="15" font-weight="700" font-family="var(--mono)" fill="${tcol(x)}">${x}</text>`).join('')}
+      ${[0,1,2].map(k=>`<path d="M${-24+k*24} 162V176" stroke="#E9EBFF" stroke-width="2" stroke-dasharray="3 3"/>`).join('')}
+    </g>`;
+  }
+  const svg=`<defs><clipPath id="cpT"><rect x="0" y="0" width="640" height="300"/></clipPath></defs>
+   <g id="gFree" style="opacity:0;transition:opacity .6s"></g>
+   <g class="sub" id="gLarge"><rect x="190" y="62" width="260" height="110" rx="24" fill="#3F4AA8" fill-opacity=".55" stroke="#8E96D8" stroke-width="2.5"/><text x="196" y="55" font-size="12" fill="#C9CEF5" font-weight="700">große Untereinheit</text></g>
+   <g id="gMrna" style="transform:translate(284px,0)">${mr}</g>
+   <g class="sub" id="gSmall"><path d="M198 216Q320 244 442 216L432 266Q320 288 208 266Z" fill="#5A66C8" fill-opacity=".7" stroke="#8E96D8" stroke-width="2.5"/><text x="248" y="258" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">E</text><text x="320" y="262" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">P</text><text x="392" y="258" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">A</text><text x="320" y="279" text-anchor="middle" font-size="11" fill="#C9CEF5" font-weight="700">kleine Untereinheit</text></g>
+   ${tr}
+   <g class="trna" id="rf" style="transform:translate(${XS.A+140}px,-24px);opacity:0"><rect x="-32" y="104" width="64" height="60" rx="16" fill="var(--rf)"/><text x="0" y="141" text-anchor="middle" font-size="18" font-weight="800" fill="#1B1932">RF</text></g>
+   <text x="624" y="26" text-anchor="end" font-size="12" fill="#A9B0DC" id="dirLbl">Leserichtung →</text>`;
+  $('#transSvg').innerHTML=svg;
+  setTransViewBox();
+}
+function setTransViewBox(){ const w=$('#transSvg').parentElement.clientWidth; $('#transSvg').setAttribute('viewBox',w&&w<620?'110 0 420 300':'0 0 640 300'); }
+function chainHTML(T,m){
+  const n=m; if(n<=0) return '';
+  let h=`<path d="M0 92V${n>2?26:(n===1?66:40)}" stroke="#E9EBFF" stroke-width="3" opacity=".7"/>`;
+  for(let j=1;j<=Math.min(n,2);j++){ const a=T.aas[m-j], y=92-26*j; h+=`<circle cx="0" cy="${y}" r="9" fill="var(--${AA[a][2]})" stroke="#fff" stroke-width="1.5"/><text x="0" y="${y+3.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#0B0F26">${a}</text>`; }
+  if(n>2) h+=`<text x="0" y="22" text-anchor="middle" font-size="12" fill="#E9EBFF" font-weight="700">+${n-2}</text>`;
+  return h;
+}
+function applyStep(){
+  const T=S.tr; if(!T) return; const st=T.steps[S.i];
+  const hold=st.k==='recog'&&S.chal&&!S.solved[S.i];
+  const A=hold?null:st.A, Ab=hold?false:st.Ab;
+  $('#gMrna').style.transform=`translate(${284-st.idxP*24}px,0)`;
+  const lg=$('#gLarge'), sm=$('#gSmall');
+  lg.style.opacity=st.large?1:0; lg.style.transform=st.split?'translateY(-26px)':'translateY(0)';
+  sm.style.opacity=st.split?.55:1; sm.style.transform=st.split?'translateY(14px)':'translateY(0)';
+  const act=[st.P,A,st.E].filter(v=>v!==null&&v!==undefined);
+  const maxA=act.length?Math.max(...act):-1, minA=act.length?Math.min(...act):999;
+  for(let m=0;m<=T.N;m++){
+    const el=$('#tr'+m); let site=null;
+    if(m===st.P) site='P'; else if(m===A) site='A'; else if(m===st.E) site='E';
+    let tx,ty=0,op=1;
+    if(site){ tx=XS[site]; } else if(act.length&&m<minA){ tx=XS.E-130; ty=-20; op=0; } else { tx=XS.A+140; ty=-24; op=0; }
+    if(st.k==='scan'||(!act.length&&m>0)){ tx=XS.A+140; ty=-24; op=0; if(m===0&&st.k==='scan'){ tx=XS.P; ty=-40; op=0; } }
+    el.style.transform=`translate(${tx}px,${ty}px)`; el.style.opacity=op;
+    const isP=site==='P', isA=site==='A';
+    const showBead=(isP&&st.Pb)||(isA&&Ab)||(site==='E'&&false);
+    const showChain=(isP&&st.Pc)||(isA&&st.Ac&&!hold);
+    el.querySelector('.beadg').style.opacity=showBead?1:0;
+    el.querySelector('.chain').innerHTML=showChain?chainHTML(T,m):'';
+  }
+  const rf=$('#rf'); if(st.rf){ rf.style.transform=`translate(${XS.A}px,0px)`; rf.style.opacity=1; } else { rf.style.transform=`translate(${XS.A+140}px,-24px)`; rf.style.opacity=0; }
+  // freies Polypeptid
+  const fr=$('#gFree');
+  if(st.released){ const n=T.aas.length, sp=Math.min(24,360/n); let h=''; T.aas.forEach((a,k)=>{ h+=`<circle cx="${320-(n-1)*sp/2+k*sp}" cy="30" r="${Math.min(11,sp/2)}" fill="var(--${AA[a][2]})" stroke="#fff" stroke-width="1.5"/>`; }); fr.innerHTML=h+`<text x="320" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#E9EBFF">fertiges Polypeptid (${n} Aminosäuren)</text>`; fr.style.opacity=1; }
+  else { fr.style.opacity=0; }
+  // Text
+  const [ti,tx2,me]=STEP_TXT[st.k](T,st);
+  $('#stTitle').textContent=ti; $('#stText').textContent=tx2; $('#stMerke').textContent=me;
+  $('#counter').textContent=`Schritt ${S.i+1} von ${T.steps.length}`;
+  $('#btnPrev').disabled=S.i===0;
+  const blocked=hold;
+  $('#btnNext').disabled=S.i>=T.steps.length-1||blocked;
+  renderChal(); renderCodonCard(); renderPep(); renderMseq();
+  if(st.codon) setCodon(st.codon);
+}
+function renderChal(){
+  const T=S.tr, box=$('#chal'), st=T&&T.steps[S.i];
+  if(!T||!S.chal||st.k!=='recog'){ box.hidden=true; return; }
+  box.hidden=false;
+  const m=st.m, cod=T.codons[m], right=antiOf(cod);
+  if(S.solved[S.i]){ box.innerHTML=`<b>Richtig.</b> Die tRNA mit dem Anticodon ${right} passt zum Codon ${cod}.`; return; }
+  if(!T.opts) T.opts={};
+  if(!T.opts[S.i]){
+    const set=new Set([right]); const pool=[cod,antiOf(cod).split('').reverse().join('')];
+    pool.forEach(x=>{ if(x!==right&&set.size<3) set.add(x); });
+    let guard=0; while(set.size<3&&guard++<50){ const r=cod.split('').map(()=>BASES[Math.floor(Math.random()*4)]).join(''); set.add(r); }
+    const arr=Array.from(set); for(let k=arr.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [arr[k],arr[j]]=[arr[j],arr[k]]; }
+    T.opts[S.i]=arr;
+  }
+  box.innerHTML=`<b>Das Codon ${cod} liegt in der A-Stelle. Welche tRNA passt (Anticodon in 3′→5′-Schreibweise)?</b><div class="opts">${T.opts[S.i].map(a=>{ const aaT=CODE[a]||'?'; return `<button type="button" class="opt" data-anti="${a}">Anticodon ${a}</button>`; }).join('')}</div><div id="chalFb" aria-live="polite"></div>`;
+}
+$('#chal').addEventListener('click',e=>{
+  const b=e.target.closest('[data-anti]'); if(!b) return; const T=S.tr, st=T.steps[S.i], cod=T.codons[st.m], right=antiOf(cod), a=b.dataset.anti, fb=$('#chalFb');
+  if(a===right){ S.solved[S.i]=true; applyStep(); return; }
+  let why='Die Basen passen nicht zusammen. Es paaren sich A mit U und G mit C.';
+  if(a===cod) why='Das ist das Codon selbst. Das Anticodon ist komplementär zum Codon.';
+  else if(a===rev(right)) why='Die Basen sind richtig, aber in falscher Reihenfolge. Beide Stränge liegen antiparallel. In 3′→5′-Schreibweise steht das Anticodon unter dem Codon in gleicher Reihenfolge.';
+  fb.innerHTML=`<div class="fb no">Nicht ganz. ${why}</div>`;
+});
+function renderCodonCard(){
+  const T=S.tr, st=T.steps[S.i]; let h='';
+  if(st.codon){ const c=st.codon, a=CODE[c]; h=`<div class="codonbig">${c.split('').map(x=>ntSpan(x)).join('')}</div><p style="margin:2px 0">${a==='*'?'<b>Stoppcodon</b>: keine tRNA, keine Aminosäure.':`Anticodon (3′→5′): <b class="mono">${antiOf(c)}</b>. Aminosäure: <b>${esc(AA[a][0])} (${AA[a][1]})</b>.`}</p><button type="button" class="linkbtn" id="btnShowSun">In der Codesonne zeigen</button>`; }
+  else h='<p class="note">Zurzeit liegt kein Codon an der A-Stelle.</p>';
+  $('#codonCard').innerHTML=h;
+}
+$('#codonCard').addEventListener('click',e=>{ if(e.target.closest('#btnShowSun')){ setCodon(S.tr.steps[S.i].codon); if(!window.matchMedia('(min-width:1000px)').matches) setTab('sonne'); } });
+function renderPep(){
+  const T=S.tr, st=T.steps[S.i]; let n=0, fresh=-1;
+  if(st.k==='init'||st.k==='transloc'||st.k==='stopA'||st.k==='release'||st.k==='noend') n=(st.k==='init')?1:(st.k==='transloc'?st.m+1:T.aas.length);
+  else if(st.k==='recog') n=st.m; else if(st.k==='bond') n=st.m+1;
+  if(st.k==='scan') n=0;
+  fresh=(st.k==='bond')?st.m:(st.k==='init'?0:-1);
+  $('#pep').innerHTML=n?T.aas.slice(0,n).map((a,k)=>`<span class="chip aa c-${AA[a][2]}${k===fresh?' new':''}" title="${AA[a][0]}">${AA[a][1]}</span>`).join(''):'<span class="note">Noch keine Aminosäure verknüpft.</span>';
+}
+function renderMseq(){
+  const T=S.tr, st=T.steps[S.i];
+  $$('#mseq .cdn').forEach(el=>el.classList.toggle('cur',+el.dataset.m===st.hi));
+}
+function stepTo(i){ S.i=clamp(i,0,S.tr.steps.length-1); applyStep(); }
+$('#btnNext').addEventListener('click',()=>{ if(S.tr) stepTo(S.i+1); });
+$('#btnPrev').addEventListener('click',()=>{ if(S.tr) stepTo(S.i-1); });
+function stopPlay(){ S.play=false; clearInterval(S.timer); $('#btnPlay').setAttribute('aria-pressed','false'); $('#btnPlay').textContent='Automatisch'; }
+$('#btnPlay').addEventListener('click',()=>{
+  if(!S.tr) return; if(S.play){ stopPlay(); return; }
+  if(S.i>=S.tr.steps.length-1) stepTo(0);
+  S.play=true; $('#btnPlay').setAttribute('aria-pressed','true'); $('#btnPlay').textContent='Anhalten';
+  S.timer=setInterval(()=>{ const st=S.tr.steps[S.i]; if(S.i>=S.tr.steps.length-1){ stopPlay(); return; } if(S.chal&&S.tr.steps[S.i+1].k==='recog'&&!S.solved[S.i+1]){ stepTo(S.i+1); stopPlay(); return; } stepTo(S.i+1); },1600);
+});
+$('#chkChal').addEventListener('change',e=>{ S.chal=e.target.checked; if(S.play) stopPlay(); if(S.tr) applyStep(); });
+
+/* ---------- Eingabe anwenden ---------- */
+function applySeq(raw,type,keepStep){
+  stopPlay();
+  let rna=toMRNA(raw,type), msg='';
+  if(rna.length>MAXNT){ rna=rna.slice(0,MAXNT); msg=`Die Sequenz wurde auf ${MAXNT} Nucleotide gekürzt. `; }
+  S.rna=rna; S.type=type; S.solved={}; S.i=0;
+  const d=$('#derived');
+  if(rna.length<3){ S.tr=null; $('#applyMsg').textContent='Bitte gib mindestens 3 Nucleotide ein.'; d.innerHTML=''; showTransUI(false); return; }
+  const T=buildSteps(rna);
+  const pre=(type==='codogen')?'<p class="note">Die mRNA ist komplementär zum codogenen Strang (A→U, T→A, G→C, C→G).</p>':(type==='coding'?'<p class="note">Die mRNA hat dieselbe Sequenz wie der codierende Strang, nur mit U statt T.</p>':'');
+  if(!T){ S.tr=null; $('#applyMsg').textContent=msg+'In dieser mRNA gibt es kein Startcodon AUG, die Translation kann nicht beginnen.'; d.innerHTML=pre+`<p class="mseq">5′-${rna}-3′</p>`; showTransUI(false); renderMut(); return; }
+  S.tr=T; $('#applyMsg').textContent=msg+(T.stop?'':'Hinweis: Im Leseraster folgt kein Stoppcodon. ')+`Startcodon bei Position ${T.s+1}, ${T.aas.length} Aminosäure${T.aas.length===1?'':'n'}.`;
+  d.innerHTML=pre+`<p class="note" style="margin-bottom:0">Abgeleitete mRNA (5′→3′):</p><p class="mseq" style="margin-top:0">5′-${groupSeq(rna,T.s,T.end)}-3′</p>`;
+  $('#mseq').innerHTML=`5′-${groupSeq(rna,T.s,T.end)}-3′`;
+  showTransUI(true); buildTransSVG(T); applyStep(); renderMut();
+}
+function showTransUI(on){
+  $('#transSvg').parentElement.hidden=!on; $('.steprow').hidden=!on; $('#chkChal').parentElement.hidden=!on;
+  if(!on){ $('#chal').hidden=true; ['#stTitle','#stText','#stMerke','#counter'].forEach(x=>{ $(x).textContent=''; }); ['#codonCard','#pep','#mseq'].forEach(x=>{ $(x).innerHTML=''; }); }
+}
+$('#selPreset').innerHTML=PRESETS.map(p=>`<option value="${p.id}">${p.nm}</option>`).join('');
+$('#selPreset').addEventListener('change',e=>{ const p=PRESETS.find(x=>x.id===e.target.value); $('#selType').value=p.type; $('#taSeq').value=p.seq; if(p.seq) applySeq(p.seq,p.type); else { $('#taSeq').focus(); } });
+$('#selType').addEventListener('change',()=>{ $('#selPreset').value='leer'; });
+$('#taSeq').addEventListener('input',()=>{ $('#selPreset').value='leer'; });
+$('#btnApply').addEventListener('click',()=>applySeq($('#taSeq').value,$('#selType').value));
+function loadPreset(id){ const p=PRESETS.find(x=>x.id===id); $('#selPreset').value=id; $('#selType').value=p.type; $('#taSeq').value=p.seq; applySeq(p.seq,p.type); }
+
+/* ---------- Mutationen ---------- */
+function mutate(rna,m,pos,base){
+  if(pos==null||pos<0||pos>=rna.length) return rna;
+  if(m==='sub') return rna.slice(0,pos)+base+rna.slice(pos+1);
+  if(m==='ins') return rna.slice(0,pos)+base+rna.slice(pos);
+  return rna.slice(0,pos)+rna.slice(pos+1);
+}
+function analyze(r0,r1,m,pos){
+  const s0=r0.indexOf('AUG'), s1=r1.indexOf('AUG');
+  const t0=s0>=0?translateFrom(r0,s0):null, t1=s1>=0?translateFrom(r1,s1):null;
+  const p0=t0?t0.aas:[], p1=t1?t1.aas:[];
+  const same=p0.join('')===p1.join('')&&(t0?t0.stop:false)===(t1?t1.stop:false);
+  if(r0===r1) return {cls:'Keine Veränderung',txt:'Die gewählte Base ist bereits vorhanden. Wähle eine andere Base.',tone:''};
+  if(!t0) return {cls:'Kein Ausgangsprotein',txt:'Die ursprüngliche mRNA hat kein Startcodon.',tone:''};
+  const inCod=pos>=s0&&pos<t0.end;
+  if(m==='sub'){
+    if(!inCod){ return same?{cls:'Mutation außerhalb des codierenden Bereichs',txt:'Die Base liegt vor dem Startcodon oder hinter dem Stoppcodon. Die Aminosäuresequenz bleibt unverändert.',tone:'ok'}:{cls:'Neues oder verlorenes Startcodon',txt:'Die Veränderung liegt außerhalb des ursprünglichen Leserasters, verändert aber, wo die Translation beginnt. Das Protein ist verändert.',tone:'no'}; }
+    const k=Math.floor((pos-s0)/3), c0=r0.substr(s0+3*k,3), c1=r1.substr(s0+3*k,3), a0=CODE[c0], a1=CODE[c1];
+    if(k===0&&a1!=='M') return {cls:'Startcodon verändert',txt:`Aus AUG wurde ${c1}. Die Translation beginnt erst am nächsten AUG oder gar nicht. Das Protein fehlt oder ist stark verändert.`,tone:'no'};
+    if(a0===a1) return {cls:'Stille Mutation (Punktmutation)',txt:`Das Codon ${c0} wurde zu ${c1}. Beide codieren ${a0==='*'?'Stopp':aaName(a0)}. Der Code ist degeneriert, deshalb bleibt die Aminosäuresequenz gleich.`,tone:'ok'};
+    if(a1==='*') return {cls:'Nonsense-Mutation (Punktmutation)',txt:`Aus ${c0} (${aaName(a0)}) wurde das Stoppcodon ${c1}. Die Kette bricht nach ${k} Aminosäuren ab. Das Protein ist verkürzt und meist funktionslos.`,tone:'no'};
+    if(a0==='*') return {cls:'Stoppcodon verloren (Punktmutation)',txt:`Aus dem Stoppcodon ${c0} wurde ${c1} (${aaName(a1)}). Die Translation läuft weiter, das Protein wird verlängert.`,tone:'no'};
+    const cl0=AA[a0][2], cl1=AA[a1][2];
+    return {cls:'Missense-Mutation (Punktmutation)',txt:`Das Codon ${c0} wurde zu ${c1}. Aus ${aaName(a0)} wird ${aaName(a1)} (${CLS[cl0]} zu ${CLS[cl1]}). ${cl0===cl1?'Die Eigenschaft bleibt ähnlich, die Auswirkung ist oft gering.':'Die Eigenschaft ändert sich, das kann die Raumstruktur und Funktion beeinflussen.'}`,tone:'no'};
+  }
+  if(!inCod) return same?{cls:'Mutation außerhalb des codierenden Bereichs',txt:'Die Veränderung liegt vor dem Startcodon oder hinter dem Stoppcodon. Die Aminosäuresequenz bleibt unverändert.',tone:'ok'}:{cls:'Neues oder verlorenes Startcodon',txt:'Die Veränderung liegt außerhalb des ursprünglichen Leserasters, verändert aber den Startpunkt der Translation.',tone:'no'};
+  let diff=0; while(diff<p0.length&&diff<p1.length&&p0[diff]===p1[diff]) diff++;
+  return {cls:'Rasterschubmutation (Frameshift)',txt:`Eine Base wurde ${m==='ins'?'eingefügt':'entfernt'}. Alle Codons dahinter verschieben sich. Ab Aminosäure ${diff+1} ist die Sequenz verändert. ${t1&&t1.stop?`Das Protein hat jetzt ${p1.length} statt ${p0.length} Aminosäuren.`:'Es folgt kein Stoppcodon mehr im Leseraster.'}`,tone:'no'};
+}
+function ntRowSel(rna,s,end,selPos,chgPos){
+  let h='';
+  for(let i=0;i<rna.length;i++){
+    const inside=s>=0&&i>=s&&i<end;
+    if(inside&&(i-s)%3===0) h+='<span class="g">';
+    const cls=`nt ${rna[i]}${inside?'':' dimn'}${selPos===i?' selp':''}${chgPos===i?' chg':''}`;
+    h+=selPos!==undefined&&selPos!==-2?`<button type="button" class="${cls}" data-i="${i}" aria-label="Base ${i+1}, ${rna[i]}">${rna[i]}</button>`:`<span class="${cls}">${rna[i]}</span>`;
+    if(inside&&((i-s)%3===2||i===end-1)) h+='</span>';
+  }
+  return h;
+}
+function protRow(arr,other,stop,label){
+  return `<div class="lab">${label}</div><div class="pep">${arr.length?arr.map((a,k)=>`<span class="chip aa c-${AA[a][2]}${other&&other[k]!==a?' diff':''}" title="${AA[a][0]}">${AA[a][1]}</span>`).join(''):'<span class="note">kein Protein</span>'}${stop?'<span class="chip aa c-st">Stopp</span>':''}</div>`;
+}
+function renderMut(){
+  const rna=S.rna, M=S.mut;
+  const has=rna&&rna.length>=3;
+  if(!has){ $('#rowOrig').innerHTML='<span class="note">Gib zuerst im Bereich Translation eine mRNA ein.</span>'; $('#rowMut').innerHTML=''; $('#clsBox').hidden=true; $('#pcmp').innerHTML=''; $('#posInfo').textContent=''; return; }
+  if(M.pos===null||M.pos>=rna.length) M.pos=Math.min(rna.length-1,Math.max(0,rna.indexOf('AUG')>=0?rna.indexOf('AUG')+3:0));
+  $('#clsBox').hidden=false;
+  const s0=rna.indexOf('AUG'), t0=s0>=0?translateFrom(rna,s0):null;
+  const r1=mutate(rna,M.m,M.pos,M.base), s1=r1.indexOf('AUG'), t1=s1>=0?translateFrom(r1,s1):null;
+  $('#rowOrig').innerHTML=ntRowSel(rna,s0,t0?t0.end:-1,M.pos,undefined);
+  let chg=-1; if(M.m!=='del') chg=M.pos;
+  $('#rowMut').innerHTML=ntRowSel(r1,s1,t1?t1.end:-1,-2,chg);
+  let posTxt=`Position ${M.pos+1} von ${rna.length}`;
+  if(t0&&M.pos>=s0&&M.pos<t0.end){ const k=Math.floor((M.pos-s0)/3), w=(M.pos-s0)%3; posTxt+=`, Codon ${k+1}, ${w+1}. Base`; } else posTxt+=', außerhalb des Leserasters';
+  $('#posInfo').textContent=posTxt;
+  $('#mutPickLbl').textContent=M.m==='ins'?'einfügen vor Position':'neue Base';
+  $('#mutPick').hidden=M.m==='del';
+  $$('#mutPick button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.b===M.base));
+  const a=analyze(rna,r1,M.m,M.pos), box=$('#clsBox');
+  box.className='cls'+(a.tone?' '+a.tone:''); box.innerHTML=`<b>${a.cls}</b>${a.txt}`;
+  const p0=t0?t0.aas:[], p1=t1?t1.aas:[];
+  $('#pcmp').innerHTML=protRow(p0,null,t0&&t0.stop,'Ursprüngliches Polypeptid (N-Terminus links)')+protRow(p1,p0,t1&&t1.stop,'Mutiertes Polypeptid (Unterschiede markiert)');
+}
+$('#segMut').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.mut.m=b.dataset.m; $$('#segMut button').forEach(x=>x.setAttribute('aria-pressed',x===b)); renderMut(); });
+$('#mutPick').insertAdjacentHTML('beforeend',BASES.map(b=>`<button type="button" class="${b}" data-b="${b}" aria-pressed="false">${b}</button>`).join(''));
+$('#mutPick').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.mut.base=b.dataset.b; renderMut(); });
+$('#rowOrig').addEventListener('click',e=>{ const b=e.target.closest('[data-i]'); if(!b) return; S.mut.pos=+b.dataset.i; renderMut(); });
+$('#posPrev').addEventListener('click',()=>{ if(S.rna){ S.mut.pos=Math.max(0,(S.mut.pos||0)-1); renderMut(); } });
+$('#posNext').addEventListener('click',()=>{ if(S.rna){ S.mut.pos=Math.min(S.rna.length-1,(S.mut.pos||0)+1); renderMut(); } });
+$('#btnMutReset').addEventListener('click',()=>{ S.mut={m:'sub',pos:null,base:'A'}; $$('#segMut button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m==='sub')); renderMut(); });
+function sichel(){ loadPreset('hbb'); S.mut={m:'sub',pos:25,base:'U'}; $$('#segMut button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m==='sub')); renderMut(); }
+$('#btnSichel').addEventListener('click',sichel);
+
+/* ---------- Training ---------- */
+const rnd=n=>Math.floor(Math.random()*n);
+function lev(a,b){ const d=[]; for(let i=0;i<=a.length;i++){ d[i]=[i]; } for(let j=1;j<=b.length;j++) d[0][j]=j; for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[a.length][b.length]; }
+const nrm=s=>String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u').replace(/[^a-z*]/g,'');
+function checkAA(ans,aa){
+  const n=nrm(ans); if(!n) return 'empty';
+  if(aa==='*') return ['stopp','stop','stoppcodon','stopcodon','terminationscodon','ende','*'].includes(n)?'ok':'bad';
+  const nm=nrm(AA[aa][0]), tl=nrm(AA[aa][1]);
+  if(n===nm||n===tl||n===aa.toLowerCase()) return 'ok';
+  if(nm.length>=6&&lev(n,nm)<=1) return 'ok';
+  return 'bad';
+}
+function newQ(){
+  const mode=S.train.mode, all=Object.keys(CODE);
+  if(mode==='c2a'){ let c; do{ c=all[rnd(64)]; }while(CODE[c]==='*'&&Math.random()<.6); S.train.q={cod:c}; }
+  else if(mode==='a2c'){ const aas=Object.keys(AA).filter(a=>a!=='*'); const a=aas[rnd(aas.length)]; const right=BYAA[a].slice().sort(()=>Math.random()-.5).slice(0,Math.min(BYAA[a].length,1+rnd(3))); const wrong=all.filter(c=>CODE[c]!==a).sort(()=>Math.random()-.5).slice(0,8-right.length); const opts=right.concat(wrong).sort(()=>Math.random()-.5); S.train.q={aa:a,opts,right,sel:{},done:false}; }
+  else { let c; do{ c=all[rnd(64)]; }while(CODE[c]==='*'); S.train.q={cod:c}; }
+  renderTrain();
+}
+function renderTrain(){
+  const T=S.train, q=T.q, box=$('#trainBox');
+  $('#trainScore').innerHTML=`<span>Richtig: ${T.ok} von ${T.n}</span><span>Serie: ${T.streak}</span>`;
+  if(!q){ newQ(); return; }
+  if(T.mode==='c2a'){
+    box.innerHTML=`<div class="q"><p class="note">Welche Aminosäure codiert dieses Codon?</p><div class="big">${q.cod.split('').map(x=>ntSpan(x)).join('')}</div></div><input class="txtin" id="trIn" type="text" autocomplete="off" spellcheck="false" aria-label="Aminosäure" placeholder="Name oder Abkürzung, zum Beispiel Glu"><div class="btnrow"><button type="button" class="btn primary" id="trCheck">Prüfen</button><button type="button" class="btn" id="trNew">Neue Aufgabe</button><button type="button" class="btn" id="trShow">In der Codesonne zeigen</button></div><div id="trFb" aria-live="polite"></div>`;
+  } else if(T.mode==='a2c'){
+    box.innerHTML=`<div class="q"><p class="note">Wähle alle Codons, die für diese Aminosäure codieren.</p><div class="aaq">${esc(AA[q.aa][0])} (${AA[q.aa][1]})</div></div><div class="multi" id="trMulti">${q.opts.map(c=>`<button type="button" data-c="${c}" aria-pressed="${!!q.sel[c]}">${c}</button>`).join('')}</div><div class="btnrow"><button type="button" class="btn primary" id="trCheck">Prüfen</button><button type="button" class="btn" id="trNew">Neue Aufgabe</button></div><div id="trFb" aria-live="polite"></div>`;
+  } else {
+    box.innerHTML=`<div class="q"><p class="note">Gegeben ist das Codon der mRNA (5′→3′). Wie lautet das Anticodon der tRNA (3′→5′)?</p><div class="big">${q.cod.split('').map(x=>ntSpan(x)).join('')}</div></div><input class="txtin" id="trIn" type="text" autocomplete="off" spellcheck="false" maxlength="3" aria-label="Anticodon" placeholder="drei Buchstaben"><div class="btnrow"><button type="button" class="btn primary" id="trCheck">Prüfen</button><button type="button" class="btn" id="trNew">Neue Aufgabe</button></div><div id="trFb" aria-live="polite"></div>`;
+  }
+  const inp=$('#trIn'); if(inp) inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); trCheck(); } });
+}
+function score(ok){ const T=S.train; T.n++; if(ok){ T.ok++; T.streak++; } else T.streak=0; $('#trainScore').innerHTML=`<span>Richtig: ${T.ok} von ${T.n}</span><span>Serie: ${T.streak}</span>`; }
+function trCheck(){
+  const T=S.train, q=T.q, fb=$('#trFb'); if(q.done) return;
+  if(T.mode==='c2a'){
+    const r=checkAA($('#trIn').value,CODE[q.cod]); if(r==='empty'){ fb.innerHTML='<div class="fb tip">Gib eine Antwort ein.</div>'; return; }
+    q.done=true; score(r==='ok'); const a=CODE[q.cod];
+    fb.innerHTML=r==='ok'?`<div class="fb ok"><b>Richtig.</b> ${q.cod} codiert ${a==='*'?'ein Stoppsignal':aaName(a)}. ${BYAA[a].length>1?'Weitere Codons: '+BYAA[a].filter(x=>x!==q.cod).join(', ')+'.':''}</div>`:`<div class="fb no"><b>Nicht ganz.</b> ${q.cod} codiert ${a==='*'?'ein Stoppsignal':aaName(a)}. Lies von innen nach außen: 1. Base ${q.cod[0]}, 2. Base ${q.cod[1]}, 3. Base ${q.cod[2]}.</div>`;
+  } else if(T.mode==='a2c'){
+    const sel=Object.keys(q.sel).filter(c=>q.sel[c]); if(!sel.length){ fb.innerHTML='<div class="fb tip">Wähle mindestens ein Codon.</div>'; return; }
+    q.done=true; const good=q.opts.every(c=>!!q.sel[c]===(CODE[c]===q.aa)); score(good);
+    $$('#trMulti button').forEach(b=>{ const c=b.dataset.c, isR=CODE[c]===q.aa; b.disabled=true; if(isR) b.classList.add('ok'); else if(q.sel[c]) b.classList.add('no'); });
+    fb.innerHTML=`<div class="fb ${good?'ok':'no'}"><b>${good?'Richtig.':'Nicht ganz.'}</b> Alle ${BYAA[q.aa].length} Codons für ${AA[q.aa][0]}: ${BYAA[q.aa].join(', ')}. Das ist die Degeneration des Codes.</div>`;
+  } else {
+    const a=$('#trIn').value.toUpperCase().replace(/[^ACGTU]/g,''); if(a.length!==3){ fb.innerHTML='<div class="fb tip">Gib genau drei Buchstaben ein.</div>'; return; }
+    const right=antiOf(q.cod);
+    if(a===right){ q.done=true; score(true); fb.innerHTML=`<div class="fb ok"><b>Richtig.</b> Zum Codon ${q.cod} passt das Anticodon ${right} (3′→5′). In 5′→3′-Schreibweise: ${rev(right)}.</div>`; }
+    else if(a===rev(right)){ q.done=true; score(true); fb.innerHTML=`<div class="fb ok"><b>Richtig in 5′→3′-Schreibweise.</b> In 3′→5′-Schreibweise (gleiche Reihenfolge wie das Codon) lautet das Anticodon ${right}.</div>`; }
+    else if(a.includes('T')){ fb.innerHTML='<div class="fb tip">RNA enthält kein Thymin. Statt T steht U.</div>'; }
+    else { q.done=true; score(false); const why=a===q.cod?'Das ist das Codon selbst. Das Anticodon ist komplementär: A–U, G–C.':'Prüfe die Basenpaarung: A–U und G–C.'; fb.innerHTML=`<div class="fb no"><b>Nicht ganz.</b> ${why} Richtig wäre ${right} (3′→5′).</div>`; }
+  }
+}
+$('#trainBox').addEventListener('click',e=>{
+  if(e.target.closest('#trCheck')) return trCheck();
+  if(e.target.closest('#trNew')) return newQ();
+  if(e.target.closest('#trShow')){ setCodon(S.train.q.cod); if(!window.matchMedia('(min-width:1000px)').matches) setTab('sonne'); return; }
+  const b=e.target.closest('#trMulti button'); if(b&&!S.train.q.done){ const c=b.dataset.c; S.train.q.sel[c]=!S.train.q.sel[c]; b.setAttribute('aria-pressed',!!S.train.q.sel[c]); }
+});
+$('#segTrain').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.train.mode=b.dataset.t; S.train.q=null; $$('#segTrain button').forEach(x=>x.setAttribute('aria-pressed',x===b)); renderTrain(); });
+
+/* ---------- Aufgaben ---------- */
+const TASKS=[
+ {afb:'I',op:'Bestimme',t:'Codesonne lesen',x:'Bestimme mit der Codesonne die Aminosäuren für die Codons GAG, UUU, AUG und UGA. Beschreibe, wie man die Codesonne liest.',setup:()=>{ setTab('sonne'); setCodon('GAG'); },
+  sol:['GAG: Glutaminsäure (Glu). UUU: Phenylalanin (Phe). AUG: Methionin (Met), zugleich Startcodon. UGA: Stoppcodon, keine Aminosäure.','Lesen: Die 1. Base steht im inneren Ring, die 2. Base im mittleren Ring, die 3. Base im äußeren Ring. Ganz außen steht die Aminosäure.']},
+ {afb:'II',op:'Erkläre',t:'Degenerierter Code',x:'Nenne alle Codons für Leucin und für Serin. Erkläre den Begriff „degenerierter Code“ und beurteile seinen Nutzen.',setup:()=>{ setTab('sonne'); setCodon('CUG'); },
+  sol:['Leucin: UUA, UUG, CUU, CUC, CUA, CUG. Serin: UCU, UCC, UCA, UCG, AGU, AGC (je 6 Codons).','Degeneriert: Mehrere Codons codieren dieselbe Aminosäure. Der Code bleibt eindeutig, denn jedes Codon codiert nur eine Aminosäure.','Nutzen: Viele Codons einer Aminosäure unterscheiden sich nur in der 3. Base. Punktmutationen dort bleiben oft stumm und verändern das Protein nicht (Fehlerpuffer).']},
+ {afb:'II',op:'Beschreibe',t:'Phasen der Translation',x:'Beschreibe mit der Simulation die drei Phasen der Translation. Ordne E-, P- und A-Stelle den Vorgängen zu.',setup:()=>{ loadPreset('kurz'); setTab('trans'); stepTo(0); },
+  sol:['Initiation: kleine Untereinheit sucht AUG, Start-tRNA (Met) und große Untereinheit lagern sich an, Start-tRNA in der P-Stelle.','Elongation (Zyklus): Codon-Erkennung in der A-Stelle (tRNA mit komplementärem Anticodon), Peptidbindung (Kette von P- auf A-Stelle), Translokation (Ribosom rückt um ein Codon nach 3′, leere tRNA in die E-Stelle und weg).','Termination: Stoppcodon in der A-Stelle, Release-Faktor, Freisetzung des Polypeptids.','A: Ankunft der neuen tRNA. P: tRNA mit wachsender Peptidkette. E: Exit der leeren tRNA.']},
+ {afb:'II',op:'Leite ab',t:'Vom Gen zum Protein',x:'Der codogene Strang eines Gens lautet (3′→5′): TACAAACCGGTATTTACT. Leite die mRNA und die Aminosäuresequenz ab.',setup:()=>{ loadPreset('cod'); setTab('trans'); },
+  sol:['mRNA (5′→3′): AUG UUU GGC CAU AAA UGA, denn die mRNA ist komplementär zum codogenen Strang (A→U, T→A, G→C, C→G).','Aminosäuren: Met – Phe – Gly – His – Lys, dann Stoppcodon UGA.','Anticodons der tRNAs (3′→5′): UAC, AAA, CCG, GUA, UUU.']},
+ {afb:'III',op:'Analysiere, erläutere',t:'Sichelzellanämie',x:'Bei der Sichelzellanämie ist im Gen der β-Kette des Hämoglobins das 6. Codon GAG zu GUG verändert (6. Aminosäure ohne das Start-Methionin gezählt). Beschreibe die Mutation und erläutere die Folgen für das Protein und die roten Blutzellen.',setup:()=>{ setTab('mut'); sichel(); },
+  sol:['Substitution einer Base (Punktmutation), die eine Missense-Mutation ist: GAG → GUG, Glutaminsäure → Valin.','Glutaminsäure ist negativ geladen und hydrophil, Valin ist unpolar. Dadurch ändert sich die Oberfläche des Proteins.','Bei Sauerstoffmangel lagert sich das veränderte Hämoglobin zu Fasern zusammen. Die roten Blutzellen verformen sich sichelförmig, verstopfen Kapillaren und werden früher abgebaut (Anämie).','Heterozygote Träger haben einen Vorteil bei Malaria (Heterozygotenvorteil). Das erklärt die Häufigkeit des Allels in Malariagebieten.']},
+ {afb:'III',op:'Vergleiche, beurteile',t:'Mutationstypen',x:'Vergleiche eine Substitution, eine Insertion und eine Deletion in der Beispielsequenz hinsichtlich ihrer Auswirkungen auf das Protein. Beurteile, welche Mutation meist die schwerwiegendste Folge hat.',setup:()=>{ loadPreset('kurz'); setTab('mut'); },
+  sol:['Substitution: stumm, Missense oder Nonsense. Nur ein Codon ist betroffen.','Insertion und Deletion einzelner Basen: Rasterschubmutation. Alle Codons hinter der Mutation verschieben sich, die Aminosäuresequenz ist ab dort völlig verändert, oft entsteht ein vorzeitiges Stoppcodon.','Meist ist die Rasterschubmutation schwerwiegender. Ausnahmen: eine Nonsense-Mutation am Anfang oder eine Missense-Mutation im aktiven Zentrum kann ebenso schwer wirken. Das Einfügen oder Entfernen von drei Basen erhält das Raster.','Urteil: Die Schwere hängt von Art und Position der Mutation und von der Funktion der betroffenen Aminosäure ab.']},
+ {afb:'III',op:'Erläutere, beurteile',t:'Universalität des Codes',x:'Der genetische Code ist nahezu universell. Erläutere die Bedeutung für die Gentechnik und die Evolutionsforschung und nenne eine Einschränkung.',setup:null,
+  sol:['Gentechnik: Das menschliche Insulin-Gen kann in Bakterien eingebracht werden, die es korrekt in Insulin übersetzen, weil sie dieselben Codons gleich lesen.','Evolution: Der gemeinsame Code spricht für eine gemeinsame Abstammung aller Lebewesen.','Einschränkungen: Einzelne Abweichungen, zum Beispiel in den Mitochondrien einiger Organismen. Außerdem bevorzugen Arten unterschiedliche Codons für dieselbe Aminosäure, was die Produktion fremder Proteine verlangsamen kann.']}
+];
+$('#taskList').innerHTML=TASKS.map((t,i)=>`<details class="task"><summary><span class="badge">AFB ${t.afb}</span><span>Aufgabe ${i+1}: ${t.t}</span></summary><p><b>${t.op}:</b> ${t.x}</p>${t.setup?`<button type="button" class="btn" data-task="${i}">Versuch einrichten</button>`:''}<details class="sol"><summary style="cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center">Lösungshinweise (Erwartungshorizont)</summary><ul>${t.sol.map(x=>`<li>${x}</li>`).join('')}</ul></details></details>`).join('');
+$('#taskList').addEventListener('click',e=>{ const b=e.target.closest('[data-task]'); if(b){ TASKS[+b.dataset.task].setup(); window.scrollTo({top:0,behavior:'smooth'}); } });
+
+/* ---------- Tabs ---------- */
+function setTab(t){
+  if(t==='sonne'&&window.matchMedia('(min-width:1000px)').matches) t='trans';
+  S.tab=t; document.body.setAttribute('data-tab',t);
+  $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['trans','mut','train','task'].forEach(k=>{ $('#pane-'+k).hidden=(k!==t&&!(t==='sonne'&&false)); });
+  if(t==='sonne'){ $$('#content > section').forEach(s=>s.hidden=true); }
+  if(t==='trans'&&S.tr){ setTransViewBox(); }
+  if(t==='mut') renderMut();
+  if(t==='train') renderTrain();
+}
+$('#tabs').addEventListener('click',e=>{ const b=e.target.closest('.tab'); if(b) setTab(b.dataset.tab); });
+window.addEventListener('resize',()=>{ if(S.tab==='sonne'&&window.matchMedia('(min-width:1000px)').matches) setTab('trans'); if(S.tr) setTransViewBox(); });
+
+/* ---------- Start ---------- */
+buildSunUI(); updateSun();
+loadPreset('kurz');
+setTab(window.matchMedia('(min-width:1000px)').matches?'trans':'trans');
+})();
+</script>
+</body>
+</html>

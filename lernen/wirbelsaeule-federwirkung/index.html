@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#EEF2F7;--surface:#FFFFFF;--ink:#16202F;--muted:#556070;--line:#D5DCE6;--accent:#13294B;--accent-ink:#FFFFFF;--yellow:#F2C230;--yellow-ink:#13294B;--bone:#F1EAD8;--boneline:#13294B;--ok:#1F7A4D;--okbg:#DDF2E6;--bad:#A3261B;--badbg:#FBE3E0;--focus:#C98F00;--mem:rgba(19,41,75,.10);--c1:#2F6DB5;--c2:#D99A00;--c3:#5E9A35;--c4:#C2475A;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:18px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.12;margin:0}
+h1{font-weight:800;font-size:clamp(28px,6.4vw,42px);letter-spacing:-.01em}
+h2{font-weight:800;font-size:clamp(22px,4.6vw,27px);margin:36px 0 8px}
+h3{font-weight:700;font-size:20px}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:4px 0 16px}
+.lead{max-width:64ch}
+.btn{font:inherit;font-weight:700;border:2px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:10px;padding:9px 16px;cursor:pointer;min-height:46px;touch-action:manipulation}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.okb{background:var(--okbg);border-color:var(--ok);color:var(--ink);opacity:1}
+.btn.badb{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.fb{border-radius:10px;padding:10px 14px;margin-top:12px;border-left:6px solid var(--line);background:var(--surface)}
+.fb.ok{background:var(--okbg);border-left-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-left-color:var(--bad)}
+.muted{color:var(--muted)}
+footer{margin-top:44px;color:var(--muted);font-size:15px;max-width:64ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<title>Warum ist die Wirbelsäule doppelt S-förmig? – Biologie Klasse 6</title>
+<style>
+.sim{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.col h3{font-size:18px}
+.col svg{width:100%;height:auto;max-height:46vh;display:block;margin:4px auto 0}
+.sp{fill:none;stroke:var(--boneline);stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+.spi{fill:none;stroke:var(--bone);stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round}
+.vt{fill:var(--boneline)}
+.head{fill:var(--bone);stroke:var(--boneline);stroke-width:2}
+.base{fill:var(--bone);stroke:var(--boneline);stroke-width:2}
+.ground{stroke:var(--muted);stroke-width:2}
+.ring{fill:none;stroke:var(--bad);stroke-width:4}
+.meter{margin-top:6px;text-align:left}
+.meter .lbl{font-size:15px;color:var(--muted);display:flex;justify-content:space-between}
+.bar{height:16px;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--bad);border-radius:999px}
+.ctrl{margin-top:14px}
+.ctrl .btn.primary{font-size:19px;min-width:160px}
+.qa .panel{margin-top:10px}
+ol.steps{padding-left:22px}
+ol.steps li{margin:4px 0}
+.warn{border-left:6px solid var(--bad)}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <h1>Warum ist die Wirbelsäule doppelt S-förmig?</h1>
+  <p class="sub">Biologie Klasse 6: Aufbau der Wirbelsäule</p>
+  <p class="lead">Vergleiche zwei Modelle in der Seitenansicht: einen geraden Stab und eine doppelt S-förmige Wirbelsäule. Wähle eine Belastung und tippe auf „Landen“. Beobachte, wie stark der Stoß am Kopf ankommt.</p>
+
+  <div class="row ctrl" role="group" aria-label="Belastung wählen" id="loads">
+    <button class="btn" data-l="0.35" aria-pressed="false">Gehen</button>
+    <button class="btn" data-l="0.65" aria-pressed="true">Hüpfen</button>
+    <button class="btn" data-l="1" aria-pressed="false">Sprung vom Kasten</button>
+  </div>
+  <div class="sim">
+    <div class="col"><h3>Gerader Stab</h3><svg id="svA" viewBox="0 0 200 340" aria-hidden="true"></svg>
+      <div class="meter"><div class="lbl"><span>Stoß am Kopf</span><span id="tA">–</span></div><div class="bar"><i id="mA"></i></div></div></div>
+    <div class="col"><h3>Doppelte S-Form</h3><svg id="svB" viewBox="0 0 200 340" aria-hidden="true"></svg>
+      <div class="meter"><div class="lbl"><span>Stoß am Kopf</span><span id="tB">–</span></div><div class="bar"><i id="mB"></i></div></div></div>
+  </div>
+  <div class="row ctrl"><button class="btn primary" id="go">Landen</button></div>
+  <p id="live" class="muted" aria-live="polite"></p>
+
+  <h2>Aufgaben</h2>
+  <div class="qa" id="qa"></div>
+
+  <h2>Selbst ausprobieren: das Drahtmodell</h2>
+  <div class="panel">
+    <h3>Material</h3>
+    <p>2 gleich lange Stücke Bastel- oder Aluminiumdraht (etwa 30 cm, nicht zu dünn), Flachzange, 2 Knetkugeln als Fuß, 2 gleich schwere kleine Gewichte (zum Beispiel Knetkugeln oder Massestücke).</p>
+    <h3 style="margin-top:12px">Durchführung</h3>
+    <ol class="steps">
+      <li>Lass einen Draht gerade. Biege den anderen doppelt S-förmig, wie die Wirbelsäule in der Seitenansicht.</li>
+      <li>Stecke beide Drähte senkrecht in je eine Knetkugel.</li>
+      <li>Befestige oben an jedem Draht das gleiche Gewicht.</li>
+      <li>Drücke beide Modelle nacheinander vorsichtig von oben herunter und lass los.</li>
+      <li>Beobachte: Welches Modell federt? Welches knickt weg oder gibt kaum nach? Notiere deine Beobachtungen.</li>
+    </ol>
+  </div>
+  <div class="panel warn" style="margin-top:10px">
+    <h3>Sicherheitshinweise</h3>
+    <ol class="steps">
+      <li>Drahtenden können spitz sein. Biege sie mit der Zange zu kleinen Ösen um.</li>
+      <li>Halte den Draht beim Biegen vom Gesicht weg. Beachte die Regeln eurer Schule zum Tragen einer Schutzbrille.</li>
+      <li>Drücke nur leicht. Gewichte dürfen nicht herunterfallen.</li>
+    </ol>
+    <p class="muted" style="font-size:15px">Für Lehrkräfte: Vor der Durchführung die Gefährdungsbeurteilung nach den Vorgaben der Schule beachten.</p>
+  </div>
+  <footer>Stark vereinfachte Simulation. Sie zeigt nur den Unterschied zwischen den beiden Formen, keine echten Messwerte. In Wirklichkeit federn auch Bandscheiben, Fußgewölbe und Kniegelenke, und Muskeln fangen Stöße ab.</footer>
+</div>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+function mk(tag, at, par){ const e = document.createElementNS(NS, tag); for(const k in at) e.setAttribute(k, at[k]); par.appendChild(e); return e; }
+const BASE = 296, H0 = 210, A0 = 14, CX = 100;
+function build(sv){
+  mk("line", {x1:20, y1:322, x2:180, y2:322, class:"ground"}, sv);
+  mk("rect", {x:70, y:BASE, width:60, height:24, rx:8, class:"base"}, sv);
+  const o = mk("path", {class:"sp"}, sv), i = mk("path", {class:"spi"}, sv);
+  const vg = mk("g", {}, sv), dots = [];
+  for(let k = 0; k < 20; k++) dots.push(mk("rect", {width:10, height:2.4, rx:1, class:"vt"}, vg));
+  const ring = mk("circle", {r:24, class:"ring", opacity:0}, sv);
+  const head = mk("circle", {r:20, class:"head"}, sv);
+  return {o, i, dots, ring, head};
+}
+const A = build(document.getElementById("svA")), Bm = build(document.getElementById("svB"));
+function shape(m, curved, c){
+  const H = curved ? H0 * (1 - 0.16 * c) : H0 * (1 - 0.015 * c);
+  const Amp = curved ? Math.max(2, A0 + 34 * c) : 0;
+  const pts = [];
+  for(let k = 0; k <= 40; k++){ const t = k / 40; pts.push([CX + Amp * Math.sin(3 * Math.PI * t), BASE - t * H]); }
+  const d = "M" + pts.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" L");
+  m.o.setAttribute("d", d); m.i.setAttribute("d", d);
+  m.dots.forEach((el, k) => { const p = pts[Math.round((k + 0.5) / 20 * 40)]; el.setAttribute("x", p[0] - 5); el.setAttribute("y", p[1] - 1.2); });
+  const top = BASE - H - 22;
+  m.head.setAttribute("cx", CX); m.head.setAttribute("cy", top);
+  m.ring.setAttribute("cx", CX); m.ring.setAttribute("cy", top);
+}
+shape(A, false, 0); shape(Bm, true, 0);
+
+let load = 0.65, anim = null;
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.getElementById("loads").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  load = parseFloat(b.dataset.l);
+  document.querySelectorAll("#loads button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+});
+const word = (v) => v > 0.7 ? "stark" : v > 0.35 ? "mittel" : "schwach";
+function setMeter(id, tid, v){ document.getElementById(id).style.width = Math.round(v * 100) + "%"; document.getElementById(tid).textContent = word(v); }
+document.getElementById("go").addEventListener("click", () => {
+  const peakA = Math.min(1, load * 0.95), peakB = load * 0.35;
+  document.getElementById("live").textContent = "Gerader Stab: Stoß am Kopf " + word(peakA) + ". Doppelte S-Form: Stoß am Kopf " + word(peakB) + ".";
+  if(reduce){ setMeter("mA", "tA", peakA); setMeter("mB", "tB", peakB); A.ring.setAttribute("opacity", peakA); Bm.ring.setAttribute("opacity", peakB); return; }
+  if(anim) cancelAnimationFrame(anim);
+  const t0 = performance.now();
+  const step = (now) => {
+    const t = (now - t0) / 1000;
+    const cB = load * Math.exp(-3.2 * t) * Math.sin(9 * t);
+    const cA = load * Math.exp(-9 * t) * Math.sin(40 * t);
+    shape(A, false, cA); shape(Bm, true, cB);
+    const jA = load * 7 * Math.exp(-9 * t) * Math.sin(40 * t);
+    A.head.setAttribute("cy", parseFloat(A.head.getAttribute("cy")) + jA);
+    const fA = t < 0.12 ? peakA * t / 0.12 : peakA * Math.exp(-2.2 * (t - 0.12));
+    const fB = t < 0.3 ? peakB * t / 0.3 : peakB * Math.exp(-2.2 * (t - 0.3));
+    setMeter("mA", "tA", fA); setMeter("mB", "tB", fB);
+    A.ring.setAttribute("opacity", Math.max(0, fA)); Bm.ring.setAttribute("opacity", Math.max(0, fB));
+    if(t < 2.2) anim = requestAnimationFrame(step);
+    else { shape(A, false, 0); shape(Bm, true, 0); setMeter("mA", "tA", peakA); setMeter("mB", "tB", peakB); A.ring.setAttribute("opacity", 0); Bm.ring.setAttribute("opacity", 0); }
+  };
+  anim = requestAnimationFrame(step);
+});
+
+const QA = [
+  {q:"Beschreibe, was beim geraden Stab passiert, wenn er landet.", a:"Der gerade Stab gibt kaum nach. Der Stoß kommt fast ungebremst am Kopf an."},
+  {q:"Vergleiche die doppelte S-Form mit dem geraden Stab.", a:"Die doppelte S-Form wird beim Landen etwas zusammengedrückt und federt zurück. Am Kopf kommt ein viel schwächerer Stoß an als beim geraden Stab."},
+  {q:"Erkläre, warum die doppelte S-Form für den Menschen günstig ist.", a:"Die Biegungen wirken wie eine Feder. Sie fangen Stöße beim Gehen, Laufen und Springen ab. So werden Kopf und Gehirn vor starken Erschütterungen geschützt."},
+  {q:"Was zeigt die Simulation nicht? Nenne eine Grenze.", a:"Zum Beispiel: Sie zeigt keine einzelnen Wirbel und keine Bandscheiben, die auch federn. Muskeln, Knie und Füße fehlen. Die Werte sind nicht gemessen."}
+];
+document.getElementById("qa").innerHTML = QA.map((x, i) => `<div class="panel"><p style="margin-top:0"><strong>${i + 1}.</strong> ${x.q}</p><button class="btn" data-a="${i}" aria-expanded="false">Lösung zeigen</button><div class="fb" id="a${i}" hidden>${x.a}</div></div>`).join("");
+document.getElementById("qa").addEventListener("click", e => {
+  const b = e.target.closest("[data-a]"); if(!b) return;
+  const t = document.getElementById("a" + b.dataset.a); t.hidden = !t.hidden;
+  b.setAttribute("aria-expanded", String(!t.hidden)); b.textContent = t.hidden ? "Lösung zeigen" : "Lösung ausblenden";
+});
+</script>
+</body>
+</html>

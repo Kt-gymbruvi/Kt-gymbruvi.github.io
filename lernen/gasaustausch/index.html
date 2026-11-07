@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gasaustausch in der Alveole</title>
+<style>
+:root{
+  --bg:#f3f6f9; --surface:#ffffff; --text:#1f2a44; --muted:#5a6680; --line:#d6dde6;
+  --air:#e6f1fa; --air-edge:#8fb6d6;
+  --tissue:#f2ddd5; --epi:#e7c2b4; --bm:#d9a996; --endo:#e7c2b4;
+  --plasma:#fbe9dc; --wall-text:#8a5a4c;
+  --o2:#1f7ae0; --co2:#e08a00; --hco3:#8a5cc7; --cl:#2f9a5c;
+  --accent:#1f4f8f; --chip:#e9eef5; --focus:#1f7ae0;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121821; --surface:#1a222e; --text:#e6ebf2; --muted:#9aa6b8; --line:#2b3544;
+    --air:#15283b; --air-edge:#3f6f95;
+    --tissue:#3a2a27; --epi:#5a3d35; --bm:#7a4f42; --endo:#5a3d35;
+    --plasma:#3b2722; --wall-text:#d9a996;
+    --o2:#5aa8ff; --co2:#ffb238; --hco3:#b996f0; --cl:#5fd08e;
+    --accent:#8fb4ff; --chip:#232d3b; --focus:#5aa8ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121821; --surface:#1a222e; --text:#e6ebf2; --muted:#9aa6b8; --line:#2b3544;
+  --air:#15283b; --air-edge:#3f6f95;
+  --tissue:#3a2a27; --epi:#5a3d35; --bm:#7a4f42; --endo:#5a3d35;
+  --plasma:#3b2722; --wall-text:#d9a996;
+  --o2:#5aa8ff; --co2:#ffb238; --hco3:#b996f0; --cl:#5fd08e;
+  --accent:#8fb4ff; --chip:#232d3b; --focus:#5aa8ff;
+  color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%;}
+main{max-width:720px;margin:0 auto;padding:16px 14px 40px;}
+h1{font-size:1.55rem;line-height:1.2;margin:4px 0 4px;font-weight:700;letter-spacing:-0.01em;}
+.sub{margin:0 0 14px;color:var(--muted);}
+h2{font-size:1.1rem;margin:0 0 8px;}
+.seg{display:inline-flex;background:var(--chip);border-radius:999px;padding:3px;margin:0 6px 10px 0;}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:.92rem;
+  padding:7px 14px;border-radius:999px;cursor:pointer;}
+.seg button.on{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12);}
+.stage{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+svg{display:block;width:100%;height:auto;}
+.track{margin:10px 0 0;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  font-size:.93rem;min-height:66px;}
+.track .row{display:flex;gap:8px;align-items:flex-start;}
+.track .row + .row{margin-top:4px;}
+.dot{flex:0 0 auto;width:11px;height:11px;border-radius:50%;margin-top:6px;}
+.dot.o2{background:var(--o2);} .dot.co2{background:var(--co2);}
+.dot.hco3{background:var(--hco3);border-radius:2px;} .dot.cl{background:var(--cl);width:8px;height:8px;margin-top:7px;}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 8px;}
+.controls button{font:inherit;font-size:.95rem;border:1px solid var(--line);background:var(--surface);color:var(--text);
+  padding:8px 14px;border-radius:10px;cursor:pointer;}
+.controls button.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
+.speed{display:flex;align-items:center;gap:6px;font-size:.92rem;color:var(--muted);}
+.speed input{width:110px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.chips label{display:flex;align-items:center;gap:6px;background:var(--chip);padding:6px 12px;border-radius:999px;font-size:.92rem;cursor:pointer;}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem;color:var(--muted);margin:0 0 18px;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.legend .dot{margin-top:0;}
+.ery-swatch{width:30px;height:12px;border-radius:50%;background:linear-gradient(90deg,#7a1f3d,#e63946);}
+.steps{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.steps ol{margin:0;padding-left:1.3em;}
+.steps li + li{margin-top:6px;}
+details.facts{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;}
+details.facts summary{cursor:pointer;font-weight:600;}
+details.facts ul{margin:10px 0 0;padding-left:1.2em;}
+details.facts li + li{margin-top:5px;}
+.note{font-size:.85rem;color:var(--muted);margin-top:14px;}
+[hidden]{display:none !important;}
+
+/* SVG */
+.tissue{fill:var(--tissue);}
+.air{fill:var(--air);stroke:var(--air-edge);stroke-width:2;}
+.epi{fill:var(--epi);} .bm{fill:var(--bm);} .endo{fill:var(--endo);}
+.plasma{fill:var(--plasma);}
+.lbl{fill:var(--muted);font-size:10px;font-family:inherit;}
+.lbl-strong{fill:var(--text);font-size:12px;font-weight:600;}
+.lbl-wall{fill:var(--wall-text);font-size:9.5px;}
+.p-o2{fill:var(--o2);} .p-co2{fill:var(--co2);} .p-hco3{fill:var(--hco3);} .p-cl{fill:var(--cl);}
+.tracked{stroke:var(--text);stroke-width:1.6;}
+.trail{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:4 3;}
+.trail.o2{stroke:var(--o2);} .trail.co2{stroke:var(--co2);}
+.ca{fill:var(--text);font-size:9px;font-weight:700;}
+.phase-bg{fill:var(--surface);stroke:var(--line);}
+.phase-t{fill:var(--text);font-size:12px;font-weight:700;}
+.phase-s{fill:var(--muted);font-size:9px;}
+.steps p{margin:10px 0 0;font-size:.93rem;color:var(--muted);}
+@media (prefers-reduced-motion: reduce){ .seg button{transition:none;} }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<main>
+  <h1>Gasaustausch in der Alveole</h1>
+  <p class="sub">Wie Sauerstoff ins Blut gelangt und Kohlenstoffdioxid ausgeatmet wird.</p>
+
+  <div class="seg" role="group" aria-label="Niveau">
+    <button type="button" data-mode="basis" class="on">Basis (Sek. I)</button>
+    <button type="button" data-mode="erweitert">Erweitert (Sek. II)</button>
+  </div>
+  <div class="seg" role="group" aria-label="Belastung">
+    <button type="button" data-load="ruhe" class="on">Ruhe</button>
+    <button type="button" data-load="belastung">Belastung</button>
+  </div>
+
+  <figure class="stage">
+    <svg id="scene" viewBox="0 0 400 440" role="img" aria-label="Animierter Querschnitt durch eine Alveole und eine Lungenkapillare. Sauerstoff diffundiert aus der Alveole in die roten Blutkörperchen, Kohlenstoffdioxid diffundiert aus dem Blut in die Alveole und wird ausgeatmet.">
+      <defs>
+        <linearGradient id="venArt" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stop-color="#5b3a8c" stop-opacity="0.22"/>
+          <stop offset="0.55" stop-color="#c8324a" stop-opacity="0.12"/>
+          <stop offset="1" stop-color="#e63946" stop-opacity="0.22"/>
+        </linearGradient>
+      </defs>
+      <rect class="tissue" x="0" y="0" width="400" height="406"/>
+      <path id="airPath" class="air" d="M165 -4 L165 26 C165 42 150 48 122 50 C62 54 32 88 32 148 L32 300 L368 300 L368 148 C368 88 338 54 278 50 C250 48 235 42 235 26 L235 -4 Z"/>
+      <rect class="epi" x="0" y="300" width="400" height="5"/>
+      <rect class="bm" x="0" y="305" width="400" height="4"/>
+      <rect class="endo" x="0" y="309" width="400" height="7"/>
+      <rect class="plasma" x="0" y="316" width="400" height="80"/>
+      <rect x="0" y="316" width="400" height="80" fill="url(#venArt)"/>
+      <rect class="endo" x="0" y="396" width="400" height="10"/>
+
+      <g id="gTrail"></g>
+      <g id="gEry"></g>
+      <g id="gCO2"></g>
+      <g id="gO2"></g>
+
+      <g id="gLabels">
+        <text class="lbl" x="243" y="14">Bronchiole</text>
+        <text class="lbl" x="243" y="27">Ein- und Ausatmung</text>
+        <text class="lbl-strong" x="200" y="140" text-anchor="middle">Alveole (Atemluft)</text>
+        <text class="lbl" x="200" y="156" text-anchor="middle">pO₂ ≈ 100 mmHg, pCO₂ ≈ 40 mmHg</text>
+        <text class="lbl-wall" x="394" y="294" text-anchor="end">Blut-Luft-Schranke, ca. 0,5 µm</text>
+        <text class="lbl-strong" x="6" y="421">venös</text>
+        <text id="venT" class="lbl" x="6" y="434">pO₂ ≈ 40, pCO₂ ≈ 46 mmHg</text>
+        <text class="lbl-strong" x="394" y="421" text-anchor="end">arteriell</text>
+        <text class="lbl" x="394" y="434" text-anchor="end">pO₂ ≈ 100, pCO₂ ≈ 40 mmHg</text>
+        <text class="lbl" x="200" y="421" text-anchor="middle">Blutfluss ➜</text>
+        <text id="contactT" class="lbl" x="200" y="434" text-anchor="middle">Kontaktzeit ≈ 0,75 s</text>
+        <text class="lbl-wall" x="200" y="403.5" text-anchor="middle">Kapillarwand</text>
+      </g>
+      <g id="gPhase">
+        <rect class="phase-bg" x="6" y="6" width="128" height="38" rx="8"/>
+        <text id="phaseT" class="phase-t" x="16" y="23">Einatmen ↓</text>
+        <text class="phase-s" x="16" y="37">Diffusion läuft weiter</text>
+      </g>
+    </svg>
+  </figure>
+
+  <div class="track" id="track" aria-live="polite">
+    <div class="row"><span class="dot o2"></span><span id="capO2">Tippe auf „Weg verfolgen“: Ein O₂- und ein CO₂-Teilchen werden markiert und ihr Weg wird nachgezeichnet.</span></div>
+    <div class="row"><span class="dot co2"></span><span id="capCO2">–</span></div>
+  </div>
+
+  <div class="controls">
+    <button type="button" id="follow" class="primary">Weg verfolgen</button>
+    <button type="button" id="play">Pause</button>
+    <button type="button" id="reset">Neu starten</button>
+    <label class="speed">Tempo <input type="range" id="speed" min="0.25" max="2" step="0.25" value="1"><output id="speedOut">1×</output></label>
+  </div>
+
+  <div class="chips">
+    <label><input type="checkbox" id="tO2" checked> O₂ zeigen</label>
+    <label><input type="checkbox" id="tCO2" checked> CO₂ zeigen</label>
+    <label><input type="checkbox" id="tLbl" checked> Beschriftung</label>
+    <label><input type="checkbox" id="tCycle" checked> Atemzyklus</label>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot o2"></span>Sauerstoff (O₂)</span>
+    <span><span class="dot co2"></span>Kohlenstoffdioxid (CO₂)</span>
+    <span class="ext" hidden><span class="dot hco3"></span>Hydrogencarbonat (HCO₃⁻)</span>
+    <span class="ext" hidden><span class="dot cl"></span>Chlorid (Cl⁻)</span>
+    <span><span class="ery-swatch"></span>Erythrozyt: sauerstoffarm bis sauerstoffreich</span>
+  </div>
+
+  <section class="steps">
+    <h2>Ablauf</h2>
+    <ol id="stepsBasis">
+      <li>Beim Einatmen gelangt frische Luft mit viel Sauerstoff in die Alveole.</li>
+      <li>Sauerstoff diffundiert vom hohen Partialdruck in der Alveole (ca. 100 mmHg) zum niedrigen im Blut (ca. 40 mmHg) durch die sehr dünne Blut-Luft-Schranke.</li>
+      <li>In den roten Blutkörperchen bindet Sauerstoff an Hämoglobin. Das Blut wird hellrot und fließt zum Herzen und weiter in den Körper.</li>
+      <li>Kohlenstoffdioxid nimmt den umgekehrten Weg: vom Blut (ca. 46 mmHg) in die Alveole (ca. 40 mmHg). Von dort wird es ausgeatmet.</li>
+    </ol>
+    <ol id="stepsExt" hidden>
+      <li>Treibende Kraft ist das Partialdruckgefälle: O₂ von ca. 100 auf 40 mmHg, CO₂ von ca. 46 auf 40 mmHg.</li>
+      <li>O₂ passiert Alveolarepithel, Basalmembran und Kapillarendothel, löst sich im Plasma und diffundiert in die Erythrozyten.</li>
+      <li>Hb + O₂ ⇌ HbO₂. In Ruhe ist das Gleichgewicht nach etwa einem Drittel der Kontaktzeit (ca. 0,75 s) erreicht.</li>
+      <li>CO₂ kommt zu rund 70 % als HCO₃⁻ im Plasma an, zu rund 20 % an Hämoglobin gebunden (Carbamino-Hb) und zu rund 10 % physikalisch gelöst.</li>
+      <li>HCO₃⁻ strömt im Austausch gegen Cl⁻ in die Erythrozyten (Umkehr des Hamburger-Shifts). Die Carboanhydrase (CA) bildet daraus CO₂ und H₂O.</li>
+      <li>CO₂ diffundiert in die Alveole und wird ausgeatmet. Die O₂-Bindung an Hb erleichtert zusätzlich die CO₂-Abgabe (Haldane-Effekt).</li>
+    </ol>
+    <p>Wichtig: Der Gasaustausch läuft beim Ein- und beim Ausatmen ununterbrochen weiter. Die Atmung erneuert nur einen Teil der Luft in der Alveole und hält so das Partialdruckgefälle aufrecht.</p>
+    <p id="loadNote"></p>
+  </section>
+
+  <details class="facts">
+    <summary>Hintergrundwissen</summary>
+    <ul>
+      <li>Die Lunge enthält mehrere Hundert Millionen Alveolen mit einer Gasaustauschfläche von rund 100 m² (Angaben schwanken je nach Quelle).</li>
+      <li>Die Diffusionsstrecke zwischen Luft und Blut beträgt meist weniger als 1 µm, an den dünnsten Stellen nur etwa 0,2 µm.</li>
+      <li>CO₂ diffundiert etwa 20-mal leichter durch Gewebe als O₂. Deshalb genügt ihm ein kleines Druckgefälle von nur ca. 6 mmHg.</li>
+      <li>Die Alveolen leeren sich beim Ausatmen nie vollständig: Rund 2,5–3 l Luft bleiben in der Lunge, ein Ruheatemzug erneuert davon nur etwa 0,35 l. Deshalb schwankt der Partialdruck in der Alveole kaum.</li>
+      <li>Ein Erythrozyt enthält Hunderte Millionen Hämoglobin-Moleküle; jedes kann vier O₂ binden. Die vier Plätze in der Animation stehen symbolisch dafür.</li>
+    </ul>
+  </details>
+
+  <p class="note">Modell: stark vereinfacht und nicht maßstabsgetreu. Teilchenzahlen und Geschwindigkeiten sind symbolisch; in Wirklichkeit laufen O₂-Aufnahme und CO₂-Abgabe gleichzeitig im vorderen Abschnitt der Kapillare ab.</p>
+</main>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const $=id=>document.getElementById(id);
+const gEry=$('gEry'), gO2=$('gO2'), gCO2=$('gCO2'), gTrail=$('gTrail'), gLabels=$('gLabels'), airPath=$('airPath'), gPhase=$('gPhase');
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function mk(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+
+const G={capTop:316,capBot:396,capMid:356,memTop:300,memBot:316,ax0:44,ax1:356,ay0:66,ay1:290};
+const LOADS={
+  ruhe:{eryV:24,spawn:2.8,pre:3,inh:2.6,exh:2.6,amp:0.035,vent:1,o2out:4,poolMax:30,co2:2,hco3:1,ven:'pO₂ ≈ 40, pCO₂ ≈ 46 mmHg',contact:'Kontaktzeit ≈ 0,75 s'},
+  belastung:{eryV:60,spawn:1.1,pre:1,inh:1.1,exh:1.1,amp:0.075,vent:2.4,o2out:5,poolMax:50,co2:3,hco3:3,ven:'pO₂ ≈ 20, pCO₂ ≈ 60 mmHg',contact:'Kontaktzeit ≈ 0,3 s'}
+};
+const L=()=>LOADS[S.load];
+const O2_SLOTS=[[-7,-3.5],[7,-3.5],[-7,4],[7,4]];
+const CO2_SLOTS_B=[[0,-6],[-14,1],[14,1]];
+const ATTACHED=['bound','boundCO2','carbamino','plasma','convert','toEry','enterEry','clOut','clFollow'];
+
+const S={running:true,speed:1,mode:'basis',cycle:true,load:'ruhe'};
+const BR={get inhale(){return L().inh;},get exhale(){return L().exh;}};
+let phase='inhale', phaseT=0;
+let eries=[], parts=[], trails=[], t=0, eryTimer=0, breathTimer=0;
+const track={o2:null,co2:null,pendingO2:false,pendingCO2:false,lastO2:'',lastCO2:''};
+
+const CAP={
+  o2:{
+    inflow:'O₂ strömt mit der eingeatmeten Luft über die Bronchiole in die Alveole.',
+    wander:'O₂ bewegt sich frei im Alveolarraum. Hier ist sein Partialdruck hoch (ca. 100 mmHg).',
+    toMembrane:'O₂ diffundiert zur Alveolarwand, in Richtung des niedrigeren Partialdrucks im Blut.',
+    cross:'O₂ diffundiert durch die Blut-Luft-Schranke: Alveolarepithel, Basalmembran, Kapillarendothel.',
+    toEry:'O₂ löst sich im Blutplasma und diffundiert in einen roten Blutkörperchen (Erythrozyten).',
+    bound:'O₂ ist an Hämoglobin gebunden und wird mit dem jetzt hellroten Blut abtransportiert.',
+    boundExt:'Hb + O₂ ⇌ HbO₂: O₂ ist als Oxyhämoglobin gebunden und wird zum Herzen transportiert.',
+    o2exhale:'Dieses O₂ wird wieder ausgeatmet. Nicht jedes O₂-Teilchen gelangt ins Blut.',
+    o2exhale2:'Dieses O₂ wird wieder ausgeatmet. Nicht jedes O₂-Teilchen gelangt ins Blut.',
+    exhaled:'O₂ wurde wieder ausgeatmet.',
+    gone:'O₂ hat den Ausschnitt mit dem arteriellen Blut verlassen – auf dem Weg zum Herzen.'
+  },
+  co2:{
+    boundCO2:'CO₂ kommt mit dem venösen Blut aus dem Körpergewebe.',
+    carbamino:'CO₂ ist an Hämoglobin gebunden (Carbamino-Hb) und wird jetzt freigesetzt.',
+    plasma:'CO₂ wird überwiegend als Hydrogencarbonat (HCO₃⁻) im Plasma transportiert.',
+    enterEry:'HCO₃⁻ strömt im Austausch gegen Cl⁻ in den Erythrozyten.',
+    convert:'Carboanhydrase: HCO₃⁻ + H⁺ → H₂CO₃ → CO₂ + H₂O.',
+    toMem:'CO₂ diffundiert aus dem Blut zur Kapillarwand.',
+    crossUp:'CO₂ diffundiert durch die Blut-Luft-Schranke in die Alveole (pCO₂ ca. 40 mmHg).',
+    drift:'CO₂ befindet sich jetzt im Alveolarraum.',
+    exhale:'CO₂ wird mit der Ausatemluft über die Bronchiole abgegeben.',
+    exhale2:'CO₂ wird mit der Ausatemluft über die Bronchiole abgegeben.',
+    driftWait:'CO₂ sammelt sich im Alveolarraum, bis ausgeatmet wird. Die Diffusion aus dem Blut läuft trotzdem weiter.',
+    pushBack:'Einströmende Frischluft schiebt CO₂ zurück in die Alveole.',
+    gone:'CO₂ wurde ausgeatmet.',
+    goneBlood:'Das Teilchen hat den Ausschnitt verlassen.'
+  }
+};
+
+function makeEry(x){
+  const g=mk('g',{},gEry);
+  const body=mk('ellipse',{rx:20,ry:11,cx:0,cy:0},g);
+  mk('ellipse',{rx:10,ry:4.5,cx:0,cy:0,fill:'rgba(0,0,0,0.16)'},g);
+  const e={x,y:G.capMid+rnd(-6,6),o2:0,reserved:0,g,body,removed:false};
+  eries.push(e);return e;
+}
+function makeEl(type){
+  const parent=type==='o2'?gO2:gCO2;
+  const el=type==='hco3'?mk('rect',{width:6,height:6,rx:1.2},parent):mk('circle',{r:type==='cl'?2.3:3.2},parent);
+  el.setAttribute('class','p-'+type);
+  return el;
+}
+function makePart(type,x,y,o){
+  const p=Object.assign({type,x,y,state:'',el:makeEl(type),timer:0,vx:0,vy:0,dead:false,seed:Math.random()*10},o||{});
+  parts.push(p);return p;
+}
+function styleTracked(p,on){
+  if(!p||!p.el)return;
+  if(on){p.el.classList.add('tracked');if(p.el.tagName==='circle')p.el.setAttribute('r',5);else{p.el.setAttribute('width',9);p.el.setAttribute('height',9);}}
+  else{p.el.classList.remove('tracked');if(p.el.tagName==='circle')p.el.setAttribute('r',p.type==='cl'?2.3:3.2);else{p.el.setAttribute('width',6);p.el.setAttribute('height',6);}}
+}
+function setType(p,type){
+  p.el.remove();p.type=type;p.el=makeEl(type);
+  if(p===track.co2){styleTracked(p,true);p.el.parentNode.appendChild(p.el);}
+}
+function setWander(p,sp){const a=rnd(0,Math.PI*2);p.vx=Math.cos(a)*sp;p.vy=Math.sin(a)*sp;}
+function wander(p,dt){
+  p.vx+=rnd(-40,40)*dt;p.vy+=rnd(-40,40)*dt;
+  const sp=Math.hypot(p.vx,p.vy)||1, m=24;p.vx=p.vx/sp*m;p.vy=p.vy/sp*m;
+  p.x+=p.vx*dt;p.y+=p.vy*dt;
+  if(p.x<G.ax0){p.x=G.ax0;p.vx=Math.abs(p.vx);} if(p.x>G.ax1){p.x=G.ax1;p.vx=-Math.abs(p.vx);}
+  if(p.y<G.ay0){p.y=G.ay0;p.vy=Math.abs(p.vy);} if(p.y>G.ay1){p.y=G.ay1;p.vy=-Math.abs(p.vy);}
+}
+function moveTo(p,tx,ty,sp,dt){
+  const dx=tx-p.x,dy=ty-p.y,d=Math.hypot(dx,dy),st=sp*dt;
+  if(d<=st){p.x=tx;p.y=ty;return true;}
+  p.x+=dx/d*st;p.y+=dy/d*st;return false;
+}
+
+function spawnEry(x,prefill){
+  const e=makeEry(x);
+  const ext=S.mode==='erweitert';
+  const lp=L();
+  const n=prefill?lp.pre+Math.round((4-lp.pre)*clamp((x-60)/230,0,1)):lp.pre;
+  for(let i=0;i<n;i++)makePart('o2',x+O2_SLOTS[i][0],e.y+O2_SLOTS[i][1],{state:'bound',ery:e,off:O2_SLOTS[i]});
+  e.o2=n;e.reserved=n;
+  const list=[];
+  if(!ext){
+    CO2_SLOTS_B.slice(0,lp.co2).forEach(off=>list.push(makePart('co2',x+off[0],e.y+off[1],{state:'boundCO2',ery:e,off,releaseX:rnd(20,230)})));
+  }else{
+    list.push(makePart('co2',x,e.y-6,{state:'carbamino',ery:e,off:[0,-6],releaseX:rnd(50,230)}));
+    [[-22,-24],[22,24],[0,26]].slice(0,lp.hco3).forEach(off=>list.push(makePart('hco3',x+off[0],e.y+off[1],{state:'plasma',ery:e,off,releaseX:rnd(10,190)})));
+  }
+  if(prefill){list.forEach(p=>{if(p.releaseX<x){p.el.remove();p.dead=true;}});}
+  else if(track.pendingCO2){
+    const c=list.find(p=>p.type==='hco3'&&p.releaseX>60)||list.find(p=>p.releaseX>60)||list[0];
+    setTrack('co2',c);track.pendingCO2=false;
+  }
+  return e;
+}
+function spawnInflow(n){
+  for(let i=0;i<n;i++){
+    const p=makePart('o2',rnd(180,220),rnd(S.cycle?-80:-24,-4),{state:'inflow',tx:rnd(70,330),ty:rnd(80,220)});
+    if(track.pendingO2){setTrack('o2',p);track.pendingO2=false;}
+  }
+}
+function spawnPool(n){
+  for(let i=0;i<n;i++){const p=makePart('o2',rnd(G.ax0,G.ax1),rnd(G.ay0,G.ay1),{state:'wander',timer:rnd(0.3,4)});setWander(p,24);}
+}
+function spawnCl(e){
+  const off=[rnd(-26,26),Math.random()<.5?-22:22];
+  makePart('cl',e.x,e.y,{state:'clOut',ery:e,off});
+}
+
+function assignO2(p){
+  const c=eries.filter(e=>!e.removed&&e.reserved<4&&e.x>-40&&e.x<280);
+  if(!c.length)return false;
+  c.sort((a,b)=>a.x-b.x);
+  const e=c[Math.random()<0.6?c.length-1:Math.floor(Math.random()*c.length)];
+  const d=Math.hypot(e.x-p.x,G.memTop-p.y);
+  const tEst=d/55+16/22+40/85;
+  const cx=e.x+L().eryV*tEst+rnd(-8,8);
+  if(cx<G.ax0||cx>G.ax1)return false;
+  p.ery=e;p.off=O2_SLOTS[e.reserved];e.reserved++;p.tx=cx;p.state='toMembrane';return true;
+}
+
+function updatePart(p,dt){
+  const e=p.ery;
+  switch(p.state){
+    case 'inflow': if(moveTo(p,p.tx,p.ty,70*L().vent,dt)){p.state='wander';p.timer=rnd(0.8,3)/L().vent;setWander(p,24);} break;
+    case 'wander': wander(p,dt);p.timer-=dt;if(p.timer<=0&&!assignO2(p))p.timer=rnd(0.3,1);break;
+    case 'toMembrane': if(moveTo(p,p.tx,G.memTop-1,55,dt))p.state='cross';break;
+    case 'cross': if(moveTo(p,p.tx,G.capTop+3,22,dt))p.state='toEry';break;
+    case 'toEry': if(moveTo(p,e.x+p.off[0],e.y+p.off[1],85+L().eryV,dt)){p.state='bound';e.o2++;} break;
+    case 'bound': case 'clFollow': p.x=e.x+p.off[0];p.y=e.y+p.off[1];break;
+    case 'boundCO2': case 'carbamino':
+      p.x=e.x+p.off[0];p.y=e.y+p.off[1];
+      if(e.x>=p.releaseX){p.state='toMem';p.tx=p.x+rnd(-4,10);} break;
+    case 'plasma':
+      p.x=e.x+p.off[0];p.y=e.y+p.off[1];
+      if(e.x>=p.releaseX)p.state='enterEry';break;
+    case 'enterEry':
+      if(moveTo(p,e.x,e.y+2,60+L().eryV,dt)){
+        p.state='convert';p.timer=0.8;spawnCl(e);
+        p.lbl=mk('text',{class:'ca','text-anchor':'middle'},gCO2);p.lbl.textContent='CA';
+        if(!$('tLbl').checked)p.lbl.style.display='none';
+      } break;
+    case 'convert':
+      p.x=e.x;p.y=e.y+2;p.timer-=dt;
+      if(p.lbl){p.lbl.setAttribute('x',p.x.toFixed(1));p.lbl.setAttribute('y',(p.y-14).toFixed(1));}
+      if(p.timer<=0){if(p.lbl){p.lbl.remove();p.lbl=null;}setType(p,'co2');p.state='toMem';p.tx=p.x+rnd(0,10);p.ery=null;} break;
+    case 'toMem': if(moveTo(p,p.tx,G.memBot+1,45,dt))p.state='crossUp';break;
+    case 'crossUp': if(moveTo(p,p.tx,G.memTop-3,22,dt)){p.state='drift';p.timer=rnd(0.6,1.6);setWander(p,24);} break;
+    case 'drift': wander(p,dt);p.timer-=dt;if(p.timer<=0&&(!S.cycle||phase==='exhale')){p.state='exhale';p.tx=rnd(186,214);} break;
+    case 'exhale': if(moveTo(p,p.tx,48,S.cycle?95*L().vent:55,dt))p.state='exhale2';break;
+    case 'exhale2': if(moveTo(p,p.tx,-12,S.cycle?95*L().vent:55,dt))p.dead=true;break;
+    case 'pushBack': if(moveTo(p,p.tx,p.ty,60*L().vent,dt)){p.state='drift';p.timer=rnd(0.5,1.5);setWander(p,24);} break;
+    case 'o2exhale': if(moveTo(p,p.tx,48,95*L().vent,dt))p.state='o2exhale2';break;
+    case 'o2exhale2': if(moveTo(p,p.tx,-12,95*L().vent,dt))p.dead=true;break;
+    case 'clOut': if(moveTo(p,e.x+p.off[0],e.y+p.off[1],70+L().eryV,dt))p.state='clFollow';break;
+  }
+  if(p.ery&&p.ery.removed&&ATTACHED.includes(p.state))p.dead=true;
+}
+
+function update(dt){
+  t+=dt;
+  eryTimer+=dt;if(eryTimer>=L().spawn){eryTimer-=L().spawn;spawnEry(-30,false);}
+  if(S.cycle){
+    phaseT+=dt;
+    if(phase==='inhale'&&phaseT>=BR.inhale){phaseT=0;setPhase('exhale');}
+    else if(phase==='exhale'&&phaseT>=BR.exhale){phaseT=0;setPhase('inhale');}
+    const x=phase==='inhale'?phaseT/BR.inhale:phaseT/BR.exhale;
+    const k=phase==='inhale'?0.5-0.5*Math.cos(Math.PI*x):0.5+0.5*Math.cos(Math.PI*x);
+    airPath.setAttribute('transform','translate(200 300) scale('+(1+L().amp*k).toFixed(4)+') translate(-200 -300)');
+  }else{
+    breathTimer+=dt;
+    if(breathTimer>=2.4){
+      breathTimer=0;
+      const pool=parts.filter(p=>p.type==='o2'&&(p.state==='wander'||p.state==='inflow')).length;
+      spawnInflow(clamp(L().poolMax-pool,0,10));
+    }
+  }
+  for(const e of eries){e.x+=L().eryV*dt;if(e.x>440)e.removed=true;}
+  for(const p of parts)updatePart(p,dt);
+  for(const p of parts){
+    if(!p.dead)continue;
+    if(p===track.o2){$('capO2').textContent=p.state==='o2exhale2'?CAP.o2.exhaled:CAP.o2.gone;track.o2=null;track.lastO2='gone';}
+    if(p===track.co2){$('capCO2').textContent=(p.state==='exhale2')?CAP.co2.gone:CAP.co2.goneBlood;track.co2=null;track.lastCO2='gone';}
+    for(const tr of trails)if(tr.p===p&&tr.fade===null)tr.fade=3;
+    p.el.remove();if(p.lbl)p.lbl.remove();
+  }
+  parts=parts.filter(p=>!p.dead);
+  for(const e of eries)if(e.removed)e.g.remove();
+  eries=eries.filter(e=>!e.removed);
+  // trails
+  for(const tr of trails){
+    if(tr.fade===null){
+      const last=tr.pts[tr.pts.length-1];
+      if(!last||Math.hypot(last[0]-tr.p.x,last[1]-tr.p.y)>3){tr.pts.push([tr.p.x,tr.p.y]);if(tr.pts.length>500)tr.pts.shift();
+        tr.path.setAttribute('d','M'+tr.pts.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L'));}
+    }else{tr.fade-=dt;tr.path.setAttribute('opacity',clamp(tr.fade/3,0,1).toFixed(2));if(tr.fade<=0){tr.path.remove();tr.done=true;}}
+  }
+  trails=trails.filter(tr=>!tr.done);
+  updateCaptions();
+}
+
+function setPhase(ph){
+  phase=ph;$('phaseT').textContent=ph==='inhale'?'Einatmen ↓':'Ausatmen ↑';
+  if(ph==='inhale'){
+    parts.forEach(p=>{
+      if(p.state==='exhale'||p.state==='exhale2'){p.state='pushBack';p.tx=rnd(70,330);p.ty=rnd(80,180);}
+      else if(p.state==='o2exhale'||p.state==='o2exhale2'){p.state='inflow';p.tx=rnd(70,330);p.ty=rnd(80,200);}
+    });
+    const pool=parts.filter(p=>p.type==='o2'&&(p.state==='wander'||p.state==='inflow')).length;
+    spawnInflow(clamp(L().poolMax-pool,0,24));
+  }else{
+    const w=parts.filter(p=>p.type==='o2'&&p.state==='wander');
+    for(let i=0;i<L().o2out&&w.length;i++){const p=w.splice(Math.floor(Math.random()*w.length),1)[0];p.state='o2exhale';p.tx=rnd(186,214);}
+  }
+}
+
+function updateCaptions(){
+  const ext=S.mode==='erweitert';
+  if(track.o2){
+    let k=track.o2.state; if(k==='bound'&&ext)k='boundExt';
+    if(k!==track.lastO2){track.lastO2=k;$('capO2').textContent=CAP.o2[k]||'';}
+  }
+  if(track.co2){
+    let k=track.co2.state;
+    if(k==='drift'&&S.cycle&&phase==='inhale')k='driftWait';
+    if(k!==track.lastCO2&&CAP.co2[k]){track.lastCO2=k;$('capCO2').textContent=CAP.co2[k];}
+  }
+}
+
+function render(){
+  for(const e of eries){
+    e.g.setAttribute('transform','translate('+e.x.toFixed(1)+','+e.y.toFixed(1)+')');
+    const f=clamp((e.o2-1)/3,0,1);
+    const r=Math.round(122+(230-122)*f),g=Math.round(31+(57-31)*f),b=Math.round(61+(70-61)*f);
+    e.body.setAttribute('fill','rgb('+r+','+g+','+b+')');
+  }
+  for(const p of parts){
+    if(p.el.tagName==='rect'){const s=+p.el.getAttribute('width');p.el.setAttribute('x',(p.x-s/2).toFixed(1));p.el.setAttribute('y',(p.y-s/2).toFixed(1));}
+    else{p.el.setAttribute('cx',p.x.toFixed(1));p.el.setAttribute('cy',p.y.toFixed(1));}
+  }
+}
+
+function setTrack(kind,p){
+  if(track[kind])styleTracked(track[kind],false);
+  track[kind]=p;styleTracked(p,true);
+  p.el.parentNode.appendChild(p.el);
+  const path=mk('path',{class:'trail '+kind},gTrail);
+  trails.push({p,path,pts:[[p.x,p.y]],fade:null,kind});
+  if(kind==='o2')track.lastO2='';else track.lastCO2='';
+}
+function startTracking(){
+  trails.forEach(tr=>tr.path.remove());trails=[];
+  if(track.o2)styleTracked(track.o2,false);
+  if(track.co2)styleTracked(track.co2,false);
+  track.o2=null;track.co2=null;track.pendingO2=false;track.pendingCO2=false;
+  const inflow=parts.filter(p=>p.type==='o2'&&p.state==='inflow');
+  const wand=parts.filter(p=>p.type==='o2'&&p.state==='wander');
+  const o=inflow[0]||wand[Math.floor(Math.random()*wand.length)];
+  if(o)setTrack('o2',o);else{track.pendingO2=true;$('capO2').textContent='Warte auf das nächste O₂-Teilchen …';}
+  const c=parts.filter(p=>p.ery&&(p.state==='boundCO2'||p.state==='carbamino'||p.state==='plasma')&&p.ery.x<40&&p.releaseX>p.ery.x+50)
+    .sort((a,b)=>(b.type==='hco3')-(a.type==='hco3'));
+  if(c.length)setTrack('co2',c[0]);else{track.pendingCO2=true;$('capCO2').textContent='Warte auf das nächste CO₂-Teilchen …';}
+}
+
+function reset(){
+  [gEry,gO2,gCO2,gTrail].forEach(g=>{while(g.firstChild)g.removeChild(g.firstChild);});
+  eries=[];parts=[];trails=[];t=0;eryTimer=0;breathTimer=0;
+  track.o2=track.co2=null;track.pendingO2=track.pendingCO2=false;track.lastO2=track.lastCO2='';
+  $('capO2').textContent='Tippe auf „Weg verfolgen“: Ein O₂- und ein CO₂-Teilchen werden markiert und ihr Weg wird nachgezeichnet.';
+  $('capCO2').textContent='–';
+  for(let x=-30;x<420;x+=68)spawnEry(x,true);
+  spawnPool(22);
+  phase='inhale';phaseT=0;$('phaseT').textContent='Einatmen ↓';
+  applyLoadUI();
+  if(S.cycle)spawnInflow(6);else airPath.removeAttribute('transform');
+  render();
+}
+
+// UI
+$('play').addEventListener('click',()=>{S.running=!S.running;$('play').textContent=S.running?'Pause':'Abspielen';});
+$('reset').addEventListener('click',reset);
+$('follow').addEventListener('click',startTracking);
+$('speed').addEventListener('input',e=>{S.speed=+e.target.value;$('speedOut').textContent=String(S.speed).replace('.',',')+'×';});
+$('tO2').addEventListener('change',e=>{gO2.style.display=e.target.checked?'':'none';});
+$('tCO2').addEventListener('change',e=>{gCO2.style.display=e.target.checked?'':'none';});
+$('tLbl').addEventListener('change',e=>{gLabels.style.display=e.target.checked?'':'none';
+  parts.forEach(p=>{if(p.lbl)p.lbl.style.display=e.target.checked?'':'none';});});
+$('tCycle').addEventListener('change',e=>{
+  S.cycle=e.target.checked;gPhase.style.display=S.cycle?'':'none';
+  airPath.removeAttribute('transform');phase='inhale';phaseT=0;breathTimer=0;$('phaseT').textContent='Einatmen ↓';
+});
+function applyLoadUI(){
+  const b=S.load==='belastung', ext=S.mode==='erweitert';
+  $('venT').textContent=L().ven;$('contactT').textContent=L().contact;
+  $('loadNote').textContent=b
+    ?'Belastung: Das Herz pumpt bis zu fünfmal so viel Blut pro Minute. Die Erythrozyten kommen sauerstoffärmer an (Sättigung bis ca. 25 %) und nehmen mehr O₂ auf. Trotz kürzerer Kontaktzeit sind sie am Ende wieder fast voll beladen. Schnelleres und tieferes Atmen hält die Luft in der Alveole frisch.'+(ext?' Bei Ausdauersportlern kann die arterielle O₂-Sättigung unter Maximalbelastung leicht sinken, weil die Kontaktzeit dann sehr kurz wird.':'')
+    :'Ruhe: Das venöse Blut ist noch zu etwa drei Vierteln mit O₂ beladen. Jeder Erythrozyt nimmt deshalb nur wenig O₂ auf. Der Rest ist eine Reserve für Belastung.';
+}
+document.querySelectorAll('.seg button[data-load]').forEach(b=>b.addEventListener('click',()=>{
+  S.load=b.dataset.load;
+  document.querySelectorAll('.seg button[data-load]').forEach(x=>x.classList.toggle('on',x===b));
+  reset();
+}));
+document.querySelectorAll('.seg button[data-mode]').forEach(b=>b.addEventListener('click',()=>{
+  S.mode=b.dataset.mode;
+  document.querySelectorAll('.seg button[data-mode]').forEach(x=>x.classList.toggle('on',x===b));
+  const ext=S.mode==='erweitert';
+  $('stepsBasis').hidden=ext;$('stepsExt').hidden=!ext;
+  document.querySelectorAll('.legend .ext').forEach(el=>el.hidden=!ext);
+  reset();
+}));
+
+if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){S.speed=0.5;$('speed').value=0.5;$('speedOut').textContent='0,5×';}
+
+let last=null;
+function loop(ts){
+  if(last===null)last=ts;
+  let dt=Math.min((ts-last)/1000,0.05);last=ts;
+  if(S.running&&!document.hidden){update(dt*S.speed);render();}
+  requestAnimationFrame(loop);
+}
+reset();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
