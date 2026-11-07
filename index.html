@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unterricht – Startseite</title>
+    <meta name="description" content="Quiz, Material und Werkzeuge für den Unterricht" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="kopf">
+      <h1 id="titel">Unterricht</h1>
+      <p id="untertitel"></p>
+    </header>
+
+    <main>
+      <section aria-labelledby="links-titel">
+        <h2 id="links-titel" class="unsichtbar">Schnellzugriff</h2>
+        <ul id="links" class="kacheln"></ul>
+      </section>
+
+      <section aria-labelledby="material-titel" class="material">
+        <div class="material-kopf">
+          <h2 id="material-titel">Materialien</h2>
+          <label class="suche">
+            <span class="unsichtbar">Materialien durchsuchen</span>
+            <input id="suche" type="search" placeholder="Suchen …" autocomplete="off" />
+          </label>
+        </div>
+        <div id="faecher" class="faecher" role="group" aria-label="Nach Fach filtern"></div>
+        <div id="materialien"></div>
+      </section>
+    </main>
+
+    <footer class="fuss">
+      <p>Diese Seite setzt keine Cookies, speichert nichts und lädt nichts von fremden Servern.</p>
+      <p><a href="impressum.html">Impressum &amp; Datenschutz</a></p>
+    </footer>
+
+    <dialog id="qr-dialog" aria-labelledby="qr-titel">
+      <h2 id="qr-titel"></h2>
+      <div id="qr-bild"></div>
+      <p id="qr-adresse"></p>
+      <button type="button" id="qr-schliessen" class="knopf">Schließen</button>
+    </dialog>
+
+    <script src="js/inhalte.js"></script>
+    <script src="js/qrcode.min.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
