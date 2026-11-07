@@ -19,6 +19,12 @@ window.SEITE = {
 /** Große Kacheln oben (Links auf eigene Seiten) */
 window.LINKS = [
   {
+    symbol: '📚',
+    titel: 'Lernangebote',
+    text: 'Simulationen, Erklärungen und Übungen – nach Fach, Jahrgang und Thema.',
+    adresse: 'lernen/',
+  },
+  {
     symbol: '❓',
     titel: 'Quizzo – Mitspielen',
     text: 'PIN eingeben und beim Live-Quiz mitmachen. Auch für Aufgaben-Codes.',

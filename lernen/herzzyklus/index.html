@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Herzzyklus im Schnitt – Systole und Diastole</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#e9eef3; --surface:#ffffff; --surface-2:#f2f5f8; --text:#17212b; --muted:#5b6876; --line:#d3dce5;
+  --accent:#23408e; --accent-soft:#dfe6f6; --ok:#1b7f55; --bad:#b8322b;
+  --muscle:#c46a5e; --vwall:#d99c91; --valve:#fdf4e3; --valve-edge:#5a2e27; --chord:#f7ead2;
+  --blue:#3567c9; --red:#cf2f3a; --glow:#ffcf3f; --sys:#f8dfdb; --dia:#dde7f6;
+  --label-bg:#ffffff; --label-ink:#17212b; --num-bg:#17212b; --num-ink:#ffffff; --stage:#f7f9fb;
+  --c-lv:#cf2f3a; --c-ao:#7a1620; --c-la:#d9821a; --c-vol:#5a45c4; --c-ekg:#13865f; --grid:#e3e8ee;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#10161d; --surface:#18212b; --surface-2:#1f2a36; --text:#eaf0f6; --muted:#9aa8b6; --line:#2c3a48;
+    --accent:#8fb0ff; --accent-soft:#22325a; --ok:#51c98f; --bad:#ff7c72;
+    --muscle:#b8665b; --vwall:#c88d83; --valve:#f6ead4; --valve-edge:#2d1713; --chord:#ecdfc6;
+    --blue:#4a7ee0; --red:#dd3e48; --glow:#ffcf3f; --sys:#3b2528; --dia:#1c2b42;
+    --label-bg:#18212b; --label-ink:#eaf0f6; --num-bg:#eaf0f6; --num-ink:#10161d; --stage:#141c25;
+    --c-lv:#ff6b70; --c-ao:#ffb4b8; --c-la:#f4a74b; --c-vol:#a996ff; --c-ekg:#4fd6a6; --grid:#26323f;
+  }
+}
+:root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg:#10161d; --surface:#18212b; --surface-2:#1f2a36; --text:#eaf0f6; --muted:#9aa8b6; --line:#2c3a48;
+    --accent:#8fb0ff; --accent-soft:#22325a; --ok:#51c98f; --bad:#ff7c72;
+    --muscle:#b8665b; --vwall:#c88d83; --valve:#f6ead4; --valve-edge:#2d1713; --chord:#ecdfc6;
+    --blue:#4a7ee0; --red:#dd3e48; --glow:#ffcf3f; --sys:#3b2528; --dia:#1c2b42;
+    --label-bg:#18212b; --label-ink:#eaf0f6; --num-bg:#eaf0f6; --num-ink:#10161d; --stage:#141c25;
+    --c-lv:#ff6b70; --c-ao:#ffb4b8; --c-la:#f4a74b; --c-vol:#a996ff; --c-ekg:#4fd6a6; --grid:#26323f;
+}
+:root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size:16px; line-height:1.5;
+}
+.wrap{ max-width:1180px; margin:0 auto; padding:16px 14px 32px; }
+header.top{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:10px 16px; margin:4px 2px 14px; }
+header.top h1{ font-size:clamp(1.5rem,4vw,2.1rem); line-height:1.15; margin:0 0 2px; letter-spacing:-.01em; }
+.level{ display:inline-grid; grid-template-columns:1fr 1fr; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:4px; gap:4px; }
+.level button{ font:inherit; font-weight:700; font-size:.95rem; padding:8px 14px; border:0; border-radius:9px; background:transparent; color:var(--muted); cursor:pointer; white-space:nowrap; }
+.level button.on{ background:var(--accent); color:#fff; }
+.sek1 .only2{ display:none !important; }
+header.top p{ margin:0; color:var(--muted); }
+.grid{ display:grid; gap:14px; grid-template-columns:minmax(0,1fr); }
+@media (min-width:920px){
+  .grid{ grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr); align-items:start; }
+  .chart{ grid-column:1 / -1; }
+}
+.card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; }
+.stage{ background:var(--stage); padding:10px 10px 6px; }
+.stagehead{ display:flex; align-items:center; gap:10px; padding:2px 4px 6px; min-height:34px; }
+.stagehead strong{ font-size:1.05rem; }
+.tag{ display:inline-block; padding:2px 10px; border-radius:999px; font-weight:700; font-size:.85rem; }
+.tag.sys{ background:var(--sys); color:var(--text); box-shadow:inset 0 0 0 1.5px var(--red); }
+.tag.dia{ background:var(--dia); color:var(--text); box-shadow:inset 0 0 0 1.5px var(--blue); }
+svg#heart{ display:block; width:100%; height:auto; max-height:78vh; touch-action:manipulation; user-select:none; -webkit-user-select:none; }
+.legendrow{ display:flex; flex-wrap:wrap; gap:6px 14px; padding:6px 4px 2px; font-size:.85rem; color:var(--muted); }
+.legendrow span{ display:inline-flex; align-items:center; gap:6px; }
+.sw{ width:14px; height:14px; border-radius:4px; display:inline-block; }
+.side{ display:grid; gap:14px; }
+.phase h2{ margin:6px 0 6px; font-size:1.35rem; line-height:1.2; }
+.phase p{ margin:0 0 10px; }
+.phasetop{ display:flex; align-items:center; gap:10px; }
+.phasetop .pn{ font-size:.9rem; color:var(--muted); }
+.valves{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0 12px; }
+.valves div{ background:var(--surface-2); border-radius:10px; padding:8px 10px; font-size:.92rem; }
+.valves b{ display:block; font-size:1rem; }
+.valves .open{ color:var(--ok); } .valves .closed{ color:var(--bad); }
+.phbtns{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.phbtns button{ font:inherit; font-size:.82rem; line-height:1.2; padding:8px 4px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--text); cursor:pointer; }
+.phbtns button b{ display:block; font-size:1rem; }
+.phbtns button.cur{ background:var(--accent); color:#fff; border-color:var(--accent); }
+:root[data-theme="dark"] .phbtns button.cur, :root[data-theme="dark"] .level button.on{ color:#10161d; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .phbtns button.cur, :root:not([data-theme="light"]) .level button.on{ color:#10161d; } }
+.controls{ display:grid; gap:12px; }
+.btnrow{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.btn{ font:inherit; font-weight:700; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--surface-2); color:var(--text); cursor:pointer; }
+.btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+:root[data-theme="dark"] .btn.primary{ color:#10161d; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.primary{ color:#10161d; } }
+.slider{ display:grid; gap:2px; font-size:.95rem; }
+.slider span{ display:flex; justify-content:space-between; }
+input[type=range]{ width:100%; accent-color:var(--accent); height:28px; }
+.seg{ display:grid; grid-template-columns:auto 1fr 1fr 1fr; gap:6px; align-items:center; font-size:.95rem; }
+.seg button{ font:inherit; font-size:.9rem; padding:7px 6px; border-radius:9px; border:1px solid var(--line); background:var(--surface); color:var(--text); cursor:pointer; }
+.seg button.on{ background:var(--accent-soft); border-color:var(--accent); font-weight:700; }
+.toggles{ display:flex; flex-wrap:wrap; gap:8px 18px; }
+.toggles label{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+.toggles input{ width:18px; height:18px; accent-color:var(--accent); }
+.stats{ font-size:.88rem; color:var(--muted); background:var(--surface-2); border-radius:10px; padding:8px 10px; }
+.stats b{ color:var(--text); }
+.info h3{ margin:0 0 4px; font-size:1.1rem; }
+.info p{ margin:0 0 8px; }
+.info .hint{ color:var(--muted); font-size:.92rem; }
+.quizq{ font-size:1.15rem; font-weight:700; margin:4px 0 6px; }
+.quizfb{ min-height:1.5em; font-weight:700; }
+.quizfb.ok{ color:var(--ok); } .quizfb.bad{ color:var(--bad); }
+.quizrow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+ol.leg{ list-style:none; margin:10px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:4px 10px; }
+ol.leg button{ font:inherit; font-size:.92rem; width:100%; text-align:left; display:flex; gap:8px; align-items:center; padding:5px 6px; border-radius:8px; border:0; background:transparent; color:var(--text); cursor:pointer; }
+ol.leg button i{ font-style:normal; font-weight:700; font-size:.78rem; min-width:22px; height:22px; border-radius:50%; display:inline-grid; place-items:center; background:var(--num-bg); color:var(--num-ink); }
+ol.leg button.sel{ background:var(--accent-soft); }
+.chart h3{ margin:0; font-size:1.1rem; }
+.charthead{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px 16px; align-items:center; }
+.chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.chip{ font:inherit; font-size:.85rem; display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--muted); cursor:pointer; }
+.chip .dot{ width:10px; height:10px; border-radius:50%; }
+.chip.on{ color:var(--text); border-color:var(--text); font-weight:700; }
+.readout{ font-size:.92rem; margin:8px 0 6px; min-height:1.5em; font-variant-numeric:tabular-nums; }
+canvas#cv{ display:block; width:100%; touch-action:none; cursor:ew-resize; }
+.note{ font-size:.85rem; color:var(--muted); margin:8px 0 0; }
+button:focus-visible, input:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+.lbl text{ font-family:inherit; }
+@keyframes pulse{ 0%{ stroke-opacity:1; } 50%{ stroke-opacity:.35; } 100%{ stroke-opacity:1; } }
+.hlc{ animation:pulse 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce){ .hlc{ animation:none; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Der Herzzyklus im Schnitt</h1>
+      <p id="sub">Systole und Diastole Schritt für Schritt – mit Klappen, Blutfluss und Druckkurven</p>
+    </div>
+    <div class="level" role="group" aria-label="Niveau">
+      <button data-lv="1">Sek I (Klasse 7)</button>
+      <button data-lv="2" class="on">Sek II</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card stage" aria-label="Herzschnitt">
+      <div class="stagehead"><span id="hTag" class="tag sys">Systole</span><strong id="hName">Anspannungsphase</strong></div>
+      <svg id="heart" viewBox="0 0 460 480" role="img" aria-label="Schematischer Frontalschnitt durch das Herz mit Vorhöfen, Kammern, Klappen und großen Gefäßen">
+        <defs>
+          <marker id="arw" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ffffff"/></marker>
+        </defs>
+      </svg>
+      <div class="legendrow">
+        <span><i class="sw" style="background:var(--blue)"></i>sauerstoffarmes Blut</span>
+        <span><i class="sw" style="background:var(--red)"></i>sauerstoffreiches Blut</span>
+        <span><i class="sw" style="background:var(--glow)"></i>Muskel kontrahiert</span>
+      </div>
+    </section>
+
+    <div class="side">
+      <section class="card phase" aria-label="Aktuelle Phase">
+        <div class="phasetop"><span id="pTag" class="tag sys">Systole</span><span class="pn" id="pNum">Phase 1 von 4</span></div>
+        <h2 id="pName">Anspannungsphase</h2>
+        <p id="pDesc"></p>
+        <div class="valves">
+          <div>Segelklappen<b id="sAV" class="closed">geschlossen</b></div>
+          <div>Taschenklappen<b id="sSL" class="closed">geschlossen</b></div>
+        </div>
+        <div class="phbtns" id="phbtns"></div>
+      </section>
+
+      <section class="card controls" aria-label="Steuerung">
+        <div class="btnrow">
+          <button id="play" class="btn primary">Pause</button>
+          <button id="step" class="btn">Nächste Phase</button>
+        </div>
+        <label class="slider"><span>Tempo <b id="spdV">0,25 ×</b></span><input id="spd" type="range" min="0.05" max="1" step="0.05" value="0.25"></label>
+        <label class="slider"><span>Herzfrequenz <b id="bpmV">72 / min</b></span><input id="bpm" type="range" min="40" max="180" step="1" value="72"></label>
+        <div class="stats" id="stats"></div>
+        <div class="seg" role="group" aria-label="Beschriftung"><span>Beschriftung</span><button data-lab="num" class="on">Nummern</button><button data-lab="name">Namen</button><button data-lab="off">Aus</button></div>
+        <div class="toggles">
+          <label><input type="checkbox" id="tFlow" checked> Blutfluss-Pfeile</label>
+          <label><input type="checkbox" id="tSound"> Herztöne hörbar</label>
+        </div>
+      </section>
+
+      <section class="card info" aria-label="Strukturen und Quiz">
+        <div id="infoBox">
+          <h3 id="iTitle">Strukturen</h3>
+          <p id="iText" class="hint">Tippe auf eine Nummer, einen Namen oder direkt auf eine Struktur im Herzen.</p>
+        </div>
+        <div id="quizBox" hidden>
+          <div class="hint" id="qProg"></div>
+          <div class="quizq" id="qQ"></div>
+          <div class="quizfb" id="qFb"></div>
+          <div class="quizrow"><button class="btn" id="qShow">Lösung zeigen</button><button class="btn" id="qEnd">Quiz beenden</button></div>
+        </div>
+        <div class="quizrow"><button class="btn" id="quizBtn">Beschriftungs-Quiz starten</button></div>
+        <ol class="leg" id="leg"></ol>
+      </section>
+    </div>
+
+    <section class="card chart only2" aria-label="Diagramm">
+      <div class="charthead">
+        <h3>Druck, Volumen und EKG – linkes Herz</h3>
+        <div class="chips" id="chips">
+          <button class="chip on" data-c="lv"><i class="dot" style="background:var(--c-lv)"></i>Kammerdruck</button>
+          <button class="chip on" data-c="ao"><i class="dot" style="background:var(--c-ao)"></i>Aortendruck</button>
+          <button class="chip" data-c="la"><i class="dot" style="background:var(--c-la)"></i>Vorhofdruck</button>
+          <button class="chip on" data-c="vol"><i class="dot" style="background:var(--c-vol)"></i>Kammervolumen</button>
+          <button class="chip" data-c="ekg"><i class="dot" style="background:var(--c-ekg)"></i>EKG</button>
+          <button class="chip on" data-c="ht"><i class="dot" style="background:var(--text)"></i>Herztöne</button>
+        </div>
+      </div>
+      <div class="readout" id="readout"></div>
+      <canvas id="cv" aria-label="Diagramm des Herzzyklus. Tippen oder ziehen, um einen Zeitpunkt zu wählen."></canvas>
+      <p class="note">Tippe oder ziehe im Diagramm, um einen Zeitpunkt anzusehen. Modellwerte eines gesunden Erwachsenen in Ruhe; rechts sind die Drücke deutlich niedriger (rechte Kammer etwa 25 mmHg). Vereinfachtes Modell: Bei hoher Frequenz verkürzt sich vor allem die Füllungsphase, Effekte des Sympathikus sind nicht berücksichtigt. Der Schnitt ist ein Schulschema – die Ausflussbahnen von Aorta und Lungenarterie sind vereinfacht nebeneinander dargestellt.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const NS = 'http://www.w3.org/2000/svg';
+const L = (a, b, t) => a + (b - a) * t;
+const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x;
+const ease = t => { t = clamp(t); return t * t * (3 - 2 * t); };
+const P = (x, y) => x.toFixed(1) + ',' + y.toFixed(1);
+const fmt = (x, d = 0) => x.toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const S = { bpm: 72, speed: 0.25, playing: !reduce, t: 0.15, flow: true, sound: false, lab: 'num', sel: null, quiz: null, level: 2 };
+const C = { lv: true, ao: true, la: false, vol: true, ekg: false, ht: true };
+
+/* ---------- Zeitmodell ---------- */
+function timing() {
+  const T = 60 / S.bpm, k = Math.sqrt(T / 0.8);
+  const dI = .05 * k, dE = .25 * k, dR = .08 * k, dA = .1 * k, dF = T - (dI + dE + dR + dA);
+  return { T, k, dI, dE, dR, dA, dF, b: [0, dI, dI + dE, dI + dE + dR, T - dA, T] };
+}
+function locate(t, tm) {
+  const b = tm.b;
+  const ph = t < b[1] ? 0 : t < b[2] ? 1 : t < b[3] ? 2 : t < b[4] ? 3 : 4;
+  return { ph, u: clamp((t - b[ph]) / (b[ph + 1] - b[ph])) };
+}
+
+/* ---------- Physiologie (linkes Herz, Modell) ---------- */
+const ESV = 50, PD = 80, PE = PD + 42 * Math.sin(0.9 * Math.PI);
+const fillV = tf => ESV + 58 * (1 - Math.exp(-tf / 0.07));
+const lvFill = tf => 4 - 1.5 * Math.sin(Math.PI * Math.min(tf / 0.12, 1)) + 3 * (1 - Math.exp(-tf / 0.25));
+const laFill = tf => 5 + 7 * Math.exp(-tf / 0.06) + 2 * (1 - Math.exp(-tf / 0.25));
+const oAVfill = tf => ease(tf / 0.03) * (1 - 0.35 * ease((tf - 0.12) / 0.12));
+const aoRun = x => 80 + 11 * (Math.exp(-3 * x) - Math.exp(-3) * x);
+
+function ekg(t, tm) {
+  const { T, b, k, dE } = tm;
+  const g = (c, w, a) => { let d = t - c; d -= Math.round(d / T) * T; return a * Math.exp(-(d * d) / (2 * w * w)); };
+  return g(b[4] - 0.05 * k, 0.022 * k, 0.15) + g(T - 0.045, 0.008, -0.12) + g(T - 0.03, 0.009, 1.0)
+       + g(T - 0.015, 0.009, -0.25) + g(b[1] + 0.7 * dE, 0.04 * k, 0.3);
+}
+
+function state(t, tm) {
+  const { b, dI, dF, T } = tm;
+  const { ph, u } = locate(t, tm);
+  const VF = fillV(dF), EDV = VF + 12, SV = EDV - ESV, PF = lvFill(dF), EDP = PF + 2, LAF = laFill(dF), OF = oAVfill(dF);
+  const D = (T - b[3]) + dI;
+  let lv, ao, la, vol, oAV = 0, oSL = 0, act = 0, atr = 0, fV = 0.5, fAV = 0, fEj = 0;
+  if (ph === 0) {
+    vol = EDV; lv = EDP + (PD - EDP) * ease(u); ao = aoRun((T - b[3] + t) / D); la = 7 + 2 * Math.sin(Math.PI * u);
+    oAV = 1 - ease(u / 0.35); act = ease(u * 3); fV = 0.4;
+  } else if (ph === 1) {
+    vol = EDV - SV * (1 - Math.pow(1 - u, 2)); lv = PD + 42 * Math.sin(0.9 * Math.PI * u); ao = lv - 2 * Math.sin(Math.PI * u);
+    la = u < 0.3 ? 7 - 4 * ease(u / 0.3) : 3 + 6 * ease((u - 0.3) / 0.7);
+    oSL = ease(u / 0.1); act = u < 0.7 ? 1 : 1 - 0.6 * ease((u - 0.7) / 0.3);
+    fV = 0.6 + 0.4 * Math.sin(Math.PI * u); fEj = Math.min(1, u / 0.08) * (1 - 0.6 * u);
+  } else if (ph === 2) {
+    vol = ESV; lv = 4 + (PE - 4) * (Math.exp(-4 * u) - Math.exp(-4) * u);
+    ao = PE - 6 * Math.sin(Math.PI * Math.min(u / 0.4, 1)) - 2 * u; la = 9 + 3 * Math.sin(Math.PI * u / 2);
+    oSL = 1 - ease(u / 0.25); act = 0.4 * (1 - u); fV = 0.6;
+  } else if (ph === 3) {
+    const tf = t - b[3];
+    vol = fillV(tf); lv = lvFill(tf); la = laFill(tf); oAV = oAVfill(tf); ao = aoRun(tf / D); fV = 0.5;
+    fAV = ease(tf / 0.03) * (0.15 + 0.85 * Math.exp(-tf / 0.08));
+  } else {
+    vol = VF + 12 * ease(u); lv = PF + 4 * Math.sin(Math.PI * u) + 2 * u; la = LAF + 5 * Math.sin(Math.PI * u) + (7 - LAF) * u;
+    oAV = OF + (1 - OF) * ease(u / 0.4); ao = aoRun((t - b[3]) / D); atr = Math.sin(Math.PI * u);
+    fV = 0.15; fAV = 0.2 + 0.6 * Math.sin(Math.PI * u);
+  }
+  return { ph, u, lv, ao, la, vol, oAV, oSL, act, atr, fV, fAV, fEj, EDV, SV, c: clamp((EDV - vol) / SV), ekg: ekg(t, tm) };
+}
+
+let SAM = null;
+function samples(tm) {
+  if (SAM && SAM.bpm === S.bpm) return SAM;
+  const N = 400, a = [];
+  for (let i = 0; i <= N; i++) a.push(state(Math.min(tm.T * i / N, tm.T - 1e-6), tm));
+  SAM = { bpm: S.bpm, a, N };
+  return SAM;
+}
+
+/* ---------- Texte ---------- */
+const PH = [
+  { n: 'Anspannungsphase', g: 'Systole', d: 'Die Kammermuskulatur zieht sich zusammen. Sobald der Kammerdruck den Vorhofdruck übersteigt, schlagen die Segelklappen zu (1. Herzton). Sehnenfäden und Papillarmuskeln verhindern, dass die Segel in die Vorhöfe durchschlagen. Alle vier Klappen sind geschlossen: Das Volumen bleibt gleich, der Druck steigt steil an.' },
+  { n: 'Austreibungsphase', g: 'Systole', d: 'Übersteigt der Kammerdruck den Druck in der Aorta (etwa 80 mmHg) bzw. in der Lungenarterie, öffnen sich die Taschenklappen. Links strömt Blut in den Körperkreislauf, rechts in den Lungenkreislauf – je Kammer etwa 70 ml. Die Ventilebene wird zur Herzspitze gezogen und saugt dabei Blut aus den Venen in die Vorhöfe.' },
+  { n: 'Entspannungsphase', g: 'Diastole', d: 'Die Kammermuskulatur erschlafft. Fällt der Kammerdruck unter den Druck in Aorta und Lungenarterie, schließen sich die Taschenklappen (2. Herzton). Die Segelklappen sind noch zu – wieder sind alle Klappen geschlossen, der Druck fällt bei gleichem Volumen.' },
+  { n: 'Füllungsphase', g: 'Diastole', d: 'Fällt der Kammerdruck unter den Vorhofdruck, öffnen sich die Segelklappen. Blut strömt zuerst schnell, dann langsamer in die Kammern – der größte Teil der Füllung geschieht passiv. Die Ventilebene gleitet zurück zur Herzbasis. Die Taschenklappen bleiben geschlossen.' },
+  { n: 'Füllungsphase: Vorhofkontraktion', g: 'Diastole', d: 'Am Ende der Diastole ziehen sich die Vorhöfe zusammen und drücken zusätzlich Blut in die Kammern (in Ruhe etwa 10 bis 20 Prozent der Füllung). Segelklappen offen, Taschenklappen geschlossen. Danach sind die Kammern maximal gefüllt – der nächste Zyklus beginnt mit der Anspannungsphase.' }
+];
+
+const PH1 = [
+  { n: 'Die Kammern ziehen sich zusammen', g: 'Systole', d: 'Die Muskulatur der Kammern zieht sich zusammen. Zuerst schließen sich die Segelklappen, damit kein Blut zurück in die Vorhöfe fließt. Dann öffnen sich die Taschenklappen und das Blut wird hinausgepresst: aus der rechten Kammer in die Lungenarterie zur Lunge, aus der linken Kammer in die Aorta in den Körper.' },
+  { n: 'Die Kammern erschlaffen und füllen sich', g: 'Diastole', d: 'Die Kammermuskulatur erschlafft. Zuerst schließen sich die Taschenklappen, damit kein Blut aus Aorta und Lungenarterie zurückfließt. Dann öffnen sich die Segelklappen und Blut fließt aus den Vorhöfen in die Kammern. Am Ende ziehen sich die Vorhöfe kurz zusammen und drücken noch etwas Blut nach.' }
+];
+
+/* ---------- SVG-Aufbau ---------- */
+const svg = $('#heart');
+function mk(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  (parent || svg).appendChild(e);
+  return e;
+}
+const tubeW = (d, w, parent) => mk('path', { d, fill: 'none', stroke: 'var(--vwall)', 'stroke-width': w, 'stroke-linejoin': 'round' }, parent);
+const tubeL = (d, w, col, id, parent) => mk('path', { d, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linejoin': 'round', 'data-id': id }, parent);
+const E = {};
+
+// Lungenarterien (hinten)
+const gPA = mk('g', {});
+const PA_L = 'M169,104 C169,80 150,78 125,78 L6,78', PA_R = 'M169,104 C169,84 186,90 210,90 L318,90';
+tubeW(PA_L, 31, gPA); tubeW(PA_R, 31, gPA); E.paTw = tubeW('', 46, gPA);
+tubeL(PA_L, 24, 'var(--blue)', 'pa', gPA); tubeL(PA_R, 24, 'var(--blue)', 'pa', gPA); E.paT = tubeL('', 38, 'var(--blue)', 'pa', gPA);
+
+// Venen + Vorhöfe
+const gA = mk('g', {});
+const SVC = 'M92,0 L92,152', IVC = 'M16,480 L16,236 Q16,214 38,214 L82,214', PV1 = 'M460,170 L360,170', PV2 = 'M460,212 L360,212';
+tubeW(SVC, 38, gA); tubeW(IVC, 30, gA); tubeW(PV1, 27, gA); tubeW(PV2, 27, gA);
+E.raW = mk('path', { fill: 'var(--muscle)', stroke: 'var(--muscle)', 'stroke-width': 9, 'stroke-linejoin': 'round' }, gA);
+E.laW = mk('path', { fill: 'var(--muscle)', stroke: 'var(--muscle)', 'stroke-width': 9, 'stroke-linejoin': 'round' }, gA);
+E.raG = mk('path', { fill: 'none', stroke: 'var(--glow)', 'stroke-width': 9, opacity: 0 }, gA);
+E.laG = mk('path', { fill: 'none', stroke: 'var(--glow)', 'stroke-width': 9, opacity: 0 }, gA);
+tubeL(SVC, 30, 'var(--blue)', 'svc', gA); tubeL(IVC, 22, 'var(--blue)', 'ivc', gA);
+tubeL(PV1, 20, 'var(--red)', 'pv', gA); tubeL(PV2, 20, 'var(--red)', 'pv', gA);
+E.raC = mk('path', { fill: 'var(--blue)', 'data-id': 'ra' }, gA);
+E.laC = mk('path', { fill: 'var(--red)', 'data-id': 'la' }, gA);
+
+// Kammern
+const gV = mk('g', {});
+E.outer = mk('path', { fill: 'var(--muscle)' }, gV);
+E.conus = mk('path', { fill: 'var(--muscle)' }, gV);
+E.glow = mk('path', { fill: 'var(--glow)', opacity: 0 }, gV);
+E.rvC = mk('path', { fill: 'var(--blue)', 'data-id': 'rv' }, gV);
+E.lvC = mk('path', { fill: 'var(--red)', 'data-id': 'lv' }, gV);
+E.rvP = mk('path', { fill: 'var(--muscle)', 'data-id': 'pm' }, gV);
+E.lvP = mk('path', { fill: 'var(--muscle)', 'data-id': 'pm' }, gV);
+E.rvPG = mk('path', { fill: 'var(--glow)', opacity: 0, 'pointer-events': 'none' }, gV);
+E.lvPG = mk('path', { fill: 'var(--glow)', opacity: 0, 'pointer-events': 'none' }, gV);
+E.chords = [];
+for (let i = 0; i < 8; i++) E.chords.push(mk('path', { fill: 'none', stroke: 'var(--chord)', 'stroke-width': 1.3, 'data-id': 'sf' }, gV));
+function valveEl(id, parent) {
+  return { e: mk('path', { fill: 'none', stroke: 'var(--valve-edge)', 'stroke-width': 6.5, 'stroke-linecap': 'round', 'data-id': id }, parent),
+           f: mk('path', { fill: 'none', stroke: 'var(--valve)', 'stroke-width': 4, 'stroke-linecap': 'round', 'data-id': id }, parent) };
+}
+E.tL = valveEl('tk', gV); E.tR = valveEl('tk', gV); E.mL = valveEl('mk', gV); E.mR = valveEl('mk', gV);
+
+// Aorta (vorne)
+const gAo = mk('g', {});
+const BR = ['M260,58 L254,0', 'M293,50 L293,0', 'M326,58 L332,0'];
+BR.forEach(d => tubeW(d, 16, gAo));
+E.aoW = tubeW('', 50, gAo);
+BR.forEach(d => tubeL(d, 10, 'var(--red)', 'ao', gAo));
+E.aoL = tubeL('', 40, 'var(--red)', 'ao', gAo);
+E.pL = valveEl('pk', gAo); E.pR = valveEl('pk', gAo); E.aL = valveEl('ak', gAo); E.aR = valveEl('ak', gAo);
+
+// Blutfluss-Pfeile
+const gF = mk('g', { 'pointer-events': 'none' });
+const FLOWS = [
+  { k: 'fV', d: () => 'M92,16 L92,148' },
+  { k: 'fV', d: () => 'M16,462 L16,238 Q16,214 40,214 L78,214' },
+  { k: 'fV', d: () => 'M452,170 L366,170' },
+  { k: 'fV', d: () => 'M452,212 L366,212' },
+  { k: 'fAV', d: B => `M100,190 L100,${(B + 78).toFixed(1)}` },
+  { k: 'fAV', d: B => `M318,192 L318,${(B + 88).toFixed(1)}` },
+  { k: 'fEj', d: B => `M118,${(B + 96).toFixed(1)} C150,${(B + 62).toFixed(1)} 169,${(B + 12).toFixed(1)} 169,${(B - 60).toFixed(1)} L169,104 C169,84 150,78 128,78 L24,78` },
+  { k: 'fEj', d: () => 'M188,90 L312,90' },
+  { k: 'fEj', d: B => `M300,${(B + 128).toFixed(1)} C252,${(B + 92).toFixed(1)} 234,${(B + 24).toFixed(1)} 234,${(B - 62).toFixed(1)} L234,98 C234,46 352,46 352,98 L352,124` },
+  { k: 'fEj', d: () => 'M258,50 L255,10' },
+  { k: 'fEj', d: () => 'M293,42 L293,8' },
+  { k: 'fEj', d: () => 'M328,50 L331,10' }
+].map(f => ({ ...f, off: 0, el: mk('path', { fill: 'none', stroke: '#ffffff', 'stroke-width': 2.6, 'stroke-linecap': 'round', 'stroke-dasharray': '7 9', 'marker-end': 'url(#arw)', opacity: 0 }, gF) }));
+
+// Ventilebene
+E.vp = mk('path', { fill: 'none', stroke: 'var(--text)', 'stroke-width': 1.2, 'stroke-dasharray': '4 5', opacity: .55, 'pointer-events': 'none' });
+
+/* ---------- Beschriftung ---------- */
+const LBL = [
+  { id: 'svc', n: 'Obere Hohlvene', i: 'Führt sauerstoffarmes Blut aus Kopf, Hals und Armen in den rechten Vorhof.',
+    a: g => [92, 44], t: g => ({ x: 92, y: 40, l: ['obere', 'Hohlvene'] }) },
+  { id: 'ivc', n: 'Untere Hohlvene', i: 'Führt sauerstoffarmes Blut aus Rumpf, Bauchorganen und Beinen in den rechten Vorhof.',
+    a: g => [16, 446], t: g => ({ x: 32, y: 446, l: ['untere', 'Hohlvene'], an: 'start' }) },
+  { id: 'ra', n: 'Rechter Vorhof', i: 'Sammelt das sauerstoffarme Blut aus dem Körperkreislauf. Dünne Wand – er muss das Blut nur in die benachbarte Kammer befördern. In seiner Wand liegt der Sinusknoten, der Taktgeber des Herzens.',
+    a: g => [96, 160], t: g => ({ x: 96, y: 148, l: ['rechter', 'Vorhof'] }) },
+  { id: 'tk', n: 'Trikuspidalklappe', i: 'Segelklappe mit drei Segeln zwischen rechtem Vorhof und rechter Kammer. Offen während der Füllungsphase, geschlossen in der Systole – so kann kein Blut in den Vorhof zurückfließen.',
+    a: g => [102, g.B - 14], t: g => ({ x: 102, y: g.B - 16, l: ['Trikuspidalklappe'] }) },
+  { id: 'rv', n: 'Rechte Kammer', i: 'Pumpt das Blut in den Lungenkreislauf. Ihre Wand ist deutlich dünner als links, weil dafür nur ein Druck von etwa 25 mmHg nötig ist.',
+    a: g => [178, g.B + 96], t: g => ({ x: 178, y: g.B + 96, l: ['rechte', 'Kammer'] }) },
+  { id: 'pk', n: 'Pulmonalklappe', i: 'Taschenklappe aus drei halbmondförmigen Taschen zwischen rechter Kammer und Lungenarterie. Sie öffnet sich passiv durch den Druck in der Austreibungsphase und schließt sich, wenn sich die Taschen beim Rückstrom mit Blut füllen.',
+    a: g => [169, g.B - 64], t: g => ({ x: 140, y: g.B - 54, l: ['Pulmonal-', 'klappe'], an: 'end', lx: 162, ly: g.B - 54 }) },
+  { id: 'pa', n: 'Lungenarterie', i: 'Führt sauerstoffarmes Blut zur Lunge. Arterien sind über die Richtung definiert (vom Herzen weg), nicht über den Sauerstoffgehalt.',
+    a: g => [169, 132], t: g => ({ x: 169, y: 146, l: ['Lungenarterie'], rot: -90 }) },
+  { id: 'pv', n: 'Lungenvenen', i: 'Bringen sauerstoffreiches Blut aus der Lunge in den linken Vorhof. Es gibt meist vier Lungenvenen, im Schnitt sind zwei zu sehen.',
+    a: g => [432, 191], t: g => ({ x: 432, y: 140, l: ['Lungen-', 'venen'], lx: 432, ly: 162 }) },
+  { id: 'la', n: 'Linker Vorhof', i: 'Sammelt das sauerstoffreiche Blut aus dem Lungenkreislauf.',
+    a: g => [320, 165], t: g => ({ x: 320, y: 165, l: ['linker', 'Vorhof'] }) },
+  { id: 'mk', n: 'Mitralklappe (Bikuspidalklappe)', i: 'Segelklappe mit zwei Segeln zwischen linkem Vorhof und linker Kammer. Ihr Schluss zu Beginn der Systole trägt – zusammen mit der Trikuspidalklappe und der Muskelanspannung – zum 1. Herzton bei.',
+    a: g => [316, g.B - 14], t: g => ({ x: 316, y: g.B - 16, l: ['Mitralklappe'] }) },
+  { id: 'lv', n: 'Linke Kammer', i: 'Pumpt das Blut in den Körperkreislauf und erzeugt dabei Drücke bis etwa 120 mmHg. Deshalb hat sie die dickste Wand des Herzens.',
+    a: g => [268, g.B + 150], t: g => ({ x: 268, y: g.B + 150, l: ['linke', 'Kammer'] }) },
+  { id: 'ak', n: 'Aortenklappe', i: 'Taschenklappe zwischen linker Kammer und Aorta. Ihr Schluss erzeugt zusammen mit der Pulmonalklappe den 2. Herzton.',
+    a: g => [234, g.B - 56], t: g => ({ x: 264, y: g.B - 62, l: ['Aorten-', 'klappe'], an: 'start', lx: 250, ly: g.B - 48 }) },
+  { id: 'ao', n: 'Aorta', i: 'Hauptschlagader. Sie verteilt das sauerstoffreiche Blut über abgehende Arterien in den ganzen Körper. Ihre elastische Wand dehnt sich in der Systole und gibt das Blut in der Diastole weiter (Windkesselfunktion) – deshalb fällt der Aortendruck nie unter etwa 80 mmHg.',
+    a: g => [234, 140], t: g => ({ x: 234, y: 150, l: ['Aorta'], rot: -90 }) },
+  { id: 'sep', n: 'Herzscheidewand (Septum)', i: 'Trennt rechte und linke Herzhälfte vollständig, sodass sich sauerstoffarmes und sauerstoffreiches Blut nicht mischen. Zwischen den Kammern ist sie kräftig und muskulös und kontrahiert mit.',
+    a: g => [220, g.B + 100], t: g => ({ x: 220, y: g.B + 100, l: ['Herzscheidewand'], rot: 80 }) },
+  { id: 'sf', n: 'Sehnenfäden', i: 'Verbinden die Segel mit den Papillarmuskeln. Sie verhindern, dass die Segel in der Systole in die Vorhöfe durchschlagen. Die Klappen öffnen und schließen sich dagegen passiv durch Druckunterschiede.',
+    a: g => g.sfA, t: g => ({ x: 390, y: g.B + 40, l: ['Sehnen-', 'fäden'], an: 'start', lx: g.sfA[0], ly: g.sfA[1] }) },
+  { id: 'pm', n: 'Papillarmuskel', i: 'Kegelförmige Muskelvorsprünge der Kammerwand. Sie kontrahieren in der Systole mit und halten so die Sehnenfäden gespannt.',
+    a: g => g.pmA, t: g => ({ x: 374, y: g.B + 172, l: ['Papillar-', 'muskel'], an: 'start', lx: g.pmA[0], ly: g.pmA[1] }) },
+  { id: 'vp', n: 'Ventilebene', i: 'Ebene, in der alle vier Herzklappen liegen (gestrichelte Linie). In der Austreibungsphase wird sie zur Herzspitze gezogen: Die Vorhöfe werden gedehnt und saugen Blut an. In der Füllungsphase gleitet sie zurück über das Blut der Kammern (Ventilebenenmechanismus).',
+    a: g => [440, g.B], t: g => ({ x: 456, y: g.B - 10, l: ['Ventilebene'], an: 'end' }) }
+];
+const BYID = Object.fromEntries(LBL.map((x, i) => [x.id, { ...x, num: i + 1 }]));
+const MAP1 = { svc: 'svc', ivc: 'ivc', ra: 'ra', tk: 'sk', mk: 'sk', rv: 'rv', pk: 'tak', ak: 'tak', pa: 'pa', pv: 'pv', la: 'la', lv: 'lv', ao: 'ao', sep: 'sep' };
+const G1 = [
+  { k: 'svc', n: 'Obere Hohlvene', i: 'Bringt sauerstoffarmes Blut aus Kopf und Armen zum Herzen.' },
+  { k: 'ivc', n: 'Untere Hohlvene', i: 'Bringt sauerstoffarmes Blut aus Bauch und Beinen zum Herzen.' },
+  { k: 'ra', n: 'Rechter Vorhof', i: 'Hier kommt das sauerstoffarme Blut aus dem Körper an.' },
+  { k: 'sk', n: 'Segelklappe', i: 'Ventil zwischen Vorhof und Kammer (es gibt eine rechts und eine links). Sie lässt Blut nur vom Vorhof in die Kammer fließen. Zieht sich die Kammer zusammen, klappen die Segel zu. Dünne Sehnenfäden halten die Segel fest, damit sie nicht in den Vorhof umschlagen.' },
+  { k: 'rv', n: 'Rechte Kammer', i: 'Pumpt das sauerstoffarme Blut zur Lunge. Ihre Wand ist dünner als die der linken Kammer, weil sie weniger kräftig pumpen muss.' },
+  { k: 'tak', n: 'Taschenklappe', i: 'Ventil am Ausgang der Kammern, also am Anfang von Lungenarterie und Aorta. Sie besteht aus kleinen Taschen. Will Blut zurückfließen, füllen sich die Taschen und verschließen den Ausgang.' },
+  { k: 'pa', n: 'Lungenarterie', i: 'Bringt sauerstoffarmes Blut vom Herzen zur Lunge. Dort wird Kohlenstoffdioxid abgegeben und Sauerstoff aufgenommen. Merke: Arterien führen vom Herzen weg.' },
+  { k: 'pv', n: 'Lungenvenen', i: 'Bringen sauerstoffreiches Blut von der Lunge zum Herzen. Merke: Venen führen zum Herzen hin.' },
+  { k: 'la', n: 'Linker Vorhof', i: 'Hier kommt das sauerstoffreiche Blut aus der Lunge an.' },
+  { k: 'lv', n: 'Linke Kammer', i: 'Pumpt das sauerstoffreiche Blut über die Aorta in den ganzen Körper. Sie hat die dickste Wand, weil sie am kräftigsten pumpen muss.' },
+  { k: 'ao', n: 'Aorta', i: 'Die Hauptschlagader. Sie verteilt das sauerstoffreiche Blut in den ganzen Körper.' },
+  { k: 'sep', n: 'Herzscheidewand', i: 'Trennt die rechte von der linken Herzhälfte. So mischen sich sauerstoffarmes und sauerstoffreiches Blut nicht.' }
+];
+const G1BY = Object.fromEntries(G1.map((x, i) => [x.k, { ...x, num: i + 1 }]));
+const L1LINES = { tk: ['Segelklappe'], mk: ['Segelklappe'], pk: ['Taschen-', 'klappe'], ak: ['Taschen-', 'klappe'] };
+const grpOf = id => S.level === 1 ? (MAP1[id] || null) : (BYID[id] ? id : null);
+const groupInfo = k => S.level === 1 ? G1BY[k] : BYID[k];
+const groups = () => S.level === 1 ? G1.map(x => G1BY[x.k]) : LBL.map(s => BYID[s.id]);
+const members = k => LBL.filter(s => grpOf(s.id) === k);
+
+const gLab = mk('g', { class: 'lbl' });
+LBL.forEach((s, i) => {
+  const g = s.g = mk('g', { 'data-id': s.id, style: 'cursor:pointer' }, gLab);
+  s.lead = mk('line', { stroke: 'var(--label-ink)', 'stroke-width': 1, opacity: .7 }, g);
+  s.txt = mk('text', { 'font-size': 12, 'font-weight': 700, fill: 'var(--label-ink)', stroke: 'var(--label-bg)', 'stroke-width': 3.5, 'paint-order': 'stroke', 'stroke-linejoin': 'round', 'dominant-baseline': 'central' }, g);
+  s.circ = mk('circle', { r: 9, fill: 'var(--num-bg)', stroke: 'var(--label-bg)', 'stroke-width': 1.5 }, g);
+  s.num = mk('text', { 'font-size': 10.5, 'font-weight': 700, fill: 'var(--num-ink)', 'text-anchor': 'middle', 'dominant-baseline': 'central' }, g);
+  s.num.textContent = i + 1;
+});
+E.hl = mk('circle', { class: 'hlc', r: 17, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, opacity: 0, 'pointer-events': 'none' });
+E.hl2 = mk('circle', { class: 'hlc', r: 17, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, opacity: 0, 'pointer-events': 'none' });
+const gHit = mk('g', {});
+LBL.forEach(s => { s.hit = mk('circle', { r: 17, fill: 'transparent', 'data-id': s.id, style: 'cursor:pointer' }, gHit); });
+
+/* ---------- Geometrie ---------- */
+function outerD(c, B) {
+  return `M${P(L(50, 54, c), B)} C${P(L(38, 46, c), B + L(100, 90, c))} ${P(L(120, 126, c), L(428, 425, c))} ${P(255, L(452, 450, c))} `
+       + `C${P(L(390, 382, c), L(428, 425, c))} ${P(L(424, 414, c), B + L(100, 90, c))} ${P(L(412, 404, c), B)} Z`;
+}
+function rvD(c, B) {
+  return `M${P(L(62, 70, c), B)} C${P(L(50, 70, c), B + L(75, 55, c))} ${P(L(95, 110, c), B + L(155, 105, c))} ${P(L(205, 200, c), B + L(168, 120, c))} `
+       + `C${P(L(212, 203, c), B + L(110, 80, c))} ${P(L(196, 194, c), B + L(40, 35, c))} ${P(188, B)} L${P(188, B - 50)} L${P(150, B - 50)} L${P(150, B)} L${P(142, B)} Z`;
+}
+function lvD(c, B) {
+  return `M${P(214, B - 42)} L${P(214, B)} C${P(L(226, 230, c), B + L(60, 45, c))} ${P(L(240, 244, c), B + L(140, 105, c))} ${P(256, B + L(180, 150, c))} `
+       + `C${P(L(302, 288, c), B + L(168, 146, c))} ${P(L(382, 340, c), B + L(95, 72, c))} ${P(L(374, 356, c), B)} L${P(366, B)} L${P(260, B)} L${P(254, B)} L${P(254, B - 42)} Z`;
+}
+const conusD = B => `M144,${(B + 2).toFixed(1)} L144,${(B - 50).toFixed(1)} L192,${(B - 50).toFixed(1)} L209,${(B - 42).toFixed(1)} L260,${(B - 42).toFixed(1)} L260,${(B + 2).toFixed(1)} Z`;
+function atrD(B, a, cx, pts, h1, h2) {
+  const cy = B - 55, s = 1 - 0.13 * a;
+  const q = (x, y) => P(cx + (x - cx) * s, cy + (y - cy) * s);
+  return `M${P(h1, B)} C${q(pts[0], B - 25)} ${q(pts[1], 175)} ${q(pts[2], 152)} C${q(pts[3], 128)} ${q(pts[4], 126)} ${q(pts[5], 148)} C${q(pts[6], 166)} ${q(pts[7], B - 25)} ${P(h2, B)} Z`;
+}
+const raD = (B, a) => atrD(B, a, 95, [48, 44, 56, 68, 126, 136, 142, 144], 62, 142);
+const laD = (B, a) => {
+  const cy = B - 55, s = 1 - 0.13 * a, cx = 320;
+  const q = (x, y) => P(cx + (x - cx) * s, cy + (y - cy) * s);
+  return `M${P(266, B)} C${q(260, B - 25)} ${q(256, 180)} ${q(266, 158)} C${q(278, 134)} ${q(364, 134)} ${q(376, 156)} C${q(386, 176)} ${q(380, B - 25)} ${P(370, B)} Z`;
+};
+function qpt(p0, c, p1, t) { const m = 1 - t; return [m * m * p0[0] + 2 * m * t * c[0] + t * t * p1[0], m * m * p0[1] + 2 * m * t * c[1] + t * t * p1[1]]; }
+function leaf(h, tc, cc, to, co, o) {
+  const tip = [L(tc[0], to[0], o), L(tc[1], to[1], o)], ctl = [L(cc[0], co[0], o), L(cc[1], co[1], o)];
+  return { h, ctl, tip, d: `M${P(h[0], h[1])} Q${P(ctl[0], ctl[1])} ${P(tip[0], tip[1])}` };
+}
+const PAP = {
+  rv: { r: [[100, 378], [152, 406], [126, 338]], c: [[108, 362], [158, 378], [130, 318]] },
+  lv: { r: [[302, 410], [348, 372], [318, 340]], c: [[292, 396], [332, 366], [310, 322]] }
+};
+function pap(p, c) {
+  const q = i => [L(p.r[i][0], p.c[i][0], c), L(p.r[i][1], p.c[i][1], c)];
+  const b1 = q(0), b2 = q(1), t = q(2);
+  return { tip: t, cen: [(b1[0] + b2[0] + t[0]) / 3, (b1[1] + b2[1] + t[1]) / 3 + 6],
+    d: `M${P(b1[0], b1[1])} C${P(b1[0] + 5, b1[1] - 14)} ${P(t[0] - 7, t[1] + 10)} ${P(t[0], t[1])} C${P(t[0] + 7, t[1] + 10)} ${P(b2[0] - 5, b2[1] - 14)} ${P(b2[0], b2[1])} Z` };
+}
+function chordD(a, b, s) {
+  const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+  return `M${P(a[0], a[1])} Q${P(mx - dy / l * s, my + dx / l * s)} ${P(b[0], b[1])}`;
+}
+function cuspD(xl, cx, yv, o, side) {
+  const m = x => side < 0 ? x : 2 * cx - x;
+  const h = [xl + 1, yv - 6], tc = [cx - 1, yv - 1], cc = [xl + (cx - xl) * 0.35, yv + 14], to = [xl + 6, yv - 30], co = [xl + 2, yv - 16];
+  const tip = [L(tc[0], to[0], o), L(tc[1], to[1], o)], ct = [L(cc[0], co[0], o), L(cc[1], co[1], o)];
+  return `M${P(m(h[0]), h[1])} Q${P(m(ct[0]), ct[1])} ${P(m(tip[0]), tip[1])}`;
+}
+const setV = (v, d) => { v.e.setAttribute('d', d); v.f.setAttribute('d', d); };
+
+/* ---------- Rendern ---------- */
+function render(st, simDt) {
+  const c = st.c, B = 245 + 14 * c, g = { B };
+  const od = outerD(c, B);
+  E.outer.setAttribute('d', od); E.glow.setAttribute('d', od + ' ' + conusD(B));
+  E.glow.setAttribute('opacity', (st.act * 0.42).toFixed(3));
+  E.conus.setAttribute('d', conusD(B));
+  E.rvC.setAttribute('d', rvD(c, B)); E.lvC.setAttribute('d', lvD(c, B));
+  const ra = raD(B, st.atr), la = laD(B, st.atr);
+  E.raW.setAttribute('d', ra); E.raC.setAttribute('d', ra); E.raG.setAttribute('d', ra);
+  E.laW.setAttribute('d', la); E.laC.setAttribute('d', la); E.laG.setAttribute('d', la);
+  E.raG.setAttribute('opacity', (st.atr * 0.7).toFixed(3)); E.laG.setAttribute('opacity', (st.atr * 0.7).toFixed(3));
+  const paT = `M169,${(B - 50).toFixed(1)} L169,100`;
+  E.paTw.setAttribute('d', paT); E.paT.setAttribute('d', paT);
+  const ao = `M234,${(B - 42).toFixed(1)} L234,95 C234,30 352,30 352,95 L352,128`;
+  E.aoW.setAttribute('d', ao); E.aoL.setAttribute('d', ao);
+
+  const o = st.oAV;
+  const tL = leaf([64, B], [101, B + 10], [82, B - 4], [76, B + 48], [68, B + 24], o);
+  const tR = leaf([140, B], [103, B + 10], [122, B - 4], [128, B + 48], [136, B + 24], o);
+  const mL = leaf([268, B], [315, B + 12], [290, B - 4], [284, B + 58], [274, B + 28], o);
+  const mR = leaf([364, B], [317, B + 12], [342, B - 4], [350, B + 58], [358, B + 28], o);
+  setV(E.tL, tL.d); setV(E.tR, tR.d); setV(E.mL, mL.d); setV(E.mR, mR.d);
+  const pr = pap(PAP.rv, c), pl = pap(PAP.lv, c);
+  E.rvP.setAttribute('d', pr.d); E.lvP.setAttribute('d', pl.d);
+  E.rvPG.setAttribute('d', pr.d); E.lvPG.setAttribute('d', pl.d);
+  const go = (st.act * 0.42).toFixed(3); E.rvPG.setAttribute('opacity', go); E.lvPG.setAttribute('opacity', go);
+  const sag = 7 * o;
+  const ch = [[pr.tip, tL.tip, sag], [pr.tip, qpt(tL.h, tL.ctl, tL.tip, .55), sag * .7], [pr.tip, tR.tip, -sag], [pr.tip, qpt(tR.h, tR.ctl, tR.tip, .55), -sag * .7],
+              [pl.tip, mL.tip, sag], [pl.tip, qpt(mL.h, mL.ctl, mL.tip, .55), sag * .7], [pl.tip, mR.tip, -sag], [pl.tip, qpt(mR.h, mR.ctl, mR.tip, .55), -sag * .7]];
+  ch.forEach((x, i) => E.chords[i].setAttribute('d', chordD(x[0], x[1], x[2])));
+
+  setV(E.pL, cuspD(150, 169, B - 50, st.oSL, -1)); setV(E.pR, cuspD(150, 169, B - 50, st.oSL, 1));
+  setV(E.aL, cuspD(214, 234, B - 42, st.oSL, -1)); setV(E.aR, cuspD(214, 234, B - 42, st.oSL, 1));
+
+  for (const f of FLOWS) {
+    const rate = st[f.k];
+    f.el.setAttribute('d', f.d(B));
+    f.el.setAttribute('opacity', S.flow ? clamp(rate * 1.6).toFixed(3) : 0);
+    f.off -= rate * simDt * 140;
+    if (f.off < -1600) f.off += 1600;
+    f.el.setAttribute('stroke-dashoffset', f.off.toFixed(1));
+  }
+  E.vp.setAttribute('d', `M30,${B.toFixed(1)} L446,${B.toFixed(1)}`);
+  E.vp.style.display = (S.level === 1 || (S.lab === 'off' && !S.quiz)) ? 'none' : '';
+
+  g.sfA = [(pl.tip[0] + mR.tip[0]) / 2 + 4, (pl.tip[1] + mR.tip[1]) / 2];
+  g.pmA = pl.cen;
+  const showLab = !S.quiz && S.lab !== 'off';
+  gLab.style.display = showLab ? '' : 'none';
+  for (const s of LBL) {
+    const a = s.a(g), k = grpOf(s.id);
+    s.hit.style.display = k ? '' : 'none'; s.g.style.display = k ? '' : 'none';
+    s.hit.setAttribute('cx', a[0].toFixed(1)); s.hit.setAttribute('cy', a[1].toFixed(1));
+    if (!showLab || !k) continue;
+    if (S.lab === 'num') {
+      s.txt.style.display = 'none'; s.lead.style.display = 'none'; s.circ.style.display = ''; s.num.style.display = '';
+      s.circ.setAttribute('cx', a[0].toFixed(1)); s.circ.setAttribute('cy', a[1].toFixed(1));
+      s.num.setAttribute('x', a[0].toFixed(1)); s.num.setAttribute('y', (a[1] + 0.5).toFixed(1));
+    } else {
+      s.circ.style.display = 'none'; s.num.style.display = 'none'; s.txt.style.display = '';
+      const t = s.t(g), an = t.an || 'middle';
+      const lines = (S.level === 1 && L1LINES[s.id]) || t.l;
+      const key = lines.join('|') + an + (t.rot || 0);
+      if (s.key !== key) {
+        s.key = key; s.txt.textContent = '';
+        lines.forEach(line => { const ts = mk('tspan', {}, s.txt); ts.textContent = line; });
+        s.txt.setAttribute('text-anchor', an);
+      }
+      const ts = s.txt.childNodes, n = ts.length;
+      for (let i = 0; i < n; i++) { ts[i].setAttribute('x', t.x.toFixed(1)); ts[i].setAttribute('y', (t.y + (i - (n - 1) / 2) * 13).toFixed(1)); }
+      s.txt.setAttribute('transform', t.rot ? `rotate(${t.rot} ${t.x.toFixed(1)} ${t.y.toFixed(1)})` : '');
+      if (t.lx !== undefined) {
+        s.lead.style.display = '';
+        const sx = an === 'end' ? t.x + 3 : an === 'start' ? t.x - 3 : t.x;
+        const sy = an === 'middle' ? t.y + (n * 13) / 2 : t.y;
+        s.lead.setAttribute('x1', sx.toFixed(1)); s.lead.setAttribute('y1', sy.toFixed(1));
+        s.lead.setAttribute('x2', t.lx.toFixed(1)); s.lead.setAttribute('y2', t.ly.toFixed(1));
+      } else s.lead.style.display = 'none';
+    }
+  }
+  const ms = S.sel ? members(S.sel) : [];
+  [E.hl, E.hl2].forEach((h, i) => {
+    if (ms[i]) {
+      const a = ms[i].a(g);
+      h.setAttribute('cx', a[0].toFixed(1)); h.setAttribute('cy', a[1].toFixed(1)); h.setAttribute('opacity', 1);
+      h.setAttribute('stroke', S.selBad ? 'var(--bad)' : 'var(--accent)');
+    } else h.setAttribute('opacity', 0);
+  });
+}
+
+/* ---------- Phase-Panel ---------- */
+let lastPh = '';
+function curDP(ph) { return S.level === 1 ? (ph < 2 ? 0 : 1) : (ph === 4 ? 3 : ph); }
+function updatePhase(st, tm) {
+  const pk = S.level + '-' + st.ph;
+  if (pk !== lastPh) {
+    lastPh = pk;
+    const dp = curDP(st.ph), p = S.level === 1 ? PH1[dp] : PH[st.ph], sys = p.g === 'Systole';
+    for (const id of ['#pTag', '#hTag']) { const e = $(id); e.textContent = p.g; e.className = 'tag ' + (sys ? 'sys' : 'dia'); }
+    $('#pName').textContent = p.n; $('#hName').textContent = p.n;
+    $('#pNum').textContent = `Phase ${dp + 1} von ${S.level === 1 ? 2 : 4}`;
+    $('#pDesc').textContent = p.d;
+    document.querySelectorAll('#phbtns button').forEach(b => b.classList.toggle('cur', +b.dataset.p === dp));
+  }
+  const setValve = (el, o) => {
+    const txt = o > 0.5 ? 'offen' : 'geschlossen';
+    if (el.textContent !== txt) { el.textContent = txt; el.className = o > 0.5 ? 'open' : 'closed'; }
+  };
+  setValve($('#sAV'), st.oAV); setValve($('#sSL'), st.oSL);
+}
+function updateStats() {
+  const tm = timing(), st = state(0, tm);
+  if (S.level === 1) {
+    $('#stats').innerHTML = `Pro Herzschlag pumpt jede Kammer etwa <b>${fmt(st.SV)} ml</b> Blut, pro Minute etwa <b>${fmt(st.SV * S.bpm / 1000, 1)} Liter</b>.<br>Bei ${S.bpm} Schlägen pro Minute schlägt das Herz etwa <b>${fmt(Math.round(S.bpm * 1440 / 1000) * 1000)}</b>-mal am Tag.`;
+    return;
+  }
+  const sys = tm.dI + tm.dE, dia = tm.T - sys;
+  $('#stats').innerHTML = `Systole <b>${fmt(sys, 2)} s</b>, Diastole <b>${fmt(dia, 2)} s</b><br>Schlagvolumen <b>${fmt(st.SV)} ml</b>, Herzminutenvolumen <b>${fmt(st.SV * S.bpm / 1000, 1)} l/min</b>`;
+}
+
+/* ---------- Diagramm ---------- */
+const cv = $('#cv'), ctx = cv.getContext('2d');
+let COL = {}, LAY = null;
+function readCols() {
+  const cs = getComputedStyle(document.documentElement);
+  ['c-lv', 'c-ao', 'c-la', 'c-vol', 'c-ekg', 'grid', 'muted', 'text', 'sys', 'dia', 'accent', 'surface'].forEach(k => COL[k] = cs.getPropertyValue('--' + k).trim());
+}
+readCols();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readCols);
+
+function drawChart(st, tm) {
+  const dpr = window.devicePixelRatio || 1, W = cv.clientWidth;
+  if (!W) return;
+  const pan = [];
+  if (C.lv || C.ao || C.la) pan.push({ k: 'p', h: W < 520 ? 130 : 160 });
+  if (C.vol) pan.push({ k: 'v', h: 74 });
+  if (C.ekg) pan.push({ k: 'e', h: 54 });
+  const top = 26, gap = 12, left = 40, right = 10;
+  const H = top + pan.reduce((s, p) => s + p.h, 0) + gap * Math.max(0, pan.length - 1) + 22;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) {
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.height = H + 'px';
+  }
+  const x = ctx; x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  const pw = W - left - right, tx = t => left + t / tm.T * pw, bot = H - 22, b = tm.b;
+  LAY = { left, pw };
+  for (let i = 0; i < 5; i++) { x.fillStyle = i < 2 ? COL.sys : COL.dia; x.fillRect(tx(b[i]), top, tx(b[i + 1]) - tx(b[i]), bot - top); }
+  x.strokeStyle = COL.muted; x.globalAlpha = .55; x.setLineDash([3, 3]); x.lineWidth = 1;
+  for (let i = 1; i < 5; i++) { x.beginPath(); x.moveTo(tx(b[i]) + .5, top); x.lineTo(tx(b[i]) + .5, bot); x.stroke(); }
+  x.setLineDash([]); x.globalAlpha = 1;
+  const font = '"Atkinson Hyperlegible", system-ui, sans-serif';
+  x.font = `700 12px ${font}`; x.textAlign = 'center'; x.textBaseline = 'middle';
+  const names = [['1 Anspannung', '1'], ['2 Austreibung', '2'], ['3 Entspannung', '3'], ['4 Füllung', '4'], ['Vorhof', '']];
+  const cur = st.ph;
+  for (let i = 0; i < 5; i++) {
+    const w = tx(b[i + 1]) - tx(b[i]);
+    let s = names[i][0];
+    if (x.measureText(s).width > w - 6) s = names[i][1];
+    if (x.measureText(s).width > w - 2) s = '';
+    x.fillStyle = (i === cur || (cur === 4 && i === 3)) ? COL.accent : COL.muted;
+    x.fillText(s, (tx(b[i]) + tx(b[i + 1])) / 2, top / 2);
+  }
+  const SM = samples(tm), N = SM.N;
+  let y0 = top;
+  x.font = `400 11px ${font}`;
+  for (const p of pan) {
+    const h = p.h;
+    let min, max, ticks, unit, series;
+    if (p.k === 'p') { min = 0; max = 130; ticks = [0, 40, 80, 120]; unit = 'mmHg'; series = [['la', 'c-la', 2, []], ['ao', 'c-ao', 2.2, [6, 4]], ['lv', 'c-lv', 2.6, []]].filter(s => C[s[0]]); }
+    else if (p.k === 'v') { min = 40; max = 130; ticks = [50, 120]; unit = 'ml'; series = [['vol', 'c-vol', 2.4, []]]; }
+    else { min = -0.4; max = 1.15; ticks = []; unit = 'EKG'; series = [['ekg', 'c-ekg', 1.8, []]]; }
+    const ys = v => y0 + h - (v - min) / (max - min) * h;
+    x.strokeStyle = COL.grid; x.lineWidth = 1; x.fillStyle = COL.muted; x.textAlign = 'right'; x.textBaseline = 'middle';
+    for (const tk of ticks) { const yy = Math.round(ys(tk)) + .5; x.beginPath(); x.moveTo(left, yy); x.lineTo(left + pw, yy); x.stroke(); x.fillText(String(tk), left - 5, yy); }
+    x.textAlign = 'left'; x.textBaseline = 'top'; x.fillStyle = COL.muted; x.fillText(unit, 2, y0 - 1);
+    for (const [key, col, lw, dash] of series) {
+      x.strokeStyle = COL[col]; x.lineWidth = lw; x.setLineDash(dash); x.beginPath();
+      for (let i = 0; i <= N; i++) { const X = left + i / N * pw, Y = ys(SM.a[i][key]); i ? x.lineTo(X, Y) : x.moveTo(X, Y); }
+      x.stroke(); x.setLineDash([]);
+      x.fillStyle = COL[col]; x.beginPath(); x.arc(tx(S.t), ys(st[key]), 4.5, 0, Math.PI * 2); x.fill();
+    }
+    if (p.k === 'p' && C.ht) {
+      x.fillStyle = COL.text; x.strokeStyle = COL.text; x.lineWidth = 2; x.font = `700 11px ${font}`; x.textBaseline = 'top';
+      [[b[0], W < 520 ? '1.' : '1. Herzton'], [b[2], W < 520 ? '2.' : '2. Herzton']].forEach(([tt, s]) => {
+        const X = tx(tt); x.beginPath(); x.moveTo(X + 1, y0 + 2); x.lineTo(X + 1, y0 + 12); x.stroke();
+        x.textAlign = 'left'; x.fillText(s, X + 5, y0 + 2);
+      });
+      x.font = `400 11px ${font}`;
+    }
+    y0 += h + gap;
+  }
+  x.strokeStyle = COL.accent; x.lineWidth = 2;
+  const cx = tx(S.t); x.beginPath(); x.moveTo(cx, top); x.lineTo(cx, bot); x.stroke();
+  x.fillStyle = COL.muted; x.textBaseline = 'top'; x.font = `400 11px ${font}`;
+  x.textAlign = 'left'; x.fillText('0 s', left, bot + 6);
+  x.textAlign = 'right'; x.fillText(fmt(tm.T, 2) + ' s', left + pw, bot + 6);
+}
+let lastRead = 0;
+function updateReadout(st, now) {
+  if (now - lastRead < 90) return;
+  lastRead = now;
+  const parts = [];
+  if (C.lv) parts.push(`Kammer <b>${fmt(st.lv)}</b> mmHg`);
+  if (C.ao) parts.push(`Aorta <b>${fmt(st.ao)}</b> mmHg`);
+  if (C.la) parts.push(`Vorhof <b>${fmt(st.la)}</b> mmHg`);
+  if (C.vol) parts.push(`Volumen <b>${fmt(st.vol)}</b> ml`);
+  $('#readout').innerHTML = parts.join(', ');
+}
+
+/* ---------- Ton ---------- */
+let actx = null;
+function thump(kind) {
+  if (!S.sound || !actx) return;
+  const t = actx.currentTime, dur = kind === 1 ? 0.15 : 0.1, f0 = kind === 1 ? 62 : 82;
+  [[1, 0.9], [2.6, 0.35]].forEach(([m, amp]) => {
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f0 * m * 1.5, t); o.frequency.exponentialRampToValueAtTime(f0 * m, t + 0.04);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(amp * (kind === 1 ? 1 : 0.75), t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + 0.03);
+  });
+}
+function crossed(prev, now, bnd, wrapped) {
+  if (!wrapped) return prev < bnd && now >= bnd;
+  return prev < bnd || now >= bnd;
+}
+
+/* ---------- Interaktion ---------- */
+const playBtn = $('#play');
+function setPlaying(p) { S.playing = p; playBtn.textContent = p ? 'Pause' : 'Abspielen'; }
+setPlaying(S.playing);
+playBtn.addEventListener('click', () => setPlaying(!S.playing));
+function gotoPhase(dp) {
+  const tm = timing(), b = tm.b;
+  if (S.level === 1) S.t = dp === 0 ? (b[1] + b[2]) / 2 : b[3] + tm.dF * 0.5;
+  else S.t = dp === 3 ? b[3] + tm.dF * 0.5 : (b[dp] + b[dp + 1]) / 2;
+  setPlaying(false);
+}
+$('#step').addEventListener('click', () => {
+  const tm = timing(), dp = curDP(locate(S.t, tm).ph);
+  gotoPhase((dp + 1) % (S.level === 1 ? 2 : 4));
+});
+$('#phbtns').addEventListener('click', e => { const b = e.target.closest('button'); if (b) gotoPhase(+b.dataset.p); });
+const spd = $('#spd');
+spd.addEventListener('input', () => { S.speed = +spd.value; $('#spdV').textContent = fmt(S.speed, 2) + ' ×'; });
+const bpm = $('#bpm');
+bpm.addEventListener('input', () => {
+  const old = timing(), loc = locate(S.t, old);
+  S.bpm = +bpm.value; const nw = timing();
+  S.t = nw.b[loc.ph] + loc.u * (nw.b[loc.ph + 1] - nw.b[loc.ph]);
+  $('#bpmV').textContent = S.bpm + ' / min';
+  updateStats();
+});
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  S.lab = b.dataset.lab;
+  document.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b));
+}));
+$('#tFlow').addEventListener('change', e => { S.flow = e.target.checked; });
+$('#tSound').addEventListener('change', e => {
+  S.sound = e.target.checked;
+  if (S.sound) {
+    try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); }
+    catch (err) { S.sound = false; e.target.checked = false; }
+  }
+});
+document.querySelectorAll('#chips .chip').forEach(b => b.addEventListener('click', () => {
+  C[b.dataset.c] = !C[b.dataset.c]; b.classList.toggle('on', C[b.dataset.c]); lastRead = 0;
+}));
+function scrub(e) {
+  if (!LAY) return;
+  const r = cv.getBoundingClientRect(), tm = timing();
+  S.t = clamp((e.clientX - r.left - LAY.left) / LAY.pw, 0, 0.9999) * tm.T;
+  setPlaying(false);
+}
+let drag = false;
+cv.addEventListener('pointerdown', e => { drag = true; cv.setPointerCapture(e.pointerId); scrub(e); });
+cv.addEventListener('pointermove', e => { if (drag) scrub(e); });
+cv.addEventListener('pointerup', () => { drag = false; });
+cv.addEventListener('pointercancel', () => { drag = false; });
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input, button')) return;
+  if (e.code === 'Space') { e.preventDefault(); setPlaying(!S.playing); }
+  if (e.code === 'ArrowRight') $('#step').click();
+});
+
+// Legende
+const leg = $('#leg');
+function buildLegend() {
+  leg.textContent = '';
+  groups().forEach(gr => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.innerHTML = `<i>${gr.num}</i><span>${gr.n}</span>`; b.dataset.id = gr.k || gr.id;
+    b.addEventListener('click', () => { if (!S.quiz) showInfo(b.dataset.id); });
+    li.appendChild(b); leg.appendChild(li);
+  });
+}
+function showInfo(id) {
+  const s = groupInfo(id); if (!s) return;
+  S.sel = id; S.selBad = false;
+  $('#iTitle').textContent = `${s.num}  ${s.n}`;
+  $('#iText').textContent = s.i; $('#iText').className = '';
+  leg.querySelectorAll('button').forEach(b => b.classList.toggle('sel', b.dataset.id === id));
+}
+function pick(id) {
+  const k = grpOf(id); if (!k) return;
+  if (S.quiz) { quizAnswer(k); return; }
+  showInfo(k);
+}
+svg.addEventListener('click', e => { const t = e.target.closest('[data-id]'); if (t) pick(t.getAttribute('data-id')); });
+
+/* ---------- Quiz ---------- */
+let qTimer = null;
+function quizStart() {
+  const ids = groups().map(gr => gr.k || gr.id);
+  for (let i = ids.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [ids[i], ids[j]] = [ids[j], ids[i]]; }
+  S.quiz = { ids, i: 0, score: 0, first: true }; S.sel = null;
+  $('#infoBox').hidden = true; $('#quizBox').hidden = false; $('#quizBtn').hidden = true; leg.hidden = true;
+  quizShow();
+}
+function quizShow() {
+  const q = S.quiz;
+  $('#qProg').textContent = `Frage ${q.i + 1} von ${q.ids.length}, richtig beim ersten Versuch: ${q.score}`;
+  $('#qQ').textContent = `Tippe auf: ${groupInfo(q.ids[q.i]).n}`;
+  $('#qFb').textContent = ''; $('#qFb').className = 'quizfb';
+}
+function quizNext(delay) {
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => {
+    const q = S.quiz; if (!q) return;
+    q.i++; q.first = true; S.sel = null;
+    if (q.i >= q.ids.length) quizFinish(); else quizShow();
+  }, delay);
+}
+function quizAnswer(id) {
+  const q = S.quiz, target = q.ids[q.i];
+  if (q.locked) return;
+  if (id === target) {
+    if (q.first) q.score++;
+    S.sel = id; S.selBad = false;
+    $('#qFb').textContent = 'Richtig!'; $('#qFb').className = 'quizfb ok';
+    q.locked = true; setTimeout(() => { q.locked = false; }, 700);
+    quizNext(700);
+  } else {
+    q.first = false; S.sel = id; S.selBad = true;
+    $('#qFb').textContent = `Nicht ganz – das war: ${groupInfo(id).n}.`; $('#qFb').className = 'quizfb bad';
+  }
+}
+function quizFinish() {
+  const q = S.quiz;
+  $('#qProg').textContent = 'Quiz beendet';
+  $('#qQ').textContent = `${q.score} von ${q.ids.length} beim ersten Versuch richtig.`;
+  $('#qFb').textContent = q.score === q.ids.length ? 'Alles richtig!' : 'Mit „Quiz beenden“ siehst du wieder alle Beschriftungen.';
+  $('#qFb').className = 'quizfb' + (q.score === q.ids.length ? ' ok' : '');
+  q.done = true;
+}
+function quizEnd() {
+  clearTimeout(qTimer);
+  S.quiz = null; S.sel = null; S.selBad = false;
+  $('#infoBox').hidden = false; $('#quizBox').hidden = true; $('#quizBtn').hidden = false; leg.hidden = false;
+  $('#iTitle').textContent = 'Strukturen';
+  $('#iText').textContent = 'Tippe auf eine Nummer, einen Namen oder direkt auf eine Struktur im Herzen.'; $('#iText').className = 'hint';
+  leg.querySelectorAll('button').forEach(b => b.classList.remove('sel'));
+}
+$('#quizBtn').addEventListener('click', quizStart);
+$('#qEnd').addEventListener('click', quizEnd);
+$('#qShow').addEventListener('click', () => {
+  const q = S.quiz; if (!q || q.done) return;
+  q.first = false; S.sel = q.ids[q.i]; S.selBad = false;
+  $('#qFb').textContent = 'Hier ist die Lösung markiert.'; $('#qFb').className = 'quizfb';
+  quizNext(1600);
+});
+
+/* ---------- Hauptschleife ---------- */
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const tm = timing();
+  let simDt = 0;
+  if (S.playing) {
+    const prev = S.t; simDt = dt * S.speed; S.t += simDt;
+    let wrapped = false;
+    if (S.t >= tm.T) { S.t -= tm.T; wrapped = true; }
+    if (crossed(prev, S.t, 0, wrapped) && wrapped) thump(1);
+    if (crossed(prev, S.t, tm.b[2], wrapped)) thump(2);
+  }
+  if (S.t >= tm.T) S.t = 0;
+  const st = state(S.t, tm);
+  render(st, simDt);
+  updatePhase(st, tm);
+  drawChart(st, tm);
+  updateReadout(st, now);
+  requestAnimationFrame(frame);
+}
+function applyLevel(lv) {
+  S.level = lv;
+  document.documentElement.classList.toggle('sek1', lv === 1);
+  document.querySelectorAll('.level button').forEach(b => b.classList.toggle('on', +b.dataset.lv === lv));
+  $('#sub').textContent = lv === 1 ? 'Wie das Herz pumpt: Systole und Diastole, Klappen und Blutweg' : 'Systole und Diastole Schritt für Schritt – mit Klappen, Blutfluss und Druckkurven';
+  const pb = $('#phbtns');
+  pb.style.gridTemplateColumns = `repeat(${lv === 1 ? 2 : 4},1fr)`;
+  pb.innerHTML = (lv === 1 ? [['Systole', 'Kammern ziehen sich zusammen'], ['Diastole', 'Kammern füllen sich']] : [['1', 'Anspannung'], ['2', 'Austreibung'], ['3', 'Entspannung'], ['4', 'Füllung']])
+    .map((x, i) => `<button data-p="${i}"><b>${x[0]}</b>${x[1]}</button>`).join('');
+  if (S.quiz) quizEnd();
+  S.sel = null; S.selBad = false;
+  $('#iTitle').textContent = 'Strukturen';
+  $('#iText').textContent = 'Tippe auf eine Nummer, einen Namen oder direkt auf eine Struktur im Herzen.'; $('#iText').className = 'hint';
+  LBL.forEach(s => { const k = grpOf(s.id); s.num.textContent = k ? groupInfo(k).num : ''; s.key = null; });
+  buildLegend(); lastPh = ''; updateStats();
+  try { localStorage.setItem('herz-level', String(lv)); } catch (e) {}
+}
+document.querySelectorAll('.level button').forEach(b => b.addEventListener('click', () => {
+  const lv = +b.dataset.lv;
+  history.replaceState(null, '', '#' + (lv === 1 ? 'sek1' : 'sek2'));
+  applyLevel(lv);
+}));
+addEventListener('hashchange', () => { const h = location.hash.slice(1); if (h === 'sek1' || h === 'sek2') applyLevel(h === 'sek1' ? 1 : 2); });
+let lv0 = 2;
+const h0 = location.hash.slice(1);
+if (h0 === 'sek1' || h0 === 'sek2') lv0 = h0 === 'sek1' ? 1 : 2;
+else { try { if (localStorage.getItem('herz-level') === '1') lv0 = 1; } catch (e) {} }
+applyLevel(lv0);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

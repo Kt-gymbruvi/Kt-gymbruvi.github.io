@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Enzymaktivität: Simulation und Michaelis-Menten-Diagramm</title>
+<meta name="description" content="Enzymaktivität simulieren: Temperatur, pH-Wert, Substrat, kompetitive und allosterische Regulation mit interaktivem Michaelis-Menten-Diagramm. Biologie Oberstufe.">
+<style>
+:root{
+  --bg:#EAF0EE; --panel:#FFFFFF; --panel-2:#F2F6F5; --ink:#14232A; --ink-soft:#4E6068; --line:#C9D6D3;
+  --paper:#F9FCFB; --grid-minor:#DDEBE6; --grid-major:#B5CEC4; --axis:#26373E;
+  --cur:#2B2F9E; --ref:#6F7F86; --s1:#D9622B; --s2:#0F8A7A; --s3:#B12A6B;
+  --temp:#C4491C; --ph:#0F7BA6; --enzc:#4E6068; --sub:#E0A010; --ik:#7A3FC4; --ia:#D43A3A; --act:#1E9A57; --x:#59656B;
+  --enz:#4C8DB5; --enzT:#95A5B0; --enzP:#B9C9D6; --molbg:#FFFFFF; --molstroke:#1F4660; --den:#7C8A90;
+  --btn:#14232A; --btn-ink:#FFFFFF; --focus:#0B57D0;
+  --good:#17693B; --good-bg:#DCF1E4; --bad:#A3241B; --bad-bg:#FBE0DC; --note-bg:#FFF2CF; --note:#6B4A00;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1618; --panel:#152225; --panel-2:#1B2D31; --ink:#E6F0EE; --ink-soft:#A1B7B7; --line:#2B4146;
+    --paper:#0F1B1E; --grid-minor:#1A2B2F; --grid-major:#2B454B; --axis:#C9D9D7;
+    --cur:#A3AAFF; --ref:#8CA0A6; --s1:#FF9A6A; --s2:#4FD1BD; --s3:#F07DB4;
+    --temp:#FF8A5C; --ph:#4FB9E3; --enzc:#A1B7B7; --sub:#F2B84B; --ik:#B58CFF; --ia:#FF7B7B; --act:#4FD18A; --x:#9CAAB0;
+    --enz:#5FA5CB; --enzT:#7C8E99; --enzP:#4B6275; --molbg:#152225; --molstroke:#A8CBE0; --den:#93A3A9;
+    --btn:#E6F0EE; --btn-ink:#0D1618; --focus:#8AB4FF;
+    --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note-bg:#3A2F12; --note:#F2C25B;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1618; --panel:#152225; --panel-2:#1B2D31; --ink:#E6F0EE; --ink-soft:#A1B7B7; --line:#2B4146;
+  --paper:#0F1B1E; --grid-minor:#1A2B2F; --grid-major:#2B454B; --axis:#C9D9D7;
+  --cur:#A3AAFF; --ref:#8CA0A6; --s1:#FF9A6A; --s2:#4FD1BD; --s3:#F07DB4;
+  --temp:#FF8A5C; --ph:#4FB9E3; --enzc:#A1B7B7; --sub:#F2B84B; --ik:#B58CFF; --ia:#FF7B7B; --act:#4FD18A; --x:#9CAAB0;
+  --enz:#5FA5CB; --enzT:#7C8E99; --enzP:#4B6275; --molbg:#152225; --molstroke:#A8CBE0; --den:#93A3A9;
+  --btn:#E6F0EE; --btn-ink:#0D1618; --focus:#8AB4FF;
+  --good:#66D394; --good-bg:#173A26; --bad:#FF938A; --bad-bg:#421C19; --note-bg:#3A2F12; --note:#F2C25B;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; font-variant-numeric:tabular-nums; }
+button,input,select{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1280px; margin:0 auto; padding:16px clamp(12px,3vw,28px) 8px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.45rem,4.4vw,2.2rem); line-height:1.1; margin:0; letter-spacing:-.015em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:70ch; }
+
+/* Raster */
+.grid{ max-width:1280px; margin:0 auto; padding:8px clamp(12px,3vw,28px) 24px; display:grid; grid-template-columns:minmax(0,1fr); gap:14px; }
+.left{ display:contents; }
+#chartCard{ order:1; position:sticky; top:env(safe-area-inset-top,0px); z-index:40; padding:8px 10px; }
+@media (min-width:700px){ #chartCard{ padding:12px 14px; } }
+.ctrl{ order:2; }
+#molCard{ order:3; } #readCard{ order:4; }
+@media (min-width:1000px){
+  .grid{ grid-template-columns:minmax(0,1fr) 410px; align-items:start; }
+  .left{ display:flex; flex-direction:column; gap:14px; }
+  #chartCard{ top:calc(env(safe-area-inset-top,0px) + 8px); order:0; } .ctrl,#molCard,#readCard{ order:0; }
+}
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:12px 14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.15rem; margin:0 0 8px; }
+
+/* Diagramm */
+.chart-head{ display:flex; gap:6px; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.tabs{ display:flex; gap:4px; flex:1; min-width:0; }
+.tab{ flex:1; border:2px solid var(--line); background:var(--panel); border-radius:10px; padding:.2em .3em; font-weight:700; font-size:.8rem; line-height:1.15; cursor:pointer; min-height:44px; color:var(--ink-soft); }
+@media (min-width:700px){ .tab{ flex:none; padding:.3em .8em; font-size:.9rem; } .tabs{ flex:none; } }
+.tab[aria-selected="true"]{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.mini-btn{ border:0; background:none; font-weight:700; cursor:pointer; min-height:44px; min-width:44px; padding:0 4px; font-size:.9rem; }
+.mini-btn .lg{ display:none; text-decoration:underline; } .mini-btn .sh{ display:inline; }
+@media (min-width:700px){ .mini-btn .lg{ display:inline; } .mini-btn .sh{ display:none; } }
+#chartCard.collapsed .mini-btn .sh{ display:inline-block; transform:rotate(180deg); }
+#plot{ border-radius:10px; overflow:hidden; background:var(--paper); border:1px solid var(--line); }
+#plot.drag{ touch-action:none; cursor:ew-resize; }
+#plot svg{ display:block; width:100%; height:auto; }
+.legend{ display:flex; flex-wrap:wrap; gap:2px 12px; margin:6px 0 0; padding:0; list-style:none; font-size:.76rem; line-height:1.3; color:var(--ink-soft); }
+.legend .d{ display:none; } @media (min-width:700px){ .legend{ font-size:.82rem; } .legend .d{ display:inline; } }
+.legend li{ display:flex; align-items:center; gap:6px; }
+.legend i{ display:inline-block; width:22px; height:0; border-top:3px solid; }
+.legend i.dash{ border-top-style:dashed; }
+.hintline{ margin:6px 0 0; font-size:.85rem; color:var(--ink-soft); }
+#plotHint{ display:none; } @media (min-width:700px){ #plotHint{ display:block; } }
+.strip{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px; }
+.stat{ background:var(--panel-2); border-radius:10px; padding:3px 8px; display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
+.stat span{ font-size:.74rem; color:var(--ink-soft); line-height:1.2; }
+.stat b{ font-family:var(--display); font-size:1.02rem; }
+@media (min-width:700px){ .stat{ padding:6px 10px; display:block; } .stat span{ display:block; font-size:.78rem; } .stat b{ font-size:1.12rem; } }
+#chartCard.collapsed #plot, #chartCard.collapsed .legend, #chartCard.collapsed .hintline{ display:none; }
+/* SVG-Klassen */
+.gm{ stroke:var(--grid-minor); stroke-width:.7; } .gM{ stroke:var(--grid-major); stroke-width:1.1; }
+.ax{ stroke:var(--axis); stroke-width:1.6; } .tk{ font-size:15px; fill:var(--ink-soft); } .al{ font-size:16px; fill:var(--ink); font-weight:700; }
+.c-cur{ stroke:var(--cur); stroke-width:3.6; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.c-ref{ stroke:var(--ref); stroke-width:2.2; stroke-dasharray:7 5; fill:none; }
+.c-s1{ stroke:var(--s1); stroke-width:2.4; fill:none; } .c-s2{ stroke:var(--s2); stroke-width:2.4; fill:none; } .c-s3{ stroke:var(--s3); stroke-width:2.4; fill:none; }
+.guide{ stroke:var(--cur); stroke-width:1.4; stroke-dasharray:4 4; opacity:.8; }
+.vm{ stroke:var(--axis); stroke-width:1.3; stroke-dasharray:2 5; }
+.km{ stroke:var(--sub); stroke-width:2; stroke-dasharray:6 4; }
+.pt{ fill:var(--cur); stroke:var(--paper); stroke-width:3; }
+.lbl{ font-size:16px; font-weight:700; fill:var(--ink); } .lbl.soft{ fill:var(--ink-soft); font-weight:400; }
+.lbl.km-l{ fill:var(--ink); paint-order:stroke; stroke:var(--paper); stroke-width:4px; }
+.lbl.halo{ paint-order:stroke; stroke:var(--paper); stroke-width:4px; }
+
+/* Steuerung */
+.ctrl{ display:grid; gap:12px; align-content:start; }
+.ctrl h2{ font-family:var(--display); font-weight:800; font-size:1.1rem; margin:0 0 8px; }
+.row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px; }
+.row label{ font-weight:700; font-size:.92rem; color:var(--ink-soft); width:100%; }
+select{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .6em; background:var(--panel); min-height:46px; }
+.seg{ display:flex; border:2px solid var(--line); border-radius:10px; overflow:hidden; width:100%; }
+.seg button{ flex:1; border:0; background:var(--panel); padding:.4em .6em; font-weight:700; font-size:.92rem; cursor:pointer; min-height:46px; }
+.seg button+button{ border-left:2px solid var(--line); }
+.seg button[aria-pressed="true"]{ background:var(--btn); color:var(--btn-ink); }
+.seg button[aria-disabled="true"]{ opacity:.5; cursor:not-allowed; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.45em .9em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--btn); border-color:var(--btn); color:var(--btn-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+.ctl{ padding:8px 0 10px; border-top:1px solid var(--line); }
+.ctl:first-of-type{ border-top:0; }
+.ctl-head{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+.ctl-head label{ font-weight:700; display:flex; gap:8px; align-items:center; }
+.dotc{ width:12px; height:12px; border-radius:50%; background:var(--c); flex:none; }
+.ctl output{ font-family:var(--display); font-weight:800; font-size:1.05rem; white-space:nowrap; }
+.ctl input[type=range]{ width:100%; height:44px; margin:2px 0; accent-color:var(--c); background:transparent; }
+.ctl-desc{ margin:0; font-size:.86rem; color:var(--ink-soft); }
+.ctl.off{ opacity:.45; }
+.mini svg{ display:block; width:100%; height:auto; margin-top:6px; }
+.mini .ln{ fill:none; stroke:var(--c); stroke-width:2.4; } .mini .fl{ fill:var(--c); opacity:.14; } .mini .dt{ fill:var(--c); stroke:var(--paper); stroke-width:2; }
+.mini .mt{ font-size:10px; fill:var(--ink-soft); } .mini .opt{ stroke:var(--ink-soft); stroke-dasharray:2 3; stroke-width:1; }
+.actions{ display:flex; flex-wrap:wrap; gap:8px; }
+.notice{ background:var(--note-bg); color:var(--note); border-radius:10px; padding:8px 12px; font-size:.9rem; margin:8px 0; }
+.mys{ border:2px dashed var(--line); border-radius:12px; padding:10px 12px; margin-top:8px; }
+.mys p{ margin:4px 0 8px; font-size:.92rem; }
+.mys .fb{ padding:8px 10px; border-radius:8px; margin-top:8px; font-size:.92rem; }
+.fb.ok{ background:var(--good-bg); color:var(--good); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--note-bg); color:var(--note); }
+
+/* Molekülmodell */
+#molWrap svg{ display:block; width:100%; height:auto; }
+#molSvg{ --amp:1.2; --dur:2.4s; }
+.mol{ animation:jig var(--dur) ease-in-out infinite; }
+@keyframes jig{ 0%,100%{transform:translate(0,0)} 20%{transform:translate(calc(var(--amp)*1px),calc(var(--amp)*-.7px))} 40%{transform:translate(calc(var(--amp)*-.8px),calc(var(--amp)*.6px))} 60%{transform:translate(calc(var(--amp)*.5px),calc(var(--amp)*.9px))} 80%{transform:translate(calc(var(--amp)*-.6px),calc(var(--amp)*-.5px))} }
+.mleg{ display:flex; flex-wrap:wrap; gap:4px 14px; list-style:none; padding:0; margin:8px 0 0; font-size:.82rem; color:var(--ink-soft); }
+.mleg li{ display:flex; align-items:center; gap:6px; }
+.mnote{ font-size:.85rem; color:var(--ink-soft); margin:6px 0 0; }
+
+/* Werte */
+.facs{ display:grid; gap:6px; margin:6px 0 10px; }
+.fac{ display:grid; grid-template-columns:minmax(0,9.5em) 1fr 4.4em; gap:8px; align-items:center; font-size:.92rem; }
+.fac .bar{ height:12px; border-radius:99px; background:var(--panel-2); overflow:hidden; }
+.fac .bar i{ display:block; height:100%; background:var(--c); border-radius:99px; transition:width .25s; }
+.fac b{ text-align:right; }
+.expl{ list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+.expl li{ background:var(--panel-2); border-radius:10px; padding:8px 12px; font-size:.95rem; }
+.expl li b{ display:block; font-family:var(--display); font-size:.98rem; }
+
+/* Aufgaben */
+.tasks{ max-width:1280px; margin:0 auto 14px; padding:0 clamp(12px,3vw,28px); }
+.tasks .card{ padding:14px 16px; }
+details.task{ border-top:1px solid var(--line); padding:8px 0; }
+details.task summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:10px; }
+details.task .badge{ flex:none; font-size:.8rem; font-weight:700; border-radius:99px; padding:2px 10px; background:var(--panel-2); border:1px solid var(--line); }
+details.task p{ margin:6px 0; max-width:75ch; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:4px 12px 8px; margin-top:8px; }
+details.task .sol summary{ min-height:40px; }
+details.task ul{ margin:4px 0 0; padding-left:1.2em; }
+details.teacher{ max-width:1280px; margin:0 auto 40px; padding:0 clamp(12px,3vw,28px); }
+details.teacher > .inner{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:6px 16px 14px; }
+details.teacher summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; padding:0 clamp(12px,3vw,28px); margin-left:calc(-1*clamp(12px,3vw,28px)); }
+details.teacher h3{ font-family:var(--display); font-size:1.02rem; margin:12px 0 4px; }
+details.teacher li, details.teacher p{ font-size:.95rem; max-width:80ch; }
+@media (prefers-reduced-motion:reduce){ .mol{ animation:none; } .fac .bar i{ transition:none; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Enzymaktivität: Simulation und Michaelis-Menten-Diagramm</h1>
+  <p>Biologie Oberstufe. Verändere die Bedingungen und beobachte, wie sich Diagramm und Molekülmodell verändern.</p>
+</header>
+
+<main class="grid" id="main">
+  <div class="left">
+    <section class="card" id="chartCard" aria-label="Diagramm">
+      <div class="chart-head">
+        <div class="tabs" role="tablist" aria-label="Diagrammart">
+          <button type="button" class="tab" role="tab" data-tab="mm" aria-selected="true">Michaelis-Menten</button>
+          <button type="button" class="tab" role="tab" data-tab="time" aria-selected="false">Zeitverlauf</button>
+          <button type="button" class="tab" role="tab" data-tab="lb" aria-selected="false">Lineweaver-Burk</button>
+        </div>
+        <button type="button" class="mini-btn" id="btnCollapse" aria-expanded="true" aria-label="Diagramm einklappen"><span class="lg">Einklappen</span><span class="sh" aria-hidden="true">▲</span></button>
+      </div>
+      <div id="plot"></div>
+      <ul class="legend" id="legend"></ul>
+      <p class="hintline" id="plotHint"></p>
+      <div class="strip" id="strip"></div>
+    </section>
+
+    <section class="card" id="molCard" aria-label="Molekülmodell">
+      <h2>Molekülmodell</h2>
+      <div id="molWrap"></div>
+      <ul class="mleg" id="molLeg"></ul>
+      <p class="mnote">Jedes Bild zeigt 15 Enzymmoleküle als Stichprobe. Wenn du Regler bewegst, ändern einzelne Moleküle ihren Zustand. Die Darstellung ist vereinfacht.</p>
+    </section>
+
+    <section class="card" id="readCard" aria-label="Messwerte und Erklärung">
+      <h2>Einflussfaktoren</h2>
+      <div class="facs" id="facs"></div>
+      <h2>Was passiert gerade?</h2>
+      <ul class="expl" id="expl"></ul>
+    </section>
+  </div>
+
+  <aside class="ctrl card" id="ctrl" aria-label="Regler">
+    <div>
+      <h2>Versuchsaufbau</h2>
+      <div class="row"><label for="selPre">Enzym</label><select id="selPre"></select></div>
+      <div class="row"><label id="lblMode">Enzymtyp</label>
+        <div class="seg" id="segMode" role="group" aria-labelledby="lblMode">
+          <button type="button" data-mode="mm" aria-pressed="true">Klassisch (Michaelis-Menten)</button>
+          <button type="button" data-mode="coop" aria-pressed="false">Allosterisch, kooperativ</button>
+        </div>
+      </div>
+      <div class="row" id="rowN" hidden><label id="lblN">Anzahl der Untereinheiten</label>
+        <div class="seg" id="segN" role="group" aria-labelledby="lblN">
+          <button type="button" data-n="2" aria-pressed="false">2</button>
+          <button type="button" data-n="3" aria-pressed="false">3</button>
+          <button type="button" data-n="4" aria-pressed="true">4</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn primary" id="btnSave">Kurve speichern</button>
+        <button type="button" class="btn" id="btnClear">Kurven löschen</button>
+        <button type="button" class="btn" id="btnReset">Zurücksetzen</button>
+      </div>
+      <p class="hintline" id="saveMsg" aria-live="polite"></p>
+    </div>
+    <div id="ctlCond"></div>
+    <div id="ctlSub"></div>
+    <div>
+      <h2>Hemmung und Aktivierung</h2>
+      <div id="ctlInh"></div>
+      <button type="button" class="btn" id="btnMys" aria-pressed="false">Rätselmodus: unbekannter Hemmstoff</button>
+      <div class="mys" id="mysBox" hidden>
+        <p>Ein Hemmstoff X wurde zugegeben. Er ist entweder <b>kompetitiv</b> oder <b>allosterisch</b>. Untersuche mit Regler und Diagramm und entscheide dich dann.</p>
+        <div class="ctl" id="ctlX" data-k="X" style="--c:var(--x)">
+          <div class="ctl-head"><label for="in_X"><span class="dotc"></span>Hemmstoff X [X]</label><output id="out_X"></output></div>
+          <input type="range" id="in_X" min="0" max="10" step="0.1" value="0">
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" data-ans="komp">Kompetitiv</button>
+          <button type="button" class="btn" data-ans="allo">Allosterisch</button>
+          <button type="button" class="btn" id="btnTip">Tipp</button>
+          <button type="button" class="btn" id="btnNew">Neues Rätsel</button>
+        </div>
+        <div id="mysFb" aria-live="polite"></div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<section class="tasks" aria-label="Aufgaben">
+  <div class="card">
+    <h2>Aufgaben</h2>
+    <p class="hintline" style="margin-top:0">„Versuch einrichten“ stellt die Regler passend ein. Die Lösungshinweise sind aufklappbar.</p>
+    <div id="taskList"></div>
+  </div>
+</section>
+
+<details class="teacher">
+  <summary>Hinweise für die Lehrkraft</summary>
+  <div class="inner">
+    <h3>Modellannahmen (Vereinfachungen)</h3>
+    <ul>
+      <li>Alle Werte sind Modellwerte, keine Literaturwerte. Vmax (Referenz) = 1 mmol/(L·min), Km bzw. K₀,₅ (Referenz) = 2 mmol/L.</li>
+      <li>Temperatur: Reaktionsgeschwindigkeit nach RGT-Regel (Q₁₀ = 2) multipliziert mit dem Anteil nicht denaturierter Moleküle (S-förmige Funktion). Denaturierung wird als dauerhaft betrachtet, aber im Modell nicht zeitabhängig simuliert.</li>
+      <li>pH-Wert: glockenförmige Funktion durch zwei ionisierbare Gruppen im aktiven Zentrum. Km und Vmax werden gemeinsam über einen Aktivitätsfaktor skaliert.</li>
+      <li>Klassischer Modus: kompetitiver Hemmstoff erhöht Km (Vmax bleibt). Der allosterische Hemmstoff verschiebt das Gleichgewicht zur wenig aktiven T-Form und senkt Vmax (V-Typ, Km bleibt). Aktivator und Hemmstoff konkurrieren um dasselbe allosterische Zentrum. Ohne Ligand liegt ein Drittel der Moleküle in der T-Form vor.</li>
+      <li>Kooperativer Modus: Monod-Wyman-Changeux-Modell (konzertiert, Substrat bindet nur an die R-Form). Allosterischer Hemmstoff verschiebt K₀,₅ nach rechts, Aktivator nach links, Vmax bleibt gleich. Das ist eine Erweiterung über den üblichen Schulstoff hinaus.</li>
+      <li>Im Molekülmodell wird die Substratbindung der T-Form vereinfacht nicht dargestellt.</li>
+    </ul>
+    <h3>Einsatz und Anforderungsbereiche</h3>
+    <ul>
+      <li>Aufgaben sind mit Anforderungsbereichen (I bis III) und Operatoren gekennzeichnet. Die Lösungshinweise können als Erwartungshorizont dienen. Punktezuteilung und Notengebung liegen in deiner Verantwortung und folgen den Fachkonferenzbeschlüssen.</li>
+      <li>Einsatz zum Beispiel als Stationenarbeit (je 15 bis 20 Minuten pro Aufgabe) oder als Demonstration am Beamer.</li>
+      <li>Differenzierung: Unterstützung mit nur einem Regler pro Versuch und Aufgabe 1 bis 4. Erweiterung mit kooperativem Modus, Lineweaver-Burk-Diagramm und Rätselmodus.</li>
+    </ul>
+    <h3>Typische Fehlvorstellungen</h3>
+    <ul>
+      <li>„Bei niedriger Temperatur wird das Enzym zerstört.“ Es arbeitet nur langsamer, die Struktur bleibt intakt.</li>
+      <li>„Ein Hemmstoff zerstört das Enzym.“ Die hier betrachtete Hemmung ist reversibel.</li>
+      <li>„Mehr Substrat bringt immer mehr Umsatz.“ Bei Sättigung sind alle aktiven Zentren besetzt.</li>
+      <li>„Allosterische Hemmung ist kompetitive Hemmung.“ Der allosterische Hemmstoff bindet an einer anderen Stelle und lässt sich nicht verdrängen.</li>
+    </ul>
+    <h3>Hinweise</h3>
+    <p>Die Zuordnung zum Kerncurriculum Niedersachsen und zu den Zentralabitur-Vorgaben bitte auf nibis.de prüfen. Lineweaver-Burk-Diagramm und MWC-Modell sind eine Erweiterung. Die Seite speichert keine Daten.</p>
+  </div>
+</details>
+
+<script>
+(function(){
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const fmt=(x,d=2)=>Number(x).toFixed(d).replace('.',',');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- Modellkonstanten ---------- */
+const KM0=2, VMAX0=1, KI=1, KIA=1, KA=1, L0MM=0.5, W=2.5, Q10=2, SMAX=20, TMAXMIN=20;
+const PRE={
+ model:{nm:'Modellenzym (37 °C, pH 7)',Topt:37,pHopt:7.0,d:1.3},
+ amy:{nm:'Speichelamylase (Mund)',Topt:37,pHopt:6.8,d:1.2},
+ pep:{nm:'Pepsin (Magen)',Topt:37,pHopt:2.0,d:1.1},
+ tryp:{nm:'Trypsin (Dünndarm)',Topt:37,pHopt:8.0,d:1.2},
+ taq:{nm:'Thermophiles Enzym (z. B. Taq-Polymerase)',Topt:72,pHopt:8.5,d:1.5},
+ cold:{nm:'Kälteangepasstes Enzym (Kaltwasserfisch)',Topt:15,pHopt:7.5,d:1.4}
+};
+const qc=Math.log(Q10)/10;
+function natF(T,pr){ return 1/(1+Math.exp((T-pr.Tm)/W)); }
+function rawT(T,pr){ return Math.pow(Q10,(T-pr.Topt)/10)*natF(T,pr); }
+function rawPH(pH,pr){ return 1/(1+Math.pow(10,(pr.pHopt-pr.d)-pH)+Math.pow(10,pH-(pr.pHopt+pr.d))); }
+Object.keys(PRE).forEach(k=>{ const pr=PRE[k]; const x=W*qc; pr.Tm=pr.Topt-W*Math.log(x/(1-x)); pr.peakT=rawT(pr.Topt,pr); pr.peakPH=rawPH(pr.pHopt,pr); });
+const fT=(T,pr)=>rawT(T,pr)/pr.peakT;
+const fPH=(pH,pr)=>rawPH(pH,pr)/pr.peakPH;
+
+/* Kooperatives Modell (MWC, konzertiert, c = 0) */
+const L0C={2:30,3:100,4:300}, KRC={};
+[2,3,4].forEach(n=>{ let lo=0,hi=1e4; for(let k=0;k<80;k++){ const m=(lo+hi)/2, Y=m*Math.pow(1+m,n-1)/(L0C[n]+Math.pow(1+m,n)); if(Y<0.5) lo=m; else hi=m; } KRC[n]=KM0/((lo+hi)/2); });
+
+/* ---------- Zustand ---------- */
+const DEF={pre:'model',T:37,pH:7,E:1,S:4,Ik:0,Ia:0,A:0,mode:'mm',n:4};
+const state=Object.assign({},DEF,{tab:'mm',saved:[],mys:{on:false,type:'komp',X:0,tip:0},collapsed:false});
+function getP(){
+  const p={pre:state.pre,T:state.T,pH:state.pH,E:state.E,Ik:state.Ik,Ia:state.Ia,A:state.A,mode:state.mode,n:state.n};
+  if(state.mys.on){ p.Ik=state.mys.type==='komp'?state.mys.X:0; p.Ia=state.mys.type==='allo'?state.mys.X:0; p.mode='mm'; }
+  return p;
+}
+const refP=p=>{ const pr=PRE[p.pre]; return {pre:p.pre,T:pr.Topt,pH:pr.pHopt,E:1,Ik:0,Ia:0,A:0,mode:p.mode,n:p.n}; };
+function parts(p){ const pr=PRE[p.pre]; return {pr,ft:fT(p.T,pr),fp:fPH(p.pH,pr),i:p.Ia/KIA,a:p.A/KA,io:p.Ik/KI,nat:natF(p.T,pr)}; }
+function gAllo(p){ const q=parts(p); return (1+L0MM)*(1+q.a)/((1+q.a)+L0MM*(1+q.i)); }
+function Vmax(p){ const q=parts(p), base=VMAX0*p.E*q.ft*q.fp; return p.mode==='mm'?base*gAllo(p):base; }
+function Yc(S,p){ const q=parts(p), n=p.n, al=S/KRC[n], Lp=L0C[n]*Math.pow((1+q.i)/(1+q.a),n), b=1+al+q.io; return al*Math.pow(b,n-1)/(Lp+Math.pow(b,n)); }
+function vel(S,p){ if(p.mode==='mm'){ const q=parts(p); return Vmax(p)*S/(KM0*(1+q.io)+S); } return Vmax(p)*Yc(S,p); }
+function halfS(p){ if(p.mode==='mm') return KM0*(1+p.Ik/KI); if(Yc(1e6,p)<0.5) return Infinity; let lo=0,hi=1e6; for(let k=0;k<90;k++){ const m=(lo+hi)/2; if(Yc(m,p)<0.5) lo=m; else hi=m; } return (lo+hi)/2; }
+
+/* ---------- Diagramm-Hilfen ---------- */
+const CW=600,CH=330,ML=68,MR=16,MT=16,MB=54,PW=CW-ML-MR,PHT=CH-MT-MB;
+function niceCeil(v){ const e=Math.pow(10,Math.floor(Math.log10(v))), m=v/e; const f=m<=1?1:m<=1.2?1.2:m<=1.5?1.5:m<=2?2:m<=2.5?2.5:m<=3?3:m<=4?4:m<=5?5:m<=6?6:m<=8?8:10; return f*e; }
+function tickStep(max){ const raw=max/5, e=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/e; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*e; }
+const decOf=s=>(Math.abs(s-Math.round(s))<1e-9?0:(Math.abs(s*10-Math.round(s*10))<1e-9?1:2));
+function axes(o){
+  const X=v=>ML+(v-o.x0)/(o.x1-o.x0)*PW, Y=v=>MT+PHT-(v-o.y0)/(o.y1-o.y0)*PHT;
+  let g=`<rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}" fill="var(--paper)"/>`;
+  const xm=o.xs/5, ym=o.ys/5;
+  for(let k=Math.ceil(o.x0/xm-1e-9); k*xm<=o.x1+1e-9; k++){ const v=k*xm; g+=`<line class="gm" x1="${X(v).toFixed(1)}" x2="${X(v).toFixed(1)}" y1="${MT}" y2="${MT+PHT}"/>`; }
+  for(let k=Math.ceil(o.y0/ym-1e-9); k*ym<=o.y1+1e-9; k++){ const v=k*ym; g+=`<line class="gm" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" x1="${ML}" x2="${ML+PW}"/>`; }
+  const dx=decOf(o.xs), dy=decOf(o.ys);
+  for(let k=Math.ceil(o.x0/o.xs-1e-9); k*o.xs<=o.x1+1e-9; k++){ const v=k*o.xs; g+=`<line class="gM" x1="${X(v).toFixed(1)}" x2="${X(v).toFixed(1)}" y1="${MT}" y2="${MT+PHT}"/><text class="tk" x="${X(v).toFixed(1)}" y="${MT+PHT+19}" text-anchor="middle">${fmt(v,dx)}</text>`; }
+  for(let k=Math.ceil(o.y0/o.ys-1e-9); k*o.ys<=o.y1+1e-9; k++){ const v=k*o.ys; g+=`<line class="gM" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" x1="${ML}" x2="${ML+PW}"/><text class="tk" x="${ML-8}" y="${(Y(v)+5).toFixed(1)}" text-anchor="end">${fmt(v,dy)}</text>`; }
+  if(o.x0<0) g+=`<line class="ax" x1="${X(0)}" x2="${X(0)}" y1="${MT}" y2="${MT+PHT}"/>`;
+  if(o.y0<0) g+=`<line class="ax" y1="${Y(0)}" y2="${Y(0)}" x1="${ML}" x2="${ML+PW}"/>`;
+  g+=`<rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}" fill="none" stroke="var(--axis)" stroke-width="1.6"/>`;
+  g+=`<text class="al" x="${ML+PW/2}" y="${CH-10}" text-anchor="middle">${o.xl}</text><text class="al" transform="translate(17 ${MT+PHT/2}) rotate(-90)" text-anchor="middle">${o.yl}</text>`;
+  return {X,Y,g};
+}
+function pathOf(ax,f,x0,x1,N){ N=N||120; let d=''; for(let k=0;k<=N;k++){ const x=x0+(x1-x0)*k/N; d+=(k?'L':'M')+ax.X(x).toFixed(1)+' '+ax.Y(f(x)).toFixed(1)+' '; } return d; }
+const svgOpen=(label)=>`<svg viewBox="0 0 ${CW} ${CH}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}"><defs><clipPath id="cp"><rect x="${ML}" y="${MT}" width="${PW}" height="${PHT}"/></clipPath></defs>`;
+const curveSet=p=>[{p:refP(p),c:'ref'}].concat(state.saved.map((s,i)=>({p:s.p,c:'s'+(i%3+1)})),[{p:p,c:'cur'}]);
+
+function chartMM(p){
+  const Vm=Vmax(p), K=halfS(p);
+  const cs=curveSet(p), ymax=niceCeil(Math.max(1.2,...cs.map(c=>Vmax(c.p)))*1.1), ys=tickStep(ymax);
+  const ax=axes({x0:0,x1:SMAX,y0:0,y1:ymax,xs:5,ys,xl:'Substratkonzentration [S] in mmol/L',yl:'v in mmol/(L·min)'});
+  const v=vel(p.S ?? state.S,p);
+  let s=svgOpen(`Michaelis-Menten-Diagramm: bei ${fmt(state.S,1)} mmol/L Substrat beträgt die Geschwindigkeit ${fmt(v,2)}, Vmax ${fmt(Vm,2)}`)+ax.g+'<g clip-path="url(#cp)">';
+  cs.forEach(c=>{ s+=`<path class="c-${c.c}" d="${pathOf(ax,S=>vel(S,c.p),0,SMAX,110)}"/>`; });
+  s+='</g>';
+  if(Vm>0.01){
+    s+=`<line class="vm" x1="${ML}" x2="${ML+PW}" y1="${ax.Y(Vm).toFixed(1)}" y2="${ax.Y(Vm).toFixed(1)}"/><text class="lbl soft halo" x="${ML+PW-6}" y="${(ax.Y(Vm)-6).toFixed(1)}" text-anchor="end">V<tspan font-size="12" dy="4">max</tspan><tspan dy="-4"> = ${fmt(Vm,2)}</tspan></text>`;
+    if(K<=SMAX){
+      const kx=ax.X(K), ky=ax.Y(Vm/2);
+      s+=`<line class="km" x1="${ML}" x2="${kx.toFixed(1)}" y1="${ky.toFixed(1)}" y2="${ky.toFixed(1)}"/><line class="km" x1="${kx.toFixed(1)}" x2="${kx.toFixed(1)}" y1="${ky.toFixed(1)}" y2="${MT+PHT}"/>`;
+      const lab=p.mode==='mm'?'K<tspan font-size="12" dy="4">m</tspan>':'K<tspan font-size="12" dy="4">0,5</tspan>';
+      s+=`<text class="lbl km-l" x="${(kx+6).toFixed(1)}" y="${MT+PHT-8}">${lab}<tspan dy="-4"> = ${fmt(K,1)}</tspan></text>`;
+    }
+  }
+  const px=ax.X(state.S), py=ax.Y(v);
+  s+=`<line class="guide" x1="${px.toFixed(1)}" x2="${px.toFixed(1)}" y1="${py.toFixed(1)}" y2="${MT+PHT}"/><line class="guide" x1="${ML}" x2="${px.toFixed(1)}" y1="${py.toFixed(1)}" y2="${py.toFixed(1)}"/>`;
+  s+=`<circle class="pt" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="8"/>`;
+  const low=py+24<MT+PHT-4, tx=low?px+14:px-14, ta=low?'start':'end', ty=low?py+22:py-14;
+  s+=`<text class="lbl halo" x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${ta}">v = ${fmt(v,2)}</text></svg>`;
+  return s;
+}
+function simulate(p,S0){
+  const N=240, sub=4, dt=TMAXMIN/N/sub; let S=S0, out=[[0,0]];
+  for(let k=1;k<=N;k++){ for(let j=0;j<sub;j++){ const dS=vel(S,p)*dt; S=Math.max(0,S-dS); } out.push([k*TMAXMIN/N,S0-S]); }
+  return out;
+}
+function chartTime(p){
+  const S0=state.S;
+  if(S0<=0.001) return svgOpen('Zeitverlauf: kein Substrat')+axes({x0:0,x1:TMAXMIN,y0:0,y1:1,xs:5,ys:.2,xl:'Zeit in min',yl:'Produkt [P] in mmol/L'}).g+`<text class="lbl" x="${CW/2}" y="${CH/2}" text-anchor="middle">Stelle eine Substratkonzentration größer als 0 ein.</text></svg>`;
+  const ymax=niceCeil(S0*1.05), ys=tickStep(ymax);
+  const ax=axes({x0:0,x1:TMAXMIN,y0:0,y1:ymax,xs:5,ys,xl:'Zeit in min',yl:'Produkt [P] in mmol/L'});
+  let s=svgOpen(`Zeitverlauf der Produktbildung bei ${fmt(S0,1)} mmol/L Anfangssubstrat`)+ax.g+'<g clip-path="url(#cp)">';
+  curveSet(p).forEach(c=>{ const d=simulate(c.p,S0).map((q,k)=>(k?'L':'M')+ax.X(q[0]).toFixed(1)+' '+ax.Y(q[1]).toFixed(1)).join(' '); s+=`<path class="c-${c.c}" d="${d}"/>`; });
+  const v0=vel(S0,p);
+  if(v0>1e-4){ const tEnd=Math.min(TMAXMIN,ymax/v0); s+=`<line class="km" x1="${ax.X(0)}" y1="${ax.Y(0)}" x2="${ax.X(tEnd).toFixed(1)}" y2="${ax.Y(v0*tEnd).toFixed(1)}"/>`; }
+  s+=`</g><text class="lbl halo" x="${ML+10}" y="${MT+20}">Anfangsgeschwindigkeit v<tspan font-size="12" dy="4">0</tspan><tspan dy="-4"> = ${fmt(v0,2)} mmol/(L·min)</tspan></text></svg>`;
+  return s;
+}
+function chartLB(p){
+  const cs=curveSet(p), Smin=0.5, xr=1/Smin;
+  const yAt=(c,x)=>{ const S=1/x, v=vel(S,c.p); return v>1e-9?1/v:1e9; };
+  const ymax=niceCeil(clamp(Math.max(6,...cs.map(c=>yAt(c,xr)))*1.1,6,40)), ys=tickStep(ymax), y0=-ys*Math.ceil(ymax*0.25/ys);
+  const ax=axes({x0:-1,x1:xr,y0,y1:ymax,xs:.5,ys,xl:'1/[S] in L/mmol',yl:'1/v in (L·min)/mmol'});
+  let s=svgOpen('Lineweaver-Burk-Diagramm: Kehrwert der Geschwindigkeit gegen Kehrwert der Substratkonzentration')+ax.g+'<g clip-path="url(#cp)">';
+  cs.forEach(c=>{
+    if(c.p.mode==='mm'){ const Vm=Vmax(c.p), K=halfS(c.p); if(Vm>1e-6){ const m=K/Vm, b=1/Vm; s+=`<path class="c-${c.c}" d="M${ax.X(-1).toFixed(1)} ${ax.Y(-m+b).toFixed(1)} L${ax.X(xr).toFixed(1)} ${ax.Y(m*xr+b).toFixed(1)}"/>`; } }
+    else { let d=''; for(let k=0;k<=80;k++){ const S=Smin*Math.pow(SMAX/Smin,k/80), x=1/S, y=yAt(c,x); d+=(k?'L':'M')+ax.X(x).toFixed(1)+' '+ax.Y(y).toFixed(1)+' '; } s+=`<path class="c-${c.c}" d="${d}"/>`; }
+  });
+  s+='</g>';
+  if(p.mode==='mm'){ const Vm=Vmax(p), K=halfS(p); if(Vm>1e-6){
+    if(1/Vm<=ymax) s+=`<circle class="pt" r="6" cx="${ax.X(0)}" cy="${ax.Y(1/Vm).toFixed(1)}"/><text class="lbl halo" x="${ax.X(0)+10}" y="${(ax.Y(1/Vm)-8).toFixed(1)}">1/V<tspan font-size="12" dy="4">max</tspan><tspan dy="-4"> = ${fmt(1/Vm,2)}</tspan></text>`;
+    s+=`<circle class="pt" r="6" cx="${ax.X(-1/K).toFixed(1)}" cy="${ax.Y(0)}"/><text class="lbl halo" x="${(ax.X(-1/K)+10).toFixed(1)}" y="${ax.Y(0)+20}">−1/K<tspan font-size="12" dy="4">m</tspan><tspan dy="-4"> = ${fmt(-1/K,2)}</tspan></text>`;
+  } }
+  return s+'</svg>';
+}
+
+/* Mini-Profile für Temperatur und pH */
+function miniProfile(kind){
+  const pr=PRE[state.pre], W2=300,H2=84,l=6,r=6,t=6,b=18, pw=W2-l-r, ph=H2-t-b, x1=kind==='T'?90:14;
+  const f=kind==='T'?(x=>fT(x,pr)):(x=>fPH(x,pr)), cur=kind==='T'?state.T:state.pH, opt=kind==='T'?pr.Topt:pr.pHopt;
+  const X=v=>l+v/x1*pw, Y=v=>t+ph-clamp(v,0,1.02)*ph; let d='',N=100;
+  for(let k=0;k<=N;k++){ const x=x1*k/N; d+=(k?'L':'M')+X(x).toFixed(1)+' '+Y(f(x)).toFixed(1)+' '; }
+  const ticks=kind==='T'?[0,30,60,90]:[0,7,14];
+  return `<svg viewBox="0 0 ${W2} ${H2}" aria-hidden="true"><path class="fl" d="${d} L${X(x1)} ${t+ph} L${X(0)} ${t+ph} Z"/><path class="ln" d="${d}"/><line class="opt" x1="${X(opt).toFixed(1)}" x2="${X(opt).toFixed(1)}" y1="${t}" y2="${t+ph}"/><line x1="${l}" x2="${l+pw}" y1="${t+ph}" y2="${t+ph}" stroke="var(--ink-soft)" stroke-width="1"/>${ticks.map(v=>`<text class="mt" x="${X(v).toFixed(1)}" y="${H2-4}" text-anchor="${v===0?'start':(v===x1?'end':'middle')}">${v}${kind==='T'?' °C':''}</text>`).join('')}<circle class="dt" cx="${X(cur).toFixed(1)}" cy="${Y(f(cur)).toFixed(1)}" r="5"/></svg>`;
+}
+
+/* ---------- Molekülmodell ---------- */
+const NMOL=15, COLS=5;
+const RND=(()=>{ let s=20240611; const r=()=>{ s|=0; s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; return Array.from({length:NMOL},()=>({u:[r(),r(),r(),r()],s:[r(),r(),r(),r()],j:Array.from({length:12},r)})); })();
+const hex=(cx,cy,r)=>[0,1,2,3,4,5].map(k=>{ const a=Math.PI/3*k+Math.PI/6; return (cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1); }).join(' ');
+const tri=(cx,cy,r)=>[[0,-1],[.87,.5],[-.87,.5]].map(q=>(cx+r*q[0]).toFixed(1)+','+(cy+r*q[1]).toFixed(1)).join(' ');
+function sub(x,y,r,st,occ){
+  const body=st==='T'?'var(--enzT)':st==='ph'?'var(--enzP)':'var(--enz)';
+  let g=`<circle cx="${x}" cy="${y}" r="${r}" fill="${body}" stroke="var(--molstroke)" stroke-width="1.6"${st==='ph'?' stroke-dasharray="3 2.5"':''}/>`;
+  const nr=st==='R'?r*0.46:(st==='T'?r*0.2:r*0.3), ny=y-r*0.82;
+  g+=`<circle cx="${x}" cy="${ny.toFixed(1)}" r="${nr.toFixed(1)}" fill="var(--molbg)"/>`;
+  if(st==='R'&&occ==='S') g+=`<polygon points="${hex(x,ny,nr*1.05)}" fill="var(--sub)" stroke="var(--molstroke)" stroke-width="1"/>`;
+  if(st==='R'&&occ==='I') g+=`<polygon points="${hex(x,ny,nr*1.05)}" fill="var(--ik)" stroke="var(--molstroke)" stroke-width="1"/>`;
+  if(st==='ph') g+=`<text x="${x}" y="${(y+r*0.34).toFixed(1)}" text-anchor="middle" font-size="${(r*0.95).toFixed(1)}" font-weight="700" fill="var(--molstroke)">±</text>`;
+  return g;
+}
+function denat(cx,cy,R,m){
+  let d=''; const N=11; for(let k=0;k<N;k++){ const a=2*Math.PI*k/N, rr=R*(0.55+0.7*m.j[k]); d+=(k?'L':'M')+(cx+rr*Math.cos(a)).toFixed(1)+' '+(cy+rr*Math.sin(a)).toFixed(1)+' '; }
+  return `<path d="${d}Z" fill="none" stroke="var(--den)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="1 0"/><path d="M${cx-R*.5} ${cy} q${R*.25} -${R*.5} ${R*.5} 0 t${R*.5} 0" fill="none" stroke="var(--den)" stroke-width="2" stroke-linecap="round"/>`;
+}
+const LAY={1:{r:27,pos:[[0,0]],ext:30},2:{r:18,pos:[[-18,0],[18,0]],ext:38},3:{r:15,pos:[[-17,10],[17,10],[0,-16]],ext:34},4:{r:14,pos:[[-15,-15],[15,-15],[-15,15],[15,15]],ext:32}};
+function molSVG(p){
+  const q=parts(p), n=p.mode==='coop'?p.n:1, L=LAY[n], i=q.i, a=q.a, io=q.io, al=p.mode==='coop'?p.S/KRC[n]:0, S=p.S;
+  const bSub=1+al+io; let pR;
+  if(p.mode==='mm'){ pR=(1+a)/((1+a)+L0MM*(1+i)); }
+  else { const Lp=L0C[n]*Math.pow((1+i)/(1+a),n); pR=Math.pow(bSub,n)/(Lp+Math.pow(bSub,n)); }
+  const pS=p.mode==='mm'?S/(KM0*(1+io)+S):al/bSub, pI=p.mode==='mm'?(io*KM0/(KM0*(1+io)+S)):io/bSub;
+  const cw=600/COLS, rows=Math.ceil(NMOL/COLS), amp=(0.3+Math.max(0,p.T)/90*2.6).toFixed(2), dur=(3.4-Math.max(0,p.T)/90*2.1).toFixed(2);
+  let s=`<svg id="molSvg" viewBox="0 0 600 ${rows*104}" role="img" aria-label="Stichprobe von ${NMOL} Enzymmolekülen" style="--amp:${amp};--dur:${dur}s">`;
+  for(let k=0;k<NMOL;k++){
+    const m=RND[k], cx=cw*(k%COLS)+cw/2-6, cy=104*Math.floor(k/COLS)+52, ext=L.ext;
+    let g=`<g class="mol" style="animation-delay:${(-m.j[0]*3).toFixed(2)}s">`, allo='';
+    if(m.u[0]>q.nat){ g+=denat(cx,cy,ext*0.72,m); }
+    else if(m.u[1]>q.fp){ L.pos.forEach(o=>{ g+=sub(cx+o[0],cy+o[1],L.r,'ph','free'); }); }
+    else {
+      const R=m.u[2]<pR;
+      L.pos.forEach((o,j)=>{ const u=m.s[j%4]; const occ=!R?'free':(u<pS?'S':(u<pS+pI?'I':'free')); g+=sub(cx+o[0],cy+o[1],L.r,R?'R':'T',occ); });
+      allo=R?(m.u[3]<a/(1+a)?'A':''):(m.u[3]<i/(1+i)?'I':'');
+      const bx=cx+ext+7, by=cy;
+      g+=`<rect x="${bx-8}" y="${by-8}" width="16" height="16" rx="3" fill="var(--molbg)" stroke="var(--molstroke)" stroke-width="1.4"${allo?'':' stroke-dasharray="3 2.5"'}/>`;
+      if(allo==='I') g+=`<polygon points="${tri(bx,by+1,7.5)}" fill="var(--ia)" stroke="var(--molstroke)" stroke-width="1"/>`;
+      if(allo==='A') g+=`<circle cx="${bx}" cy="${by}" r="6" fill="var(--act)" stroke="var(--molstroke)" stroke-width="1"/>`;
+    }
+    s+=g+'</g>';
+  }
+  return s+'</svg>';
+}
+function legIcon(kind){
+  const b='var(--molstroke)'; const w=22;
+  const sh={
+    S:`<polygon points="${hex(11,11,8)}" fill="var(--sub)" stroke="${b}"/>`,
+    I:`<polygon points="${hex(11,11,8)}" fill="var(--ik)" stroke="${b}"/>`,
+    AI:`<polygon points="${tri(11,12,9)}" fill="var(--ia)" stroke="${b}"/>`,
+    AA:`<circle cx="11" cy="11" r="7.5" fill="var(--act)" stroke="${b}"/>`,
+    R:`<circle cx="11" cy="11" r="8.5" fill="var(--enz)" stroke="${b}" stroke-width="1.4"/><circle cx="11" cy="4.5" r="4" fill="var(--molbg)"/>`,
+    T:`<circle cx="11" cy="11" r="8.5" fill="var(--enzT)" stroke="${b}" stroke-width="1.4"/><circle cx="11" cy="4.5" r="1.8" fill="var(--molbg)"/>`,
+    D:`<path d="M3 11 L7 4 L11 12 L15 3 L19 11 L14 18 L8 16 Z" fill="none" stroke="var(--den)" stroke-width="2" stroke-linejoin="round"/>`,
+    P:`<circle cx="11" cy="11" r="8.5" fill="var(--enzP)" stroke="${b}" stroke-width="1.4" stroke-dasharray="3 2.5"/><text x="11" y="14.5" text-anchor="middle" font-size="9" font-weight="700" fill="${b}">±</text>`
+  }[kind];
+  return `<svg width="${w}" height="${w}" viewBox="0 0 22 22" aria-hidden="true">${sh}</svg>`;
+}
+const MLEG=[['R','aktive Form (R), aktives Zentrum frei'],['S','Substrat im aktiven Zentrum'],['I','kompetitiver Hemmstoff im aktiven Zentrum'],['AI','allosterischer Hemmstoff (am Nebenzentrum)'],['AA','allosterischer Aktivator (am Nebenzentrum)'],['T','T-Form, wenig aktiv'],['D','denaturiert'],['P','pH-bedingt inaktiv']];
+
+/* ---------- Steuerelemente ---------- */
+const CTRL={
+ T:{label:'Temperatur',min:0,max:90,step:1,f:v=>v+' °C',c:'--temp',desc:'Beeinflusst die Teilchenbewegung und die Raumstruktur des Enzyms.'},
+ pH:{label:'pH-Wert',min:0,max:14,step:.1,f:v=>fmt(v,1),c:'--ph',desc:'Verändert die Ladung von Aminosäureresten im aktiven Zentrum.'},
+ E:{label:'Enzymkonzentration [E]',min:.25,max:3,step:.05,f:v=>'× '+fmt(v,2),c:'--enzc',desc:'Mehr Enzymmoleküle bedeuten mehr aktive Zentren.'},
+ S:{label:'Substratkonzentration [S]',min:0,max:20,step:.1,f:v=>fmt(v,1)+' mmol/L',c:'--sub',desc:'Du kannst [S] auch im Michaelis-Menten-Diagramm ziehen.'},
+ Ik:{label:'Kompetitiver Hemmstoff [I]',min:0,max:10,step:.1,f:v=>fmt(v,1)+' mmol/L',c:'--ik',desc:'Ähnelt dem Substrat und besetzt das aktive Zentrum.'},
+ Ia:{label:'Allosterischer Hemmstoff [I]',min:0,max:10,step:.1,f:v=>fmt(v,1)+' mmol/L',c:'--ia',desc:'Bindet an einem anderen Zentrum und verändert die Raumstruktur.'},
+ A:{label:'Allosterischer Aktivator [A]',min:0,max:10,step:.1,f:v=>fmt(v,1)+' mmol/L',c:'--act',desc:'Bindet am allosterischen Zentrum und stabilisiert die aktive Form.'}
+};
+function ctlHTML(k){ const c=CTRL[k]; return `<div class="ctl" data-k="${k}" style="--c:var(${c.c})"><div class="ctl-head"><label for="in_${k}"><span class="dotc"></span>${c.label}</label><output id="out_${k}"></output></div><input type="range" id="in_${k}" min="${c.min}" max="${c.max}" step="${c.step}"><p class="ctl-desc">${c.desc}</p>${k==='T'?'<div class="mini" id="miniT"></div>':''}${k==='pH'?'<div class="mini" id="miniPH"></div>':''}</div>`; }
+function buildCtrl(){
+  $('#ctlCond').innerHTML='<h2>Bedingungen</h2>'+['T','pH','E'].map(ctlHTML).join('');
+  $('#ctlSub').innerHTML='<h2>Substrat</h2>'+ctlHTML('S');
+  $('#ctlInh').innerHTML=['Ik','Ia','A'].map(ctlHTML).join('');
+  $('#selPre').innerHTML=Object.keys(PRE).map(k=>`<option value="${k}">${PRE[k].nm}</option>`).join('');
+}
+function syncCtrl(){
+  Object.keys(CTRL).forEach(k=>{ const el=$('#in_'+k); if(!el) return; el.value=state[k]; $('#out_'+k).textContent=CTRL[k].f(+state[k]); });
+  $('#in_X').value=state.mys.X; $('#out_X').textContent=fmt(state.mys.X,1)+' mmol/L';
+  $('#selPre').value=state.pre;
+  $$('#segMode button').forEach(b=>{ b.setAttribute('aria-pressed',b.dataset.mode===state.mode); b.setAttribute('aria-disabled',state.mys.on&&b.dataset.mode==='coop'?'true':'false'); });
+  $('#rowN').hidden=state.mode!=='coop';
+  $$('#segN button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.n===state.n));
+  ['Ik','Ia'].forEach(k=>{ const c=$('.ctl[data-k="'+k+'"]'); c.hidden=state.mys.on; });
+  $('#mysBox').hidden=!state.mys.on; $('#btnMys').setAttribute('aria-pressed',state.mys.on); $('#btnMys').textContent=state.mys.on?'Rätselmodus beenden':'Rätselmodus: unbekannter Hemmstoff';
+  $$('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===state.tab));
+}
+
+/* ---------- Anzeige ---------- */
+function describe(p){
+  let d=`${p.T} °C, pH ${fmt(p.pH,1)}, [S] ${fmt(state.S,1)}`;
+  if(p.E!==1) d+=`, [E] ×${fmt(p.E,2)}`;
+  if(state.mys.on){ if(state.mys.X>0) d+=`, Hemmstoff X ${fmt(state.mys.X,1)}`; }
+  else { if(p.Ik>0) d+=`, kompetitiv ${fmt(p.Ik,1)}`; if(p.Ia>0) d+=`, allosterischer Hemmstoff ${fmt(p.Ia,1)}`; }
+  if(p.A>0) d+=`, Aktivator ${fmt(p.A,1)}`;
+  return d+(p.mode==='coop'?` (kooperativ, n = ${p.n})`:'');
+}
+function renderLegend(p){
+  let h='<li><i style="border-color:var(--cur)"></i>aktuell</li><li><i class="dash" style="border-color:var(--ref)"></i>Referenz<span class="d">: Optimum, ohne Hemmstoff, [E] = 1</span></li>';
+  state.saved.forEach((s,i)=>{ h+=`<li><i style="border-color:var(--s${i%3+1})"></i>Kurve ${i+1}<span class="d">: ${s.desc}</span></li>`; });
+  if(state.tab==='time') h+='<li><i class="dash" style="border-color:var(--sub)"></i>Tangente (v₀)</li>';
+  $('#legend').innerHTML=h;
+}
+function renderPlot(p){
+  const pl=$('#plot'); pl.className=state.tab==='mm'?'drag':'';
+  pl.innerHTML=state.tab==='mm'?chartMM(p):state.tab==='time'?chartTime(p):chartLB(p);
+  $('#plotHint').textContent=state.tab==='mm'?'Ziehe im Diagramm nach links oder rechts, um die Substratkonzentration zu ändern.':state.tab==='time'?'Die Kurve zeigt, wie viel Produkt entsteht, wenn das Substrat verbraucht wird. Die Steigung am Anfang ist die Anfangsgeschwindigkeit v₀, die im Michaelis-Menten-Diagramm aufgetragen wird.':(p.mode==='mm'?'Auftragung von 1/v gegen 1/[S]. Kompetitiv: gleicher y-Achsenabschnitt. Allosterisch (V-Typ): gleicher x-Achsenabschnitt.':'Im kooperativen Modus ergibt sich keine Gerade, sondern eine Kurve.');
+}
+function renderStrip(p){
+  const Vm=Vmax(p), K=halfS(p), v=vel(state.S,p);
+  $('#strip').innerHTML=`<div class="stat"><span title="Reaktionsgeschwindigkeit in mmol/(L·min)">v</span><b>${fmt(v,2)}</b></div><div class="stat"><span title="scheinbare maximale Geschwindigkeit">V<sub>max</sub></span><b>${fmt(Vm,2)}</b></div><div class="stat"><span title="scheinbare Michaelis-Konstante in mmol/L">${p.mode==='mm'?'K<sub>m</sub>':'K<sub>0,5</sub>'}</span><b>${isFinite(K)?fmt(K,1):'>1000'}</b></div>`;
+}
+function renderFacs(p){
+  const q=parts(p), v=vel(state.S,p), Vm=Vmax(p), K=halfS(p), rv=vel(state.S,refP(p));
+  const rows=[
+   ['Temperatur',q.ft,'--temp',1,'×'],['pH-Wert',q.fp,'--ph',1,'×'],['Enzymmenge',p.E,'--enzc',3,'×']
+  ];
+  if(p.mode==='mm') rows.push(['Allosterie (V<sub>max</sub>)',gAllo(p),'--ia',1.5,'×'],['Kompetitive Hemmung (K<sub>m</sub>)',1+q.io,'--ik',11,'×']);
+  else rows.push(['Allosterie (K<sub>0,5</sub>)',halfS(Object.assign({},p,{Ik:0}))/KM0,'--ia',6,'×'],['Kompetitive Hemmung (K<sub>0,5</sub>)',halfS(Object.assign({},p,{Ia:0,A:0}))/KM0,'--ik',11,'×']);
+  let h=rows.map(r=>{ const mx=r[3]; return `<div class="fac" style="--c:var(${r[2]})"><span>${r[0]}</span><span class="bar"><i style="width:${clamp(r[1]/mx*100,2,100).toFixed(0)}%"></i></span><b>${r[4]} ${fmt(r[1],2)}</b></div>`; }).join('');
+  h+=`<div class="fac" style="--c:var(--cur)"><span>Aktivität gegenüber Referenz bei dieser [S]</span><span class="bar"><i style="width:${clamp(rv>0?v/rv*50:0,2,100).toFixed(0)}%"></i></span><b>${rv>1e-9?fmt(v/rv*100,0)+' %':'–'}</b></div>`;
+  $('#facs').innerHTML=h;
+}
+function explain(p){
+  const q=parts(p), pr=q.pr, out=[], v=vel(state.S,p), Vm=Vmax(p);
+  if(p.T<pr.Topt-6) out.push(['Temperatur','Unterhalb des Optimums bewegen sich die Teilchen langsamer. Enzym und Substrat treffen seltener erfolgreich aufeinander (RGT-Regel: etwa doppelte Geschwindigkeit pro 10 K). Die Struktur des Enzyms bleibt dabei intakt.']);
+  else if(p.T>pr.Topt+2) out.push(['Temperatur',`Oberhalb des Optimums wird die Raumstruktur zerstört (Denaturierung). ${q.nat<0.005?'Fast alle Enzymmoleküle sind zerstört.':'Nur noch '+fmt(q.nat*100,0)+' % der Enzymmoleküle sind intakt.'} Das aktive Zentrum geht verloren, das ist meist nicht umkehrbar.`]);
+  else out.push(['Temperatur','Nahe am Temperaturoptimum: schnelle Teilchenbewegung und weitgehend intakte Raumstruktur.']);
+  if(Math.abs(p.pH-pr.pHopt)>0.8) out.push(['pH-Wert',`Der pH-Wert weicht vom Optimum (etwa ${fmt(pr.pHopt,1)}) ab. Die Ladung von Aminosäureresten ändert sich, Ionenbindungen und Wasserstoffbrücken passen nicht mehr, das Substrat wird schlechter gebunden. Es sind nur noch ${fmt(q.fp*100,0)} % der maximalen Aktivität vorhanden.`]);
+  if(state.S>0&&Vm>0.005){ const sat=v/Vm; { if(sat>0.9) out.push(['Sättigung','Fast alle aktiven Zentren sind besetzt. Das Enzym arbeitet nahe Vmax, mehr Substrat bringt kaum noch etwas.']); else if(sat<0.3) out.push(['Substratmangel','Viele aktive Zentren sind frei. Mehr Substrat erhöht die Geschwindigkeit deutlich.']); } }
+  if(state.mys.on){ out.push(['Hemmstoff X','Die Art des Hemmstoffs ist unbekannt. Lies Vmax und Km im Diagramm ab, vergleiche mit der Referenz und prüfe, was bei sehr hoher Substratkonzentration passiert.']); }
+  else {
+    if(p.Ik>0) out.push(['Kompetitive Hemmung',`Der Hemmstoff ähnelt dem Substrat und besetzt das aktive Zentrum. Er konkurriert mit dem Substrat und lässt sich durch viel Substrat verdrängen. ${p.mode==='mm'?`Vmax bleibt gleich, Km steigt auf ${fmt(KM0*(1+p.Ik/KI),1)} mmol/L.`:'Die Kurve verschiebt sich nach rechts, Vmax bleibt gleich.'}`]);
+    if(p.Ia>0) out.push(['Allosterische Hemmung',p.mode==='mm'?'Der Hemmstoff bindet an das allosterische Zentrum und verändert die Raumstruktur. Das aktive Zentrum passt nicht mehr gut. Substrat kann ihn nicht verdrängen: Vmax sinkt, Km bleibt gleich.':'Der Hemmstoff stabilisiert die wenig aktive T-Form. Die Kurve verschiebt sich nach rechts und wird steiler im mittleren Bereich, Vmax bleibt gleich.']);
+    if(p.A>0) out.push(['Allosterische Aktivierung',p.mode==='mm'?'Der Aktivator bindet am allosterischen Zentrum und stabilisiert die aktive R-Form. Es sind mehr Moleküle aktiv, Vmax steigt.':'Der Aktivator stabilisiert die aktive R-Form. Die Kurve verschiebt sich nach links, Vmax bleibt gleich.']);
+  }
+  if(p.mode==='coop') out.push(['Kooperativität','Die Bindung von Substrat stabilisiert die aktive R-Form des ganzen Enzyms. Dadurch wird weitere Bindung leichter, die Kurve ist S-förmig und reagiert im mittleren Bereich sehr empfindlich auf [S].']);
+  $('#expl').innerHTML=out.map(o=>`<li><b>${o[0]}</b>${o[1]}</li>`).join('');
+}
+let raf=0;
+function update(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(draw); }
+function draw(){
+  const p=getP(); p.S=state.S;
+  syncCtrl(); renderPlot(p); renderLegend(p); renderStrip(p); renderFacs(p); explain(p);
+  $('#molWrap').innerHTML=molSVG(p);
+  $('#miniT').innerHTML=miniProfile('T'); $('#miniPH').innerHTML=miniProfile('pH');
+}
+
+/* ---------- Ereignisse ---------- */
+$('#ctrl').addEventListener('input',e=>{
+  const el=e.target; if(!el.matches('input[type=range]')) return; const k=el.id.slice(3);
+  if(k==='X') state.mys.X=+el.value; else state[k]=+el.value; update();
+});
+$('#selPre').addEventListener('change',e=>{ state.pre=e.target.value; state.T=PRE[state.pre].Topt; state.pH=PRE[state.pre].pHopt; update(); });
+$('#segMode').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||b.getAttribute('aria-disabled')==='true') return; state.mode=b.dataset.mode; update(); });
+$('#segN').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; state.n=+b.dataset.n; update(); });
+$('.chart-head').addEventListener('click',e=>{ const t=e.target.closest('.tab'); if(t){ state.tab=t.dataset.tab; update(); } });
+$('#btnCollapse').addEventListener('click',function(){ state.collapsed=!state.collapsed; $('#chartCard').classList.toggle('collapsed',state.collapsed); $('.lg',this).textContent=state.collapsed?'Ausklappen':'Einklappen'; this.setAttribute('aria-label',state.collapsed?'Diagramm ausklappen':'Diagramm einklappen'); this.setAttribute('aria-expanded',!state.collapsed); });
+$('#btnSave').addEventListener('click',()=>{
+  const p=getP(); if(state.saved.length>=3){ $('#saveMsg').textContent='Es können höchstens 3 Kurven gespeichert werden. Lösche zuerst gespeicherte Kurven.'; return; }
+  state.saved.push({p:Object.assign({},p),desc:describe(p)}); $('#saveMsg').textContent=`Kurve ${state.saved.length} gespeichert.`; update();
+});
+$('#btnClear').addEventListener('click',()=>{ state.saved=[]; $('#saveMsg').textContent='Gespeicherte Kurven gelöscht.'; update(); });
+function reset(){ Object.assign(state,DEF); state.mys={on:false,type:'komp',X:0,tip:0}; state.saved=[]; $('#mysFb').innerHTML=''; $('#saveMsg').textContent=''; }
+$('#btnReset').addEventListener('click',()=>{ reset(); update(); });
+
+/* Ziehen im Michaelis-Menten-Diagramm */
+let dragging=false;
+function setSFromEvent(e){ const svg=$('#plot svg'); if(!svg) return; const r=svg.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width*CW; state.S=clamp(Math.round((x-ML)/PW*SMAX*10)/10,0,SMAX); update(); }
+$('#plot').addEventListener('pointerdown',e=>{ if(state.tab!=='mm') return; dragging=true; try{ $('#plot').setPointerCapture(e.pointerId); }catch(_){} setSFromEvent(e); e.preventDefault(); });
+$('#plot').addEventListener('pointermove',e=>{ if(dragging) setSFromEvent(e); });
+['pointerup','pointercancel'].forEach(ev=>$('#plot').addEventListener(ev,()=>{ dragging=false; }));
+
+/* Rätselmodus */
+function newMystery(){ state.mys.type=Math.random()<0.5?'komp':'allo'; state.mys.X=0; state.mys.tip=0; $('#mysFb').innerHTML=''; state.saved=[]; }
+$('#btnMys').addEventListener('click',()=>{
+  if(state.mys.on){ state.mys.on=false; $('#mysFb').innerHTML=''; state.saved=[]; }
+  else { state.mys.on=true; state.mode='mm'; state.Ik=0; state.Ia=0; newMystery(); state.S=Math.max(state.S,2); }
+  update();
+});
+$('#btnNew').addEventListener('click',()=>{ newMystery(); update(); });
+const TIPS=['Vergleiche die Kurve mit der gestrichelten Referenz. Welcher Wert verändert sich: Vmax, Km oder beide?','Erhöhe die Substratkonzentration auf 20 mmol/L. Nähert sich die Kurve der Referenz an, oder bleibt sie deutlich darunter?','Wechsle zum Lineweaver-Burk-Diagramm. Schneiden sich die Geraden auf der y-Achse oder auf der x-Achse?'];
+$('#btnTip').addEventListener('click',()=>{ const t=TIPS[state.mys.tip%TIPS.length]; state.mys.tip++; $('#mysFb').innerHTML=`<div class="fb tip">${t}</div>`; });
+$$('#mysBox [data-ans]').forEach(b=>b.addEventListener('click',()=>{
+  if(state.mys.X<=0.05){ $('#mysFb').innerHTML='<div class="fb tip">Stelle zuerst eine Konzentration von X ein und beobachte, was passiert.</div>'; return; }
+  const ok=b.dataset.ans===state.mys.type;
+  const why=state.mys.type==='komp'?'Der Hemmstoff war <b>kompetitiv</b>: Vmax blieb gleich, nur Km stieg. Bei sehr hoher Substratkonzentration verdrängt das Substrat den Hemmstoff aus dem aktiven Zentrum, die Kurve nähert sich der Referenz.':'Der Hemmstoff war <b>allosterisch</b>: Vmax sank, Km blieb gleich. Das Substrat kann den Hemmstoff nicht verdrängen, weil er an einer anderen Stelle bindet. Auch bei viel Substrat bleibt die Kurve unter der Referenz.';
+  $('#mysFb').innerHTML=`<div class="fb ${ok?'ok':'no'}"><b>${ok?'Richtig.':'Nicht ganz.'}</b> ${why}</div>`;
+}));
+
+/* ---------- Aufgaben ---------- */
+function setup(o){ reset(); Object.assign(state,o.s||{}); if(o.pre){ state.pre=o.pre; state.T=PRE[o.pre].Topt; state.pH=PRE[o.pre].pHopt; Object.assign(state,o.s||{}); } if(o.mys){ state.mys.on=true; state.mode='mm'; newMystery(); state.S=3; } if(o.tab) state.tab=o.tab; update(); $('#chartCard').scrollIntoView({block:'start',behavior:'smooth'}); }
+const TASKS=[
+ {afb:'I',op:'Beschreibe, bestimme',t:'Sättigungskurve',x:'Beschreibe den Zusammenhang zwischen Substratkonzentration und Reaktionsgeschwindigkeit. Bestimme am Diagramm Vmax und Km.',s:{s:{S:4},tab:'mm'},
+  sol:['Bei kleiner [S] steigt v fast linear an, danach wird der Anstieg flacher und nähert sich einem Grenzwert (Sättigung).','Vmax = 1,0 mmol/(L·min). Km = 2 mmol/L, das ist die [S], bei der v = Vmax/2 ist.','Erklärung: Die Zahl der aktiven Zentren ist begrenzt. Bei Sättigung sind alle besetzt, das Enzym arbeitet mit maximaler Geschwindigkeit.']},
+ {afb:'II',op:'Erkläre',t:'Temperatur',x:'Variiere die Temperatur von 0 bis 80 °C bei hoher Substratkonzentration. Beschreibe den Kurvenverlauf im Temperaturprofil und erkläre ihn.',s:{s:{S:12,T:20}},
+  sol:['Anstieg bis etwa 37 °C: Die Teilchen bewegen sich schneller, mehr erfolgreiche Zusammenstöße (RGT-Regel: etwa doppelte Geschwindigkeit je 10 K).','Optimum um 37 °C.','Starker Abfall oberhalb: Wasserstoffbrücken und Ionenbindungen brechen, die Tertiärstruktur und damit das aktive Zentrum gehen verloren (Denaturierung). Bei 50 °C sind es unter 10 % der maximalen Aktivität.','Das Optimum ist ein Kompromiss aus zwei gegenläufigen Effekten. Bei niedriger Temperatur ist das Enzym nicht zerstört, nur langsam.']},
+ {afb:'II',op:'Vergleiche, erkläre',t:'pH-Abhängigkeit',x:'Vergleiche die pH-Abhängigkeit von Pepsin und Trypsin. Erkläre die Unterschiede mit dem Aufbau des aktiven Zentrums und nenne den Zusammenhang mit dem Wirkort.',s:{pre:'pep',s:{S:12}},pre:'pep',
+  sol:['Pepsin: Optimum bei etwa pH 2 (saurer Magensaft). Trypsin: Optimum bei etwa pH 8 (Dünndarm). Bei pH 7 ist Pepsin nahezu inaktiv.','Der pH-Wert verändert die Ladung geladener Aminosäurereste im aktiven Zentrum und im Rest des Proteins. Ionenbindungen und Wasserstoffbrücken ändern sich, Substratbindung und Struktur leiden.','Anpassung der Enzyme an das Milieu des Wirkorts.']},
+ {afb:'II',op:'Untersuche, erkläre',t:'Kompetitive Hemmung',x:'Untersuche, wie sich Vmax und Km bei einem kompetitiven Hemmstoff (3 mmol/L) verändern. Zeige am Diagramm, warum die Hemmung bei sehr hoher Substratkonzentration kaum noch auffällt, und erkläre das.',s:{s:{Ik:3,S:2},tab:'mm'},
+  sol:['Vmax bleibt gleich (1,0). Km steigt von 2 auf 8 mmol/L (Km × (1 + [I]/Ki)).','Hemmstoff und Substrat konkurrieren um das aktive Zentrum. Der Hemmstoff ähnelt dem Substrat und bindet reversibel.','Bei hohem [S] ist das Substrat in großer Überzahl und verdrängt den Hemmstoff. Die Kurve nähert sich der Referenz an.']},
+ {afb:'II',op:'Vergleiche, beurteile',t:'Kompetitiv oder allosterisch?',x:'Vergleiche kompetitive und allosterische Hemmung (je 3 mmol/L) im Michaelis-Menten- und im Lineweaver-Burk-Diagramm. Erkläre den Wirkmechanismus anhand des Molekülmodells.',s:{s:{Ia:3,S:6},tab:'lb'},
+  sol:['Allosterisch: Vmax sinkt (hier auf die Hälfte), Km bleibt 2 mmol/L. Auch bei hoher [S] bleibt die Kurve unter der Referenz.','Kompetitiv: Vmax gleich, Km steigt.','Lineweaver-Burk: kompetitiv gleicher y-Achsenabschnitt (1/Vmax), allosterisch (V-Typ) gleicher x-Achsenabschnitt (−1/Km).','Mechanismus: Der allosterische Hemmstoff bindet an einem anderen Zentrum, die Raumstruktur ändert sich, das aktive Zentrum passt schlechter. Das Substrat kann ihn nicht verdrängen.']},
+ {afb:'III',op:'Beurteile',t:'Medikament entwickeln',x:'Ein Medikament soll ein überaktives Enzym hemmen. Beurteile, ob ein kompetitiver oder ein allosterischer Hemmstoff besser geeignet ist.',s:null,
+  sol:['Allosterisch, dafür: Wirkung unabhängig von der Substratkonzentration, auch bei Substratstau. Oft sehr selektiv, weil allosterische Zentren sich zwischen Enzymen stärker unterscheiden.','Allosterisch, dagegen: Ein geeignetes allosterisches Zentrum muss vorhanden und bekannt sein.','Kompetitiv, dafür: Substratähnliche Moleküle sind oft leichter zu entwerfen.','Kompetitiv, dagegen: Die Wirkung sinkt, wenn sich Substrat anreichert. Mögliche Verwechslung mit ähnlichen Enzymen.','Ein begründetes Urteil gewichtet Kriterien (Wirksamkeit, Selektivität, Nebenwirkungen) und nennt Bedingungen.']},
+ {afb:'III',op:'Erkläre, untersuche',t:'Allosterische Regulation',x:'Stelle das kooperative Enzym mit vier Untereinheiten ein. Beschreibe die Kurvenform und erkläre sie mit dem R/T-Modell. Untersuche, wie Aktivator und allosterischer Hemmstoff die Kurve verändern, und erkläre die Bedeutung für den Stoffwechsel (Endprodukthemmung).',s:{s:{mode:'coop',n:4,S:3},tab:'mm'},
+  sol:['Die Kurve ist S-förmig (sigmoid). Ohne Substrat liegt fast alles in der wenig aktiven T-Form vor.','Substratbindung stabilisiert die R-Form des ganzen Enzyms. Das erleichtert die Bindung weiterer Substratmoleküle (Kooperativität). Im mittleren Bereich ändert sich v stark bei kleiner Änderung von [S].','Aktivator verschiebt die Kurve nach links (K0,5 sinkt), allosterischer Hemmstoff nach rechts. Vmax bleibt gleich.','Stoffwechsel: Ein Endprodukt kann als allosterischer Hemmstoff das erste Enzym eines Stoffwechselwegs hemmen. So wird nicht mehr Produkt gebildet, als benötigt wird.']},
+ {afb:'III',op:'Bestimme, begründe',t:'Rätsel: unbekannter Hemmstoff',x:'Im Rätselmodus wirkt ein unbekannter Hemmstoff. Bestimme seine Art und begründe mit Messwerten aus dem Diagramm.',mys:true,s:{tab:'mm'},
+  sol:['Prüfe Vmax und Km und vergleiche mit der Referenz.','Kompetitiv: Vmax unverändert, Km größer, bei sehr hohem [S] Annäherung an die Referenz.','Allosterisch: Vmax kleiner, Km unverändert, auch bei hohem [S] bleibt die Kurve darunter.','Lineweaver-Burk: gemeinsamer y-Achsenabschnitt spricht für kompetitiv, gemeinsamer x-Achsenabschnitt für allosterisch.']}
+];
+$('#taskList').innerHTML=TASKS.map((t,i)=>`<details class="task"><summary><span class="badge">AFB ${t.afb}</span><span>Aufgabe ${i+1}: ${t.t}</span></summary><p><b>${t.op}:</b> ${t.x}</p>${t.s||t.mys?`<button type="button" class="btn" data-task="${i}">Versuch einrichten</button>`:''}<details class="sol"><summary>Lösungshinweise (Erwartungshorizont)</summary><ul>${t.sol.map(x=>`<li>${x}</li>`).join('')}</ul></details></details>`).join('');
+$('#taskList').addEventListener('click',e=>{ const b=e.target.closest('[data-task]'); if(!b) return; const t=TASKS[+b.dataset.task]; setup({s:t.s&&t.s.s,pre:t.pre,mys:t.mys,tab:t.s&&t.s.tab}); });
+
+/* ---------- Start ---------- */
+buildCtrl();
+$('#molLeg').innerHTML=MLEG.map(m=>`<li>${legIcon(m[0])}${m[1]}</li>`).join('');
+update();
+})();
+</script>
+</body>
+</html>

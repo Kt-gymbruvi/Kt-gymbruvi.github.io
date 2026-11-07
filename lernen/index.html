@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lernangebote</title>
+    <meta name="description" content="Simulationen, Erklärungen und Übungen für Biologie und Sport" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../werkzeuge/werkzeug.css" />
+    <style>
+      .raster {
+        display: grid;
+        gap: 1.75rem;
+        grid-template-columns: 16rem 1fr;
+        align-items: start;
+      }
+      /* ---------- Baum links ---------- */
+      .baum {
+        position: sticky;
+        top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .baum ul {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .baum ul ul {
+        margin: 0.35rem 0 0.25rem 1.1rem;
+      }
+      .ast {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.7rem 0.9rem;
+        border: 0;
+        border-radius: 1rem;
+        background: rgb(255 255 255 / 0.06);
+        color: rgb(255 255 255 / 0.88);
+        font: inherit;
+        font-weight: 700;
+        text-align: left;
+        cursor: pointer;
+      }
+      .ast:hover {
+        background: rgb(255 255 255 / 0.14);
+      }
+      .ast[aria-current='true'] {
+        background: var(--gelb);
+        color: var(--navy);
+      }
+      .ast .name {
+        flex: 1;
+        min-width: 0;
+      }
+      .ast .zahl {
+        padding: 0 0.5rem;
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.12);
+        font-size: 0.9rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .ast[aria-current='true'] .zahl {
+        background: rgb(11 31 77 / 0.15);
+      }
+      .ebene-2 .ast {
+        padding: 0.55rem 0.85rem;
+        font-size: 1rem;
+      }
+      .ebene-3 .ast {
+        padding: 0.45rem 0.8rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      /* ---------- Inhalt rechts ---------- */
+      .pfad {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin: 0;
+        color: rgb(255 255 255 / 0.65);
+      }
+      .pfad button {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+      .pfad button:hover {
+        color: var(--gelb);
+        text-decoration: underline;
+      }
+      .kopfzeile {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem 1rem;
+        margin-bottom: 1rem;
+      }
+      .kopfzeile h2 {
+        margin: 0;
+        font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+        font-weight: 900;
+      }
+      .werkzeugleiste {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 1.25rem;
+      }
+      .werkzeugleiste input {
+        flex: 1 1 14rem;
+        padding: 0.7rem 1rem;
+        border: 0;
+        border-radius: 999px;
+        font: inherit;
+      }
+      .werkzeugleiste select {
+        padding: 0.7rem 1rem;
+        border: 0;
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.12);
+        color: #fff;
+        font: inherit;
+        font-weight: 700;
+      }
+      .werkzeugleiste select option {
+        color: var(--navy);
+      }
+      .karten {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .karte {
+        position: relative;
+      }
+      .karte a {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        height: 100%;
+        padding: 1.1rem 1.25rem 1.1rem;
+        border-radius: 1.25rem;
+        background: rgb(22 50 122 / 0.75);
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+        color: #fff;
+        text-decoration: none;
+      }
+      .karte a:hover,
+      .karte a:focus-visible {
+        box-shadow: inset 0 0 0 2px var(--gelb);
+      }
+      .karte .titel {
+        padding-right: 3.5rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+      .karte .info {
+        color: rgb(255 255 255 / 0.72);
+        font-size: 0.98rem;
+      }
+      .marken {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-top: auto;
+        padding-top: 0.4rem;
+      }
+      .marke {
+        padding: 0.1rem 0.6rem;
+        border-radius: 999px;
+        background: rgb(255 255 255 / 0.12);
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+      .marke.fach {
+        background: var(--gelb);
+        color: var(--navy);
+      }
+      .karte .qr-knopf {
+        position: absolute;
+        top: 0.85rem;
+        right: 0.85rem;
+      }
+      .leer {
+        padding: 3rem 1rem;
+        border: 3px dashed rgb(255 255 255 / 0.2);
+        border-radius: 1.5rem;
+        text-align: center;
+        color: rgb(255 255 255 / 0.65);
+      }
+
+      /* ---------- Handy: Baum wird zu Leisten zum Tippen ---------- */
+      @media (max-width: 52rem) {
+        .raster {
+          grid-template-columns: 1fr;
+        }
+        .baum {
+          position: static;
+        }
+        .baum ul {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+        .baum ul ul {
+          flex-basis: 100%;
+          margin: 0.2rem 0 0.2rem 0;
+          padding: 0.5rem;
+          border-radius: 1rem;
+          background: rgb(255 255 255 / 0.04);
+        }
+        .baum li {
+          display: contents;
+        }
+        .baum li > ul {
+          order: 99;
+        }
+        .ast {
+          width: auto;
+        }
+        .karte .qr-knopf,
+        #qr-auswahl {
+          display: none;
+        }
+        .karte .titel {
+          padding-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">← Startseite</a>
+      <h1>📚 Lernangebote</h1>
+    </header>
+    <main class="werkzeug-inhalt raster">
+      <nav class="baum" id="baum" aria-label="Nach Fach, Jahrgang und Thema filtern"></nav>
+      <section aria-labelledby="ueberschrift">
+        <div class="kopfzeile">
+          <div>
+            <p class="pfad" id="pfad"></p>
+            <h2 id="ueberschrift">Alle Lernangebote</h2>
+          </div>
+          <button class="qr-knopf" id="qr-auswahl" type="button" title="QR-Code zu dieser Auswahl für den Beamer">QR zu dieser Auswahl</button>
+        </div>
+        <div class="werkzeugleiste">
+          <input id="suche" type="search" placeholder="Suchen, z. B. Herz, Enzym …" aria-label="Lernangebote durchsuchen" autocomplete="off" />
+          <select id="sortierung" aria-label="Sortieren">
+            <option value="name">A–Z</option>
+            <option value="datum">Neueste zuerst</option>
+          </select>
+        </div>
+        <ul class="karten" id="karten"></ul>
+      </section>
+    </main>
+
+    <dialog id="qr-dialog" aria-labelledby="qr-titel">
+      <h2 id="qr-titel"></h2>
+      <div id="qr-bild"></div>
+      <p id="qr-adresse"></p>
+      <button type="button" id="qr-schliessen" class="knopf">Schließen</button>
+    </dialog>
+
+    <script src="angebote.js"></script>
+    <script src="../js/qrcode.min.js"></script>
+    <script src="lernen.js"></script>
+  </body>
+</html>

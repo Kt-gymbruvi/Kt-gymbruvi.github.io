@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#EEF2F7;--surface:#FFFFFF;--ink:#16202F;--muted:#556070;--line:#D5DCE6;--accent:#13294B;--accent-ink:#FFFFFF;--yellow:#F2C230;--yellow-ink:#13294B;--bone:#F1EAD8;--boneline:#13294B;--ok:#1F7A4D;--okbg:#DDF2E6;--bad:#A3261B;--badbg:#FBE3E0;--focus:#C98F00;--mem:rgba(19,41,75,.10);--c1:#2F6DB5;--c2:#D99A00;--c3:#5E9A35;--c4:#C2475A;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1726;--surface:#16233A;--ink:#E7ECF4;--muted:#A3AEC2;--line:#2A3A55;--accent:#9DB8E8;--accent-ink:#0E1726;--bone:#E3D9C1;--boneline:#0E1726;--ok:#6FD39C;--okbg:#173A2A;--bad:#FF8A7E;--badbg:#45201C;--focus:#F2C230;--mem:rgba(157,184,232,.14);--c1:#6FA3E8;--c2:#F2C230;--c3:#8CC665;--c4:#E8798A;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:18px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.12;margin:0}
+h1{font-weight:800;font-size:clamp(28px,6.4vw,42px);letter-spacing:-.01em}
+h2{font-weight:800;font-size:clamp(22px,4.6vw,27px);margin:36px 0 8px}
+h3{font-weight:700;font-size:20px}
+p{margin:8px 0}
+.sub{color:var(--muted);margin:4px 0 16px}
+.lead{max-width:64ch}
+.btn{font:inherit;font-weight:700;border:2px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:10px;padding:9px 16px;cursor:pointer;min-height:46px;touch-action:manipulation}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.okb{background:var(--okbg);border-color:var(--ok);color:var(--ink);opacity:1}
+.btn.badb{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.fb{border-radius:10px;padding:10px 14px;margin-top:12px;border-left:6px solid var(--line);background:var(--surface)}
+.fb.ok{background:var(--okbg);border-left-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-left-color:var(--bad)}
+.muted{color:var(--muted)}
+footer{margin-top:44px;color:var(--muted);font-size:15px;max-width:64ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<title>Das Skelett des Menschen – Biologie Klasse 6</title>
+<style>
+.modes{margin-top:6px}
+.stage{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start;margin-top:18px}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;justify-content:center}
+#sk{width:100%;height:auto;max-height:80vh;display:block;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.side{position:sticky;top:calc(12px + env(safe-area-inset-top,0px))}
+@media (max-width:720px){
+  .stage{grid-template-columns:minmax(0,1fr);gap:12px}
+  .side{order:-1;top:env(safe-area-inset-top,0px);z-index:3;background:var(--bg);padding:8px 0}
+  #sk{max-height:70vh}
+}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.card h3{font-size:26px}
+.grp{color:var(--muted);font-size:15px;margin:2px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chip{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:38px}
+.chip[aria-pressed="true"]{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink);font-weight:700}
+.prompt{margin:0}
+.prompt strong{display:block;font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;font-size:30px;line-height:1.1;margin-top:2px}
+.prog{color:var(--muted);font-size:15px;margin:0 0 6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.opts .btn{font-weight:700;min-height:52px}
+.next{margin-top:10px}
+#sk .b{cursor:pointer;outline:none}
+#sk .b .s{fill:var(--bone);stroke:var(--boneline);stroke-width:1.6;stroke-linejoin:round}
+#sk .b .o{fill:none;stroke:var(--boneline);stroke-linecap:round}
+#sk .b .i{fill:none;stroke:var(--bone);stroke-linecap:round}
+#sk .b .dk{fill:var(--boneline);stroke:none}
+#sk .b .ln{stroke:var(--boneline);stroke-width:1.2;fill:none}
+#sk .b .hit{fill:transparent;stroke:none;pointer-events:all}
+#sk .b .hitl{fill:none;stroke:transparent;stroke-width:18;pointer-events:stroke}
+#sk .b.sel .s{fill:var(--yellow)} #sk .b.sel .i{stroke:var(--yellow)}
+#sk .b.good .s{fill:var(--ok)} #sk .b.good .i{stroke:var(--ok)}
+#sk .b.wrong .s{fill:var(--bad)} #sk .b.wrong .i{stroke:var(--bad)}
+#sk .b:focus-visible .s{stroke:var(--focus);stroke-width:3}
+#sk.locked .b{cursor:default}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<div class="wrap">
+  <h1>Das Skelett des Menschen</h1>
+  <p class="sub">Biologie Klasse 6: Der Mensch, ein Wirbeltier</p>
+  <div class="row modes" role="group" aria-label="Modus wählen">
+    <button class="btn" data-mode="entdecken" aria-pressed="true">Entdecken</button>
+    <button class="btn" data-mode="finden" aria-pressed="false">Üben: Knochen finden</button>
+    <button class="btn" data-mode="benennen" aria-pressed="false">Üben: Knochen benennen</button>
+  </div>
+  <div class="stage">
+    <div class="fig"><svg id="sk" viewBox="0 0 300 640" role="group" aria-label="Skelett des Menschen von vorn"></svg></div>
+    <div class="side" id="side" aria-live="polite"></div>
+  </div>
+  <footer>Vereinfachte Zeichnung von vorn. Die Arme sind in Grundstellung: Die Handflächen zeigen nach vorn, deshalb liegen Elle und Speiche nebeneinander. Es sind nicht alle Knochen einzeln gezeichnet, zum Beispiel nur ein Teil der 12 Rippenpaare.</footer>
+</div>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("sk");
+const side = document.getElementById("side");
+const BONES = [
+  {id:"schaedel", n:"Schädel", a:"der", g:"Kopf", i:"Er schützt das Gehirn. Der Unterkiefer ist beweglich. So kannst du kauen und sprechen."},
+  {id:"schluesselbein", n:"Schlüsselbein", a:"das", g:"Schultergürtel", i:"Es verbindet das Brustbein mit der Schulter."},
+  {id:"schulterblatt", n:"Schulterblatt", a:"das", g:"Schultergürtel", i:"Ein flacher Knochen hinten auf dem Rücken. Hier setzen viele Muskeln für den Arm an."},
+  {id:"brustbein", n:"Brustbein", a:"das", g:"Brustkorb", i:"Ein flacher Knochen vorn in der Brust. Viele Rippen sind daran befestigt."},
+  {id:"rippen", n:"Rippen", a:"die", pl:true, g:"Brustkorb", i:"Rippen, Brustbein und Wirbelsäule bilden zusammen den Brustkorb. Er schützt Herz und Lunge. Du hast 12 Rippenpaare."},
+  {id:"wirbelsaeule", n:"Wirbelsäule", a:"die", g:"Rumpf", i:"Sie trägt Kopf und Rumpf und hält dich aufrecht. Sie besteht aus vielen einzelnen Wirbeln. Innen schützt sie das Rückenmark. Kreuzbein und Steißbein gehören auch dazu."},
+  {id:"oberarm", n:"Oberarmknochen", a:"der", g:"Arm", i:"Er reicht von der Schulter bis zum Ellenbogen."},
+  {id:"elle", n:"Elle", a:"die", g:"Arm", i:"Ein Knochen im Unterarm. Sie liegt auf der Seite des kleinen Fingers."},
+  {id:"speiche", n:"Speiche", a:"die", g:"Arm", i:"Ein Knochen im Unterarm. Sie liegt auf der Seite des Daumens. Wenn du die Hand drehst, dreht sich die Speiche um die Elle."},
+  {id:"hand", n:"Handknochen", a:"die", pl:true, g:"Arm", i:"Handwurzel-, Mittelhand- und Fingerknochen. Viele kleine Knochen machen deine Hand sehr beweglich."},
+  {id:"becken", n:"Becken", a:"das", g:"Beckengürtel", i:"Es verbindet die Wirbelsäule mit den Beinen. Es trägt das Gewicht des Oberkörpers und schützt Organe im Unterleib."},
+  {id:"oberschenkel", n:"Oberschenkelknochen", a:"der", g:"Bein", i:"Der längste und kräftigste Knochen deines Körpers."},
+  {id:"kniescheibe", n:"Kniescheibe", a:"die", g:"Bein", i:"Ein kleiner, flacher Knochen vor dem Kniegelenk. Sie schützt das Knie."},
+  {id:"schienbein", n:"Schienbein", a:"das", g:"Bein", i:"Der kräftigere Knochen im Unterschenkel. Seine Kante kannst du vorn am Bein fühlen."},
+  {id:"wadenbein", n:"Wadenbein", a:"das", g:"Bein", i:"Der dünnere Knochen im Unterschenkel. Er liegt an der Außenseite."},
+  {id:"fuss", n:"Fußknochen", a:"die", pl:true, g:"Bein", i:"Fußwurzel-, Mittelfuß- und Zehenknochen. Sie tragen dein ganzes Körpergewicht."}
+];
+const B = (id) => BONES.find(b => b.id === id);
+const das = (b) => (b.pl ? "Das sind " : "Das ist ") + b.a + " " + b.n + ".";
+const Das = (b) => b.a.charAt(0).toUpperCase() + b.a.slice(1) + " " + b.n;
+
+function mk(tag, at, par){ const e = document.createElementNS(NS, tag); for(const k in at) e.setAttribute(k, at[k]); par.appendChild(e); return e; }
+const groups = {};
+function G(id){
+  if(!groups[id]){
+    const b = B(id);
+    groups[id] = mk("g", {class:"b", "data-id":id, tabindex:"0", role:"button", "aria-label":b.n}, svg);
+  }
+  return groups[id];
+}
+function seg(g, x1, y1, x2, y2, w, knob = true){
+  const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
+  if(knob){
+    const ux = dx / len, uy = dy / len, r = w * 0.62, o = r * 0.55;
+    mk("circle", {cx:x1 + ux * o, cy:y1 + uy * o, r, class:"s"}, g);
+    mk("circle", {cx:x2 - ux * o, cy:y2 - uy * o, r, class:"s"}, g);
+  }
+  const h = knob ? w * 0.72 : w;
+  mk("rect", {x:-len / 2, y:-h / 2, width:len, height:h, rx:h / 2, class:"s", transform:`translate(${(x1 + x2) / 2} ${(y1 + y2) / 2}) rotate(${ang})`}, g);
+}
+function strokeP(g, d, w){ mk("path", {d, class:"o", "stroke-width":w + 3.2}, g); mk("path", {d, class:"i", "stroke-width":w}, g); }
+const SIDES = [false, true];
+const X = (m, x) => m ? 300 - x : x;
+
+/* Zeichnung: Reihenfolge = Ebenen von hinten nach vorn */
+{ const g = G("schulterblatt"); for(const m of SIDES) mk("path", {d:`M${X(m,103)},116 L${X(m,131)},121 L${X(m,121)},188 Z`, class:"s"}, g); mk("path",{d:"M95,112 L135,112 L125,192 Z",class:"hit"},g); mk("path",{d:"M205,112 L165,112 L175,192 Z",class:"hit"},g); }
+{ const g = G("becken"); for(const m of SIDES) mk("path", {d:`M150,332 C${X(m,130)},320 ${X(m,106)},314 ${X(m,103)},334 C${X(m,101)},352 ${X(m,116)},366 ${X(m,128)},372 C${X(m,132)},380 ${X(m,136)},388 ${X(m,143)},388 C${X(m,147)},382 150,374 150,366 Z`, class:"s"}, g); }
+{ const g = G("wirbelsaeule");
+  for(let i = 0; i < 24; i++){ const y = 96 + i * 9.7, w = 10 + i * 0.45; mk("rect", {x:150 - w / 2, y, width:w, height:7.2, rx:2, class:"s"}, g); }
+  mk("path", {d:"M139,330 L161,330 L156,360 L150,372 L144,360 Z", class:"s"}, g);
+  mk("circle", {cx:150, cy:378, r:3.2, class:"s"}, g);
+}
+{ const g = G("rippen"); const LAT = [118,108,102,98,96,95,96,98,101,105];
+  for(const m of SIDES) for(let i = 0; i < 10; i++){
+    const yb = 128 + i * 10.4, lat = LAT[i], ex = i < 7 ? 144 : 126 - (i - 7) * 6, mx = (lat + ex) / 2;
+    strokeP(g, `M${X(m,146)},${yb} C${X(m,lat + 14)},${yb - 5} ${X(m,lat)},${yb + 2} ${X(m,lat)},${yb + 12} C${X(m,lat)},${yb + 22} ${X(m,mx)},${yb + 27} ${X(m,ex)},${yb + 24}`, 3.2);
+  }
+}
+{ const g = G("brustbein"); mk("path", {d:"M143,122 L157,122 L156,150 L157,206 L150,216 L143,206 L144,150 Z", class:"s"}, g); }
+{ const g = G("schluesselbein"); for(const m of SIDES){ const d = `M${X(m,145)},121 Q${X(m,124)},109 ${X(m,101)},114`; strokeP(g, d, 5); mk("path", {d, class:"hitl"}, g); } }
+{ const g = G("schaedel");
+  mk("ellipse", {cx:150, cy:48, rx:32, ry:37, class:"s"}, g);
+  mk("path", {d:"M124,60 C124,90 136,104 150,104 C164,104 176,90 176,60 Z", class:"s"}, g);
+  mk("ellipse", {cx:138, cy:56, rx:7, ry:8, class:"dk"}, g);
+  mk("ellipse", {cx:162, cy:56, rx:7, ry:8, class:"dk"}, g);
+  mk("path", {d:"M150,67 L146,79 L154,79 Z", class:"dk"}, g);
+  mk("path", {d:"M137,90 L163,90 M143,86 L143,94 M150,86 L150,94 M157,86 L157,94", class:"ln"}, g);
+}
+{ const g = G("oberarm"); for(const m of SIDES) seg(g, X(m,101), 124, X(m,87), 236, 11); }
+{ const g = G("speiche"); for(const m of SIDES){ seg(g, X(m,80), 246, X(m,66), 344, 6.5); mk("path", {d:`M${X(m,80)},246 L${X(m,66)},344`, class:"hitl", "stroke-width":11}, g); } }
+{ const g = G("elle"); for(const m of SIDES){ seg(g, X(m,93), 243, X(m,81), 348, 7); mk("path", {d:`M${X(m,93)},243 L${X(m,81)},348`, class:"hitl", "stroke-width":11}, g); } }
+{ const g = G("hand"); for(const m of SIDES){
+    mk("ellipse", {cx:X(m,74), cy:360, rx:11, ry:8, class:"s"}, g);
+    seg(g, X(m,63), 366, X(m,52), 392, 4.5);
+    const ends = [414, 421, 419, 410];
+    for(let j = 0; j < 4; j++) seg(g, X(m,68 + j * 5.5), 368, X(m,64 + j * 7.5), ends[j], 4, false);
+    mk("ellipse", {cx:X(m,72), cy:388, rx:22, ry:36, class:"hit"}, g);
+} }
+{ const g = G("oberschenkel"); for(const m of SIDES) seg(g, X(m,119), 362, X(m,130), 486, 12.5); }
+{ const g = G("schienbein"); for(const m of SIDES) seg(g, X(m,137), 506, X(m,137), 596, 9.5); }
+{ const g = G("wadenbein"); for(const m of SIDES){ seg(g, X(m,121), 510, X(m,124), 594, 5); mk("path", {d:`M${X(m,120)},510 L${X(m,123)},594`, class:"hitl", "stroke-width":11}, g); } }
+{ const g = G("kniescheibe"); for(const m of SIDES){ mk("ellipse", {cx:X(m,131), cy:494, rx:7.5, ry:9, class:"s"}, g); mk("circle", {cx:X(m,131), cy:494, r:13, class:"hit"}, g); } }
+{ const g = G("fuss"); for(const m of SIDES){
+    mk("path", {d:`M${X(m,118)},600 L${X(m,148)},600 L${X(m,153)},621 L${X(m,113)},623 Z`, class:"s"}, g);
+    for(let j = 0; j < 5; j++) mk("circle", {cx:X(m,116 + j * 8.5), cy:628, r:3.6, class:"s"}, g);
+} }
+
+/* Zustand */
+let mode = "entdecken", sel = null;
+let order = [], idx = 0, firstOk = 0, missed = [], tries = 0, done = false, fb = "", fbCls = "", opts = [], badOpts = [];
+const shuffle = (a) => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function setSel(id){ for(const k in groups) groups[k].classList.toggle("sel", k === id); }
+function flash(id, cls){ const g = groups[id]; g.classList.remove("good","wrong"); void g.getBBox(); g.classList.add(cls); setTimeout(() => g.classList.remove(cls), 800); }
+
+svg.addEventListener("click", e => { const g = e.target.closest(".b"); if(g) pick(g.dataset.id); });
+svg.addEventListener("keydown", e => { const g = e.target.closest(".b"); if(g && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); pick(g.dataset.id); } });
+
+function pick(id){
+  if(mode === "entdecken"){ sel = id; setSel(id); render(); }
+  else if(mode === "finden") answerFind(id);
+}
+
+function startMode(m, list){
+  mode = m;
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+  svg.classList.toggle("locked", m === "benennen");
+  setSel(null); sel = null;
+  if(m !== "entdecken"){ order = shuffle(list || BONES.map(b => b.id)); idx = 0; firstOk = 0; missed = []; nextQ(); }
+  else render();
+}
+document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => startMode(b.dataset.mode)));
+
+function nextQ(){
+  tries = 0; done = false; fb = ""; fbCls = ""; badOpts = [];
+  setSel(null);
+  if(idx >= order.length){ render(); return; }
+  if(mode === "benennen"){
+    const t = order[idx];
+    setSel(t);
+    opts = shuffle([t, ...shuffle(BONES.map(b => b.id).filter(x => x !== t)).slice(0, 3)]);
+  }
+  render();
+}
+function miss(t){ if(!missed.includes(t)) missed.push(t); }
+function answerFind(id){
+  if(done || idx >= order.length) return;
+  const t = order[idx], bt = B(t);
+  if(id === t){
+    if(tries === 0) firstOk++;
+    done = true; setSel(t); flash(t, "good");
+    fb = "Richtig! " + bt.i; fbCls = "ok";
+  } else {
+    tries++; miss(t); flash(id, "wrong");
+    if(tries >= 2){ done = true; setSel(t); const pr = bt.pl ? "Sie sind" : bt.a === "der" ? "Er ist" : bt.a === "die" ? "Sie ist" : "Es ist"; fb = das(B(id)) + " Gesucht " + (bt.pl ? "waren " : "war ") + bt.a + " " + bt.n + ". " + pr + " jetzt gelb markiert."; fbCls = "bad"; }
+    else { fb = das(B(id)) + " Versuche es noch einmal."; fbCls = "bad"; }
+  }
+  render();
+}
+function answerName(id){
+  if(done) return;
+  const t = order[idx], bt = B(t);
+  if(id === t){
+    if(tries === 0) firstOk++;
+    done = true; flash(t, "good"); fb = "Richtig! " + bt.i; fbCls = "ok";
+  } else {
+    tries++; miss(t); badOpts.push(id);
+    if(tries >= 2){ done = true; fb = das(bt) + " " + bt.i; fbCls = "bad"; }
+    else { fb = "Nicht ganz. Schau dir die Lage noch einmal genau an."; fbCls = "bad"; }
+  }
+  render();
+}
+
+function render(){
+  let h = "";
+  if(mode === "entdecken"){
+    if(sel){ const b = B(sel); h += `<div class="card"><h3>${esc(Das(b))}</h3><p class="grp">Gehört zu: ${esc(b.g)}</p><p>${esc(b.i)}</p></div>`; }
+    else h += `<div class="card"><h3>Tippe auf einen Knochen</h3><p>Du erfährst seinen Namen und seine Aufgabe. Oder wähle unten einen Namen.</p></div>`;
+    h += `<div class="chips" role="group" aria-label="Knochen auswählen">` + BONES.map(b => `<button class="chip" data-pick="${b.id}" aria-pressed="${b.id === sel}">${esc(b.n)}</button>`).join("") + `</div>`;
+  } else if(idx >= order.length){
+    h += `<div class="card"><h3>Geschafft!</h3><p>${firstOk} von ${order.length} hast du beim ersten Versuch richtig.</p>`;
+    if(missed.length) h += `<p>Diese Knochen übst du am besten noch einmal:</p><div class="chips">` + missed.map(id => `<button class="chip" data-look="${id}">${esc(B(id).n)}</button>`).join("") + `</div>`;
+    else h += `<p>Alles richtig. Stark!</p>`;
+    h += `<div class="row next"><button class="btn primary" data-act="again">Noch einmal</button>` + (missed.length ? `<button class="btn" data-act="missed">Nur diese üben</button>` : "") + `</div></div>`;
+  } else {
+    const t = B(order[idx]);
+    h += `<div class="card"><p class="prog">Aufgabe ${idx + 1} von ${order.length}</p>`;
+    if(mode === "finden") h += `<p class="prompt">Tippe auf:<strong>${esc(Das(t))}</strong></p>`;
+    else {
+      h += `<p class="prompt">Wie heißt der <strong>gelb markierte Knochen?</strong></p><div class="opts">` + opts.map(id => {
+        const cls = done && id === t.id ? "okb" : badOpts.includes(id) ? "badb" : "";
+        return `<button class="btn ${cls}" data-opt="${id}" ${done || badOpts.includes(id) ? "disabled" : ""}>${esc(B(id).n)}</button>`;
+      }).join("") + `</div>`;
+    }
+    if(fb) h += `<div class="fb ${fbCls}">${esc(fb)}</div>`;
+    if(done) h += `<div class="row next"><button class="btn primary" data-act="next">Weiter</button></div>`;
+    h += `</div>`;
+  }
+  side.innerHTML = h;
+  const nb = side.querySelector('[data-act="next"]'); if(nb) nb.focus({preventScroll:true});
+}
+side.addEventListener("click", e => {
+  const t = e.target.closest("button"); if(!t) return;
+  if(t.dataset.pick){ sel = t.dataset.pick; setSel(sel); render(); }
+  else if(t.dataset.look){ const id = t.dataset.look; startMode("entdecken"); sel = id; setSel(id); render(); }
+  else if(t.dataset.opt) answerName(t.dataset.opt);
+  else if(t.dataset.act === "next"){ idx++; nextQ(); }
+  else if(t.dataset.act === "again") startMode(mode);
+  else if(t.dataset.act === "missed") startMode(mode, missed.slice());
+});
+render();
+</script>
+</body>
+</html>

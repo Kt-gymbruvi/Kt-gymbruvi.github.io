@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Räuber-Beute-Modell</title>
+<meta name="description" content="Räuber-Beute-Modell nach Lotka und Volterra: Zeitverlauf, Phasendiagramm, Regeln, Eingriffe, Zufallsmodell, Datenanpassung und Prognoseaufgaben.">
+<style>
+:root{
+  --bg:#EBF1EA; --panel:#FFFFFF; --panel-2:#F2F7F0; --ink:#14251B; --ink-soft:#485A4E; --line:#C9D7CB; --nav:#1D4A33; --nav-ink:#FFFFFF; --focus:#0B57D0;
+  --prey:#0D76A6; --pred:#D2501C; --ok:#1B6B3B; --ok-bg:#DCEFE2; --warn:#7A5600; --warn-bg:#FFF0C7; --bad:#B3261E; --bad-bg:#FBE3E0; --info:#2A4FB0; --info-bg:#E2E9FB;
+  --q1:rgba(13,118,166,.15); --q2:rgba(50,160,80,.17); --q3:rgba(210,80,28,.15); --q4:rgba(140,80,160,.16); --grid:#DCE6DD;
+  --display:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,-apple-system,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1610; --panel:#15211A; --panel-2:#1B2A21; --ink:#E7EFE9; --ink-soft:#A6B8AB; --line:#2B3E31; --nav:#D3EBDB; --nav-ink:#0D1610; --focus:#8AB4FF;
+    --prey:#58C7F2; --pred:#FF8D5E; --ok:#6FD596; --ok-bg:#133422; --warn:#F2C25B; --warn-bg:#3A2F12; --bad:#FF8F85; --bad-bg:#47201D; --info:#9DB7FF; --info-bg:#1E2C5C;
+    --q1:rgba(88,199,242,.15); --q2:rgba(111,213,150,.14); --q3:rgba(255,141,94,.15); --q4:rgba(200,140,220,.16); --grid:#223329;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1610; --panel:#15211A; --panel-2:#1B2A21; --ink:#E7EFE9; --ink-soft:#A6B8AB; --line:#2B3E31; --nav:#D3EBDB; --nav-ink:#0D1610; --focus:#8AB4FF;
+  --prey:#58C7F2; --pred:#FF8D5E; --ok:#6FD596; --ok-bg:#133422; --warn:#F2C25B; --warn-bg:#3A2F12; --bad:#FF8F85; --bad-bg:#47201D; --info:#9DB7FF; --info-bg:#1E2C5C;
+  --q1:rgba(88,199,242,.15); --q2:rgba(111,213,150,.14); --q3:rgba(255,141,94,.15); --q4:rgba(200,140,220,.16); --grid:#223329;
+}
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 8px); }
+*,*::before,*::after{ box-sizing:border-box; }
+[hidden]{ display:none !important; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5; }
+button,input,select,textarea{ font-family:inherit; font-size:inherit; color:inherit; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.top{ max-width:1040px; margin:0 auto; padding:14px clamp(12px,3vw,24px) 4px; }
+.top h1{ font-family:var(--display); font-weight:800; font-size:clamp(1.55rem,5vw,2.3rem); line-height:1.08; margin:0; letter-spacing:-.02em; }
+.top p{ margin:6px 0 0; color:var(--ink-soft); max-width:74ch; }
+.tabs{ max-width:1040px; margin:8px auto 0; padding:0 clamp(12px,3vw,24px); display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{ flex:none; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:.35em 1em; font-weight:700; font-size:.95rem; cursor:pointer; min-height:46px; color:var(--ink-soft); }
+.tab[aria-selected="true"]{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+
+/* Messfenster (angeheftet) */
+.viewer{ position:sticky; top:0; z-index:20; max-width:1040px; margin:10px auto 0; padding:0 clamp(12px,3vw,24px); }
+.vbox{ background:var(--panel); border:2px solid var(--ink); border-radius:14px; overflow:hidden; box-shadow:0 6px 0 -2px color-mix(in srgb,var(--ink) 16%,transparent); }
+.vbar{ display:flex; flex-wrap:wrap; gap:6px 8px; padding:6px 8px; border-bottom:1px solid var(--line); align-items:center; background:var(--panel-2); }
+.vbar .btn{ min-height:40px; padding:.1em .7em; min-width:42px; font-size:.95rem; }
+.vbar .scrubw{ flex:1 1 130px; min-width:110px; display:flex; align-items:center; }
+.vt{ font-variant-numeric:tabular-nums; font-weight:700; font-size:.88rem; min-width:5.6em; text-align:right; }
+.vbar .seg button{ min-height:38px; padding:.1em .7em; font-size:.88rem; }
+.viewer.collapsed .vcharts,.viewer.collapsed .vinfo{ display:none; }
+.vcharts{ display:flex; gap:0; }
+.vcharts .ch{ flex:1 1 0; min-width:0; touch-action:pan-y; cursor:crosshair; }
+.vcharts .ch+.ch{ border-left:1px solid var(--line); }
+.vcharts .ch[hidden]{ display:none; }
+.vinfo{ padding:5px 12px; font-size:.88rem; min-height:32px; border-top:1px solid var(--line); background:var(--panel); color:var(--ink-soft); }
+.vinfo b{ color:var(--ink); } .vinfo .pb,.vinfo .pr{ font-weight:700; } .vinfo .pb{ color:var(--prey); } .vinfo .pr{ color:var(--pred); }
+@media (max-width:700px){ .vinfo{ font-size:.8rem; padding:4px 10px; } .vbar .seg .opt-both{ display:none; } }
+
+.wrap{ max-width:1040px; margin:0 auto; padding:12px clamp(12px,3vw,24px) 40px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; margin-bottom:14px; }
+.card h2{ font-family:var(--display); font-weight:800; font-size:1.25rem; margin:0 0 8px; line-height:1.2; }
+.card h3{ font-family:var(--display); font-weight:800; font-size:1.05rem; margin:14px 0 4px; line-height:1.25; }
+.lead{ margin:0 0 10px; max-width:76ch; }
+.note{ font-size:.9rem; color:var(--ink-soft); margin:6px 0; max-width:82ch; }
+.btnrow{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; align-items:center; }
+.btn{ font-weight:700; border-radius:10px; border:2px solid var(--line); background:var(--panel); padding:.4em .9em; cursor:pointer; min-height:46px; }
+.btn.primary{ background:var(--nav); border-color:var(--nav); color:var(--nav-ink); }
+.btn:hover:not(:disabled){ border-color:var(--ink); } .btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); border-color:var(--nav); }
+.btn.sm{ min-height:40px; font-size:.92rem; padding:.2em .8em; }
+.seg{ display:inline-flex; flex-wrap:wrap; border:2px solid var(--line); border-radius:10px; overflow:hidden; }
+.seg button{ border:0; background:var(--panel); padding:.35em .85em; font-weight:700; cursor:pointer; min-height:42px; border-right:1px solid var(--line); }
+.seg button:last-child{ border-right:0; }
+.seg button[aria-pressed="true"]{ background:var(--nav); color:var(--nav-ink); }
+input[type=range]{ width:100%; accent-color:var(--nav); min-height:34px; }
+input[type=text],input[type=number],select,textarea{ width:100%; border:2px solid var(--line); border-radius:10px; padding:.5em .65em; background:var(--panel); min-height:46px; }
+textarea{ min-height:150px; line-height:1.4; font-family:ui-monospace,Consolas,monospace; font-size:.92rem; resize:vertical; }
+label.fl{ display:block; font-weight:700; font-size:.92rem; margin:10px 0 2px; }
+label.fl small{ display:block; font-weight:400; color:var(--ink-soft); font-size:.84rem; line-height:1.3; }
+.sl output{ font-variant-numeric:tabular-nums; font-weight:800; }
+.ck{ display:flex; gap:8px; align-items:center; min-height:40px; cursor:pointer; }
+.ck input{ width:22px; height:22px; accent-color:var(--nav); flex:none; }
+.grid2{ display:grid; gap:2px 22px; grid-template-columns:1fr; }
+@media (min-width:760px){ .grid2{ grid-template-columns:1fr 1fr; } }
+.fb{ padding:8px 12px; border-radius:10px; margin-top:8px; font-size:.95rem; }
+.fb.ok{ background:var(--ok-bg); color:var(--ok); } .fb.no{ background:var(--bad-bg); color:var(--bad); } .fb.tip{ background:var(--warn-bg); color:var(--warn); } .fb.info{ background:var(--info-bg); color:var(--info); }
+.warn{ background:var(--warn-bg); color:var(--warn); border-radius:12px; padding:10px 14px; margin:8px 0; font-size:.93rem; }
+.badge{ display:inline-block; font-size:.78rem; font-weight:700; border-radius:99px; padding:1px 10px; border:1px solid var(--line); background:var(--panel-2); margin-right:4px; white-space:nowrap; }
+.badge.ok{ background:var(--ok-bg); color:var(--ok); border-color:transparent; } .badge.no{ background:var(--bad-bg); color:var(--bad); border-color:transparent; } .badge.tip{ background:var(--warn-bg); color:var(--warn); border-color:transparent; } .badge.info{ background:var(--info-bg); color:var(--info); border-color:transparent; }
+.chips{ display:flex; gap:8px; overflow-x:auto; padding:2px 0 8px; scrollbar-width:thin; }
+.chip{ flex:none; text-align:left; border:2px solid var(--line); background:var(--panel); border-radius:12px; padding:8px 12px; cursor:pointer; min-height:56px; max-width:230px; }
+.chip b{ display:block; font-family:var(--display); font-size:.98rem; line-height:1.2; } .chip span{ font-size:.82rem; color:var(--ink-soft); line-height:1.25; display:block; }
+.chip[aria-pressed="true"]{ border-color:var(--nav); box-shadow:0 0 0 2px var(--nav) inset; }
+.kpis{ display:grid; gap:8px; grid-template-columns:repeat(2,1fr); }
+@media (min-width:760px){ .kpis{ grid-template-columns:repeat(4,1fr); } }
+.kpis div{ border:1px solid var(--line); border-radius:12px; padding:6px 10px; background:var(--panel); }
+.kpis b{ display:block; font-family:var(--display); font-size:1.2rem; line-height:1.15; } .kpis small{ display:block; color:var(--ink-soft); font-size:.8rem; line-height:1.25; }
+.pb{ color:var(--prey); } .pr{ color:var(--pred); }
+.tbl{ width:100%; border-collapse:collapse; font-size:.92rem; } .tbl th,.tbl td{ text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; } .tbl td.n,.tbl th.n{ text-align:right; font-variant-numeric:tabular-nums; }
+.tscroll{ overflow-x:auto; max-width:100%; }
+.rule{ border-left:6px solid var(--nav); background:var(--panel-2); border-radius:10px; padding:8px 12px; margin:6px 0 10px; }
+.rule b{ font-family:var(--display); }
+.up{ color:var(--bad); font-weight:800; } .dn{ color:var(--info); font-weight:800; } .eq{ color:var(--ink-soft); font-weight:800; }
+.chart{ display:block; width:100%; }
+.chart text{ fill:var(--ink); font-family:var(--body); } .chart .tx2{ fill:var(--ink-soft); } .chart .gl{ stroke:var(--grid); } .chart .axl{ stroke:var(--ink-soft); }
+.chartbox{ margin:6px 0; }
+.legendrow{ display:flex; flex-wrap:wrap; gap:4px 14px; font-size:.86rem; margin:4px 0; } .legendrow i{ display:inline-block; width:22px; height:0; border-top:3px solid; vertical-align:middle; margin-right:5px; }
+.bars{ display:grid; gap:6px; margin:8px 0; } .bar{ display:grid; grid-template-columns:minmax(110px,150px) 1fr 3.4em; gap:8px; align-items:center; font-size:.92rem; } .bar .tr{ height:20px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line); } .bar .tr i{ display:block; height:100%; } .bar b{ text-align:right; font-variant-numeric:tabular-nums; }
+.prog{ height:8px; border-radius:4px; background:var(--panel-2); overflow:hidden; margin:6px 0; } .prog i{ display:block; height:100%; background:var(--nav); width:0; transition:width .1s; }
+canvas.scene{ width:100%; height:170px; display:block; border-radius:12px; background:var(--panel-2); border:1px solid var(--line); }
+details.task{ border-top:1px solid var(--line); padding:6px 0; } details.task>summary,details.mode>summary{ cursor:pointer; font-weight:700; min-height:44px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+details.task .sol{ background:var(--panel-2); border-radius:10px; padding:2px 12px 8px; margin-top:8px; }
+ul.plain{ margin:4px 0 0; padding-left:1.2em; } ul.plain li{ margin:3px 0; }
+.gl dt{ font-family:var(--display); font-weight:800; margin-top:10px; } .gl dd{ margin:2px 0 0; max-width:76ch; }
+.eqn{ font-family:ui-monospace,Consolas,monospace; background:var(--panel-2); border-radius:10px; padding:8px 12px; font-size:.95rem; overflow-x:auto; line-height:1.7; }
+.opt{ text-align:left; border:2px solid var(--line); border-radius:12px; padding:8px 12px; background:var(--panel); cursor:pointer; display:block; width:100%; margin:6px 0; min-height:46px; }
+.opt[aria-pressed="true"]{ border-color:var(--nav); box-shadow:0 0 0 2px var(--nav) inset; }
+.opt.right{ border-color:var(--ok); background:var(--ok-bg); } .opt.wrong{ border-color:var(--bad); background:var(--bad-bg); }
+@media print{ .tabs,.btnrow,.viewer .vbar{ display:none !important; } .viewer{ position:static; } }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" style="all:initial;display:flex;align-items:center;gap:12px;box-sizing:border-box;width:100%;padding:8px 16px;background:#0b1f4d;font:700 16px/1.3 system-ui,-apple-system,Segoe UI,Roboto,sans-serif"><a href="../" style="all:initial;color:#ffc928;font:inherit;cursor:pointer;text-decoration:none">← Lernangebote</a></nav>
+<header class="top">
+  <h1>Räuber-Beute-Modell</h1>
+  <p>Wie schwanken Räuber und Beute? Simuliere das Lotka-Volterra-Modell, prüfe die drei Regeln, greife ein, erweitere das Modell und vergleiche es mit Daten. Alle Zahlen sind Modellwerte.</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Bereiche">
+  <button type="button" class="tab" role="tab" data-tab="model" aria-selected="true">Modell</button>
+  <button type="button" class="tab" role="tab" data-tab="rules" aria-selected="false">Regeln</button>
+  <button type="button" class="tab" role="tab" data-tab="chance" aria-selected="false">Zufall</button>
+  <button type="button" class="tab" role="tab" data-tab="data" aria-selected="false">Daten</button>
+  <button type="button" class="tab" role="tab" data-tab="train" aria-selected="false">Üben</button>
+  <button type="button" class="tab" role="tab" data-tab="info" aria-selected="false">Info und Aufgaben</button>
+</nav>
+
+<div class="viewer" id="viewer">
+  <div class="vbox">
+    <div class="vbar" role="toolbar" aria-label="Zeit und Ansicht">
+      <button type="button" class="btn" data-v="play" aria-label="Abspielen" aria-pressed="false">▶</button>
+      <button type="button" class="btn" data-v="rewind" aria-label="Zum Anfang">⏮</button>
+      <div class="scrubw"><input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Zeitpunkt wählen"></div>
+      <span class="vt" id="vt" aria-live="off"></span>
+      <div class="seg" role="group" aria-label="Ansicht"><button type="button" data-v="view" data-m="time" aria-pressed="true">Zeit</button><button type="button" data-v="view" data-m="phase" aria-pressed="false">Phasen</button><button type="button" class="opt-both" data-v="view" data-m="both" aria-pressed="false">Beides</button></div>
+      <button type="button" class="btn" data-v="fold" aria-pressed="false" aria-label="Diagramme ein- oder ausklappen">▲</button>
+    </div>
+    <div class="vcharts"><div class="ch" id="chT"></div><div class="ch" id="chP" hidden></div></div>
+    <div class="vinfo" id="vinfo" aria-live="polite"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="pane-model"></section>
+  <section id="pane-rules" hidden></section>
+  <section id="pane-chance" hidden></section>
+  <section id="pane-data" hidden></section>
+  <section id="pane-train" hidden></section>
+  <section id="pane-info" hidden></section>
+</main>
+
+<script>
+(function(){
+'use strict';
+/* =============== Modellkern: Räuber-Beute (rein rechnerisch, ohne DOM) =============== */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const PDEF={model:'lv',a:0.8,b:0.04,c:0.1,d:0.5,K:400,th:0.1,R:0,x0:100,y0:10,T:60};
+/* Funktionelle Antwort: Beute pro Räuber und Zeit; xe = erreichbare Beute oberhalb des Rückzugsraums R */
+function respF(p,x){ const xe=Math.max(x-p.R,0); return p.model==='hol'?p.b*xe/(1+p.b*p.th*xe):p.b*xe; }
+function growth(p,x){ return p.model==='lv'?p.a*x:p.a*x*(1-x/p.K); }
+function deriv(p,x,y,hv){ const f=respF(p,x); return [growth(p,x)-f*y-hv*x, p.c*f*y-p.d*y-hv*y]; }
+const hvAt=(harv,t)=>harv&&harv.on&&t>=harv.t0&&(harv.t1==null||t<harv.t1)?harv.h:0;
+function integrate(p,o){
+  o=o||{}; const dt=o.dt||0.025, T=p.T, n=Math.ceil(T/dt+1e-9), harv=o.harv, ev=(o.events||[]).slice().sort((a,b)=>a.t-b.t);
+  const t=new Float64Array(n+1), X=new Float64Array(n+1), Y=new Float64Array(n+1);
+  let x=p.x0,y=p.y0,ei=0,div=false;
+  for(let i=0;i<=n;i++){
+    const tt=i*dt;
+    while(ei<ev.length&&ev[ei].t<=tt+1e-9){ x*=ev[ei].kx; y*=ev[ei].ky; ei++; }
+    t[i]=tt; X[i]=x; Y[i]=y;
+    if(i===n) break;
+    const h0=hvAt(harv,tt), h1=hvAt(harv,tt+dt/2), h2=hvAt(harv,tt+dt);
+    const k1=deriv(p,x,y,h0), k2=deriv(p,x+dt/2*k1[0],y+dt/2*k1[1],h1), k3=deriv(p,x+dt/2*k2[0],y+dt/2*k2[1],h1), k4=deriv(p,x+dt*k3[0],y+dt*k3[1],h2);
+    x+=dt/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); y+=dt/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]);
+    if(x<0)x=0; if(y<0)y=0;
+    if(!(x<1e7&&y<1e7)){ div=true; for(let j=i+1;j<=n;j++){ t[j]=j*dt; X[j]=Math.min(x,1e7); Y[j]=Math.min(y,1e7); } break; }
+  }
+  return {t,X,Y,n,dt,T,div};
+}
+/* Gleichgewicht (innere Ruhelage) bei konstanter zusätzlicher Verlustrate hv beider Arten */
+function equilibrium(p,hv){
+  hv=hv||0; const dd=p.d+hv; let xe;
+  if(p.model==='hol'){ const den=p.b*(p.c-p.th*dd); if(den<=0) return null; xe=dd/den; } else xe=dd/(p.c*p.b);
+  const xs=xe+p.R; if(p.model!=='lv'&&xs>=p.K) return null;
+  const g=growth(p,xs)-hv*xs, ys=g*p.c/dd;
+  return (ys>0&&xs>0)?{x:xs,y:ys}:null;
+}
+function classify(p,hv){
+  hv=hv||0; const E=equilibrium(p,hv); if(!E) return {kind:'none'};
+  const ex=1e-5*E.x, ey=1e-5*E.y; const dx=(a,b)=>deriv(p,a,b,hv);
+  const J=[[(dx(E.x+ex,E.y)[0]-dx(E.x-ex,E.y)[0])/(2*ex),(dx(E.x,E.y+ey)[0]-dx(E.x,E.y-ey)[0])/(2*ey)],[(dx(E.x+ex,E.y)[1]-dx(E.x-ex,E.y)[1])/(2*ex),(dx(E.x,E.y+ey)[1]-dx(E.x,E.y-ey)[1])/(2*ey)]];
+  const tr=J[0][0]+J[1][1], det=J[0][0]*J[1][1]-J[0][1]*J[1][0], disc=tr*tr-4*det;
+  let kind; if(det<=0) kind='saddle'; else if(Math.abs(tr)<1e-5*Math.sqrt(det)) kind='center'; else if(tr<0) kind=disc<0?'spiral':'node'; else kind='unstable';
+  return {kind,E,tr,det,omega:det>0?Math.sqrt(det):0,T0:det>0?2*Math.PI/Math.sqrt(det):null,damp:tr/2};
+}
+/* Phase aus den Vorzeichen der Änderungen: 1 Beute↑ Räuber↓, 2 beide↑, 3 Beute↓ Räuber↑, 4 beide↓ */
+function phaseOf(p,x,y,hv){ const d=deriv(p,x,y,hv); return d[0]>=0?(d[1]>=0?2:1):(d[1]>=0?3:4); }
+/* Spitzen, Perioden, Mittelwerte über volle Zyklen */
+function cycleStats(sim,E,t0,t1){
+  const {t,X,Y,dt}=sim; const i0=Math.max(1,Math.floor((t0||0)/dt)), i1=Math.min(t.length-2,Math.floor((t1==null?sim.T:t1)/dt));
+  const thr=E?E.x:0, pk=[];
+  for(let i=i0;i<=i1;i++){ if(X[i]>X[i-1]&&X[i]>=X[i+1]&&X[i]>thr) pk.push(i); }
+  let a=i0,b=i1,period=null,cycles=0;
+  if(pk.length>=2){ a=pk[0]; b=pk[pk.length-1]; period=(t[b]-t[a])/(pk.length-1); cycles=pk.length-1; }
+  let sx=0,sy=0,w=0; for(let i=a;i<b;i++){ sx+=(X[i]+X[i+1])/2*dt; sy+=(Y[i]+Y[i+1])/2*dt; w+=dt; }
+  const mx=w>0?sx/w:X[a], my=w>0?sy/w:Y[a];
+  let xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity; for(let i=a;i<=b;i++){ xmin=Math.min(xmin,X[i]); xmax=Math.max(xmax,X[i]); ymin=Math.min(ymin,Y[i]); ymax=Math.max(ymax,Y[i]); }
+  const lags=[]; for(let k=0;k<pk.length;k++){ const s=pk[k], e=k+1<pk.length?pk[k+1]:Math.min(t.length-2,s+Math.round((period||1e9)/dt)); let best=-1,bv=-Infinity; for(let i=s+1;i<=Math.min(e,t.length-2);i++){ if(Y[i]>Y[i-1]&&Y[i]>=Y[i+1]&&Y[i]>bv){ best=i; bv=Y[i]; break; } } if(best>0) lags.push(t[best]-t[s]); }
+  const lag=lags.length?lags.reduce((p,q)=>p+q,0)/lags.length:null;
+  return {period,cycles,mx,my,xmin,xmax,ymin,ymax,lag,lagFrac:(lag!=null&&period)?lag/period:null,partial:pk.length<2};
+}
+/* Zufallsmodell (Gillespie) mit Einzeltieren. Om = Systemgröße (Skalierung der Tierzahlen) */
+function gillespie(p,o,Om,seed,keep){
+  const rnd=mulberry32(seed), harv=o.harv, ev=(o.events||[]).slice().sort((a,b)=>a.t-b.t), T=p.T;
+  const b=p.b/Om, K=p.K*Om, R=p.R*Om;
+  const fr=x=>{ const xe=Math.max(x-R,0); return p.model==='hol'?b*xe/(1+b*p.th*xe):b*xe; };
+  let t=0,x=Math.round(p.x0*Om),y=Math.round(p.y0*Om),events=0,out=0,tExt=null;
+  const bps=[]; if(harv&&harv.on){ bps.push({t:harv.t0}); if(harv.t1!=null) bps.push({t:harv.t1}); } ev.forEach(e=>bps.push({t:e.t,e}));
+  bps.sort((a,b)=>a.t-b.t); let bi=0;
+  const NS=keep?1200:0, ds=T/Math.max(1,NS); let ns=0; const ts=[],xs=[],ys=[];
+  const pushTo=tt=>{ if(!keep) return; while(ns*ds<=tt+1e-9&&ns<=NS){ ts.push(ns*ds); xs.push(x/Om); ys.push(y/Om); ns++; } };
+  const applyBp=bp=>{ if(bp.e){ x=Math.round(x*bp.e.kx); y=Math.round(y*bp.e.ky); } };
+  while(bi<bps.length&&bps[bi].t<=1e-9){ applyBp(bps[bi]); bi++; }
+  while(t<T&&events<600000){
+    const hv=hvAt(harv,t);
+    const r1=p.a*x, r2=p.model==='lv'?0:p.a*x*x/K, f=fr(x), r3=f*y, r4=p.d*y, r5=hv*x, r6=hv*y;
+    const tot=r1+r2+r3+r4+r5+r6; if(!(tot>0)) break;
+    let tau=-Math.log(1-rnd())/tot, tn=t+tau;
+    if(bi<bps.length&&tn>=bps[bi].t){ pushTo(bps[bi].t-1e-9); t=bps[bi].t; applyBp(bps[bi]); bi++; if(x===0||y===0) break; continue; }
+    pushTo(Math.min(tn,T)-1e-9); if(tn>=T){ t=T; break; }
+    t=tn; events++;
+    let u=rnd()*tot;
+    if((u-=r1)<0) x++; else if((u-=r2)<0) x--; else if((u-=r3)<0){ x--; let nb=Math.floor(p.c); if(rnd()<p.c-nb) nb++; y+=nb; } else if((u-=r4)<0) y--; else if((u-=r5)<0) x--; else y--;
+    if(x<=0){ x=0; out=2; tExt=t; break; } if(y<=0){ y=0; out=1; tExt=t; break; }
+  }
+  if(keep){ if(out===0) pushTo(T); else { ts.push(tExt); xs.push(x/Om); ys.push(y/Om); } }
+  return {out,tExt,ts,xs,ys,events,Om};
+}
+/* Anpassung des klassischen Modells an Daten (Nelder-Mead im Log-Raum) */
+function lvSeries(par,times,dt){
+  dt=dt||0.05; const p={model:'lv',a:par.a,b:par.b,c:par.c,d:par.d,x0:par.x0,y0:par.y0,R:0,K:1e9,th:0,T:times[times.length-1]};
+  const s=integrate(p,{dt}); const X=[],Y=[]; for(const tm of times){ const f=tm/dt, i=Math.min(s.n-1,Math.floor(f)), w=f-i; X.push(s.X[i]*(1-w)+s.X[i+1]*w); Y.push(s.Y[i]*(1-w)+s.Y[i+1]*w); } return {X,Y};
+}
+function nrmse(par,data){
+  const s=lvSeries(par,data.t); const mx=data.x.reduce((a,b)=>a+b,0)/data.x.length, my=data.y.reduce((a,b)=>a+b,0)/data.y.length; let e=0;
+  for(let i=0;i<data.t.length;i++){ e+=Math.pow((s.X[i]-data.x[i])/mx,2)+Math.pow((s.Y[i]-data.y[i])/my,2); }
+  return Math.sqrt(e/(2*data.t.length));
+}
+function nelder(f,x0,step,iters){
+  const n=x0.length; let S=[x0.slice()]; for(let i=0;i<n;i++){ const v=x0.slice(); v[i]+=step; S.push(v); }
+  let F=S.map(f);
+  for(let it=0;it<iters;it++){
+    const idx=F.map((v,i)=>i).sort((a,b)=>F[a]-F[b]); S=idx.map(i=>S[i]); F=idx.map(i=>F[i]);
+    if(Math.abs(F[n]-F[0])<1e-10) break;
+    const c=new Array(n).fill(0); for(let i=0;i<n;i++) for(let j=0;j<n;j++) c[j]+=S[i][j]/n;
+    const ref=c.map((v,j)=>v+(v-S[n][j])), fr=f(ref);
+    if(fr<F[0]){ const ex=c.map((v,j)=>v+2*(v-S[n][j])), fe=f(ex); if(fe<fr){ S[n]=ex; F[n]=fe; } else { S[n]=ref; F[n]=fr; } }
+    else if(fr<F[n-1]){ S[n]=ref; F[n]=fr; }
+    else { const co=c.map((v,j)=>v+0.5*(S[n][j]-v)), fc=f(co); if(fc<F[n]){ S[n]=co; F[n]=fc; } else { for(let i=1;i<=n;i++){ S[i]=S[i].map((v,j)=>S[0][j]+0.5*(v-S[0][j])); F[i]=f(S[i]); } } }
+  }
+  const k=F.indexOf(Math.min(...F)); return {x:S[k],f:F[k]};
+}
+function smooth3(v){ return v.map((_,i)=>(v[Math.max(0,i-1)]+v[i]+v[Math.min(v.length-1,i+1)])/3); }
+function guessPeriod(data){
+  const xs=smooth3(data.x), m=xs.reduce((a,b)=>a+b,0)/xs.length; const up=[]; for(let i=1;i<xs.length;i++){ if(xs[i-1]<m&&xs[i]>=m) up.push(data.t[i-1]+(m-xs[i-1])/(xs[i]-xs[i-1]||1)*(data.t[i]-data.t[i-1])); }
+  return up.length>=2?(up[up.length-1]-up[0])/(up.length-1):null;
+}
+function fitLV(data){
+  const mx=data.x.reduce((a,b)=>a+b,0)/data.x.length, my=data.y.reduce((a,b)=>a+b,0)/data.y.length; const T=guessPeriod(data)||10, w=2*Math.PI/T;
+  const obj=v=>{ const par={a:Math.exp(v[0]),b:Math.exp(v[1]),c:Math.exp(v[2]),d:Math.exp(v[3]),x0:Math.exp(v[4]),y0:Math.exp(v[5])}; if(par.a>6||par.d>6||par.b>5||par.c>5) return 1e3; return nrmse(par,data); };
+  let best=null; for(const r of [1.5,1,0.67]){ const a=w*r, d=w/r, b=a/my, c=d/(b*mx); const v0=[Math.log(a),Math.log(b),Math.log(c),Math.log(d),Math.log(Math.max(data.x[0],1)),Math.log(Math.max(data.y[0],1))];
+    let res=nelder(obj,v0,0.15,500); res=nelder(obj,res.x,0.05,500); if(!best||res.f<best.f) best=res; }
+  const v=best.x; return {a:Math.exp(v[0]),b:Math.exp(v[1]),c:Math.exp(v[2]),d:Math.exp(v[3]),x0:Math.exp(v[4]),y0:Math.exp(v[5]),err:best.f};
+}
+function parseData(txt){
+  const rows=[],bad=[]; String(txt||'').split(/\r?\n/).forEach((ln,i)=>{
+    const s=ln.trim(); if(!s) return; if(/[A-Za-zÄÖÜäöüß]/.test(s)) return;
+    let parts; if(/[;\t]/.test(s)) parts=s.split(/[;\t]/); else if(/,\s+/.test(s)) parts=s.split(/\s*,\s+/); else if(/\s+/.test(s)) parts=s.split(/\s+/); else parts=s.split(',');
+    const nums=parts.map(q=>q.trim()).filter(q=>q!=='').map(q=>parseFloat(q.replace(',','.')));
+    if(nums.length<3||nums.slice(0,3).some(v=>!isFinite(v))){ bad.push(i+1); return; }
+    rows.push(nums.slice(0,3)); });
+  rows.sort((a,b)=>a[0]-b[0]); return {t:rows.map(r=>r[0]),x:rows.map(r=>r[1]),y:rows.map(r=>r[2]),bad};
+}
+function makeChallenge(seed){
+  const rnd=mulberry32(seed*977+13); for(let k=0;k<200;k++){
+    const a=0.5+rnd()*0.7, d=0.3+rnd()*0.6, b=0.02+rnd()*0.04, c=0.05+rnd()*0.15; const xs=d/(c*b), ys=a/b;
+    const x0=xs*(0.5+rnd()*0.3), y0=ys*(0.5+rnd()*0.4); const par={a,b,c,d,x0,y0};
+    const p={model:'lv',a,b,c,d,x0,y0,R:0,K:1e9,th:0,T:40}; const s=integrate(p,{dt:0.05}); let mnx=Infinity,mny=Infinity,mxx=0,mxy=0; for(let i=0;i<=s.n;i++){ mnx=Math.min(mnx,s.X[i]); mny=Math.min(mny,s.Y[i]); mxx=Math.max(mxx,s.X[i]); mxy=Math.max(mxy,s.Y[i]); }
+    const st=cycleStats(s,{x:xs,y:ys}); if(mny<4||mnx<8||mxx>900||mxy>150||!st.period||st.period<6||st.period>16||st.cycles<2) continue;
+    const t=[],x=[],y=[]; const sd=0.07; const gauss=()=>{ let u=0,v=0; while(!u) u=rnd(); v=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+    for(let tm=0;tm<=40;tm+=1){ const f=tm/0.05, i=Math.round(f); t.push(tm); x.push(Math.round(s.X[i]*Math.exp(sd*gauss())*10)/10); y.push(Math.round(s.Y[i]*Math.exp(sd*gauss())*10)/10); }
+    return {par,data:{t,x,y},noise:sd};
+  }
+  return null;
+}
+/* =============== Hilfen und Diagramme =============== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const f1=x=>Math.round(x*10)/10;
+const de=(v,d)=>Number(v).toFixed(d).replace('.',',').replace('-','−');
+const fn=v=>!isFinite(v)?'–':Math.abs(v)>=100?de(v,0):Math.abs(v)>=10?de(v,1):de(v,2);
+const ROM=['','I','II','III','IV'];
+const PHN=['','Beute wächst, Räuber nehmen ab','Beide nehmen zu','Beute nimmt ab, Räuber wachsen noch','Beide nehmen ab'];
+function niceCeil(v){ if(!(v>0)) return 1; const e=Math.pow(10,Math.floor(Math.log10(v))), m=v/e; const c=[1,1.5,2,2.5,3,4,5,6,8,10].find(k=>k>=m*0.999)||10; return c*e; }
+function niceStep(range,target){ const raw=range/target, e=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/e; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*e; }
+function pathOf(pts){ let s=''; for(let i=0;i<pts.length;i++) s+=(i?'L':'M')+f1(pts[i][0])+' '+f1(pts[i][1]); return s; }
+function maxOf(arr,from){ let m=from||0; for(let i=0;i<arr.length;i++) if(arr[i]>m) m=arr[i]; return m; }
+const evLabel=e=>e.kx!==1&&e.ky===1?`Beute ×${de(e.kx,2)}`:e.ky!==1&&e.kx===1?`Räuber ×${de(e.ky,2)}`:'Eingriff';
+
+/* Zeitverlauf. o: {p,sim,harv,events,ghost,stoch,data,eq0,eqH,show,tcur,cursor} */
+function renderTime(W,H,o){
+  const sim=o.sim, T=sim.T, dual=o.show.dual;
+  const L=46,R=dual?46:14,TP=30,B=30, pw=W-L-R, ph=H-TP-B;
+  let mx=maxOf(sim.X), my=maxOf(sim.Y);
+  if(o.ghost){ mx=maxOf(o.ghost.X,mx); my=maxOf(o.ghost.Y,my); }
+  if(o.stoch){ mx=maxOf(o.stoch.xs,mx); my=maxOf(o.stoch.ys,my); }
+  if(o.data){ mx=maxOf(o.data.x,mx); my=maxOf(o.data.y,my); }
+  if(o.eq0){ mx=Math.max(mx,o.eq0.x); my=Math.max(my,o.eq0.y); }
+  if(o.eqH){ mx=Math.max(mx,o.eqH.x); my=Math.max(my,o.eqH.y); }
+  const yl=niceCeil((dual?mx:Math.max(mx,my))*1.04), yr=dual?niceCeil(my*1.04):yl;
+  const xs=t=>L+pw*t/T, ysl=v=>TP+ph-ph*Math.min(1.04,Math.max(0,v/yl)), ysr=v=>TP+ph-ph*Math.min(1.04,Math.max(0,v/yr));
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Zeitverlauf der Individuenzahlen von Beute und Räubern">`;
+  // Phasenbänder
+  if(o.show.phases){
+    const st=Math.max(1,Math.floor(sim.n/(pw/2))); let cur=0,a=0; const runs=[];
+    for(let i=0;i<=sim.n;i+=st){ const phs=phaseOf(o.p,sim.X[i],sim.Y[i],hvAt(o.harv,sim.t[i])); if(phs!==cur){ if(cur) runs.push([cur,a,sim.t[i]]); cur=phs; a=sim.t[i]; } }
+    runs.push([cur,a,T]);
+    runs.forEach(([ph1,t0,t1])=>{ s+=`<rect x="${f1(xs(t0))}" y="${TP}" width="${f1(Math.max(0.5,xs(t1)-xs(t0)))}" height="${ph}" style="fill:var(--q${ph1})"/>`; if(xs(t1)-xs(t0)>20) s+=`<text x="${f1((xs(t0)+xs(t1))/2)}" y="${TP+ph-6}" text-anchor="middle" font-size="12" font-weight="700" class="tx2">${ROM[ph1]}</text>`; });
+  }
+  // Raster und Achsen
+  const stepL=niceStep(yl,4); for(let v=0;v<=yl+1e-9;v+=stepL){ const y=ysl(v); s+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${f1(y)}" y2="${f1(y)}"/><text x="${L-5}" y="${f1(y+3.5)}" text-anchor="end" font-size="10.5" style="fill:${dual?'var(--prey)':'var(--ink-soft)'}">${v>=1000?de(v/1000,1)+'k':de(v,v<10&&v>0?1:0)}</text>`; }
+  if(dual){ const stepR=niceStep(yr,4); for(let v=0;v<=yr+1e-9;v+=stepR){ const y=ysr(v); s+=`<text x="${W-R+5}" y="${f1(y+3.5)}" font-size="10.5" style="fill:var(--pred)">${v>=1000?de(v/1000,1)+'k':de(v,v<10&&v>0?1:0)}</text>`; } }
+  const stepT=niceStep(T,6); for(let t=0;t<=T+1e-9;t+=stepT){ s+=`<line class="axl" x1="${f1(xs(t))}" x2="${f1(xs(t))}" y1="${TP+ph}" y2="${TP+ph+4}"/><text x="${f1(xs(t))}" y="${TP+ph+16}" text-anchor="middle" font-size="10.5" class="tx2">${de(t,0)}</text>`; }
+  s+=`<line class="axl" x1="${L}" x2="${W-R}" y1="${TP+ph}" y2="${TP+ph}"/><text x="${f1(L+pw/2)}" y="${H-3}" text-anchor="middle" font-size="11" class="tx2">Zeit</text>`;
+  // Eingriffe
+  const hv=o.harv&&o.harv.on?o.harv:null;
+  if(hv){ const t1=hv.t1==null?T:hv.t1; s+=`<rect x="${f1(xs(hv.t0))}" y="${TP-14}" width="${f1(Math.max(2,xs(t1)-xs(hv.t0)))}" height="9" rx="2" style="fill:var(--warn-bg);stroke:var(--warn)"/><text x="${f1(xs(hv.t0)+4)}" y="${TP-6.5}" font-size="9.5" style="fill:var(--warn)" font-weight="700">Dezimierung ${de(hv.h,2)}</text>`; }
+  (o.events||[]).forEach(e=>{ const x=xs(e.t); s+=`<line x1="${f1(x)}" x2="${f1(x)}" y1="${TP-4}" y2="${TP+ph}" stroke="var(--warn)" stroke-dasharray="3 3"/><path d="M${f1(x-4)} ${TP-12} L${f1(x+4)} ${TP-12} L${f1(x)} ${TP-4} Z" style="fill:var(--warn)"/><text x="${f1(Math.min(x+6,W-R-60))}" y="${TP+10}" font-size="9.5" style="fill:var(--warn)" font-weight="700">${evLabel(e)}</text>`; });
+  // Gleichgewichte / Mittelwerte
+  if(o.show.means){
+    const lineE=(E,t0,t1,lab)=>{ if(!E) return ''; const a=f1(xs(t0)), b=f1(xs(t1)); let r=`<line x1="${a}" x2="${b}" y1="${f1(ysl(E.x))}" y2="${f1(ysl(E.x))}" stroke="var(--prey)" stroke-width="1.4" stroke-dasharray="6 4"/><line x1="${a}" x2="${b}" y1="${f1(ysr(E.y))}" y2="${f1(ysr(E.y))}" stroke="var(--pred)" stroke-width="1.4" stroke-dasharray="6 4"/>`; if(lab){ r+=`<text x="${b-3}" y="${f1(ysl(E.x)-4)}" text-anchor="end" font-size="10" style="fill:var(--prey)" font-weight="700">${lab}x = ${fn(E.x)}</text><text x="${b-3}" y="${f1(ysr(E.y)-4)}" text-anchor="end" font-size="10" style="fill:var(--pred)" font-weight="700" dy="${E.y/yr>E.x/yl?-0:15}">${lab}y = ${fn(E.y)}</text>`; } return r; };
+    if(hv&&o.eqH){ s+=lineE(o.eq0,0,hv.t0,''); s+=lineE(o.eqH,hv.t0,hv.t1==null?T:hv.t1,"'"); } else s+=lineE(o.eq0,0,T,'');
+  }
+  // Vergleichslauf
+  const path=(X,Y,stride)=>{ const a=[],b=[]; for(let i=0;i<X.length;i+=stride){ a.push([xs(i*sim.dt),ysl(X[i])]); b.push([xs(i*sim.dt),ysr(Y[i])]); } return [pathOf(a),pathOf(b)]; };
+  const stride=Math.max(1,Math.floor(sim.n/(pw*1.4)));
+  if(o.ghost){ const g=o.ghost; const gs=Math.max(1,Math.floor(g.n/(pw*1.4))); const a=[],b=[]; for(let i=0;i<=g.n;i+=gs){ a.push([xs(g.t[i]),ysl(g.X[i])]); b.push([xs(g.t[i]),ysr(g.Y[i])]); } s+=`<path d="${pathOf(a)}" fill="none" stroke="var(--prey)" stroke-width="2" stroke-dasharray="5 4" opacity=".5"/><path d="${pathOf(b)}" fill="none" stroke="var(--pred)" stroke-width="2" stroke-dasharray="5 4" opacity=".5"/>`; }
+  if(o.stoch){ const g=o.stoch; const a=[],b=[]; for(let i=0;i<g.ts.length;i++){ a.push([xs(g.ts[i]),ysl(g.xs[i])]); b.push([xs(g.ts[i]),ysr(g.ys[i])]); } s+=`<path d="${pathOf(a)}" fill="none" stroke="var(--prey)" stroke-width="1.4" opacity=".9"/><path d="${pathOf(b)}" fill="none" stroke="var(--pred)" stroke-width="1.4" opacity=".9"/>`; }
+  if(o.stoch&&o.stoch.out){ const lx=xs(o.stoch.tExt), ly=o.stoch.out===1?ysr(0):ysl(0); s+=`<path d="M${f1(lx-6)} ${f1(ly-14)} l12 12 m0 -12 l-12 12" stroke="var(--bad)" stroke-width="3" fill="none"/><text x="${f1(Math.min(lx,W-R-70))}" y="${f1(ly-18)}" font-size="10" font-weight="800" style="fill:var(--bad)">${o.stoch.out===1?'Räuber ausgestorben':'Beute ausgestorben'}</text>`; }
+  const w=o.stoch?1.8:2.8; const [pa,pb]=[(()=>{ const a=[]; for(let i=0;i<=sim.n;i+=stride) a.push([xs(sim.t[i]),ysl(sim.X[i])]); a.push([xs(T),ysl(sim.X[sim.n])]); return pathOf(a); })(),(()=>{ const a=[]; for(let i=0;i<=sim.n;i+=stride) a.push([xs(sim.t[i]),ysr(sim.Y[i])]); a.push([xs(T),ysr(sim.Y[sim.n])]); return pathOf(a); })()];
+  s+=`<path d="${pa}" fill="none" stroke="var(--prey)" stroke-width="${w}" stroke-linejoin="round" ${o.stoch?'stroke-dasharray="6 3" opacity=".75"':''}/><path d="${pb}" fill="none" stroke="var(--pred)" stroke-width="${w}" stroke-linejoin="round" ${o.stoch?'stroke-dasharray="6 3" opacity=".75"':''}/>`;
+  if(o.data){ const d=o.data; for(let i=0;i<d.t.length;i++){ s+=`<circle cx="${f1(xs(d.t[i]))}" cy="${f1(ysl(d.x[i]))}" r="3.4" style="fill:var(--panel);stroke:var(--prey);stroke-width:1.8"/><rect x="${f1(xs(d.t[i])-3)}" y="${f1(ysr(d.y[i])-3)}" width="6.4" height="6.4" style="fill:var(--panel);stroke:var(--pred);stroke-width:1.8"/>`; } }
+  // Legende
+  s+=`<g font-size="10.5" font-weight="700"><line x1="${L+6}" x2="${L+24}" y1="8" y2="8" stroke="var(--prey)" stroke-width="3"/><text x="${L+28}" y="12" style="fill:var(--prey)">Beute${dual?' (links)':''}</text><line x1="${L+(dual?96:76)}" x2="${L+(dual?114:94)}" y1="8" y2="8" stroke="var(--pred)" stroke-width="3"/><text x="${L+(dual?118:98)}" y="12" style="fill:var(--pred)">Räuber${dual?' (rechts)':''}</text></g>`;
+  // Lesezeiger
+  if(o.cursor!==false){ const x=xs(o.tcur||0), i=Math.min(sim.n,Math.round((o.tcur||0)/sim.dt));
+    s+=`<g id="cT"><line id="cTl" x1="${f1(x)}" x2="${f1(x)}" y1="${TP}" y2="${TP+ph}" stroke="var(--ink)" stroke-width="1.4" opacity=".7"/><circle id="cTx" cx="${f1(x)}" cy="${f1(ysl(sim.X[i]))}" r="5" style="fill:var(--prey);stroke:var(--panel);stroke-width:2"/><circle id="cTy" cx="${f1(x)}" cy="${f1(ysr(sim.Y[i]))}" r="5" style="fill:var(--pred);stroke:var(--panel);stroke-width:2"/></g>`; }
+  s+='</svg>';
+  return {svg:s,ctx:{L,R,TP,ph,pw,T,xs,ysl,ysr}};
+}
+
+/* Phasendiagramm: Beute waagerecht, Räuber senkrecht */
+function renderPhaseChart(W,H,o){
+  const p=o.p, sim=o.sim, L=46,R=12,TP=12,B=34, pw=W-L-R, ph=H-TP-B;
+  let mx=maxOf(sim.X), my=maxOf(sim.Y);
+  (o.nest||[]).forEach(n=>{ mx=maxOf(n.X,mx); my=maxOf(n.Y,my); });
+  if(o.ghost){ mx=maxOf(o.ghost.X,mx); my=maxOf(o.ghost.Y,my); }
+  if(o.stoch){ mx=maxOf(o.stoch.xs,mx); my=maxOf(o.stoch.ys,my); }
+  if(o.data){ mx=maxOf(o.data.x,mx); my=maxOf(o.data.y,my); }
+  const E=o.eqNow, E0=o.eq0; if(E){ mx=Math.max(mx,E.x*1.15); my=Math.max(my,E.y*1.15); } if(E0){ mx=Math.max(mx,E0.x*1.1); my=Math.max(my,E0.y*1.1); }
+  const xm=niceCeil(mx*1.05), ym=niceCeil(my*1.05);
+  const xs=x=>L+pw*Math.min(1.04,x/xm), ys=y=>TP+ph-ph*Math.min(1.04,Math.max(0,y/ym));
+  const hv=o.hv||0;
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Phasendiagramm: Räuberzahl gegen Beutezahl, die Bahn läuft gegen den Uhrzeigersinn">`;
+  const yc=x=>{ if(x<=p.R+1e-9) return Infinity; const f=respF(p,x); return f>0?(growth(p,x)-hv*x)/f:Infinity; };
+  const ycl=x=>{ const v=yc(x); return Math.min(ym,Math.max(0,isFinite(v)?v:ym)); };
+  // Quadranten nach Nullklinen
+  if(E&&o.show.nulls){
+    const N=50, left=[], right=[]; for(let i=0;i<=N;i++){ left.push(E.x*i/N); right.push(E.x+(xm-E.x)*i/N); }
+    const poly=(xsA,lo,hi)=>{ const top=xsA.map(x=>[xs(x),ys(lo?0:ycl(x))]); return top; };
+    const reg=(xa,below,cls)=>{ const crv=xa.map(x=>[xs(x),ys(ycl(x))]); const base=below?[[xs(xa[xa.length-1]),ys(0)],[xs(xa[0]),ys(0)]]:[[xs(xa[xa.length-1]),ys(ym)],[xs(xa[0]),ys(ym)]]; return `<path d="${pathOf(crv.concat(base))}Z" style="fill:var(--q${cls})"/>`; };
+    s+=reg(left,true,1)+reg(right,true,2)+reg(right,false,3)+reg(left,false,4);
+    const mid=(a,b)=>(a+b)/2;
+    [[1,E.x/2,ycl(E.x/2)/2],[2,mid(E.x,xm),ycl(mid(E.x,xm))/2],[3,mid(E.x,xm),mid(ycl(mid(E.x,xm)),ym)],[4,E.x/2,mid(ycl(E.x/2),ym)]].forEach(([k,x,y])=>{ s+=`<text x="${f1(xs(x))}" y="${f1(ys(y)+7)}" text-anchor="middle" font-size="22" font-weight="800" style="fill:var(--ink-soft)" opacity=".5">${ROM[k]}</text>`; });
+  }
+  // Raster, Achsen
+  const sx=niceStep(xm,5), sy=niceStep(ym,4);
+  for(let v=0;v<=xm+1e-9;v+=sx){ s+=`<line class="gl" x1="${f1(xs(v))}" x2="${f1(xs(v))}" y1="${TP}" y2="${TP+ph}"/><text x="${f1(xs(v))}" y="${TP+ph+15}" text-anchor="middle" font-size="10.5" class="tx2">${de(v,0)}</text>`; }
+  for(let v=0;v<=ym+1e-9;v+=sy){ s+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${f1(ys(v))}" y2="${f1(ys(v))}"/><text x="${L-5}" y="${f1(ys(v)+3.5)}" text-anchor="end" font-size="10.5" class="tx2">${de(v,v<10&&v>0?1:0)}</text>`; }
+  s+=`<rect x="${L}" y="${TP}" width="${pw}" height="${ph}" fill="none" class="axl"/><text x="${f1(L+pw/2)}" y="${H-4}" text-anchor="middle" font-size="11" style="fill:var(--prey)" font-weight="700">Beute (Individuen)</text><text x="12" y="${f1(TP+ph/2)}" text-anchor="middle" font-size="11" style="fill:var(--pred)" font-weight="700" transform="rotate(-90 12 ${f1(TP+ph/2)})">Räuber (Individuen)</text>`;
+  // Richtungsfeld
+  if(o.show.field){ const nx=9,ny=6; for(let i=0;i<nx;i++) for(let j=0;j<ny;j++){ const x=xm*(i+0.5)/nx, y=ym*(j+0.5)/ny, d=deriv(p,x,y,hv); let ux=d[0]/xm*pw, uy=-d[1]/ym*ph; const l=Math.hypot(ux,uy)||1; ux/=l; uy/=l; const cx=xs(x), cy=ys(y), a=[cx-ux*6,cy-uy*6], b=[cx+ux*6,cy+uy*6]; s+=`<path d="M${f1(a[0])} ${f1(a[1])} L${f1(b[0])} ${f1(b[1])} M${f1(b[0]-ux*4+uy*3)} ${f1(b[1]-uy*4-ux*3)} L${f1(b[0])} ${f1(b[1])} L${f1(b[0]-ux*4-uy*3)} ${f1(b[1]-uy*4+ux*3)}" fill="none" stroke="var(--ink-soft)" stroke-width="1.2" opacity=".6"/>`; } }
+  // Nullklinen
+  if(E&&o.show.nulls){ const pts=[]; for(let i=0;i<=80;i++){ const x=xm*i/80; const v=yc(x); if(isFinite(v)&&v>=0&&v<=ym*1.02) pts.push([xs(x),ys(v)]); } if(pts.length>1) s+=`<path d="${pathOf(pts)}" fill="none" stroke="var(--prey)" stroke-width="1.4" stroke-dasharray="6 4"/>`; s+=`<line x1="${f1(xs(E.x))}" x2="${f1(xs(E.x))}" y1="${TP}" y2="${TP+ph}" stroke="var(--pred)" stroke-width="1.4" stroke-dasharray="6 4"/>`; }
+  // Bahnen
+  const orbit=(sm,w,op,dash)=>{ const st=Math.max(1,Math.floor(sm.n/500)); const a=[]; for(let i=0;i<=sm.n;i+=st) a.push([xs(sm.X[i]),ys(sm.Y[i])]); a.push([xs(sm.X[sm.n]),ys(sm.Y[sm.n])]); return `<path d="${pathOf(a)}" fill="none" stroke="var(--ink)" stroke-width="${w}" opacity="${op}" stroke-linejoin="round" ${dash?'stroke-dasharray="5 4"':''}/>`; };
+  if(o.nest) o.nest.forEach(n=>{ s+=orbit(n,1.8,.7,false); });
+  if(o.ghost) s+=orbit(o.ghost,1.8,.45,true);
+  if(o.stoch){ const a=[]; for(let i=0;i<o.stoch.ts.length;i++) a.push([xs(o.stoch.xs[i]),ys(o.stoch.ys[i])]); s+=`<path d="${pathOf(a)}" fill="none" stroke="var(--pred)" stroke-width="1.3" opacity=".8"/>`; }
+  s+=orbit(sim,2.6,1,false);
+  // Pfeilspitzen
+  [0.12,0.37,0.62,0.87].forEach(fr=>{ const i=Math.max(1,Math.min(sim.n-1,Math.round(sim.n*fr))), x1=xs(sim.X[i-1]),y1=ys(sim.Y[i-1]),x2=xs(sim.X[i+1]),y2=ys(sim.Y[i+1]); const l=Math.hypot(x2-x1,y2-y1); if(l<0.05) return; const ux=(x2-x1)/l, uy=(y2-y1)/l, cx=xs(sim.X[i]), cy=ys(sim.Y[i]); s+=`<path d="M${f1(cx+ux*6)} ${f1(cy+uy*6)} L${f1(cx-ux*4+uy*5)} ${f1(cy-uy*4-ux*5)} L${f1(cx-ux*4-uy*5)} ${f1(cy-uy*4+ux*5)} Z" style="fill:var(--ink)"/>`; });
+  if(o.data){ const d=o.data, a=[]; for(let i=0;i<d.t.length;i++) a.push([xs(d.x[i]),ys(d.y[i])]); s+=`<path d="${pathOf(a)}" fill="none" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="2 3"/>`; a.forEach(q=>{ s+=`<circle cx="${f1(q[0])}" cy="${f1(q[1])}" r="3" style="fill:var(--panel);stroke:var(--ink);stroke-width:1.5"/>`; }); }
+  s+=`<rect x="${f1(xs(sim.X[0])-4)}" y="${f1(ys(sim.Y[0])-4)}" width="8" height="8" style="fill:var(--panel);stroke:var(--ink);stroke-width:2"/><text x="${f1(xs(sim.X[0])+7)}" y="${f1(ys(sim.Y[0])+14)}" font-size="10" class="tx2">Start</text>`;
+  // Gleichgewichte
+  const cross=(e,fill)=>`<path d="M${f1(xs(e.x)-6)} ${f1(ys(e.y))} H${f1(xs(e.x)+6)} M${f1(xs(e.x))} ${f1(ys(e.y)-6)} V${f1(ys(e.y)+6)}" stroke="var(--ink)" stroke-width="2.6" fill="none"/>`;
+  if(E0&&(!E||Math.abs(E0.x-E.x)>1e-6||Math.abs(E0.y-E.y)>1e-6)) s+=cross(E0)+`<text x="${f1(xs(E0.x)+8)}" y="${f1(ys(E0.y)-6)}" font-size="10.5" font-weight="800">E</text>`;
+  if(E) s+=cross(E)+`<text x="${f1(xs(E.x)+8)}" y="${f1(ys(E.y)-6)}" font-size="10.5" font-weight="800">${E0&&Math.abs(E0.x-E.x)>1e-6?"E′":'E'}</text>`;
+  if(o.cursor!==false){ const i=Math.min(sim.n,Math.round((o.tcur||0)/sim.dt)); s+=`<circle id="cP" cx="${f1(xs(sim.X[i]))}" cy="${f1(ys(sim.Y[i]))}" r="6" style="fill:var(--pred);stroke:var(--panel);stroke-width:2.4"/>`; }
+  return {svg:s+'</svg>',ctx:{L,TP,pw,ph,xm,ym,xs,ys}};
+}
+
+/* Balkenliste (z. B. Aussterberisiko) */
+function barsHTML(items){ return `<div class="bars">${items.map(([lab,v,col])=>`<div class="bar"><span>${esc(lab)}</span><div class="tr"><i style="width:${Math.round(clamp(v,0,1)*100)}%;background:${col}"></i></div><b>${Math.round(v*100)} %</b></div>`).join('')}</div>`; }
+/* =============== Zustand =============== */
+const MODELN={lv:'Klassisch (Lotka-Volterra)',log:'Mit Kapazitätsgrenze',hol:'Mit Sättigung (Holling II)'};
+const MODELT={
+  lv:'Die Beute wächst ohne Grenze, die Räuber fressen proportional zu den Begegnungen und sterben ohne Beute. Ergebnis: Zyklen, die nie abklingen.',
+  log:'Die Beute hat eine Kapazitätsgrenze K (begrenzte Nahrung oder Raum). Die Schwankungen klingen ab, es stellt sich ein Gleichgewicht ein.',
+  hol:'Räuber werden satt: Pro Räuber ist die Fressrate begrenzt (Handhabungszeit). Bei hoher Kapazität K entstehen dauerhafte, große Schwankungen: Paradox der Anreicherung.'
+};
+const copyP=o=>Object.assign({},o);
+const S={tab:'model',p:copyP(PDEF),harv:{on:false,h:0.2,t0:30,t1:null},events:[],tcur:0,play:false,speed:1,view:window.innerWidth>=900?'both':'time',
+  show:{means:true,phases:false,nulls:true,field:false,dual:true},ghost:null,nest:null,nestSims:null,sim:null,preset:'base',ctx:{},
+  dataMode:null,data:null,chal:null,dtxt:'',fit:null,dev:null,reveal:false,
+  st:{Om:1,seed:7,run:null,batch:null,busy:false},poe:{},score:{ok:0,n:0}};
+const PRESETS=[
+ {id:'base',t:'Grundmodell',d:'Zyklen mit Periode etwa 10',set:{}},
+ {id:'fast',t:'Schnelle Zyklen',d:'z. B. Insekten: hohe Raten',set:{a:1.6,b:0.04,c:0.2,d:1.2,x0:100,y0:20,T:30}},
+ {id:'insect',t:'Insektizid',d:'Volterra-Prinzip: beide Arten dezimiert',set:{T:100},harv:{on:true,h:0.25,t0:40,t1:null},show:{means:true}},
+ {id:'cap',t:'Kapazitätsgrenze',d:'Schwankungen klingen ab',set:{model:'log',K:600,T:80}},
+ {id:'enrich',t:'Anreicherung',d:'Mehr Nahrung: größere Ausschläge',set:{model:'hol',K:1000,th:0.1,T:120,x0:250,y0:25}},
+ {id:'refuge',t:'Rückzugsraum',d:'Beute unter R ist geschützt',set:{R:80,T:60}}
+];
+function applyPreset(id){
+  const pr=PRESETS.find(q=>q.id===id); S.p=Object.assign(copyP(PDEF),pr.set); S.harv=Object.assign({on:false,h:0.2,t0:30,t1:null},pr.harv||{}); S.events=[]; S.nest=null; S.ghost=null; S.preset=id; S.tcur=0;
+  if(pr.show) Object.assign(S.show,pr.show); S.dataMode=null; S.st.run=null; S.st.batch=null; stopPlay(); recompute(); }
+
+function recompute(){
+  const p=S.p, hv=S.harv.on?S.harv:null;
+  S.sim=integrate(p,{harv:hv,events:S.events});
+  S.eq0=equilibrium(p,0); S.eqH=hv?equilibrium(p,hv.h):null; S.cls=classify(p,0);
+  S.nestSims=S.nest?S.nest.map(n=>integrate(Object.assign({},p,{x0:n.x0,y0:n.y0}),{})):null;
+  S.stats=cycleStats(S.sim,S.eq0,0,p.T);
+  S.stamp=JSON.stringify([p,S.harv,S.events]);
+  S.dev=(S.data&&S.dataMode)?nrmse({a:p.a,b:p.b,c:p.c,d:p.d,x0:p.x0,y0:p.y0},S.data):null;
+  S.tcur=Math.min(S.tcur,p.T);
+}
+const hvNow=()=>S.harv.on?hvAt(S.harv,S.tcur):0;
+const stochNow=()=>S.st.run&&S.st.run.stamp===S.stamp?S.st.run:null;
+
+/* =============== Messfenster =============== */
+function chartSizes(){
+  const box=$('#viewer .vcharts'); const total=Math.max(280,Math.round(box.clientWidth||340)); const both=S.view==='both';
+  const W=both?Math.floor(total/2):total; const H=Math.round(Math.max(both?210:176,Math.min(270,W*(both?0.56:0.5)))); return {W,H};
+}
+function drawCharts(){
+  if(!S.sim||$('#viewer').hidden) return;
+  const {W,H}=chartSizes(); const chT=$('#chT'), chP=$('#chP');
+  chT.hidden=S.view==='phase'; chP.hidden=S.view==='time';
+  $$('.vbar [data-v="view"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.view));
+  const stoch=(S.tab==='chance')?stochNow():null;
+  const dataOn=(S.tab==='data'&&S.data)?S.data:null;
+  const base={p:S.p,sim:S.sim,harv:S.harv,events:S.events,ghost:S.ghost?S.ghost.sim:null,stoch,data:dataOn,eq0:S.eq0,eqH:S.eqH,show:S.show,tcur:S.tcur};
+  if(!chT.hidden){ const r=renderTime(W,H,base); chT.innerHTML=r.svg; S.ctx.t=r.ctx; }
+  if(!chP.hidden){ const r=renderPhaseChart(W,H,Object.assign({},base,{nest:S.nestSims,hv:hvNow(),eqNow:S.harv.on&&S.tcur>=S.harv.t0?(S.eqH||null):S.eq0})); chP.innerHTML=r.svg; S.ctx.p=r.ctx; }
+  updateInfo();
+}
+function moveCursor(){
+  const sim=S.sim; if(!sim) return; const i=Math.min(sim.n,Math.round(S.tcur/sim.dt)); const c=S.ctx.t, q=S.ctx.p;
+  if(c&&$('#cTl')){ const x=f1(c.xs(S.tcur)); $('#cTl').setAttribute('x1',x); $('#cTl').setAttribute('x2',x); $('#cTx').setAttribute('cx',x); $('#cTy').setAttribute('cx',x); $('#cTx').setAttribute('cy',f1(c.ysl(sim.X[i]))); $('#cTy').setAttribute('cy',f1(c.ysr(sim.Y[i]))); }
+  if(q&&$('#cP')){ $('#cP').setAttribute('cx',f1(q.xs(sim.X[i]))); $('#cP').setAttribute('cy',f1(q.ys(sim.Y[i]))); }
+  updateInfo(); drawScene();
+}
+function updateInfo(){
+  const sim=S.sim; if(!sim) return; const i=Math.min(sim.n,Math.round(S.tcur/sim.dt)), x=sim.X[i], y=sim.Y[i];
+  const ph=phaseOf(S.p,x,y,hvNow());
+  $('#vt').textContent='t = '+de(S.tcur,1);
+  $('#vinfo').innerHTML=`<span class="pb">Beute ${fn(x)}</span> · <span class="pr">Räuber ${fn(y)}</span> · <b>Phase ${ROM[ph]}</b>: ${PHN[ph]}`;
+  $('#scrub').value=Math.round(S.tcur/S.p.T*1000);
+}
+function setT(t){ S.tcur=clamp(t,0,S.p.T); moveCursor(); }
+
+/* Wiedergabe */
+let rafId=null,lastTs=0;
+function stopPlay(){ S.play=false; if(rafId) cancelAnimationFrame(rafId); rafId=null; const b=$('[data-v="play"]'); if(b){ b.setAttribute('aria-pressed','false'); b.textContent='▶'; b.setAttribute('aria-label','Abspielen'); } }
+function startPlay(){ if(S.tcur>=S.p.T-1e-6) S.tcur=0; S.play=true; const b=$('[data-v="play"]'); b.setAttribute('aria-pressed','true'); b.textContent='⏸'; b.setAttribute('aria-label','Pause'); lastTs=0; rafId=requestAnimationFrame(tick); }
+function tick(ts){ if(!S.play) return; if(!lastTs) lastTs=ts; const dt=Math.min(0.1,(ts-lastTs)/1000); lastTs=ts; S.tcur+=dt*S.speed*S.p.T/20; if(S.tcur>=S.p.T){ S.tcur=S.p.T; moveCursor(); stopPlay(); return; } moveCursor(); rafId=requestAnimationFrame(tick); }
+
+/* Lebensraum (Canvas) */
+const SC={prey:[],pred:[],w:0,h:0,rnd:mulberry32(5)};
+function sceneSync(arr,n,mk){ while(arr.length<n) arr.push(mk()); while(arr.length>n) arr.splice(Math.floor(SC.rnd()*arr.length),1); }
+function drawScene(){
+  const cv=$('#scene'); if(!cv||!S.sim) return; const dpr=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight; if(!w) return;
+  if(cv.width!==Math.round(w*dpr)){ cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); }
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+  const sim=S.sim, i=Math.min(sim.n,Math.round(S.tcur/sim.dt)); const mxX=Math.max(maxOf(sim.X),1), mxY=Math.max(maxOf(sim.Y),1);
+  const nP=Math.round(S.sim.X[i]/mxX*60+(sim.X[i]>0.5?1:0)), nQ=Math.round(S.sim.Y[i]/mxY*22+(sim.Y[i]>0.5?1:0));
+  const mkP=()=>({x:SC.rnd(),y:SC.rnd(),vx:SC.rnd()-.5,vy:SC.rnd()-.5}); sceneSync(SC.prey,nP,mkP); sceneSync(SC.pred,nQ,mkP);
+  const step=S.play?0.0035:0; [SC.prey,SC.pred].forEach((arr,k)=>arr.forEach(a=>{ if(step){ a.vx+= (SC.rnd()-.5)*.3; a.vy+=(SC.rnd()-.5)*.3; const l=Math.hypot(a.vx,a.vy)||1, sp=k?1:0.8; a.x+=a.vx/l*step*sp; a.y+=a.vy/l*step*sp*1.4; if(a.x<.02||a.x>.98) a.vx*=-1; if(a.y<.04||a.y>.96) a.vy*=-1; a.x=clamp(a.x,.02,.98); a.y=clamp(a.y,.04,.96); } }));
+  const cs=getComputedStyle(cv), prey=cs.getPropertyValue('--prey').trim()||'#0D76A6', pred=cs.getPropertyValue('--pred').trim()||'#D2501C';
+  ctx.fillStyle=prey; SC.prey.forEach(a=>{ ctx.beginPath(); ctx.arc(a.x*w,a.y*h,4.2,0,6.283); ctx.fill(); });
+  ctx.fillStyle=pred; SC.pred.forEach(a=>{ const x=a.x*w,y=a.y*h; ctx.beginPath(); ctx.moveTo(x,y-8); ctx.lineTo(x+7,y+6); ctx.lineTo(x-7,y+6); ctx.closePath(); ctx.fill(); });
+  const lb=$('#sceneLbl'); if(lb) lb.textContent=`Beute ${fn(S.sim.X[i])} (Punkte) · Räuber ${fn(S.sim.Y[i])} (Dreiecke). Gezeichnet werden höchstens 60 Punkte und 22 Dreiecke, sie stehen für den Höchstwert des Laufs.`;
+}
+
+/* =============== Reiter: Modell =============== */
+const PINFO={
+  a:['Wachstumsrate der Beute a','Geburten minus Todesfälle der Beute ohne Räuber, pro Zeiteinheit',0.1,2,0.05,2],
+  b:['Fangrate b','Wie viel Beute ein Räuber je Zeiteinheit und Beutedichte erbeutet',0.005,0.1,0.005,3],
+  c:['Umsetzung c','Räubernachwuchs je erbeutetem Tier',0.02,0.5,0.01,2],
+  d:['Sterberate der Räuber d','Todesrate der Räuber ohne Beute, pro Zeiteinheit',0.1,1.5,0.05,2],
+  x0:['Start: Beute','Anfangszahl der Beute',10,400,5,0],
+  y0:['Start: Räuber','Anfangszahl der Räuber',1,60,1,0],
+  T:['Dauer','Beobachtungszeit in Zeiteinheiten',20,160,10,0],
+  K:['Kapazität K der Beute','Höchstzahl, die der Lebensraum trägt',100,1200,50,0],
+  th:['Handhabungszeit','Zeit, die ein Räuber je erbeutetem Tier „verliert“ (Sättigung)',0.02,0.19,0.01,2],
+  R:['Rückzugsraum R','Beute bis zu dieser Zahl ist vor Räubern geschützt',0,150,5,0]
+};
+const slider=(k,idp)=>{ const q=PINFO[k]; return `<div class="sl"><label class="fl" for="s_${k}">${q[0]}: <output id="o_${k}">${de(S.p[k],q[5])}</output><small>${q[1]}</small></label><input type="range" id="s_${k}" data-p="${k}" min="${q[2]}" max="${q[3]}" step="${q[4]}" value="${S.p[k]}"></div>`; };
+function kpiHTML(){
+  const st=S.stats, E=S.eq0, c=S.cls, p=S.p; let h='';
+  const kinds={center:'Neutrales Gleichgewicht: Die Schwankungen bleiben dauerhaft erhalten.',spiral:'Stabiles Gleichgewicht: Die Schwankungen klingen ab.',node:'Stabiles Gleichgewicht ohne Schwingung.',unstable:'Instabil: Die Schwankungen wachsen bis zu einem dauerhaften Zyklus oder bis zum Aussterben.',saddle:'Instabiles Gleichgewicht.',none:'Kein Gleichgewicht mit beiden Arten: Die Räuber finden zu wenig Beute und sterben aus.'};
+  h+=`<div class="kpis"><div><b><span class="pb">${E?fn(E.x):'–'}</span> | <span class="pr">${E?fn(E.y):'–'}</span></b><small>Gleichgewicht (Beute | Räuber)${p.model==='lv'&&p.R===0?': x* = d/(c·b), y* = a/b':''}</small></div>`;
+  h+=`<div><b><span class="pb">${fn(st.mx)}</span> | <span class="pr">${fn(st.my)}</span></b><small>Mittelwert über ${st.partial?'den ganzen Lauf (kein voller Zyklus)':st.cycles+' volle Zyklen'}</small></div>`;
+  h+=`<div><b>${st.period?de(st.period,1):'–'}</b><small>Periode (gemessen)${c.T0?'. Formel für kleine Schwankungen: '+de(c.T0,1):''}</small></div>`;
+  h+=`<div><b>${st.lag!=null?de(st.lag,1)+' ('+de(st.lagFrac,2)+' T)':'–'}</b><small>Räubermaximum nach Beutemaximum (Verzögerung)</small></div></div>`;
+  h+=`<p class="note" style="margin-top:8px"><b>${kinds[c.kind]||''}</b>${st.partial?'':` Schwankungsbereich: Beute ${fn(st.xmin)} bis ${fn(st.xmax)}, Räuber ${fn(st.ymin)} bis ${fn(st.ymax)}.`}</p>`;
+  return h;
+}
+function eventListHTML(){ if(!S.events.length) return '<p class="note">Keine Ereignisse.</p>'; return `<ul class="plain">${S.events.map((e,i)=>`<li>t = ${de(e.t,1)}: ${evLabel(e)} <button type="button" class="lk" data-act="delev" data-i="${i}" style="border:0;background:none;text-decoration:underline;cursor:pointer;font-weight:700;color:var(--ink)">entfernen</button></li>`).join('')}</ul>`; }
+function renderModel(){
+  const p=S.p; let h='';
+  h+=`<div class="card"><h2>Szenarien</h2><p class="lead">Starte mit einem Szenario und verändere es danach mit den Reglern.</p><div class="chips" role="group" aria-label="Szenarien">${PRESETS.map(q=>`<button type="button" class="chip" data-act="preset" data-id="${q.id}" aria-pressed="${S.preset===q.id}"><b>${q.t}</b><span>${q.d}</span></button>`).join('')}</div></div>`;
+  h+=`<div class="card"><h2>Modell und Parameter</h2><div class="seg" role="group" aria-label="Modell wählen">${Object.keys(MODELN).map(k=>`<button type="button" data-act="model" data-m="${k}" aria-pressed="${p.model===k}">${MODELN[k]}</button>`).join('')}</div><p class="note">${MODELT[p.model]}</p>
+  <div class="eqn" aria-label="Gleichungen">${p.model==='lv'?'dx/dt = a·x − b·x·y':p.model==='log'?'dx/dt = a·x·(1 − x/K) − b·x·y':'dx/dt = a·x·(1 − x/K) − b·x·y / (1 + b·h·x)'}<br>${p.model==='hol'?'dy/dt = c·b·x·y / (1 + b·h·x) − d·y':'dy/dt = c·b·x·y − d·y'}<br><span style="font-family:var(--body);font-size:.85rem;color:var(--ink-soft)">x Beute, y Räuber${p.R>0?'. Bei Rückzugsraum R wird x durch (x − R) ersetzt, wo gefressen wird':''}</span></div>
+  <div id="sliders"><div class="grid2">${slider('a')}${slider('b')}${slider('c')}${slider('d')}</div>
+  <div class="grid2">${slider('x0')}${slider('y0')}${slider('T')}${p.model!=='lv'?slider('K'):''}${p.model==='hol'?slider('th'):''}${slider('R')}</div></div>
+  <div class="btnrow"><button type="button" class="btn sm" data-act="resetp">Zurücksetzen</button><button type="button" class="btn sm" data-act="ghost">Lauf als Vergleich merken</button><button type="button" class="btn sm" data-act="noghost" ${S.ghost?'':'disabled'}>Vergleich löschen</button></div></div>`;
+  h+=`<div class="card"><h2>Auswertung</h2><div id="kpi">${kpiHTML()}</div></div>`;
+  h+=`<div class="card"><h2>Eingriffe</h2><p class="lead">Greife in den Lauf ein und beobachte, wie sich die Zyklen verändern. Für einmalige Ereignisse stellst du zuerst oben den Zeitpunkt ein.</p>
+  <label class="ck"><input type="checkbox" data-act="harvon" ${S.harv.on?'checked':''}> Beide Arten gleichmäßig dezimieren (zum Beispiel Insektizid oder Befischung)</label>`;
+  if(S.harv.on){ h+=`<div class="grid2"><div class="sl"><label class="fl" for="s_hh">Verlustrate h: <output id="o_hh">${de(S.harv.h,2)}</output><small>zusätzliche Todesrate beider Arten pro Zeiteinheit${S.harv.h>=p.a?'. Achtung: h ≥ a, die Beute kann sich nicht mehr halten':''}</small></label><input type="range" id="s_hh" data-h="h" min="0.05" max="0.6" step="0.05" value="${S.harv.h}"></div>
+  <div class="sl"><label class="fl" for="s_ht0">Beginn bei t = <output id="o_ht0">${S.harv.t0}</output></label><input type="range" id="s_ht0" data-h="t0" min="0" max="${p.T}" step="5" value="${Math.min(S.harv.t0,p.T)}"></div></div>
+  <label class="ck"><input type="checkbox" data-act="harvend" ${S.harv.t1!=null?'checked':''}> Eingriff endet wieder</label>${S.harv.t1!=null?`<div class="sl"><label class="fl" for="s_ht1">Ende bei t = <output id="o_ht1">${S.harv.t1}</output></label><input type="range" id="s_ht1" data-h="t1" min="${Math.min(p.T,S.harv.t0+5)}" max="${p.T}" step="5" value="${S.harv.t1}"></div>`:''}`; }
+  h+=`<h3>Einmalige Ereignisse beim Lesezeiger (t = <span id="tcurlbl">${de(S.tcur,1)}</span>)</h3><div class="btnrow"><button type="button" class="btn sm" data-act="kick" data-kx="0.5" data-ky="1">Beute halbieren</button><button type="button" class="btn sm" data-act="kick" data-kx="1" data-ky="0.5">Räuber halbieren</button><button type="button" class="btn sm" data-act="kick" data-kx="1" data-ky="1.5">Räuber aussetzen (+50 %)</button><button type="button" class="btn sm" data-act="kick" data-kx="1.5" data-ky="1">Beute +50 %</button></div><div id="evlist">${eventListHTML()}</div></div>`;
+  h+=`<div class="card"><h2>Anzeige</h2><div class="grid2"><label class="ck"><input type="checkbox" data-sh="means" ${S.show.means?'checked':''}> Gleichgewicht und Mittelwerte zeigen</label><label class="ck"><input type="checkbox" data-sh="phases" ${S.show.phases?'checked':''}> Phasen I bis IV markieren</label><label class="ck"><input type="checkbox" data-sh="nulls" ${S.show.nulls?'checked':''}> Nullklinen und Quadranten</label><label class="ck"><input type="checkbox" data-sh="field" ${S.show.field?'checked':''}> Richtungsfeld</label><label class="ck"><input type="checkbox" data-sh="dual" ${S.show.dual?'checked':''}> Zwei Achsen (Räuber rechts)</label></div>
+  <div class="rule"><b>Vier Phasen:</b> I Beute wächst, Räuber nehmen ab · II beide nehmen zu · III Beute nimmt ab, Räuber wachsen noch · IV beide nehmen ab. Im Phasendiagramm läuft die Bahn gegen den Uhrzeigersinn.</div>
+  <label class="fl" for="spd">Wiedergabe-Tempo: <output id="o_spd">${S.speed}×</output></label><input type="range" id="spd" data-spd="1" min="0.5" max="4" step="0.5" value="${S.speed}"></div>`;
+  h+=`<div class="card"><h2>Lebensraum</h2><canvas class="scene" id="scene" role="img" aria-label="Lebensraum mit Beutetieren als Punkten und Räubern als Dreiecken"></canvas><p class="note" id="sceneLbl"></p></div>`;
+  h+=`<div class="card"><details class="mode"><summary>Wertetabelle und Export</summary>${tableHTML()}<div class="btnrow"><button type="button" class="btn sm" data-act="copycsv">Werte als CSV kopieren</button><button type="button" class="btn sm" data-act="copyprot">Protokoll kopieren</button></div></details></div>`;
+  $('#pane-model').innerHTML=h;
+}
+function tableHTML(){
+  const sim=S.sim, step=Math.max(1,Math.round(S.p.T/20/sim.dt)); let rows=''; for(let i=0;i<=sim.n;i+=step) rows+=`<tr><td class="n">${de(sim.t[i],1)}</td><td class="n">${fn(sim.X[i])}</td><td class="n">${fn(sim.Y[i])}</td><td>${ROM[phaseOf(S.p,sim.X[i],sim.Y[i],hvAt(S.harv.on?S.harv:null,sim.t[i]))]}</td></tr>`;
+  return `<div class="tscroll" style="max-height:260px;overflow:auto"><table class="tbl"><thead><tr><th class="n">Zeit</th><th class="n">Beute</th><th class="n">Räuber</th><th>Phase</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function csvText(){ const sim=S.sim, step=Math.max(1,Math.round(1/sim.dt)/ (S.p.T>60?0.5:1)); let s='Zeit;Beute;Räuber\n'; for(let i=0;i<=sim.n;i+=Math.round(step)) s+=`${de(sim.t[i],1)};${de(sim.X[i],1)};${de(sim.Y[i],1)}\n`; return s; }
+function protText(){
+  const p=S.p, st=S.stats, E=S.eq0; const L=['Protokoll Räuber-Beute-Modell','Modell: '+MODELN[p.model],`Parameter: a=${de(p.a,2)}, b=${de(p.b,3)}, c=${de(p.c,2)}, d=${de(p.d,2)}${p.model!=='lv'?', K='+p.K:''}${p.model==='hol'?', h='+de(p.th,2):''}${p.R?', R='+p.R:''}`,`Start: Beute ${p.x0}, Räuber ${p.y0}, Dauer ${p.T}`];
+  if(S.harv.on) L.push(`Eingriff: beide Arten h=${de(S.harv.h,2)} ab t=${S.harv.t0}${S.harv.t1!=null?' bis '+S.harv.t1:''}`); S.events.forEach(e=>L.push(`Ereignis bei t=${de(e.t,1)}: ${evLabel(e)}`));
+  L.push(E?`Gleichgewicht: Beute ${fn(E.x)}, Räuber ${fn(E.y)}`:'Gleichgewicht: keines'); L.push(`Mittelwert: Beute ${fn(st.mx)}, Räuber ${fn(st.my)}${st.partial?' (kein voller Zyklus)':''}`); if(st.period) L.push(`Periode: ${de(st.period,1)}${st.lagFrac!=null?', Verzögerung Räubermaximum: '+de(st.lagFrac,2)+' T':''}`);
+  L.push('Hinweis: vereinfachtes Lernmodell, keine Vorhersage realer Populationen.'); return L.join('\n');
+}
+function updateLive(){ recompute(); const k=$('#kpi'); if(k) k.innerHTML=kpiHTML(); const e=$('#evlist'); if(e) e.innerHTML=eventListHTML(); drawCharts(); drawScene(); const tb=$('#pane-model details table'); }
+
+/* =============== Reiter: Regeln =============== */
+function arrow(a,b){ const r=b/a; return r>1.03?'<span class="up">↑</span>':r<0.97?'<span class="dn">↓</span>':'<span class="eq">→</span>'; }
+function loadRule(n){
+  S.p=copyP(PDEF); S.harv={on:false,h:0.2,t0:30,t1:null}; S.events=[]; S.nest=null; S.ghost=null; S.dataMode=null; S.tcur=0; stopPlay();
+  if(n===1){ S.p.T=60; S.show.phases=true; S.show.means=true; S.view=window.innerWidth>=900?'both':'time'; }
+  if(n===2){ S.p.T=80; S.show.means=true; S.show.phases=false; S.view='phase'; const E=equilibrium(S.p,0); S.nest=[{x0:E.x*0.9,y0:E.y*0.85},{x0:E.x*1.4,y0:E.y*1.5}]; }
+  if(n===3){ S.p.T=120; S.harv={on:true,h:0.2,t0:60,t1:null}; S.show.means=true; S.show.phases=false; S.view='time'; }
+  S.preset=''; recompute(); }
+function renderRules(){
+  const p=S.p, E=S.eq0, dirty=S.harv.on||S.events.length>0; let h='';
+  const clean=dirty?integrate(p,{}):S.sim, st=dirty?cycleStats(clean,E,0,p.T):S.stats;
+  h+=`<div class="card"><h2>Die drei Lotka-Volterra-Regeln</h2><p class="lead">Jede Regel hat ein Experiment. Lade es, sieh dir das Messfenster oben an und lies unten die gemessenen Werte. Die Tabellen rechnen mit den aktuellen Parametern aus dem Reiter Modell.</p>${p.model!=='lv'?'<div class="warn">Aktuell ist ein erweitertes Modell eingestellt. Die Regeln gelten für das klassische Modell: Beim Laden eines Experiments wird es zurückgesetzt.</div>':''}</div>`;
+  h+=`<div class="card"><h2>Regel 1: Periodische Schwankung</h2><div class="rule"><b>Die Individuenzahlen von Räuber und Beute schwanken periodisch. Das Maximum der Räuber folgt dem der Beute mit Verzögerung.</b></div>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="rule" data-n="1">Experiment laden</button></div>
+  <div class="kpis"><div><b>${st.period?de(st.period,1):'–'}</b><small>Periode, gemessen</small></div><div><b>${S.cls.T0?de(S.cls.T0,1):'–'}</b><small>Periode nach T ≈ 2π/√(a·d), gilt für kleine Schwankungen</small></div><div><b>${st.lag!=null?de(st.lag,1):'–'}</b><small>Verzögerung Räubermaximum</small></div><div><b>${st.lagFrac!=null?de(st.lagFrac,2):'–'}</b><small>Verzögerung als Bruchteil der Periode (bei kleinen Schwankungen genau ¼)</small></div></div>
+  <p class="note">Beobachte: Zuerst wächst die Beute (Räuber selten), dann folgen die Räuber, dann bricht die Beute ein, und schließlich verhungern die Räuber. Schalte im Reiter Modell „Phasen I bis IV markieren“ ein, um die Abschnitte zu sehen. Ändere a und d: Die Periode hängt von beiden ab.</p></div>`;
+  h+=`<div class="card"><h2>Regel 2: Konstanz der Mittelwerte</h2><div class="rule"><b>Über eine Periode gemittelt bleiben die Individuenzahlen gleich. Die Mittelwerte hängen nicht von den Startwerten ab.</b></div>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="rule" data-n="2">Experiment laden (drei Startwerte)</button></div>`;
+  if(E){ const rows=[]; const starts=[[p.x0,p.y0],[E.x*0.9,E.y*0.85],[E.x*1.4,E.y*1.5]];
+    starts.forEach((s0,i)=>{ const sm=i===0?clean:integrate(Object.assign({},p,{x0:s0[0],y0:s0[1]}),{}); const q=cycleStats(sm,E,0,p.T); rows.push(`<tr><td>Lauf ${i+1}</td><td class="n">${fn(s0[0])} | ${fn(s0[1])}</td><td class="n">${fn(q.mx)}</td><td class="n">${fn(q.my)}</td><td class="n">${q.period?de(q.period,1):'–'}</td></tr>`); });
+    h+=`<div class="tscroll"><table class="tbl"><thead><tr><th>Lauf</th><th class="n">Start (Beute | Räuber)</th><th class="n">Mittel Beute</th><th class="n">Mittel Räuber</th><th class="n">Periode</th></tr></thead><tbody>${rows.join('')}<tr><td><b>Gleichgewicht</b></td><td class="n">–</td><td class="n"><b>${fn(E.x)}</b></td><td class="n"><b>${fn(E.y)}</b></td><td class="n">–</td></tr></tbody></table></div>`; }
+  h+=`<p class="note">Beobachte im Phasendiagramm: Die Bahnen sind geschlossen und liegen ineinander um dasselbe Gleichgewicht E. Die Mittelwerte sind in allen Läufen gleich, nur die Periode ist verschieden. Begründung: Mittelt man dx/dt = 0 und dy/dt = 0 über eine Periode, erhält man y = a/b und x = d/(c·b).</p></div>`;
+  h+=`<div class="card"><h2>Regel 3: Störung der Mittelwerte</h2><div class="rule"><b>Werden beide Arten gleichmäßig dezimiert, steigt der Mittelwert der Beute und sinkt der Mittelwert der Räuber.</b></div>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="rule" data-n="3">Experiment laden (Insektizid)</button></div>`;
+  { const hv=S.harv.on?S.harv:{on:true,h:0.2,t0:60,t1:null}, p3=Object.assign({},p,{T:Math.max(p.T,hv.t0+40)}); const sm=integrate(p3,{harv:hv}), E2=equilibrium(p3,hv.h);
+    const pre=cycleStats(sm,E,0,hv.t0), post=cycleStats(sm,E2||E,hv.t0,hv.t1==null?p3.T:hv.t1);
+    h+=`<p class="note" style="margin-top:0">Gerechnet: beide Arten verlieren zusätzlich mit der Rate h = ${de(hv.h,2)} ab t = ${hv.t0}${hv.t1!=null?' bis t = '+hv.t1:''}.</p><div class="tscroll"><table class="tbl"><thead><tr><th></th><th class="n">vor dem Eingriff</th><th class="n">nach dem Eingriff</th><th class="n">Theorie danach</th><th>Änderung</th></tr></thead><tbody>
+    <tr><td><span class="pb"><b>Beute</b></span></td><td class="n">${fn(pre.mx)}</td><td class="n">${fn(post.mx)}</td><td class="n">${E2?fn(E2.x):'–'}</td><td>${arrow(pre.mx,post.mx)}</td></tr>
+    <tr><td><span class="pr"><b>Räuber</b></span></td><td class="n">${fn(pre.my)}</td><td class="n">${fn(post.my)}</td><td class="n">${E2?fn(E2.y):'–'}</td><td>${arrow(pre.my,post.my)}</td></tr></tbody></table></div>
+    <p class="note">Mittelwerte jeweils über volle Zyklen. Theorie: x* = (d + h)/(c·b) und y* = (a − h)/b. Ein Breitband-Insektizid, das Schädling (Beute) und Nützling (Räuber) im gleichen Verhältnis trifft, kann den Schädling im Mittel also fördern.</p>`; }
+  h+='</div>';
+  $('#pane-rules').innerHTML=h;
+}
+
+/* =============== Reiter: Zufall =============== */
+const OMS=[0.5,1,2,4,8];
+function renderChance(){
+  const t=S.st, run=stochNow(), b=t.batch&&t.batch.stamp===S.stamp+'|'+t.Om?t.batch:null; let h='';
+  h+=`<div class="card"><h2>Zufall und kleine Populationen</h2><p class="lead">Das Modell rechnet mit glatten Kurven. In der Natur sterben, gebären und fressen Einzeltiere zufällig. Hier läuft dieselbe Modellwelt Tier für Tier. Bei kleinen Populationen kann eine Art durch Zufall aussterben, obwohl die Kurven oben Zyklen zeigen.</p>
+  <h3>Populationsgröße</h3><div class="seg" role="group" aria-label="Populationsgröße">${OMS.map(o=>`<button type="button" data-act="om" data-o="${o}" aria-pressed="${t.Om===o}">${o===1?'1× (Start '+Math.round(S.p.x0)+' | '+Math.round(S.p.y0)+')':o+'×'}</button>`).join('')}</div>
+  <p class="note">Bei Faktor n starten ${Math.round(S.p.x0*t.Om)} Beutetiere und ${Math.round(S.p.y0*t.Om)} Räuber. Die Dichten und damit die mittleren Kurven bleiben gleich, nur die Zahl der Einzeltiere wächst.</p>
+  <div class="btnrow"><button type="button" class="btn primary" data-act="stochrun">Zufallslauf zeigen</button><button type="button" class="btn" data-act="stochnew">Anderer Zufall</button><button type="button" class="btn" data-act="stochbatch" ${t.busy?'disabled':''}>100 Läufe: Aussterberisiko</button></div>
+  <p class="note"><b>Es gilt der aktuelle Lauf aus dem Reiter Modell:</b> ${MODELN[S.p.model]}, a = ${de(S.p.a,2)}, b = ${de(S.p.b,3)}, c = ${de(S.p.c,2)}, d = ${de(S.p.d,2)}, Dauer ${S.p.T}${S.p.R?', Rückzugsraum '+S.p.R:''}${S.harv.on?', Dezimierung h = '+de(S.harv.h,2)+' ab t = '+S.harv.t0:''}${S.events.length?', '+S.events.length+' Ereignis(se)':''}.</p>
+  <p class="note">Startwert des Zufalls: ${t.seed}. Im Messfenster: dicke gestrichelte Linien = glattes Modell, dünne Linien = Zufallslauf.</p>`;
+  if(run){ const o=run.out; h+=`<div class="fb ${o===0?'ok':'no'}" role="status">${o===0?'In diesem Lauf überleben beide Arten bis t = '+S.p.T+'.':o===1?'In diesem Lauf sterben die Räuber bei t = '+de(run.tExt,1)+' aus.':'In diesem Lauf stirbt die Beute bei t = '+de(run.tExt,1)+' aus (danach verhungern die Räuber).'}</div>`; }
+  if(t.busy) h+=`<div class="prog" aria-hidden="true"><i id="prog"></i></div><p class="note">Rechnet …</p>`;
+  if(b){ const n=b.n; h+=`<h3>Ergebnis von ${n} Läufen (Faktor ${t.Om}×)</h3>${barsHTML([['Beide überleben',b.c[0]/n,'var(--ok)'],['Räuber sterben aus',b.c[1]/n,'var(--pred)'],['Beute stirbt aus',b.c[2]/n,'var(--prey)']])}<p class="note">${b.med!=null?'Mittleres Aussterben nach etwa t = '+de(b.med,0)+' (Median der Läufe mit Aussterben). ':''}Je größer die Population, desto seltener stirbt eine Art zufällig aus. ${S.p.R>0?'Mit Rückzugsraum R = '+S.p.R+' ist die Beute besser geschützt.':'Probiere im Reiter Modell einen Rückzugsraum R aus und wiederhole die 100 Läufe.'}</p>`; }
+  h+='</div>';
+  h+=`<div class="card"><h2>Was das zeigt</h2><ul class="plain"><li>Im klassischen Modell haben Zyklen keinen Halt: Zufall verschiebt Bahn und Schwankungsbreite, bis eine Art an den Rand gerät.</li><li>Kleine Populationen sind deshalb stärker vom Aussterben bedroht (Artenschutz: Mindestgröße von Populationen).</li><li>Rückzugsräume und Kapazitätsgrenzen verringern das Risiko im Modell deutlich. Prüfe das mit den Szenarien „Rückzugsraum“ und „Kapazitätsgrenze“.</li></ul></div>`;
+  $('#pane-chance').innerHTML=h;
+}
+function runStoch(){ S.st.run=Object.assign(gillespie(S.p,{harv:S.harv.on?S.harv:null,events:S.events},S.st.Om,S.st.seed,true),{stamp:S.stamp}); }
+function runBatch(){
+  const t=S.st; if(t.busy) return; t.busy=true; const n=100, c=[0,0,0], ext=[]; let i=0; const stamp=S.stamp+'|'+t.Om, opts={harv:S.harv.on?S.harv:null,events:S.events};
+  renderChance();
+  const chunk=()=>{ const t0=performance.now(); while(i<n&&performance.now()-t0<30){ const r=gillespie(S.p,opts,t.Om,5000+i*7+t.seed,false); c[r.out]++; if(r.tExt!=null) ext.push(r.tExt); i++; } const pr=$('#prog'); if(pr) pr.style.width=Math.round(i/n*100)+'%'; if(i<n) setTimeout(chunk,0); else { ext.sort((a,b)=>a-b); t.batch={c,n,med:ext.length?ext[Math.floor(ext.length/2)]:null,stamp}; t.busy=false; if(S.tab==='chance') renderChance(); } };
+  setTimeout(chunk,0);
+}
+
+/* =============== Reiter: Daten =============== */
+const EXAMPLE_TXT='Jahr;Beute;Räuber\n0;80;14\n1;105;12\n2;150;12\n3;210;16\n4;240;26\n5;200;40\n6;120;43\n7;70;34\n8;52;23\n9;55;16\n10;75;12';
+function setData(d,mode){
+  S.data=d; S.dataMode=mode; const T=Math.max(10,Math.ceil(d.t[d.t.length-1]/5)*5);
+  S.p=Object.assign(copyP(PDEF),{model:'lv',T,x0:Math.round(d.x[0]),y0:Math.max(1,Math.round(d.y[0]))}); S.harv={on:false,h:0.2,t0:30,t1:null}; S.events=[]; S.nest=null; S.ghost=null; S.preset=''; S.reveal=false; S.fit=null;
+  const m=d.x.reduce((a,b)=>a+b,0)/d.x.length, my=d.y.reduce((a,b)=>a+b,0)/d.y.length, T0=guessPeriod(d)||10, w=2*Math.PI/T0; S.p.a=clamp(Math.round(w*20)/20,0.1,2); S.p.d=clamp(Math.round(w*20)/20,0.1,1.5); S.p.b=clamp(Math.round(S.p.a/my/0.005)*0.005,0.005,0.1); S.p.c=clamp(Math.round(S.p.d/(S.p.b*m)/0.01)*0.01,0.02,0.5);
+  S.tcur=0; stopPlay(); recompute();
+}
+function newChallenge(){ const seed=Math.floor(Math.random()*9000)+1; const ch=makeChallenge(seed); S.chal=ch; S.chal.seed=seed; setData(ch.data,'chal'); }
+function devVerdict(e){ if(e==null) return ''; return e<=0.10?['ok','Sehr gut: Die Abweichung liegt im Bereich des Messrauschens.']:e<=0.18?['ok','Gut: Die Kurven stimmen im Wesentlichen überein.']:e<=0.30?['tip','Grob: Periode und Höhe passen noch nicht.']:['no','Noch weit entfernt: Beginne mit der Periode (a·d) und den Mittelwerten (a/b und d/(c·b)).']; }
+function renderData(){
+  const d=S.data, p=S.p; let h='';
+  h+=`<div class="card"><h2>Modell und Messdaten</h2><p class="lead">Lege Messwerte neben die Modellkurven und passe die Parameter an. Das gilt für das klassische Modell. Messwerte sind in der Regel Zählungen oder Schätzungen, deshalb streuen sie.</p>
+  <div class="seg" role="group" aria-label="Datenquelle"><button type="button" data-act="dsrc" data-m="chal" aria-pressed="${S.dataMode==='chal'}">Übungsdaten (künstlich)</button><button type="button" data-act="dsrc" data-m="user" aria-pressed="${S.dataMode==='user'}">Eigene Daten einfügen</button></div>`;
+  if(S.dataMode==='user'||!S.dataMode&&false) {}
+  if(S.dataMode==='user') h+=`<label class="fl" for="dtxt">Messwerte: Zeit; Beute; Räuber (eine Zeile je Messung)<small>Trennzeichen Semikolon, Tabulator oder Leerzeichen. Dezimalkomma ist erlaubt. Kopfzeilen werden übersprungen.</small></label><textarea id="dtxt" data-dtxt="1" spellcheck="false" placeholder="0;80;14&#10;1;105;12">${esc(S.dtxt)}</textarea><div class="btnrow"><button type="button" class="btn primary" data-act="duse">Daten übernehmen</button><button type="button" class="btn" data-act="dex">Beispiel einfügen</button></div><div id="dmsg"></div><div class="warn">Verwende nur Zahlen aus Büchern, Aufgaben oder eigenen Zählungen, die du verwenden darfst. Es werden keine Daten gespeichert.</div>`;
+  if(S.dataMode==='chal') h+=`<div class="btnrow"><button type="button" class="btn primary" data-act="newchal">Neue Übungsdaten</button></div><p class="note">Die Daten stammen aus einem versteckten Modelllauf mit etwa 7 % Messrauschen. Finde die Parameter.</p>`;
+  h+='</div>';
+  if(d){
+    const mx=d.x.reduce((a,b)=>a+b,0)/d.x.length, my=d.y.reduce((a,b)=>a+b,0)/d.y.length, Tg=guessPeriod(d); const v=devVerdict(S.dev);
+    h+=`<div class="card"><h2>Anpassung</h2><div class="kpis"><div><b><span class="pb">${fn(mx)}</span> | <span class="pr">${fn(my)}</span></b><small>Mittelwerte der Daten</small></div><div><b>${Tg?de(Tg,1):'–'}</b><small>Periode der Daten (geschätzt)</small></div><div><b>${d.t.length}</b><small>Messpunkte</small></div><div><b id="devv">${S.dev!=null?de(S.dev*100,0)+' %':'–'}</b><small>Abweichung Modell–Daten (RMSE relativ)</small></div></div>
+    <div id="devfb">${v?`<div class="fb ${v[0]}" role="status">${v[1]}</div>`:''}</div>
+    <div class="rule" style="margin-top:10px"><b>Tipps:</b> Periode T ≈ 2π/√(a·d). Mittelwert Räuber ≈ a/b. Mittelwert Beute ≈ d/(c·b). Nutze danach die Startwerte und Feinheiten.</div>
+    <div class="grid2">${['a','b','c','d','x0','y0'].map(k=>slider(k)).join('')}</div>
+    <div class="btnrow"><button type="button" class="btn primary" data-act="fit">Automatisch anpassen</button>${S.dataMode==='chal'?`<button type="button" class="btn" data-act="reveal">Versteckte Parameter zeigen</button>`:''}</div>`;
+    if(S.fit) h+=`<div class="fb info" role="status">Automatische Anpassung: a = ${de(S.fit.a,2)}, b = ${de(S.fit.b,3)}, c = ${de(S.fit.c,2)}, d = ${de(S.fit.d,2)}, Start ${fn(S.fit.x0)} | ${fn(S.fit.y0)}. Abweichung ${de(S.fit.err*100,0)} %. Die Regler wurden darauf gesetzt.</div>`;
+    if(S.reveal&&S.chal) h+=`<div class="fb tip" role="status">Versteckte Parameter: a = ${de(S.chal.par.a,2)}, b = ${de(S.chal.par.b,3)}, c = ${de(S.chal.par.c,2)}, d = ${de(S.chal.par.d,2)}, Start ${fn(S.chal.par.x0)} | ${fn(S.chal.par.y0)}. Selbst die richtigen Werte erreichen wegen des Rauschens nur etwa ${de(nrmse(S.chal.par,d)*100,0)} %.</div>`;
+    h+=`<p class="note">Beurteile die Aussagekraft: Eine gute Anpassung beweist nicht, dass das Modell die Ursache der Zyklen beschreibt. Andere Modelle können ähnliche Kurven erzeugen.</p></div>`;
+    h+=`<div class="card"><details class="mode"><summary>Datentabelle</summary><div class="tscroll" style="max-height:240px;overflow:auto"><table class="tbl"><thead><tr><th class="n">Zeit</th><th class="n">Beute</th><th class="n">Räuber</th></tr></thead><tbody>${d.t.map((t,i)=>`<tr><td class="n">${de(t,1)}</td><td class="n">${fn(d.x[i])}</td><td class="n">${fn(d.y[i])}</td></tr>`).join('')}</tbody></table></div></details></div>`;
+  } else h+=`<div class="card"><p class="note">Wähle oben eine Datenquelle. Danach erscheinen die Messwerte als Punkte im Messfenster.</p></div>`;
+  $('#pane-data').innerHTML=h;
+}
+function updateDevLive(){ const e=$('#devv'); if(e&&S.dev!=null) e.textContent=de(S.dev*100,0)+' %'; const v=devVerdict(S.dev); const f=$('#devfb'); if(f&&v) f.innerHTML=`<div class="fb ${v[0]}" role="status">${v[1]}</div>`; }
+
+/* =============== Reiter: Üben (Prognose) =============== */
+const POE=[
+ {id:1,t:'Ein Breitband-Insektizid tötet Schädlinge (Beute) und Nützlinge (Räuber) im gleichen Verhältnis.',q:'Wie verändern sich die Mittelwerte?',opts:['Beide Mittelwerte sinken.','Beute-Mittelwert steigt, Räuber-Mittelwert sinkt.','Beute-Mittelwert sinkt, Räuber-Mittelwert steigt.'],ok:1,
+  mod:()=>({harv:{on:true,h:0.2,t0:0,t1:null}}),why:'Regel 3 (Volterra-Prinzip): Die Räuber verlieren zusätzlich Tiere und haben weniger Nachwuchs, die Beute profitiert von den wenigen Räubern. Im Gleichgewicht: x* = (d + h)/(c·b) steigt, y* = (a − h)/b sinkt.'},
+ {id:2,t:'Die Räuber werden stärker bejagt: Ihre Sterberate steigt von 0,5 auf 0,8.',q:'Was passiert mit dem Mittelwert der Beute?',opts:['Er sinkt.','Er bleibt gleich.','Er steigt.'],ok:2,
+  mod:()=>({p:{d:0.8}}),why:'Mit x* = d/(c·b) steigt der Beute-Mittelwert. Der Räuber-Mittelwert y* = a/b bleibt gleich: Im Modell hängt er nicht von der Räubersterberate ab.'},
+ {id:3,t:'Die Beute wird bejagt: Ihre Wachstumsrate sinkt von 0,8 auf 0,5.',q:'Was passiert mit dem Mittelwert der Räuber?',opts:['Er sinkt.','Er bleibt gleich.','Er steigt.'],ok:0,
+  mod:()=>({p:{a:0.5}}),why:'y* = a/b sinkt mit a. Der Beute-Mittelwert x* = d/(c·b) bleibt gleich: Weniger Beutenachwuchs trifft vor allem die Räuber.'},
+ {id:4,t:'Die Räuber werden effizienter: Die Fangrate steigt von 0,04 auf 0,06.',q:'Wie verändern sich die Mittelwerte?',opts:['Beide sinken.','Beute sinkt, Räuber steigen.','Beide steigen.'],ok:0,
+  mod:()=>({p:{b:0.06}}),why:'x* = d/(c·b) und y* = a/b sinken beide mit größerem b. Effizientere Räuber erschöpfen ihre Nahrung: Beute wird knapp, Räuber verhungern häufiger.'},
+ {id:5,t:'Die Beute findet bessere Nahrung: Ihre Wachstumsrate steigt von 0,8 auf 1,2.',q:'Wer profitiert im Mittel?',opts:['Die Beute.','Die Räuber.','Beide gleich stark.'],ok:1,
+  mod:()=>({p:{a:1.2}}),why:'y* = a/b steigt, x* = d/(c·b) bleibt gleich. Mehr Nahrung für die Beute kommt im Mittel bei den Räubern an. Außerdem werden die Zyklen schneller.'},
+ {id:6,t:'Die Beute hat nun eine Kapazitätsgrenze K = 300 (logistisches Wachstum).',q:'Wie verlaufen die Schwankungen?',opts:['Sie bleiben dauerhaft gleich groß.','Sie klingen ab, bis sich ein Gleichgewicht einstellt.','Sie wachsen immer weiter an.'],ok:1,
+  mod:()=>({p:{model:'log',K:300,T:80}}),why:'Die Kapazitätsgrenze bremst die Beute bei hohen Zahlen. Das dämpft die Schwingung: stabiler Strudel (Spirale) im Phasendiagramm.'},
+ {id:7,t:'Im Jahr 20 sterben durch einen Frost 60 % der Beute. Danach läuft alles wie vorher.',q:'Was gilt langfristig für die Mittelwerte?',opts:['Sie bleiben dauerhaft niedriger.','Sie bleiben gleich, nur die Schwankungen werden anders.','Die Beute erholt sich nie.'],ok:1,
+  mod:()=>({events:[{t:20,kx:0.4,ky:1}],p:{T:120}}),why:'Im klassischen Modell springt das System auf eine andere Bahn um dasselbe Gleichgewicht. Die Mittelwerte sind durch die Parameter festgelegt, nur Höhe und Periode der Zyklen ändern sich.'}
+];
+function poeRun(sc){
+  const base=copyP(PDEF); base.T=120; const ch=sc.mod(); const p2=Object.assign(copyP(base),ch.p||{}); if(p2.T<120&&!ch.p) p2.T=120;
+  const sim0=integrate(base,{}), sim1=integrate(p2,{harv:ch.harv||null,events:ch.events||[]});
+  const E0=equilibrium(base,0), E1=equilibrium(p2,ch.harv&&ch.harv.on?ch.harv.h:0);
+  const w=ch.events?[ch.events[0].t,120]:[0,120];
+  const a=cycleStats(sim0,E0,ch.events?ch.events[0].t:0,120), b=cycleStats(sim1,E1,w[0],w[1]);
+  const pre=ch.events?cycleStats(sim1,E0,0,ch.events[0].t):null;
+  return {sim0,sim1,p:p2,a,b,pre,harv:ch.harv,events:ch.events};
+}
+function renderTrain(){
+  let h=`<div class="card"><h2>Prognose: Was passiert, wenn …?</h2><p class="lead">Entscheide zuerst, dann rechnet die App. So testest du deine Vorstellung vom Modell. Das Ergebnis mit Zahlen und Kurven erscheint direkt unter jeder Aufgabe.</p>${S.score.n?`<span class="badge info">Richtig: ${S.score.ok} von ${S.score.n}</span>`:''}</div>`;
+  POE.forEach(sc=>{ const st=S.poe[sc.id];
+    h+=`<div class="card"><h3 style="margin-top:0">Aufgabe ${sc.id}</h3><p style="margin:2px 0">${esc(sc.t)}</p><p style="margin:6px 0"><b>${esc(sc.q)}</b></p>${sc.opts.map((o,i)=>`<button type="button" class="opt${st?(i===sc.ok?' right':i===st.choice?' wrong':''):''}" data-act="poe" data-id="${sc.id}" data-i="${i}" ${st?'disabled':''}>${esc(o)}</button>`).join('')}`;
+    if(st){ const r=st.res; const ok=st.choice===sc.ok;
+      h+=`<div class="fb ${ok?'ok':'no'}" role="status">${ok?'Richtig. ':'Nicht ganz. '}${esc(sc.why)}</div><div class="tscroll"><table class="tbl"><thead><tr><th></th><th class="n">Grundlauf</th><th class="n">${sc.id===7?'mit Frost (nach t = 20)':'verändert'}</th><th>Änderung</th></tr></thead><tbody><tr><td><span class="pb"><b>Beute (Mittel)</b></span></td><td class="n">${fn(r.a.mx)}</td><td class="n">${fn(r.b.mx)}</td><td>${arrow(r.a.mx,r.b.mx)}</td></tr><tr><td><span class="pr"><b>Räuber (Mittel)</b></span></td><td class="n">${fn(r.a.my)}</td><td class="n">${fn(r.b.my)}</td><td>${arrow(r.a.my,r.b.my)}</td></tr><tr><td>Schwankung Beute</td><td class="n">${fn(r.a.xmin)}–${fn(r.a.xmax)}</td><td class="n">${fn(r.b.xmin)}–${fn(r.b.xmax)}</td><td></td></tr></tbody></table></div><div class="legendrow"><span><i style="border-color:var(--ink-soft);border-top-style:dashed"></i>Grundlauf</span><span><i style="border-color:var(--prey)"></i>Beute (verändert)</span><span><i style="border-color:var(--pred)"></i>Räuber (verändert)</span></div><div class="chartbox" data-chart="poe${sc.id}"></div>`; }
+    h+='</div>'; });
+  $('#pane-train').innerHTML=h;
+}
+function fillPoeCharts(){ $$('[data-chart^="poe"]').forEach(el=>{ const id=+el.dataset.chart.slice(3), st=S.poe[id]; if(!st) return; const W=Math.max(280,Math.round(el.clientWidth||320)); const r=st.res; el.innerHTML=renderTime(W,200,{p:r.p,sim:r.sim1,harv:r.harv,events:r.events||[],ghost:r.sim0,eq0:null,eqH:null,show:{means:false,phases:false,dual:true},tcur:0,cursor:false}).svg; }); }
+
+/* =============== Reiter: Info und Aufgaben =============== */
+const GLOS=[
+ ['Räuber-Beute-Beziehung','Wechselbeziehung zweier Arten: Räuber (Prädatoren) fressen Beutetiere. Die Zahl der Räuber hängt von der Beute ab, die Zahl der Beute von den Räubern.'],
+ ['Lotka-Volterra-Modell','Einfaches Modell mit zwei gekoppelten Differenzialgleichungen. Es liefert periodische Schwankungen beider Arten.'],
+ ['Gleichgewicht (Ruhelage)','Zustand, in dem beide Zahlen konstant bleiben (dx/dt = 0 und dy/dt = 0). Im klassischen Modell: Beute x* = d/(c·b), Räuber y* = a/b.'],
+ ['Phasendiagramm','Diagramm, in dem Räuberzahl gegen Beutezahl aufgetragen ist. Die Zeit steckt in der Richtung der Bahn.'],
+ ['Nullkline','Linie, auf der sich eine Zahl momentan nicht ändert. Dort, wo sich die Nullklinen schneiden, liegt das Gleichgewicht.'],
+ ['Periode','Dauer eines vollständigen Zyklus von einem Maximum der Beute zum nächsten.'],
+ ['neutral stabil','Nach einer Störung kehrt das System nicht zum alten Zustand zurück, entfernt sich aber auch nicht: Es läuft auf einer neuen geschlossenen Bahn.'],
+ ['Kapazität K','Höchste Individuenzahl, die ein Lebensraum dauerhaft trägt (begrenzende Faktoren wie Nahrung, Raum).'],
+ ['funktionelle Antwort, Sättigung','Wie viel Beute ein Räuber pro Zeit frisst. Bei hoher Beutedichte ist er satt: Die Fressrate steigt nicht weiter (Holling Typ II).'],
+ ['Paradox der Anreicherung','Mehr Nahrung für die Beute kann das System instabil machen: Die Schwankungen werden größer, die Aussterbegefahr steigt.'],
+ ['Rückzugsraum (Refugium)','Bereich oder Zahl von Beutetieren, die Räuber nicht erreichen. Er verhindert, dass die Beute ganz ausgerottet wird.'],
+ ['demografische Zufälligkeit','Zufällige Schwankungen durch einzelne Geburten und Todesfälle. Sie sind bei kleinen Populationen wichtig.']
+];
+const ITASKS=[
+ {afb:'I',t:'Regeln nennen',p:6,op:'Nenne',text:'Nenne die drei Lotka-Volterra-Regeln in eigenen Worten.',load:'rules',sol:['Regel 1: Die Individuenzahlen von Räuber und Beute schwanken periodisch, die Räuber verzögert (2 P).','Regel 2: Die Mittelwerte über eine Periode sind konstant und hängen nicht von den Startwerten ab (2 P).','Regel 3: Werden beide Arten gleichmäßig dezimiert, steigt der Beute-Mittelwert und sinkt der Räuber-Mittelwert (2 P).']},
+ {afb:'I',t:'Kurven beschreiben',p:6,op:'Beschreibe',text:'Beschreibe den Zeitverlauf im Grundmodell und benenne die vier Phasen eines Zyklus.',load:'rule1',sol:['Beide Zahlen schwanken periodisch, das Räubermaximum folgt dem Beutemaximum mit zeitlichem Abstand (2 P).','Phase I: Beute wächst, Räuber nehmen ab. Phase II: beide wachsen (2 P).','Phase III: Beute nimmt ab, Räuber wachsen noch. Phase IV: beide nehmen ab (2 P).']},
+ {afb:'II',t:'Verzögerung erklären',p:7,op:'Erkläre',text:'Erkläre, warum das Räubermaximum zeitlich nach dem Beutemaximum liegt.',load:'rule1',sol:['Viele Beutetiere bedeuten viel Nahrung, die Räuber vermehren sich aber erst mit Verzögerung (Fortpflanzung braucht Zeit) (3 P).','Zum Zeitpunkt des Beutemaximums wachsen die Räuber noch, deshalb sinkt die Beute danach (2 P).','Erst wenn die Beute knapp wird, nehmen auch die Räuber ab (2 P).']},
+ {afb:'II',t:'Mittelwerte begründen',p:7,op:'Begründe',text:'Begründe mit den Gleichungen, warum die Mittelwerte nicht von den Startwerten abhängen.',load:'rule2',sol:['Im Gleichgewicht gilt dx/dt = 0 und dy/dt = 0 (2 P).','Aus a·x − b·x·y = 0 folgt y* = a/b, aus c·b·x·y − d·y = 0 folgt x* = d/(c·b) (3 P).','Die Mittelwerte über eine Periode sind gleich diesen Werten, sie enthalten keine Startwerte (2 P).']},
+ {afb:'II',t:'Volterra-Prinzip',p:6,op:'Erkläre',text:'Erkläre am Beispiel eines Breitband-Insektizids, warum ein Schädling durch die Bekämpfung zunehmen kann.',load:'rule3',sol:['Das Mittel trifft Schädling (Beute) und Nützling (Räuber) im gleichen Verhältnis (1 P).','Die Räuber sinken stärker, weil sie sich langsamer vermehren: y* = (a − h)/b (2 P).','Der Schädling hat weniger Fressfeinde und nimmt im Mittel zu: x* = (d + h)/(c·b) (3 P).']},
+ {afb:'III',t:'Modell beurteilen',p:8,op:'Beurteile',text:'Beurteile das klassische Modell. Nenne unrealistische Annahmen und zeige mit den Szenarien Kapazitätsgrenze, Anreicherung und Zufall, wie sich das Bild verändert.',load:'cap',sol:['Annahmen: unbegrenztes Beutewachstum, unbegrenzte Fressleistung der Räuber, keine Zufallsschwankungen, gleichmäßige Umwelt, konstante Parameter, keine Alternativnahrung (3 P).','Kapazitätsgrenze: Schwankungen klingen ab (1 P). Sättigung und hohe Kapazität: große dauerhafte Schwankungen, Paradox der Anreicherung (2 P).','Zufall: Kleine Populationen sterben aus (1 P). Fazit: Das Modell zeigt Prinzipien, ist aber keine Prognose für reale Populationen (1 P).']},
+ {afb:'III',t:'Daten auswerten',p:7,op:'Werte aus',text:'Passe das Modell an die Übungsdaten an. Beurteile die Güte der Anpassung und die Aussagekraft für Vorhersagen.',load:'data',sol:['Vorgehen: Periode aus a·d, Mittelwerte aus a/b und d/(c·b) schätzen, dann Feinabstimmung (2 P).','Güte: Abweichung im Bereich des Messrauschens ist das Beste, was möglich ist (2 P).','Grenzen: Gute Anpassung beweist nicht die Ursache, andere Modelle passen ähnlich, kurze Reihen mit wenigen Zyklen sind unsicher (3 P).']},
+ {afb:'III',t:'Eingriffe bewerten',p:7,op:'Bewerte',text:'Bewerte Eingriffe wie Schädlingsbekämpfung oder Bejagung von Räubern. Nutze die Prognoseaufgaben.',load:'train',sol:['Gleichmäßige Dezimierung kann die Beute fördern, Räuber verlieren (2 P).','Bejagung der Räuber erhöht den Beute-Mittelwert, im Modell ändert sie den Räuber-Mittelwert nicht (2 P).','Bewertung: Eingriffe haben Nebenwirkungen auf das ganze System, Folgen für Artenvielfalt und Nachhaltigkeit, Modelle sind nur Hinweise (3 P).']}
+];
+function renderInfo(){
+  let h=`<div class="card"><h2>Gleichungen</h2><div class="eqn">dx/dt = a·x − b·x·y<br>dy/dt = c·b·x·y − d·y</div><p class="note">x Beute, y Räuber. a: Wachstumsrate der Beute, b: Fangrate, c: Umsetzung der gefressenen Beute in Räubernachwuchs, d: Sterberate der Räuber. Gleichgewicht: x* = d/(c·b), y* = a/b. Periode bei kleinen Schwankungen: T ≈ 2π/√(a·d). Die Zahlen sind Modellwerte und haben keine Einheit.</p></div>`;
+  h+=`<div class="card"><h2>Annahmen und Grenzen</h2><ul class="plain"><li>Die Beute findet unbegrenzt Nahrung und wächst exponentiell, solange keine Räuber da sind (im klassischen Modell).</li><li>Räuber fressen nur diese Beute, werden nie satt und reagieren sofort auf Nahrung (ohne Zeitverzögerung durch Altersstruktur).</li><li>Begegnungen sind zufällig und gleichmäßig verteilt, die Umwelt bleibt konstant.</li><li>Die Populationen sind groß genug, dass Zufall keine Rolle spielt (im Reiter Zufall wird das aufgehoben).</li><li>Das Modell zeigt Prinzipien. Reale Zyklen entstehen oft durch mehrere Ursachen zugleich. Die Zahlen sind keine Vorhersagen über echte Populationen.</li></ul></div>`;
+  h+=`<div class="card"><h2>Begriffe</h2><dl class="gl">${GLOS.map(([t,d])=>`<dt>${esc(t)}</dt><dd>${esc(d)}</dd>`).join('')}</dl></div>`;
+  h+=`<div class="card"><h2>Aufgaben</h2><p class="note">Die Punktzahlen sind ein Vorschlag. Notengebung und Bewertungsmaßstab richten sich nach den Beschlüssen eurer Fachkonferenz.</p>`;
+  ITASKS.forEach((t,i)=>{ h+=`<details class="task"><summary><span class="badge">AFB ${t.afb}</span>${i+1}. ${esc(t.t)} <span class="badge">${t.p} P</span></summary><p><b>${t.op}:</b> ${esc(t.text)}</p><div class="btnrow"><button type="button" class="btn sm" data-act="itask" data-load="${t.load}">Passende Einstellung laden</button></div><details><summary style="cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:700">Erwartungshorizont</summary><div class="sol"><ul class="plain">${t.sol.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></details></details>`; });
+  h+='</div>';
+  h+=`<div class="card"><details class="mode"><summary>Hinweise für die Lehrkraft</summary><p><b>Einsatz:</b> Einstieg mit dem Grundmodell (Zeitverlauf und Phasen), Erarbeitung der Regeln im Reiter Regeln, Vertiefung mit den Prognoseaufgaben (Vorhersage, dann Rechnung), Modellkritik mit Kapazitätsgrenze, Anreicherung und Zufall.</p><p><b>Typische Fehlvorstellungen:</b> „Die Räuber fressen die Beute auf“; „der Zyklus ist ein Zufall“; „Mittelwert und Maximum sind dasselbe“; „Beute und Räuber schwanken gleichzeitig“; „Ein Eingriff ändert die Mittelwerte immer in die erwartete Richtung“.</p><p><b>Einordnung:</b> Die Zuordnung zu Kompetenzbereichen (Fachwissen, Erkenntnisgewinnung, Kommunikation, Bewertung) und zu den Themenschwerpunkten des Zentralabiturs musst du am aktuellen Kerncurriculum und an den Vorgaben auf nibis.de prüfen. Die Benennung der Regeln kann je nach Schulbuch abweichen.</p><p><b>Bewertung:</b> Die Punktevorschläge sind unverbindlich. Notengebung bleibt deine Verantwortung und folgt den Fachkonferenzbeschlüssen.</p><p><b>Datenschutz:</b> Die App speichert nichts. Eigene Daten bleiben im Browser.</p></details></div>`;
+  $('#pane-info').innerHTML=h;
+}
+
+/* =============== Steuerung =============== */
+function renderTab(){ ({model:renderModel,rules:renderRules,chance:renderChance,data:renderData,train:renderTrain,info:renderInfo}[S.tab])(); requestAnimationFrame(()=>{ if(S.tab==='train') fillPoeCharts(); if(S.tab==='model') drawScene(); }); }
+function showTab(t){
+  S.tab=t; if(t!=='model') {} $$('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['model','rules','chance','data','train','info'].forEach(k=>{ $('#pane-'+k).hidden=k!==t; });
+  const vis=!(t==='train'||t==='info'); $('#viewer').hidden=!vis; if(!vis) stopPlay();
+  if(t==='data'&&S.p.model!=='lv'){ S.p.model='lv'; recompute(); }
+  renderTab(); if(vis) drawCharts(); window.scrollTo({top:0});
+}
+const PKEYS=['a','b','c','d','x0','y0','T','K','th','R'];
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='scrub'){ stopPlay(); setT(t.value/1000*S.p.T); return; }
+  if(t.dataset.p){ const k=t.dataset.p; S.p[k]=parseFloat(t.value); const o=$('#o_'+k); if(o) o.textContent=de(S.p[k],PINFO[k][5]); S.preset=''; S.fit=null; S.st.run=null; if(k==='T'){ S.harv.t0=Math.min(S.harv.t0,S.p.T); } updateLive(); if(S.tab==='data') updateDevLive(); return; }
+  if(t.dataset.h){ const k=t.dataset.h; S.harv[k]=parseFloat(t.value); const o=$('#o_h'+(k==='h'?'h':k)); if(o) o.textContent=k==='h'?de(S.harv[k],2):S.harv[k]; S.preset=''; updateLive(); return; }
+  if(t.dataset.spd){ S.speed=parseFloat(t.value); $('#o_spd').textContent=S.speed+'×'; return; }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.sh){ S.show[t.dataset.sh]=t.checked; drawCharts(); return; }
+  if(t.dataset.act==='harvon'){ S.harv.on=t.checked; S.preset=''; updateLive(); renderModel(); drawScene(); return; }
+  if(t.dataset.act==='harvend'){ S.harv.t1=t.checked?Math.min(S.p.T,Math.max(S.harv.t0+20,S.p.T*0.8)):null; updateLive(); renderModel(); drawScene(); return; }
+});
+document.addEventListener('input',e=>{ if(e.target.dataset&&e.target.dataset.dtxt) S.dtxt=e.target.value; });
+function copyText(txt,btn,label){ const done=()=>{ if(btn){ const o=btn.textContent; btn.textContent='Kopiert'; setTimeout(()=>btn.textContent=label||o,1500); } };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done,()=>{}); else { const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(err){} ta.remove(); } }
+function applyLoad(l){
+  if(l==='rules'){ showTab('rules'); return; } if(l==='rule1'||l==='rule2'||l==='rule3'){ loadRule(+l.slice(4)); showTab('rules'); drawCharts(); return; }
+  if(l==='cap'){ applyPreset('cap'); showTab('model'); return; } if(l==='data'){ newChallenge(); showTab('data'); return; } if(l==='train'){ showTab('train'); return; }
+}
+document.addEventListener('click',e=>{
+  const v=e.target.closest('[data-v]'); if(v){ const k=v.dataset.v;
+    if(k==='play'){ if(S.play) stopPlay(); else startPlay(); }
+    else if(k==='rewind'){ stopPlay(); setT(0); }
+    else if(k==='view'){ S.view=v.dataset.m; drawCharts(); }
+    else if(k==='fold'){ const c=$('#viewer').classList.toggle('collapsed'); v.setAttribute('aria-pressed',c); v.textContent=c?'▼':'▲'; }
+    return; }
+  const tb=e.target.closest('.tab'); if(tb){ showTab(tb.dataset.tab); return; }
+  const a=e.target.closest('[data-act]'); if(!a||a.tagName==='INPUT') return; const act=a.dataset.act;
+  switch(act){
+    case 'preset': applyPreset(a.dataset.id); renderModel(); drawCharts(); drawScene(); break;
+    case 'model': S.p.model=a.dataset.m; S.preset=''; S.st.run=null; recompute(); renderModel(); drawCharts(); drawScene(); break;
+    case 'resetp': { const m=S.p.model; S.p=copyP(PDEF); S.p.model=m; S.preset=''; recompute(); renderModel(); drawCharts(); drawScene(); break; }
+    case 'ghost': S.ghost={sim:S.sim}; renderModel(); drawCharts(); break;
+    case 'noghost': S.ghost=null; renderModel(); drawCharts(); break;
+    case 'kick': S.events.push({t:Math.round(S.tcur*10)/10,kx:parseFloat(a.dataset.kx),ky:parseFloat(a.dataset.ky)}); S.preset=''; updateLive(); break;
+    case 'delev': S.events.splice(+a.dataset.i,1); updateLive(); break;
+    case 'copycsv': copyText(csvText(),a); break;
+    case 'copyprot': copyText(protText(),a); break;
+    case 'rule': loadRule(+a.dataset.n); renderRules(); drawCharts(); break;
+    case 'om': S.st.Om=parseFloat(a.dataset.o); S.st.run=null; renderChance(); drawCharts(); break;
+    case 'stochrun': runStoch(); renderChance(); drawCharts(); break;
+    case 'stochnew': S.st.seed=Math.floor(Math.random()*90000)+1; runStoch(); renderChance(); drawCharts(); break;
+    case 'stochbatch': runBatch(); break;
+    case 'dsrc': if(a.dataset.m==='chal'){ if(!S.chal) newChallenge(); else setData(S.chal.data,'chal'); } else { S.dataMode='user'; S.data=null; } renderData(); drawCharts(); break;
+    case 'dex': S.dtxt=EXAMPLE_TXT; renderData(); break;
+    case 'duse': { const r=parseData(S.dtxt); const msg=$('#dmsg'); if(r.t.length<6){ msg.innerHTML='<div class="fb no">Es wurden weniger als 6 gültige Zeilen gefunden. Prüfe das Format: Zeit; Beute; Räuber.</div>'; break; } if(r.x.some(v=>v<=0)||r.y.some(v=>v<=0)){ msg.innerHTML='<div class="fb no">Beute und Räuber müssen größer als 0 sein.</div>'; break; } setData(r,'user'); renderData(); drawCharts(); break; }
+    case 'newchal': newChallenge(); renderData(); drawCharts(); break;
+    case 'fit': { a.textContent='Rechnet …'; setTimeout(()=>{ const f=fitLV(S.data); S.fit=f; Object.assign(S.p,{a:clamp(f.a,0.1,2),b:clamp(f.b,0.005,0.1),c:clamp(f.c,0.02,0.5),d:clamp(f.d,0.1,1.5),x0:clamp(Math.round(f.x0),10,400),y0:clamp(Math.round(f.y0),1,60)}); recompute(); renderData(); drawCharts(); },20); break; }
+    case 'reveal': S.reveal=true; renderData(); break;
+    case 'poe': { const sc=POE.find(q=>q.id===+a.dataset.id), i=+a.dataset.i; if(S.poe[sc.id]) break; S.poe[sc.id]={choice:i,res:poeRun(sc)}; S.score.n++; if(i===sc.ok) S.score.ok++; renderTrain(); requestAnimationFrame(fillPoeCharts); break; }
+    case 'itask': applyLoad(a.dataset.load); break;
+  }
+});
+/* Lesezeiger an den Diagrammen */
+let dragging=false;
+function pick(ev){ const ch=ev.currentTarget, r=ch.getBoundingClientRect(); const x=ev.clientX-r.left, y=ev.clientY-r.top;
+  if(ch.id==='chT'&&S.ctx.t){ const c=S.ctx.t; setT((x-c.L)/c.pw*c.T); }
+  else if(ch.id==='chP'&&S.ctx.p){ const c=S.ctx.p, sim=S.sim; let best=0,bd=1e18; const st=Math.max(1,Math.floor(sim.n/800)); for(let i=0;i<=sim.n;i+=st){ const dx=c.xs(sim.X[i])-x, dy=c.ys(sim.Y[i])-y, d=dx*dx+dy*dy; if(d<bd){ bd=d; best=i; } } setT(sim.t[best]); } }
+['chT','chP'].forEach(id=>{ const el=document.getElementById(id); el.addEventListener('pointerdown',ev=>{ dragging=true; stopPlay(); try{ el.setPointerCapture(ev.pointerId); }catch(e){} pick(ev); }); el.addEventListener('pointermove',ev=>{ if(dragging) pick(ev); }); el.addEventListener('pointerup',()=>{ dragging=false; }); el.addEventListener('pointercancel',()=>{ dragging=false; }); });
+let rsz=null; window.addEventListener('resize',()=>{ clearTimeout(rsz); rsz=setTimeout(()=>{ drawCharts(); drawScene(); if(S.tab==='train') fillPoeCharts(); },120); });
+$('[data-v="view"][data-m="both"]').setAttribute('aria-pressed',S.view==='both'); $('[data-v="view"][data-m="time"]').setAttribute('aria-pressed',S.view==='time');
+
+/* =============== Start =============== */
+(function init(){ recompute(); showTab('model'); })();
+})();
+</script>
+</body>
+</html>

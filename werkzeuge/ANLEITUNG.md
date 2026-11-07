@@ -1,4 +1,17 @@
-# Werkzeuge – und wie ein Claude-Artefakt hierher kommt
+# Werkzeuge, Lernangebote – und wie ein Claude-Artefakt hierher kommt
+
+**Lernangebote** (Simulationen, Erklärungen, Übungen aus Claude-Artefakten) liegen unter `lernen/<ordner>/` und
+erscheinen auf `lernen/` geordnet nach Fach › Jahrgang › Thema (wie in „Meine Artefakte“). Übernahme in einem Schritt:
+
+```
+node lernen/werkzeug/uebernehmen.mjs <heruntergeladenes-artefakt.html> <ordnername>
+```
+
+Das ersetzt Google Fonts durch die lokalen Schriften (`lernen/schriften/`), fügt die Leiste „← Lernangebote“ ein und
+prüft die Datei. Danach in `lernen/angebote.js` eintragen (Fach, Jahrgänge, Thema). Was das Prüfskript als Fehler meldet
+(z. B. Speichern im Claude-Konto über `window.claude`), muss von Hand entfernt werden.
+
+**Werkzeuge** (kleine eigene Helfer wie Timer) liegen unter `werkzeuge/`:
 
 Jedes Werkzeug ist ein eigener Ordner mit einer `index.html`:
 
