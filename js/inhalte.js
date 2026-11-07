@@ -26,16 +26,9 @@ window.LINKS = [
   },
   {
     symbol: '❓',
-    titel: 'Quizzo – Mitspielen',
-    text: 'PIN eingeben und beim Live-Quiz mitmachen. Auch für Aufgaben-Codes.',
-    adresse: 'https://kt-gymbruvi.github.io/Quizzo/#/mitspielen',
-  },
-  {
-    symbol: '🧑‍🏫',
-    titel: 'Quizzo – Lehrkraft',
-    text: 'Anmelden, Quizze bearbeiten, Spiel starten.',
+    titel: 'Quizzo',
+    text: 'Das Live-Quiz: mit PIN oder Aufgaben-Code mitspielen – oder als Lehrkraft ein Quiz starten.',
     adresse: 'https://kt-gymbruvi.github.io/Quizzo/',
-    qr: false, // braucht niemand als QR-Code
   },
   {
     symbol: '📡',
