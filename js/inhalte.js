@@ -37,6 +37,12 @@ window.LINKS = [
     adresse: 'https://kt-gymbruvi.github.io/Quizzo/',
     qr: false, // braucht niemand als QR-Code
   },
+  {
+    symbol: '📡',
+    titel: 'Klassenfunk – Mitmachen',
+    text: 'PIN eingeben und anonym abstimmen: Wortwolke, Umfrage, Fragen an die Lehrkraft.',
+    adresse: 'https://kt-gymbruvi.github.io/Klassenfunk/#/mitmachen',
+  },
 ]
 
 /**
