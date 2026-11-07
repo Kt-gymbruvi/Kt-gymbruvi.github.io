@@ -31,8 +31,7 @@ Siehe [`werkzeuge/ANLEITUNG.md`](werkzeuge/ANLEITUNG.md). Prüfen mit `node werk
 ## Vor der ersten Veröffentlichung
 
 1. ✅ Überschrift „Lernen mit Spaß“, Beispiel-Material entfernt.
-2. `impressum.html`: `SCHUL_ADRESSE` (zweimal) durch die Adresse der Schulwebseite ersetzen und den roten
-   Entwurfs-Kasten löschen – vorher das OK der Schulleitung einholen.
+2. ✅ `impressum.html` verweist auf Impressum und Datenschutz von gymnasium-bruvi.de (OK der Schulleitung einholen).
 3. Prüfen: `node werkzeuge/pruefen.mjs --veroeffentlichen` muss „Keine Probleme gefunden“ melden.
 4. Auf github.com (angemeldet als **Kt-gymbruvi**) ein **öffentliches** Repository mit genau dem Namen
    `Kt-gymbruvi.github.io` anlegen – leer, ohne README.
