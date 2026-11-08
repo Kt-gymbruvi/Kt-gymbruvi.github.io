@@ -59,11 +59,11 @@ window.WERKZEUGE = [
     adresse: 'werkzeuge/gruppen/',
   },
   {
-    bereich: 'Sport',
-    symbol: '❤️',
-    titel: 'Herzfrequenz-Zonen',
-    text: 'Trainingsbereiche aus Alter und Ruhepuls berechnen – mit Pulswerten für 15 Sekunden.',
-    adresse: 'werkzeuge/herzfrequenz/',
+    bereich: 'Unterricht',
+    symbol: '🚦',
+    titel: 'Lautstärkeampel',
+    text: 'Zeigt am Beamer, wie laut es in der Klasse ist. Das Mikrofon wird nur auf diesem Gerät ausgewertet, nichts aufgenommen.',
+    adresse: 'werkzeuge/lautstaerke/',
   },
 ]
 

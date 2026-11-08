@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Herzfrequenz-Zonen</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../style.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <style>
+      .eingaben {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+        padding: 1.25rem;
+        border-radius: 1.25rem;
+        background: rgb(22 50 122 / 0.7);
+      }
+      .ergebnis {
+        margin-top: 1.5rem;
+      }
+      .kennzahlen {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      .kennzahl {
+        flex: 1 1 12rem;
+        padding: 1rem 1.25rem;
+        border-radius: 1.25rem;
+        background: rgb(255 255 255 / 0.06);
+      }
+      .kennzahl b {
+        display: block;
+        font-size: 2.25rem;
+        color: var(--gelb);
+        font-variant-numeric: tabular-nums;
+      }
+      .zonen {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .zone {
+        display: grid;
+        grid-template-columns: 0.6rem 1fr auto;
+        gap: 0.9rem;
+        align-items: center;
+        padding: 0.8rem 1.1rem 0.8rem 0.8rem;
+        border-radius: 1rem;
+        background: rgb(255 255 255 / 0.06);
+      }
+      .zone .farbe {
+        align-self: stretch;
+        border-radius: 999px;
+      }
+      .zone h3 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+      .zone p {
+        margin: 0.15rem 0 0;
+        color: rgb(255 255 255 / 0.7);
+        font-size: 0.98rem;
+      }
+      .zone .werte {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .zone .werte b {
+        display: block;
+        font-size: 1.6rem;
+      }
+      .zone .werte span {
+        color: rgb(255 255 255 / 0.7);
+        font-size: 0.95rem;
+      }
+      @media (max-width: 34rem) {
+        .zone {
+          grid-template-columns: 0.5rem 1fr;
+        }
+        .zone .werte {
+          grid-column: 2;
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">← Lernangebote</a>
+      <h1>❤️ Herzfrequenz-Zonen</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <form class="eingaben" id="eingaben" onsubmit="return false">
+        <label class="feld">Alter (Jahre) <input id="alter" type="number" min="8" max="90" value="16" inputmode="numeric" /></label>
+        <label class="feld"
+          >Ruhepuls (Schläge/min)
+          <input id="ruhe" type="number" min="30" max="120" placeholder="z. B. 65" inputmode="numeric" />
+          <small>Morgens im Liegen messen. Leer lassen = ohne Ruhepuls rechnen.</small>
+        </label>
+        <label class="feld"
+          >Maximalpuls
+          <select id="formel">
+            <option value="tanaka">geschätzt: 208 − 0,7 × Alter</option>
+            <option value="220">geschätzt: 220 − Alter</option>
+            <option value="gemessen">selbst gemessen</option>
+          </select>
+        </label>
+        <label class="feld" id="max-feld" hidden>Gemessener Maximalpuls <input id="hfmax" type="number" min="120" max="230" inputmode="numeric" /></label>
+      </form>
+
+      <section class="ergebnis" aria-live="polite">
+        <div class="kennzahlen">
+          <div class="kennzahl"><b id="k-max">–</b>Maximalpuls (Schläge/min)</div>
+          <div class="kennzahl"><b id="k-reserve">–</b><span id="k-reserve-text">Herzfrequenzreserve</span></div>
+        </div>
+        <ol class="zonen" id="zonen"></ol>
+        <p class="hinweis" id="methode"></p>
+        <p class="hinweis">
+          Die Formeln liefern nur Schätzwerte – der tatsächliche Maximalpuls kann um 10 bis 20 Schläge abweichen. Spalte rechts: so viele Schläge
+          zählst du in <b>15 Sekunden</b> (Puls am Handgelenk oder Hals). Es wird nichts gespeichert oder gesendet.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      ;(function () {
+        'use strict'
+        const $ = (id) => document.getElementById(id)
+        // Bereiche in % (der Herzfrequenzreserve nach Karvonen bzw. des Maximalpulses)
+        const ZONEN = [
+          { name: 'Regeneration', von: 50, bis: 60, farbe: '#7dd3fc', text: 'Lockeres Auslaufen, aktive Erholung' },
+          { name: 'Grundlagenausdauer 1', von: 60, bis: 70, farbe: '#4ade80', text: 'Lange, ruhige Läufe – Unterhalten geht gut' },
+          { name: 'Grundlagenausdauer 2', von: 70, bis: 80, farbe: '#ffc928', text: 'Zügiges Tempo – Unterhalten geht noch in kurzen Sätzen' },
+          { name: 'Entwicklungsbereich', von: 80, bis: 90, farbe: '#fb923c', text: 'Tempoläufe nahe der Schwelle – anstrengend' },
+          { name: 'Spitzenbereich', von: 90, bis: 100, farbe: '#f43f5e', text: 'Sehr hohe Belastung, nur kurz (Intervalle, Endspurt)' },
+        ]
+        const zahl = (id) => {
+          const v = Number($(id).value)
+          return Number.isFinite(v) && $(id).value !== '' ? v : null
+        }
+        function el(tag, text, klasse) {
+          const e = document.createElement(tag)
+          if (text != null) e.textContent = text
+          if (klasse) e.className = klasse
+          return e
+        }
+
+        function rechnen() {
+          const alter = zahl('alter')
+          const ruhe = zahl('ruhe')
+          const formel = $('formel').value
+          $('max-feld').hidden = formel !== 'gemessen'
+          let max = null
+          if (formel === 'gemessen') max = zahl('hfmax')
+          else if (alter !== null && alter >= 8 && alter <= 90) max = Math.round(formel === '220' ? 220 - alter : 208 - 0.7 * alter)
+          const mitRuhe = ruhe !== null && ruhe >= 30 && ruhe <= 120 && max !== null && ruhe < max - 40
+
+          $('k-max').textContent = max ?? '–'
+          $('k-reserve').textContent = mitRuhe ? max - ruhe : '–'
+          $('k-reserve-text').textContent = mitRuhe ? 'Herzfrequenzreserve (Maximal- minus Ruhepuls)' : 'Herzfrequenzreserve (Ruhepuls fehlt)'
+          $('methode').textContent = mitRuhe
+            ? 'Berechnet nach Karvonen: Ruhepuls + Prozent × (Maximalpuls − Ruhepuls).'
+            : 'Berechnet als Prozent des Maximalpulses (mit Ruhepuls wird es genauer).'
+
+          const liste = $('zonen')
+          liste.textContent = ''
+          if (max === null) {
+            liste.append(el('li', 'Bitte Alter (8–90) oder einen gemessenen Maximalpuls eingeben.', 'hinweis'))
+            return
+          }
+          const puls = (p) => Math.round(mitRuhe ? ruhe + (p / 100) * (max - ruhe) : (p / 100) * max)
+          ZONEN.forEach((z) => {
+            const von = puls(z.von)
+            const bis = puls(z.bis)
+            const li = el('li', null, 'zone')
+            const f = el('span', null, 'farbe')
+            f.style.background = z.farbe
+            const mitte = el('div')
+            mitte.append(el('h3', `${z.name} · ${z.von}–${z.bis} %`), el('p', z.text))
+            const werte = el('div', null, 'werte')
+            werte.append(el('b', `${von}–${bis}`), el('span', `/min · ${Math.round(von / 4)}–${Math.round(bis / 4)} in 15 s`))
+            li.append(f, mitte, werte)
+            liste.append(li)
+          })
+        }
+
+        $('eingaben').addEventListener('input', rechnen)
+        rechnen()
+      })()
+    </script>
+  </body>
+</html>

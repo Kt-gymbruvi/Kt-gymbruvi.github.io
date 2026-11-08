@@ -338,6 +338,14 @@ window.ANGEBOTE = [
     datum: '2026-10-26',
   },
   {
+    ordner: 'herzfrequenz-zonen',
+    titel: 'Herzfrequenz-Zonen',
+    fach: 'sport',
+    stufen: ['11', 'sek2'],
+    text: 'Trainingsbereiche aus Alter und Ruhepuls berechnen (Karvonen) – mit Pulswerten für 15 Sekunden zum Selbstmessen.',
+    datum: '2026-11-07',
+  },
+  {
     ordner: 'leichtathletik-rechner',
     titel: 'Leichtathletik-Rechner',
     fach: 'sport',

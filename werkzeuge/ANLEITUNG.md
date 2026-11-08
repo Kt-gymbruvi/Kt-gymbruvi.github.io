@@ -25,7 +25,7 @@ werkzeuge/
   werkzeug.css          gemeinsames Aussehen (Kopfzeile, Felder, Knöpfe)
   timer/index.html
   gruppen/index.html
-  herzfrequenz/index.html
+  lautstaerke/index.html
   pruefen.mjs           Prüfskript (siehe unten)
 ```
 

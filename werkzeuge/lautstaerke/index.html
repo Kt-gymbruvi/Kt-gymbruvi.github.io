@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lautstärkeampel</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../style.css" />
+    <link rel="stylesheet" href="../werkzeug.css" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+      }
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        width: min(72rem, 100% - 2rem);
+        margin: 0 auto;
+        padding-bottom: 1.5rem;
+      }
+      .buehne {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(1.5rem, 5vw, 4rem);
+        flex-wrap: wrap;
+      }
+
+      /* Ampel */
+      .ampel {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(0.6rem, 2vh, 1.2rem);
+        padding: clamp(0.8rem, 2.5vh, 1.5rem);
+        border-radius: 2.5rem;
+        background: #10141c;
+        box-shadow: 0 0.6rem 0 rgb(0 0 0 / 0.35), inset 0 0 0 0.35rem #2a3140;
+      }
+      .licht {
+        --groesse: min(22vh, 34vw, 12rem);
+        width: var(--groesse);
+        height: var(--groesse);
+        border-radius: 50%;
+        background: var(--aus);
+        transition: background 0.25s, box-shadow 0.25s;
+      }
+      .licht.rot {
+        --aus: #3a1414;
+        --an: #ff3b30;
+      }
+      .licht.gelb {
+        --aus: #3a3112;
+        --an: #ffcc00;
+      }
+      .licht.gruen {
+        --aus: #13301c;
+        --an: #34c759;
+      }
+      .licht.an {
+        background: var(--an);
+        box-shadow: 0 0 2.5rem var(--an), inset 0 -0.6rem 1.2rem rgb(0 0 0 / 0.25);
+      }
+
+      /* Rechte Seite: Text + Pegel */
+      .seite {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        min-width: min(100%, 22rem);
+        flex: 1 1 22rem;
+        max-width: 36rem;
+      }
+      #zustand {
+        margin: 0;
+        font-size: clamp(2.5rem, 7vw, 5rem);
+        font-weight: 900;
+        line-height: 1.05;
+      }
+      #zustand-text {
+        margin: 0;
+        font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+        color: rgb(255 255 255 / 0.8);
+      }
+      .pegel {
+        position: relative;
+        height: 2.25rem;
+        border-radius: 1.2rem;
+        background: linear-gradient(90deg, #34c759 0 var(--gelb-ab), #ffcc00 var(--gelb-ab) var(--rot-ab), #ff3b30 var(--rot-ab) 100%);
+        opacity: 0.95;
+        overflow: hidden;
+      }
+      .pegel .rest {
+        position: absolute;
+        inset: 0 0 0 auto;
+        background: rgb(6 18 51 / 0.82);
+        transition: width 0.1s linear;
+      }
+      .pegel .marke {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 0.25rem;
+        margin-left: -0.125rem;
+        background: #fff;
+      }
+      .zaehler {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        font-size: 1.15rem;
+        color: rgb(255 255 255 / 0.75);
+      }
+      .zaehler b {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .einstellungen {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        padding: 1.25rem;
+        border-radius: 1.25rem;
+        background: rgb(22 50 122 / 0.7);
+      }
+      .feld input[type='range'] {
+        padding: 0;
+        accent-color: var(--gelb);
+        background: transparent;
+      }
+      .hinweis {
+        margin: 0;
+        color: rgb(255 255 255 / 0.65);
+      }
+      #fehler {
+        margin: 0;
+        padding: 0.9rem 1.2rem;
+        border-radius: 1rem;
+        background: rgb(255 59 48 / 0.2);
+        font-weight: 700;
+      }
+      /* Im Vollbild nur Ampel und Pegel */
+      :fullscreen .einstellungen,
+      :fullscreen .hinweis,
+      :fullscreen .werkzeug-kopf a {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../">← Startseite</a>
+      <h1>🚦 Lautstärkeampel</h1>
+    </header>
+    <main>
+      <div class="knopf-reihe">
+        <button class="knopf gross" id="start" type="button">🎤 Ampel starten</button>
+        <button class="knopf zweit gross" id="eichen" type="button" disabled title="3 Sekunden still sein – dann passen sich die Grenzen an den Raum an">🤫 Ruhe messen</button>
+        <button class="knopf zweit gross" id="ton" type="button" aria-pressed="false">🔕 Ton aus</button>
+        <button class="knopf zweit gross" id="vollbild" type="button">⛶ Vollbild</button>
+      </div>
+      <p id="fehler" role="alert" hidden></p>
+
+      <div class="buehne">
+        <div class="ampel" role="img" aria-label="Ampel" id="ampel">
+          <div class="licht rot" id="licht-rot"></div>
+          <div class="licht gelb" id="licht-gelb"></div>
+          <div class="licht gruen an" id="licht-gruen"></div>
+        </div>
+        <div class="seite">
+          <p id="zustand" aria-live="polite">Bereit</p>
+          <p id="zustand-text">Tippe auf „Ampel starten“ und erlaube das Mikrofon.</p>
+          <div class="pegel" id="pegel" aria-hidden="true">
+            <div class="rest" id="rest" style="width: 100%"></div>
+            <div class="marke" id="marke-gelb"></div>
+            <div class="marke" id="marke-rot"></div>
+          </div>
+          <div class="zaehler">
+            <span>Ruhig seit <b id="ruhig">–</b></span>
+            <span>Rot: <b id="rot-anzahl">0</b>×</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="einstellungen">
+        <label class="feld"
+          >Gelb ab <span id="gelb-wert"></span>
+          <input id="gelb" type="range" min="5" max="90" step="1" value="45" />
+        </label>
+        <label class="feld"
+          >Rot ab <span id="rot-wert"></span>
+          <input id="rot" type="range" min="10" max="95" step="1" value="65" />
+        </label>
+        <label class="feld"
+          >Reaktion
+          <select id="traegheit">
+            <option value="0.5">schnell (0,5 s)</option>
+            <option value="1.5" selected>mittel (1,5 s)</option>
+            <option value="3">gelassen (3 s)</option>
+          </select>
+          <small>Wie lange es laut sein muss, bis die Ampel umspringt.</small>
+        </label>
+      </div>
+      <p class="hinweis">
+        Datenschutz: Das Mikrofon wird nur auf diesem Gerät ausgewertet – es wird nichts aufgenommen, gespeichert oder verschickt. Gemerkt werden nur die Einstellungen.
+        Am besten das Gerät vorne in den Raum legen; Tipp: erst „Ruhe messen“, wenn die Klasse still ist.
+      </p>
+    </main>
+
+    <script>
+      ;(function () {
+        'use strict'
+        const $ = (id) => document.getElementById(id)
+        const SPEICHER = 'lautstaerkeampel'
+        const ZUSTAENDE = {
+          gruen: { titel: 'Gut so 👍', text: 'Angenehme Lautstärke.' },
+          gelb: { titel: 'Etwas leiser', text: 'Es wird lauter – bitte etwas ruhiger.' },
+          rot: { titel: 'Zu laut!', text: 'Bitte jetzt leise sein.' },
+        }
+
+        let einst = { gelb: 45, rot: 65, traegheit: 1.5, ton: false }
+        try {
+          Object.assign(einst, JSON.parse(localStorage.getItem(SPEICHER) || '{}'))
+        } catch {
+          /* egal */
+        }
+        const merken = () => {
+          try {
+            localStorage.setItem(SPEICHER, JSON.stringify(einst))
+          } catch {
+            /* egal */
+          }
+        }
+
+        let audio = null
+        let strom = null
+        let analyse = null
+        let puffer = null
+        let laeuft = false
+        let pegel = 0 // geglättet, 0–100
+        let zustand = 'gruen'
+        let kandidat = null // Zustand, in den gewechselt werden soll
+        let kandidatSeit = 0
+        let ruhigSeit = null
+        let rotAnzahl = 0
+        let eichen = null // { ende, werte[] }
+        let sperre = null
+
+        // Lautstärke (RMS) → 0–100: ca. −70 dBFS (sehr still) bis −10 dBFS (sehr laut)
+        function messen() {
+          analyse.getFloatTimeDomainData(puffer)
+          let summe = 0
+          for (let i = 0; i < puffer.length; i++) summe += puffer[i] * puffer[i]
+          const db = 20 * Math.log10(Math.sqrt(summe / puffer.length) + 1e-9)
+          return Math.max(0, Math.min(100, ((db + 70) / 60) * 100))
+        }
+
+        function schritt() {
+          if (!laeuft) return
+          const jetzt = performance.now()
+          const roh = messen()
+          // schnell hoch, langsam runter – damit kurze Pausen nicht sofort „grün“ zeigen
+          pegel += (roh - pegel) * (roh > pegel ? 0.25 : 0.06)
+
+          if (eichen) {
+            eichen.werte.push(roh)
+            if (jetzt >= eichen.ende) eichenFertig()
+          }
+
+          const ziel = pegel >= einst.rot ? 'rot' : pegel >= einst.gelb ? 'gelb' : 'gruen'
+          if (ziel === zustand) kandidat = null
+          else if (ziel !== kandidat) {
+            kandidat = ziel
+            kandidatSeit = jetzt
+          } else if (jetzt - kandidatSeit >= einst.traegheit * 1000) {
+            wechsle(ziel)
+          }
+          zeichnen()
+          requestAnimationFrame(schritt)
+        }
+
+        function wechsle(neu) {
+          if (neu === 'rot' && zustand !== 'rot') {
+            rotAnzahl++
+            if (einst.ton) warnton()
+          }
+          if (neu === 'gruen') ruhigSeit = ruhigSeit || Date.now()
+          else ruhigSeit = null
+          zustand = neu
+          kandidat = null
+          $('zustand').textContent = ZUSTAENDE[neu].titel
+          $('zustand-text').textContent = ZUSTAENDE[neu].text
+        }
+
+        function zeichnen() {
+          ;['rot', 'gelb', 'gruen'].forEach((f) => $('licht-' + f).classList.toggle('an', f === zustand))
+          $('ampel').setAttribute('aria-label', 'Ampel: ' + { rot: 'rot', gelb: 'gelb', gruen: 'grün' }[zustand])
+          $('rest').style.width = (100 - pegel).toFixed(1) + '%'
+          $('rot-anzahl').textContent = rotAnzahl
+          if (ruhigSeit && laeuft) {
+            const s = Math.floor((Date.now() - ruhigSeit) / 1000)
+            $('ruhig').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
+          } else $('ruhig').textContent = '–'
+        }
+
+        function grenzenZeigen() {
+          const p = $('pegel')
+          p.style.setProperty('--gelb-ab', einst.gelb + '%')
+          p.style.setProperty('--rot-ab', einst.rot + '%')
+          $('marke-gelb').style.left = einst.gelb + '%'
+          $('marke-rot').style.left = einst.rot + '%'
+          $('gelb').value = einst.gelb
+          $('rot').value = einst.rot
+          $('gelb-wert').textContent = '(' + einst.gelb + ')'
+          $('rot-wert').textContent = '(' + einst.rot + ')'
+          $('traegheit').value = String(einst.traegheit)
+          $('ton').setAttribute('aria-pressed', String(einst.ton))
+          $('ton').textContent = einst.ton ? '🔔 Ton bei Rot' : '🔕 Ton aus'
+        }
+
+        function fehler(text) {
+          $('fehler').textContent = text
+          $('fehler').hidden = !text
+        }
+
+        async function starten() {
+          fehler('')
+          if (!navigator.mediaDevices?.getUserMedia) {
+            fehler('Dieser Browser kann nicht auf das Mikrofon zugreifen.')
+            return
+          }
+          try {
+            // Ohne automatische Lautstärkeregelung – sonst würde der Browser laute Klassen „leiser rechnen“
+            strom = await navigator.mediaDevices.getUserMedia({
+              audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+            })
+          } catch (e) {
+            fehler(
+              e && e.name === 'NotAllowedError'
+                ? 'Das Mikrofon wurde nicht erlaubt. Erlaube es in den Einstellungen des Browsers (Schloss-Symbol neben der Adresse) und tippe erneut auf „Ampel starten“.'
+                : 'Kein Mikrofon gefunden oder es wird gerade von einer anderen App benutzt.',
+            )
+            return
+          }
+          audio = audio || new (window.AudioContext || window.webkitAudioContext)()
+          if (audio.state === 'suspended') await audio.resume()
+          analyse = audio.createAnalyser()
+          analyse.fftSize = 2048
+          puffer = new Float32Array(analyse.fftSize)
+          audio.createMediaStreamSource(strom).connect(analyse) // nicht an die Lautsprecher
+          laeuft = true
+          ruhigSeit = Date.now()
+          wechsle('gruen')
+          $('start').textContent = '⏹ Ampel stoppen'
+          $('eichen').disabled = false
+          bildschirmAn(true)
+          requestAnimationFrame(schritt)
+        }
+
+        function stoppen() {
+          laeuft = false
+          eichen = null
+          strom?.getTracks().forEach((t) => t.stop())
+          strom = null
+          pegel = 0
+          $('start').textContent = '🎤 Ampel starten'
+          $('eichen').disabled = true
+          $('eichen').textContent = '🤫 Ruhe messen'
+          $('zustand').textContent = 'Gestoppt'
+          $('zustand-text').textContent = 'Das Mikrofon ist aus.'
+          bildschirmAn(false)
+          zeichnen()
+        }
+
+        // 3 Sekunden Ruhe messen: Gelb etwas darüber, Rot deutlich darüber
+        function eichenStarten() {
+          eichen = { ende: performance.now() + 3000, werte: [] }
+          $('eichen').disabled = true
+          $('eichen').textContent = '🤫 Bitte still … (3 s)'
+        }
+        function eichenFertig() {
+          const w = eichen.werte.sort((a, b) => a - b)
+          const ruhe = w[Math.floor(w.length * 0.8)] || 0 // 80 %-Wert: einzelne Geräusche zählen nicht
+          eichen = null
+          einst.gelb = Math.round(Math.min(85, ruhe + 15))
+          einst.rot = Math.round(Math.min(95, einst.gelb + 15))
+          merken()
+          grenzenZeigen()
+          $('eichen').disabled = false
+          $('eichen').textContent = '🤫 Ruhe messen'
+        }
+
+        // kurzer, freundlicher Doppelton (kein Alarm)
+        function warnton() {
+          if (!audio) return
+          const t0 = audio.currentTime
+          ;[0, 0.25].forEach((t, i) => {
+            const o = audio.createOscillator()
+            const g = audio.createGain()
+            o.type = 'sine'
+            o.frequency.value = [660, 440][i]
+            g.gain.setValueAtTime(0.0001, t0 + t)
+            g.gain.exponentialRampToValueAtTime(0.3, t0 + t + 0.02)
+            g.gain.exponentialRampToValueAtTime(0.0001, t0 + t + 0.22)
+            o.connect(g).connect(audio.destination)
+            o.start(t0 + t)
+            o.stop(t0 + t + 0.24)
+          })
+        }
+
+        async function bildschirmAn(an) {
+          try {
+            if (an && 'wakeLock' in navigator) sperre = await navigator.wakeLock.request('screen')
+            else if (!an && sperre) {
+              await sperre.release()
+              sperre = null
+            }
+          } catch {
+            /* nicht schlimm */
+          }
+        }
+
+        $('start').addEventListener('click', () => (laeuft ? stoppen() : starten()))
+        $('eichen').addEventListener('click', eichenStarten)
+        $('ton').addEventListener('click', () => {
+          einst.ton = !einst.ton
+          merken()
+          grenzenZeigen()
+        })
+        $('gelb').addEventListener('input', (e) => {
+          einst.gelb = Number(e.target.value)
+          if (einst.rot <= einst.gelb) einst.rot = Math.min(95, einst.gelb + 1)
+          merken()
+          grenzenZeigen()
+        })
+        $('rot').addEventListener('input', (e) => {
+          einst.rot = Number(e.target.value)
+          if (einst.gelb >= einst.rot) einst.gelb = Math.max(5, einst.rot - 1)
+          merken()
+          grenzenZeigen()
+        })
+        $('traegheit').addEventListener('change', (e) => {
+          einst.traegheit = Number(e.target.value)
+          merken()
+        })
+        $('vollbild').addEventListener('click', () => {
+          if (document.fullscreenElement) document.exitFullscreen()
+          else document.documentElement.requestFullscreen?.()
+        })
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible' && laeuft) bildschirmAn(true)
+        })
+
+        grenzenZeigen()
+        zeichnen()
+      })()
+    </script>
+  </body>
+</html>
