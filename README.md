@@ -10,7 +10,7 @@ Fast alles steht in **`js/inhalte.js`**:
 
 - `SEITE` – Überschrift und Untertitel
 - `LINKS` – die großen gelben Kacheln (z. B. Quizzo)
-- `WERKZEUGE` – kleine Web-Apps unter `werkzeuge/` (Timer, Gruppen & Zufall, Herzfrequenz-Zonen …)
+- `WERKZEUGE` – kleine Web-Apps unter `werkzeuge/` (Timer, Gruppen & Zufall, Lautstärkeampel)
 - `MATERIALIEN` – die Materialliste (Fach, Klasse, Titel, Datei, Beschreibung)
 
 Neues Material: Datei nach `materialien/` legen (Name ohne Leerzeichen/Umlaute), Eintrag in
