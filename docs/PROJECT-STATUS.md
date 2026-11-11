@@ -35,8 +35,12 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 - Keine automatischen Tests; Qualitätssicherung nur über `pruefen.mjs` und Ansehen im Browser.
 - Materialliste ist leer.
 
+## Schwesterprojekt Lehrraum
+- Seit 11.11.2026 gibt es `../Lehrraum` (nur lokal, kein GitHub-Repository): Gerüst und Tafel mit Stift, Textmarker, Radierer, Rückgängig, Autospeichern (Etappen 1.3 und 2a). Stand dort in `docs/PROJECT-STATUS.md`.
+- Der Navigationspunkt „Tafel“ in `js/inhalte.js` bleibt ohne Adresse, bis Lehrraum unter `/Lehrraum/` veröffentlicht ist.
+
 ## Nächste Schritte (priorisiert, siehe `IMPLEMENTATION_ROADMAP.md`)
-1. Rückmeldung der Lehrkraft zum Aussehen der Startseite; danach Etappe 1.2: Lernübersicht und Werkzeuge auf `gemeinsam/` umstellen, QR-Fenster als gemeinsames Modul.
-2. Etappe 1.3: Repository `Lehrraum` anlegen (Gerüst, Anmeldung, Navigation), dann Phase 2a (Zeichnen) mit früher Erprobung am iPad.
+1. Tafel am iPad (Apple Pencil) und am Smartboard erproben – dafür muss Lehrraum veröffentlicht werden (Entscheidung der Lehrkraft).
+2. Etappe 1.2: Lernübersicht und Werkzeuge auf `gemeinsam/` umstellen, QR-Fenster als gemeinsames Modul.
 3. Zusammenführen mit `main` und Veröffentlichen erst nach ausdrücklicher Zustimmung.
 4. Lautstärkeampel am iPad im Unterricht ausprobieren, Grenzwerte ggf. anpassen.
