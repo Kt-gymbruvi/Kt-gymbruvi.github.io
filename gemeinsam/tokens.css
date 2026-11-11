@@ -1,0 +1,110 @@
+/*
+ * Lehrraum – gemeinsame Gestaltungswerte (Farben, Abstände, Schrift) für alle Seiten ohne Build-Schritt.
+ * Heller Modus ist die Grundlage; der dunkle Modus gilt, wenn das Gerät ihn verlangt oder wenn
+ * <html data-design="dunkel"> gesetzt ist (Umschalter: gemeinsam/design.js).
+ * Wer hier eine Farbe ändert, muss sie im dunklen Block zweimal ändern (Gerät und Umschalter).
+ */
+:root {
+  color-scheme: light;
+
+  /* Marke */
+  --navy: #0b1f4d;
+  --navy-hell: #16327a;
+  --navy-dunkel: #061233;
+  --gelb: #ffc928;
+  --gelb-dunkel: #e6ac00;
+
+  /* Flächen und Text */
+  --seite: #f2f4f8;
+  --flaeche: #ffffff;
+  --flaeche-2: #e8ecf3;
+  --text: #0b1f4d;
+  --text-2: #46557a;
+  --linie: #cdd5e3;
+  --linie-stark: #9aa7c2;
+  --verweis: #1d4fc4;
+  --fokus: #1d5fd1;
+  --fehler: #b3261e;
+
+  /* Kopfleiste (in beiden Modi dunkelblau) */
+  --kopf: #0b1f4d;
+  --kopf-text: #ffffff;
+  --kopf-text-2: #c3cce3;
+
+  /* Akzentfarben der Bereiche: kräftig (Text, Symbol) und hell (Fläche) */
+  --tafel: #1d4fc4;
+  --tafel-hell: #e3ecfc;
+  --unterrichten: #1b6b43;
+  --unterrichten-hell: #e1f2e9;
+  --interaktion: #a83418;
+  --interaktion-hell: #fde9e3;
+  --lernen: #7a5800;
+  --lernen-hell: #fff2c7;
+  --bibliothek: #5237a8;
+  --bibliothek-hell: #ece7fb;
+
+  /* Eigene Farben der Anwendungen (bleiben in beiden Modi gleich) */
+  --quizzo: #0b1f4d;
+  --quizzo-text: #ffc928;
+  --klassenfunk: #0d3b42;
+  --klassenfunk-text: #ff9a82;
+
+  /* Maße */
+  --radius: 0.75rem;
+  --radius-gross: 1.25rem;
+  --tippflaeche: 3rem;
+  --breite: 72rem;
+  --schrift: ui-rounded, 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-design='hell']) {
+    color-scheme: dark;
+    --seite: #061233;
+    --flaeche: #0f2558;
+    --flaeche-2: #16327a;
+    --text: #ffffff;
+    --text-2: #c3cce3;
+    --linie: #2a4489;
+    --linie-stark: #5570b8;
+    --verweis: #ffc928;
+    --fokus: #ffc928;
+    --fehler: #ffb4ab;
+    --kopf: #030b22;
+    --tafel: #a9c5ff;
+    --tafel-hell: #17357a;
+    --unterrichten: #8fdcb2;
+    --unterrichten-hell: #12452e;
+    --interaktion: #ffb4a0;
+    --interaktion-hell: #5e2212;
+    --lernen: #ffd866;
+    --lernen-hell: #4a3800;
+    --bibliothek: #c9bbff;
+    --bibliothek-hell: #36257a;
+  }
+}
+
+:root[data-design='dunkel'] {
+  color-scheme: dark;
+  --seite: #061233;
+  --flaeche: #0f2558;
+  --flaeche-2: #16327a;
+  --text: #ffffff;
+  --text-2: #c3cce3;
+  --linie: #2a4489;
+  --linie-stark: #5570b8;
+  --verweis: #ffc928;
+  --fokus: #ffc928;
+  --fehler: #ffb4ab;
+  --kopf: #030b22;
+  --tafel: #a9c5ff;
+  --tafel-hell: #17357a;
+  --unterrichten: #8fdcb2;
+  --unterrichten-hell: #12452e;
+  --interaktion: #ffb4a0;
+  --interaktion-hell: #5e2212;
+  --lernen: #ffd866;
+  --lernen-hell: #4a3800;
+  --bibliothek: #c9bbff;
+  --bibliothek-hell: #36257a;
+}

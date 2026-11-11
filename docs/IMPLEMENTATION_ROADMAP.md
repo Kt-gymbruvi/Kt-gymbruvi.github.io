@@ -3,7 +3,9 @@
 Stand: 11.11.2026 · Vorschlag zur Freigabe, Teil des Repository-Audits ([PROJECT_AUDIT.md](PROJECT_AUDIT.md))
 Grundlage: Zielarchitektur in [ARCHITECTURE.md](ARCHITECTURE.md), Bestand in [FEATURE_INVENTORY.md](FEATURE_INVENTORY.md)
 
-**Es wurde noch nichts umgebaut.** Der Umbau beginnt erst nach Freigabe dieses Plans.
+**Freigegeben am 11.11.2026** (Entscheidungen in `DECISIONS.md`). Erledigt: Phase 0 und Etappe 1.1 (Tokens,
+heller/dunkler Modus, Symbole, Startseite „Lehrraum“ mit Hauptnavigation) – auf dem Zweig `lehrraum-phase-1`,
+nicht veröffentlicht.
 
 ## 1. Grundsätze für jede Etappe
 
@@ -57,8 +59,8 @@ bestehende Funktion sich anders verhält.
 
 | Etappe | Inhalt | Repo |
 |---|---|---|
-| 1.1 | `/gemeinsam/tokens.css` (Farben, Abstände, Schrift, heller und dunkler Modus), einheitlicher Symbolsatz als SVG | Startseite |
-| 1.2 | Startseite und Lernübersicht auf die Tokens umstellen; Hauptnavigation; QR-Dialog als gemeinsames Modul; kleine Unstimmigkeiten aus dem Audit (Abschnitt 5, Nr. 1–4) bereinigen | Startseite |
+| 1.1 ✅ | `/gemeinsam/` (Tokens hell/dunkel, Grundlage, Symbolsatz als SVG, Umschalter); Startseite „Lehrraum“ mit Hauptnavigation, Mitmachen per PIN, Schnellstart; Impressum im neuen Design; Unstimmigkeiten aus dem Audit (Abschnitt 5, Nr. 1–3) bereinigt | Startseite |
+| 1.2 | Lernübersicht und Werkzeuge auf `/gemeinsam/` umstellen; QR-Dialog als gemeinsames Modul (Audit Nr. 4) | Startseite |
 | 1.3 | Neues Repository `Lehrraum` nach dem Muster von Quizzo: Vite, React, TypeScript, Tailwind, Vitest, Actions-Deploy, Anmeldung mit dem bestehenden Konto, drei leere Bereiche mit Navigation | Lehrraum (neu) |
 | 1.4 | Übersichtsseite „Interaktion“; Rückweg zur Plattform in Quizzo ergänzen (Klassenfunk hat ihn) | Startseite, Quizzo |
 
@@ -126,6 +128,7 @@ gleichzeitig; Bedienung mit dem Finger am Smartboard.
 | 4.5 | Klassenwechsel in der Kopfzeile der Tafel; Zuordnung von Quizzen, Präsentationen, Lernangeboten, Tafelbildern |
 | 4.6 | Goodnotes-Link pro Klasse; PDF über das Teilen-Menü weitergeben |
 | 4.7 | Einmaliges Angebot, die im Gruppen-Werkzeug gemerkte Liste als Klasse zu übernehmen |
+| 4.8 | Startseite: Kacheln „Meine Klassen“ (nur auf dem Gerät der Lehrkraft sichtbar) mit Einstieg in die Tafel der Klasse, dazu „Freie Tafel“ und „Klasse anlegen“ |
 
 **Abnahme:** Klassenwechsel ändert Namensliste, Goodnotes-Knopf und Vorschläge; keine Netzwerkanfrage enthält einen
 Schülernamen (per Test geprüft); archivierte Klassen sind wiederherstellbar.
@@ -207,7 +210,7 @@ Der Schülerzugang existiert und funktioniert. Diese Phase vereinheitlicht und h
 | 1 | Neue App als eigenes Repository `Lehrraum` unter `/Lehrraum/`? | ja | Phase 1.3 |
 | 2 | Schülernamen nur auf dem Gerät? | ja, Stufe 1 | Phase 4 |
 | 3 | Eigene schlanke Zeichenfläche mit `perfect-freehand`, PDF.js, `pdf-lib`? | ja | Phase 2 |
-| 4 | Startseite bleibt Schülerseite, Lehrkraft-Bereich dahinter? | ja | Phase 1.2 |
+| 4 | Startseite bleibt Schülerseite, Lehrkraft-Bereich dahinter? | **anders entschieden:** Startseite ist die Übersicht „Lehrraum“ mit Einstieg in die Tafeln der Klassen | Phase 1.1 ✅, Kacheln in 4.8 |
 | 5 | Quizzo und Klassenfunk behalten ihre Farben? | ja | Phase 1.4 |
 | 6 | Reihenfolge wie in Abschnitt 2 (Tafel früh am iPad erproben, „Starten aus der Tafel“ vorziehen)? | ja | Planung |
 
@@ -216,7 +219,7 @@ Zusätzlich hilfreich, aber nicht blockierend:
 - Welcher Supabase-Tarif ist aktiv?
 - Soll der Name „Lehrraum“ bleiben?
 
-## 5. Erster Schritt nach der Freigabe
+## 5. Nächster Schritt
 
-Etappe 1.1 und 1.2 im Repository der Startseite: Tokens, heller und dunkler Modus, Hauptnavigation – als ein
-überprüfbarer Commit, lokal angesehen auf Handy-, iPad- und Beamerbreite, **ohne Veröffentlichung** bis zur Zustimmung.
+Rückmeldung der Lehrkraft zum Aussehen der Startseite. Danach Etappe 1.2 (Lernübersicht und Werkzeuge im neuen
+Design) oder direkt Etappe 1.3 (Repository `Lehrraum`) – **ohne Veröffentlichung** bis zur Zustimmung.

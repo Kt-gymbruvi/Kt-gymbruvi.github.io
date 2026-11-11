@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Impressum und Datenschutz</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="gemeinsam/grundlage.css" />
+    <script src="gemeinsam/design.js"></script>
     <style>
       main { max-width: 48rem; padding-bottom: 3rem; }
-      h2 { margin-top: 2rem; color: var(--gelb); }
+      main h1 { margin: 1.5rem 0 0; font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 900; line-height: 1.15; }
+      main h2 { margin-top: 2rem; font-size: 1.4rem; }
+      main li { margin-bottom: 0.6rem; }
     </style>
   </head>
   <body>
-    <header class="kopf">
-      <p><a href="./">← Zur Startseite</a></p>
-      <h1>Impressum &amp; Datenschutz</h1>
+    <header class="kopfleiste">
+      <div class="kopfleiste-innen">
+        <p class="marke"><a href="./">Lehrraum</a></p>
+        <a class="nav-punkt" href="./">← Zur Startseite</a>
+      </div>
     </header>
-    <main>
+    <main class="inhalt">
+      <h1>Impressum &amp; Datenschutz</h1>
 
       <h2>Impressum</h2>
       <p>
@@ -39,8 +46,13 @@
           Schriftarten, keine eingebetteten Videos). QR-Codes werden direkt im Browser erzeugt.
         </li>
         <li>
-          Die Werkzeuge (z. B. Timer, Gruppen &amp; Zufall, Herzfrequenz-Zonen) laufen nur im Browser. Eingaben werden nicht
-          gesendet; gespeichert wird höchstens auf dem eigenen Gerät und nur, wenn man es ausdrücklich auswählt.
+          Die Werkzeuge (Timer, Gruppen &amp; Zufall, Lautstärkeampel) laufen nur im Browser. Eingaben werden nicht
+          gesendet; gespeichert wird höchstens auf dem eigenen Gerät (zum Beispiel Einstellungen, die Wahl des hellen oder
+          dunklen Modus oder eine Namensliste, wenn man das ausdrücklich auswählt).
+        </li>
+        <li>
+          Die <b>Lautstärkeampel</b> nutzt das Mikrofon erst nach ausdrücklicher Erlaubnis. Der Pegel wird nur auf dem eigenen
+          Gerät ausgewertet; es wird nichts aufgenommen, gespeichert oder gesendet.
         </li>
         <li>
           Die <b>Lernangebote</b> laufen nur im Browser. Welche Angebote in welcher Reihenfolge angezeigt werden, lädt die

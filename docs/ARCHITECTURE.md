@@ -60,9 +60,11 @@ Gerät der Lehrkraft (IndexedDB)            Supabase (bestehendes Projekt, Frank
 | Aufwand Einrichtung | klein (Muster aus Quizzo) | mittel | klein |
 | Eignung für eine große Tafel-App | gut | gut | schlecht (tausende Zeilen ohne Typen und Tests) |
 
-**Entscheidung 4 – Rolle der Startseite.** Die Startseite wird von Schülern per QR-Code aufgerufen. Empfohlen: Sie
-bleibt die freundliche Schülerseite „Lernen mit Spaß“ und bekommt die Hauptnavigation; die Punkte Tafel, Unterrichten
-und Bibliothek führen zur Lehrkraft-Anmeldung.
+**Entscheidung 4 – Rolle der Startseite (entschieden am 11.11.2026).** Die Startseite heißt „Lehrraum“ und ist die
+Übersicht der Plattform nach dem Muster „Klassen zuerst“: Auf dem Gerät der Lehrkraft stehen die Kacheln der eigenen
+Klassen im Mittelpunkt, ein Tipp öffnet die Tafel dieser Klasse. Weil Klassen nur auf dem Gerät gespeichert sind und
+die Startseite dieselbe Herkunft hat wie die App, kann sie die Liste lesen; ein Schülergerät hat keine Klassen und
+zeigt nur „Mitmachen“ und die Lernangebote. Der Name der Zeichenfläche („Tafel“) ist noch offen.
 
 ## 3. Technik der neuen App „Lehrraum“
 

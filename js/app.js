@@ -1,8 +1,11 @@
-/* Startseite: baut Kacheln und Materialliste aus js/inhalte.js. Keine Daten verlassen das Gerät. */
+/* Startseite „Lehrraum“: baut Navigation, Kacheln, Werkzeuge und Materialliste aus js/inhalte.js.
+   Keine Daten verlassen das Gerät. */
 ;(function () {
   'use strict'
 
   const SEITE = window.SEITE || {}
+  const NAVIGATION = window.NAVIGATION || []
+  const MITMACHEN = window.MITMACHEN || {}
   const LINKS = window.LINKS || []
   const MATERIALIEN = window.MATERIALIEN || []
 
@@ -12,6 +15,16 @@
     if (klasse) e.className = klasse
     if (text != null) e.textContent = text
     return e
+  }
+
+  /** Symbol aus gemeinsam/symbole.js; unbekannte Namen (z. B. ein Emoji) erscheinen als Text */
+  function zeichen(name, klasse) {
+    const huelle = el('span', klasse)
+    huelle.setAttribute('aria-hidden', 'true')
+    const svg = name && window.LehrraumSymbol ? window.LehrraumSymbol(name) : null
+    if (svg) huelle.append(svg)
+    else huelle.textContent = name || ''
+    return huelle
   }
 
   const volleAdresse = (pfad) => new URL(pfad, location.href).href
@@ -72,15 +85,82 @@
     document.getElementById('titel').textContent = SEITE.titel
     document.title = SEITE.titel
   }
-  document.getElementById('untertitel').textContent = SEITE.untertitel || ''
+  const untertitel = document.getElementById('untertitel')
+  untertitel.textContent = SEITE.untertitel || ''
+  untertitel.hidden = !SEITE.untertitel
+
+  // ---------- Hauptnavigation ----------
+  const navListe = document.getElementById('navigation')
+  NAVIGATION.forEach((n) => {
+    if (!n.adresse && !SEITE.geplantesZeigen) return
+    const li = el('li', n.adresse ? null : 'nav-geplant')
+    // Bereiche ohne Adresse gibt es noch nicht: kein Link, sondern Text mit dem Hinweis „folgt“
+    const punkt = el(n.adresse ? 'a' : 'span', 'nav-punkt' + (n.adresse ? '' : ' geplant'))
+    if (n.adresse) punkt.href = n.adresse
+    punkt.append(zeichen(n.symbol, 'nav-symbol'), el('span', null, n.titel))
+    if (!n.adresse) punkt.append(el('small', null, 'folgt'))
+    li.append(punkt)
+    navListe.append(li)
+  })
+
+  // ---------- Heller und dunkler Modus ----------
+  const designKnopf = document.getElementById('design-knopf')
+  function zeichneDesignKnopf() {
+    const dunkel = window.LehrraumDesign && window.LehrraumDesign.aktuell() === 'dunkel'
+    designKnopf.textContent = ''
+    designKnopf.append(zeichen(dunkel ? 'sonne' : 'mond'))
+    designKnopf.setAttribute('aria-label', dunkel ? 'Zum hellen Modus wechseln' : 'Zum dunklen Modus wechseln')
+    designKnopf.title = dunkel ? 'Heller Modus' : 'Dunkler Modus'
+  }
+  if (window.LehrraumDesign) {
+    designKnopf.addEventListener('click', () => window.LehrraumDesign.umschalten())
+    document.addEventListener('lehrraum-design', zeichneDesignKnopf)
+    if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', zeichneDesignKnopf)
+    zeichneDesignKnopf()
+  } else {
+    designKnopf.hidden = true
+  }
+
+  // ---------- Mitmachen mit PIN ----------
+  const pinFeld = document.getElementById('pin')
+  const pinFehler = document.getElementById('pin-fehler')
+  function pinMeldung(text) {
+    pinFehler.textContent = text
+    pinFehler.hidden = !text
+    pinFeld.setAttribute('aria-invalid', String(!!text))
+  }
+  pinFeld.addEventListener('input', () => {
+    pinFeld.value = pinFeld.value.replace(/\D/g, '').slice(0, 6)
+    pinMeldung('')
+  })
+  document.querySelectorAll('#pin-form [data-ziel]').forEach((knopf) => {
+    const basis = MITMACHEN[knopf.dataset.ziel]
+    if (!basis) {
+      knopf.hidden = true
+      return
+    }
+    knopf.addEventListener('click', () => {
+      if (!/^\d{6}$/.test(pinFeld.value)) {
+        pinMeldung('Die PIN hat sechs Ziffern. Sie steht am Beamer.')
+        pinFeld.focus()
+        return
+      }
+      location.href = basis + pinFeld.value
+    })
+  })
+  document.getElementById('pin-form').addEventListener('submit', (e) => {
+    e.preventDefault() // Eingabetaste: Quiz und Abstimmung haben getrennte PINs, also erst wählen lassen
+    pinMeldung(/^\d{6}$/.test(pinFeld.value) ? 'Bitte wählen: Quiz oder Abstimmung.' : 'Die PIN hat sechs Ziffern. Sie steht am Beamer.')
+  })
+  if (!MITMACHEN.quiz && !MITMACHEN.abstimmung) document.getElementById('mitmachen').hidden = true
 
   // ---------- Kacheln ----------
   const linkListe = document.getElementById('links')
   LINKS.forEach((l) => {
     const li = el('li')
-    const a = el('a', 'kachel')
+    const a = el('a', 'kachel' + (l.farbe ? ' farbe-' + l.farbe : ''))
     a.href = l.adresse
-    a.append(el('span', 'kachel-symbol', l.symbol || '🔗'))
+    a.append(zeichen(l.symbol || 'verweis', 'kachel-symbol'))
     a.append(el('span', 'kachel-titel', l.titel))
     if (l.text) a.append(el('span', 'kachel-text', l.text))
     li.append(a)
@@ -105,7 +185,7 @@
       const li = el('li')
       const a = el('a', 'werkzeug mit-qr')
       a.href = w.adresse
-      a.append(el('span', 'werkzeug-symbol', w.symbol || '🧰'))
+      a.append(zeichen(w.symbol || 'werkzeug', 'werkzeug-symbol'))
       const textteil = el('span', 'werkzeug-text')
       textteil.append(el('span', 'werkzeug-titel', w.titel))
       if (w.text) textteil.append(el('span', 'werkzeug-info', w.text))

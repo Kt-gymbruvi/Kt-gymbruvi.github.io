@@ -1,0 +1,274 @@
+/*
+ * Lehrraum – gemeinsame Grundlage: Seite, Kopfleiste mit Hauptnavigation, Knöpfe, QR-Fenster, Fuß.
+ * Braucht gemeinsam/tokens.css. Seitenspezifisches steht in eigenen Dateien (z. B. startseite.css).
+ */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--seite);
+  color: var(--text);
+  font-family: var(--schrift);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--verweis);
+}
+
+:focus-visible {
+  outline: 3px solid var(--fokus);
+  outline-offset: 2px;
+}
+
+.unsichtbar {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.symbol {
+  width: 1.5em;
+  height: 1.5em;
+  flex-shrink: 0;
+}
+
+.inhalt,
+.fuss {
+  width: min(var(--breite), 100% - 2rem);
+  margin-inline: auto;
+}
+
+/* ---------- Kopfleiste ---------- */
+.kopfleiste {
+  background: var(--kopf);
+  color: var(--kopf-text);
+}
+.kopfleiste-innen {
+  width: min(var(--breite), 100% - 2rem);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+.marke {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+.marke a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tippflaeche);
+  color: var(--gelb);
+  text-decoration: none;
+}
+.hauptnavigation {
+  flex: 1;
+  min-width: 0;
+}
+.hauptnavigation ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hauptnavigation ul::-webkit-scrollbar {
+  display: none;
+}
+.nav-punkt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--tippflaeche);
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  color: var(--kopf-text);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.nav-punkt:hover,
+a.nav-punkt:focus-visible {
+  background: rgb(255 255 255 / 0.14);
+}
+.nav-punkt.geplant {
+  color: var(--kopf-text-2);
+  font-weight: 600;
+}
+.nav-punkt small {
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.kopfleiste :focus-visible {
+  outline-color: var(--gelb);
+}
+.rund-knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tippflaeche);
+  height: var(--tippflaeche);
+  flex-shrink: 0;
+  margin-left: auto;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.12);
+  color: var(--kopf-text);
+  cursor: pointer;
+}
+.rund-knopf:hover {
+  background: rgb(255 255 255 / 0.22);
+}
+
+/* ---------- Knöpfe ---------- */
+.knopf,
+.qr-knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  min-height: var(--tippflaeche);
+  padding: 0.5rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+.knopf {
+  background: var(--navy);
+  color: #fff;
+}
+.knopf:hover {
+  background: var(--navy-hell);
+}
+.knopf.zweit,
+.qr-knopf {
+  background: var(--flaeche-2);
+  color: var(--text);
+}
+.knopf.zweit:hover,
+.qr-knopf:hover {
+  box-shadow: inset 0 0 0 2px var(--linie-stark);
+}
+:root[data-design='dunkel'] .knopf:not(.zweit) {
+  background: var(--gelb);
+  color: var(--navy);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-design='hell']) .knopf:not(.zweit) {
+    background: var(--gelb);
+    color: var(--navy);
+  }
+}
+
+/* ---------- QR-Anzeige für den Beamer ---------- */
+dialog {
+  width: min(44rem, 100% - 2rem);
+  max-height: calc(100% - 2rem);
+  padding: 2rem;
+  border: 0;
+  border-radius: 2rem;
+  background: var(--flaeche);
+  color: var(--text);
+  text-align: center;
+}
+dialog::backdrop {
+  background: rgb(3 11 34 / 0.8);
+}
+dialog h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+#qr-bild svg {
+  display: block;
+  width: min(28rem, 100%, 60vh);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 1rem;
+}
+#qr-adresse {
+  margin: 1rem 0 1.5rem;
+  font-size: 1.15rem;
+  overflow-wrap: anywhere;
+  color: var(--text-2);
+}
+
+/* ---------- Fuß ---------- */
+.fuss {
+  margin-top: 4rem;
+  padding: 1.5rem 0 2.5rem;
+  border-top: 1px solid var(--linie);
+  font-size: 0.95rem;
+  color: var(--text-2);
+}
+.fuss p {
+  margin: 0.25rem 0;
+}
+
+/* Schmale Bildschirme: Navigation in eine eigene Zeile, bei Bedarf seitlich wischen */
+@media (max-width: 72rem) {
+  .hauptnavigation {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .nav-punkt {
+    padding-inline: 0.7rem;
+  }
+  .hauptnavigation li:first-child .nav-punkt {
+    padding-left: 0;
+  }
+}
+
+/* Handy: Bereiche, die es noch nicht gibt, gar nicht erst zeigen */
+@media (max-width: 40rem) {
+  .hauptnavigation .nav-geplant {
+    display: none;
+  }
+  .hauptnavigation li:not(.nav-geplant) .nav-punkt {
+    padding-left: 0;
+    padding-right: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .kopfleiste,
+  .qr-knopf {
+    display: none;
+  }
+}

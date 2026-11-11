@@ -8,33 +8,64 @@
  *
  * Alles hier ist öffentlich sichtbar – keine Schülerdaten, keine Prüfungslösungen,
  * keine Scans aus Schulbüchern.
+ *
+ * Symbole: Namen aus gemeinsam/symbole.js (z. B. 'tafel', 'quiz', 'timer'). Ein Emoji geht auch.
  */
 
-/** Überschrift oben auf der Seite */
+/** Name und Untertitel der Seite */
 window.SEITE = {
-  titel: 'Lernen mit Spaß',
-  untertitel: 'Quiz, Material und Werkzeuge an einem Ort',
+  titel: 'Lehrraum',
+  untertitel: 'Unterrichten, mitmachen und lernen an einem Ort',
+  // Bereiche, die es noch nicht gibt, in der Navigation mit dem Hinweis „folgt“ zeigen (false = weglassen)
+  geplantesZeigen: true,
 }
 
-/** Große Kacheln oben (Links auf eigene Seiten) */
+/**
+ * Hauptnavigation oben.
+ *   adresse: Ziel des Bereichs. Solange sie fehlt (null), ist der Bereich noch nicht gebaut.
+ */
+window.NAVIGATION = [
+  { titel: 'Tafel', symbol: 'tafel', adresse: null },
+  { titel: 'Unterrichten', symbol: 'unterrichten', adresse: null },
+  { titel: 'Interaktion', symbol: 'interaktion', adresse: '#interaktion' },
+  { titel: 'Lernen', symbol: 'lernen', adresse: 'lernen/' },
+  { titel: 'Bibliothek', symbol: 'bibliothek', adresse: null },
+]
+
+/**
+ * Mitmachen mit der PIN vom Beamer: Die PIN wird an diese Adressen angehängt.
+ * (Quiz und Abstimmung haben getrennte PINs; deshalb wählt man, wohin es geht.)
+ */
+window.MITMACHEN = {
+  quiz: 'https://kt-gymbruvi.github.io/Quizzo/#/mitspielen?pin=',
+  abstimmung: 'https://kt-gymbruvi.github.io/Klassenfunk/#/mitmachen?pin=',
+}
+
+/**
+ * Große Kacheln (Links auf eigene Seiten).
+ *   farbe: 'lernen' | 'quizzo' | 'klassenfunk' | 'tafel' | 'unterrichten' | 'interaktion' | 'bibliothek' (optional)
+ */
 window.LINKS = [
   {
-    symbol: '📚',
-    titel: 'Lernangebote',
-    text: 'Simulationen, Erklärungen und Übungen – nach Fach, Jahrgang und Thema.',
-    adresse: 'lernen/',
-  },
-  {
-    symbol: '❓',
+    symbol: 'quiz',
+    farbe: 'quizzo',
     titel: 'Quizzo',
     text: 'Das Live-Quiz: mit PIN oder Aufgaben-Code mitspielen – oder als Lehrkraft ein Quiz starten.',
     adresse: 'https://kt-gymbruvi.github.io/Quizzo/',
   },
   {
-    symbol: '📡',
+    symbol: 'funk',
+    farbe: 'klassenfunk',
     titel: 'Klassenfunk',
     text: 'Live abstimmen im Unterricht: Wortwolke, Umfrage, Fragen an die Lehrkraft. Mitmachen mit PIN, anonym.',
     adresse: 'https://kt-gymbruvi.github.io/Klassenfunk/',
+  },
+  {
+    symbol: 'lernen',
+    farbe: 'lernen',
+    titel: 'Lernangebote',
+    text: 'Simulationen, Erklärungen und Übungen – nach Fach, Jahrgang und Thema.',
+    adresse: 'lernen/',
   },
 ]
 
@@ -46,21 +77,21 @@ window.LINKS = [
 window.WERKZEUGE = [
   {
     bereich: 'Unterricht',
-    symbol: '⏱',
+    symbol: 'timer',
     titel: 'Timer',
     text: 'Countdown für Arbeitsphasen – groß für den Beamer, mit Signalton.',
     adresse: 'werkzeuge/timer/',
   },
   {
     bereich: 'Unterricht',
-    symbol: '🎲',
+    symbol: 'wuerfel',
     titel: 'Gruppen & Zufall',
     text: 'Gruppen oder Paare auslosen, eine Person ziehen. Namen bleiben auf diesem Gerät.',
     adresse: 'werkzeuge/gruppen/',
   },
   {
     bereich: 'Unterricht',
-    symbol: '🚦',
+    symbol: 'ampel',
     titel: 'Lautstärkeampel',
     text: 'Zeigt am Beamer, wie laut es in der Klasse ist. Das Mikrofon wird nur auf diesem Gerät ausgewertet, nichts aufgenommen.',
     adresse: 'werkzeuge/lautstaerke/',

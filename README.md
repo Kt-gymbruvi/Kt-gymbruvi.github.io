@@ -1,4 +1,4 @@
-# Startseite kt-gymbruvi.github.io
+# Startseite kt-gymbruvi.github.io – „Lehrraum“
 
 Einfache Startseite ohne Build-Schritt: reines HTML, CSS und JavaScript. Was im Repository liegt, ist
 nach dem Push unter https://kt-gymbruvi.github.io/ erreichbar. Quizzo bleibt unter `/Quizzo/` und
@@ -8,8 +8,10 @@ wird hiervon nicht berührt.
 
 Fast alles steht in **`js/inhalte.js`**:
 
-- `SEITE` – Überschrift und Untertitel
-- `LINKS` – die großen gelben Kacheln (z. B. Quizzo)
+- `SEITE` – Name und Untertitel
+- `NAVIGATION` – die Hauptnavigation oben (Bereiche ohne Adresse erscheinen als „folgt“)
+- `MITMACHEN` – wohin die PIN-Eingabe führt (Quizzo, Klassenfunk)
+- `LINKS` – die großen Kacheln (z. B. Quizzo)
 - `WERKZEUGE` – kleine Web-Apps unter `werkzeuge/` (Timer, Gruppen & Zufall, Lautstärkeampel)
 - `MATERIALIEN` – die Materialliste (Fach, Klasse, Titel, Datei, Beschreibung)
 
@@ -17,6 +19,9 @@ Neues Material: Datei nach `materialien/` legen (Name ohne Leerzeichen/Umlaute),
 `MATERIALIEN` ergänzen. Jeder Eintrag bekommt automatisch einen QR-Knopf für den Beamer.
 
 Lokal ansehen: `index.html` im Browser öffnen (Doppelklick genügt).
+
+Farben, Abstände und Symbole stehen in `gemeinsam/` (`tokens.css`, `grundlage.css`, `symbole.js`); der helle und
+dunkle Modus wird dort gesteuert. Plan für den Ausbau zur Unterrichtsplattform: `docs/IMPLEMENTATION_ROADMAP.md`.
 
 ## Werkzeuge und Claude-Artefakte
 

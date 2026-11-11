@@ -1,0 +1,366 @@
+/* Startseite „Lehrraum“. Braucht gemeinsam/tokens.css und gemeinsam/grundlage.css. */
+
+.untertitel {
+  margin: 1.5rem 0 0;
+  font-size: 1.25rem;
+  color: var(--text-2);
+}
+
+main h2 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+main > section {
+  margin-top: 2.5rem;
+  scroll-margin-top: 1rem;
+}
+
+/* ---------- Mitmachen mit PIN ---------- */
+.mitmachen {
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: inset 0 0 0 1px var(--linie);
+}
+main .mitmachen {
+  margin-top: 1.5rem;
+}
+.mitmachen h2 {
+  margin-bottom: 0.5rem;
+}
+.pin-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+.pin-form label {
+  font-weight: 700;
+  color: var(--text-2);
+}
+.pin-form input {
+  width: 9.5rem;
+  min-height: var(--tippflaeche);
+  padding: 0.25rem 0.9rem;
+  border: 2px solid var(--linie-stark);
+  border-radius: var(--radius);
+  background: var(--seite);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+.pin-form input::placeholder {
+  color: var(--linie-stark);
+  font-weight: 600;
+}
+.pin-form input[aria-invalid='true'] {
+  border-color: var(--fehler);
+}
+.pin-knoepfe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.fehler {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--fehler);
+  font-weight: 700;
+}
+
+/* ---------- Kacheln ---------- */
+.kacheln {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+.kacheln li {
+  position: relative;
+}
+.kachel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: inset 0 0 0 1px var(--linie);
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.1s;
+}
+.kachel:hover,
+.kachel:focus-visible {
+  transform: translateY(-2px);
+}
+.kachel.mit-qr {
+  padding-right: 5rem;
+}
+.kachel-symbol {
+  display: flex;
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.kachel-titel {
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+.kachel-text {
+  font-size: 1.05rem;
+}
+.kacheln .qr-knopf {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+/* Bereichsfarben */
+.kachel.farbe-tafel { background: var(--tafel-hell); box-shadow: none; }
+.kachel.farbe-tafel .kachel-symbol, .kachel.farbe-tafel .kachel-titel { color: var(--tafel); }
+.kachel.farbe-unterrichten { background: var(--unterrichten-hell); box-shadow: none; }
+.kachel.farbe-unterrichten .kachel-symbol, .kachel.farbe-unterrichten .kachel-titel { color: var(--unterrichten); }
+.kachel.farbe-interaktion { background: var(--interaktion-hell); box-shadow: none; }
+.kachel.farbe-interaktion .kachel-symbol, .kachel.farbe-interaktion .kachel-titel { color: var(--interaktion); }
+.kachel.farbe-lernen { background: var(--lernen-hell); box-shadow: none; }
+.kachel.farbe-lernen .kachel-symbol, .kachel.farbe-lernen .kachel-titel { color: var(--lernen); }
+.kachel.farbe-bibliothek { background: var(--bibliothek-hell); box-shadow: none; }
+.kachel.farbe-bibliothek .kachel-symbol, .kachel.farbe-bibliothek .kachel-titel { color: var(--bibliothek); }
+
+/* Quizzo und Klassenfunk behalten ihre eigenen Farben */
+.kachel.farbe-quizzo,
+.kachel.farbe-klassenfunk {
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+}
+.kachel.farbe-quizzo { background: var(--quizzo); }
+.kachel.farbe-quizzo .kachel-symbol, .kachel.farbe-quizzo .kachel-titel { color: var(--quizzo-text); }
+.kachel.farbe-klassenfunk { background: var(--klassenfunk); }
+.kachel.farbe-klassenfunk .kachel-symbol, .kachel.farbe-klassenfunk .kachel-titel { color: var(--klassenfunk-text); }
+.kachel.farbe-quizzo + .qr-knopf,
+.kachel.farbe-klassenfunk + .qr-knopf {
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
+}
+.kachel.farbe-quizzo:focus-visible,
+.kachel.farbe-klassenfunk:focus-visible {
+  outline-color: var(--gelb);
+  outline-offset: 3px;
+}
+
+/* ---------- Werkzeuge ---------- */
+.werkzeug-liste,
+.werkzeug-karten {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.werkzeug-gruppe h3 {
+  margin: 1.25rem 0 0.75rem;
+  font-size: 1.2rem;
+  color: var(--text-2);
+}
+.werkzeug-liste > li:first-child h3 {
+  margin-top: 0;
+}
+.werkzeug-karten {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+.werkzeug-karten li {
+  position: relative;
+}
+.werkzeug {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+  padding: 1rem 5rem 1rem 1.25rem;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: inset 0 0 0 1px var(--linie);
+  color: var(--text);
+  text-decoration: none;
+}
+.werkzeug:hover,
+.werkzeug:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--linie-stark);
+}
+.werkzeug-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--flaeche-2);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.werkzeug-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.werkzeug-titel {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+.werkzeug-info {
+  color: var(--text-2);
+  font-size: 1rem;
+}
+.werkzeug-karten .qr-knopf {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+}
+
+/* ---------- Materialien ---------- */
+.material-kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.material-kopf h2 {
+  margin: 0;
+}
+.suche input {
+  width: min(20rem, 100%);
+  min-height: var(--tippflaeche);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--linie);
+  border-radius: 999px;
+  background: var(--flaeche);
+  color: var(--text);
+  font: inherit;
+}
+.faecher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+}
+.fach-knopf {
+  min-height: var(--tippflaeche);
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--flaeche-2);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fach-knopf[aria-pressed='true'] {
+  background: var(--navy);
+  color: #fff;
+}
+.fach-gruppe + .fach-gruppe {
+  margin-top: 2rem;
+}
+.fach-gruppe h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+  color: var(--text-2);
+}
+.liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.eintrag {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: inset 0 0 0 1px var(--linie);
+}
+.eintrag-link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--text);
+  text-decoration: none;
+}
+.eintrag-link:hover .eintrag-titel,
+.eintrag-link:focus-visible .eintrag-titel {
+  text-decoration: underline;
+}
+.eintrag-titel {
+  font-size: 1.2rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.eintrag-info,
+.leer {
+  color: var(--text-2);
+  font-size: 1rem;
+}
+.typ {
+  flex-shrink: 0;
+  min-width: 3.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--flaeche-2);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ---------- Handy ---------- */
+@media (max-width: 40rem) {
+  .untertitel {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+  .pin-form label {
+    flex-basis: 100%;
+  }
+  .pin-form input {
+    flex: 1;
+    min-width: 0;
+  }
+  .pin-knoepfe {
+    flex-basis: 100%;
+  }
+  .pin-knoepfe .knopf {
+    flex: 1 1 auto;
+    white-space: nowrap;
+  }
+  .eintrag {
+    flex-wrap: wrap;
+  }
+  /* QR-Codes braucht man am Beamer, nicht auf dem Handy */
+  .eintrag .qr-knopf,
+  .werkzeug-karten .qr-knopf {
+    display: none;
+  }
+  .werkzeug {
+    padding-right: 1.25rem;
+  }
+}
+
+@media print {
+  .mitmachen {
+    display: none;
+  }
+}
