@@ -36,11 +36,11 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 - Materialliste ist leer.
 
 ## Schwesterprojekt Lehrraum
-- Seit 11.11.2026 gibt es `../Lehrraum` (nur lokal, kein GitHub-Repository): Gerüst und Tafel mit Stift, Textmarker, Radierer, Text, Formen, Bildern, Auswahl, Seiten, PDF öffnen und speichern, Rückgängig, Autospeichern sowie Fenstern (Uhr, Timer, Stoppuhr, Würfel, Notizen, Quizzo, Klassenfunk, Lernangebote) – Etappen 1.3, 2a, 2b, 2c, 3a und 5a. Stand dort in `docs/PROJECT-STATUS.md`.
-- Der Navigationspunkt „Tafel“ in `js/inhalte.js` bleibt ohne Adresse, bis Lehrraum unter `/Lehrraum/` veröffentlicht ist.
+- Seit 11.11.2026 gibt es `../Lehrraum`, veröffentlicht unter https://kt-gymbruvi.github.io/Lehrraum/ (Repository `Kt-gymbruvi/Lehrraum`): Gerüst und Tafel mit Stift, Textmarker, Radierer, Text, Formen, Bildern, Auswahl, Seiten, PDF öffnen und speichern, Rückgängig, Autospeichern sowie Fenstern (Uhr, Timer, Stoppuhr, Würfel, Notizen, Quizzo, Klassenfunk, Lernangebote) – Etappen 1.3, 2a, 2b, 2c, 3a und 5a. Stand dort in `docs/PROJECT-STATUS.md`.
+- Der Navigationspunkt „Tafel“ in `js/inhalte.js` hat auf dem Zweig noch keine Adresse. Lehrraum ist jetzt live; beim Veröffentlichen der neuen Startseite `adresse: '/Lehrraum/#/tafel'` eintragen.
 
 ## Nächste Schritte (priorisiert, siehe `IMPLEMENTATION_ROADMAP.md`)
-1. Tafel am iPad (Apple Pencil) und am Smartboard erproben – dafür muss Lehrraum veröffentlicht werden (Entscheidung der Lehrkraft).
+1. Tafel am iPad (Apple Pencil) und am Smartboard erproben (Lehrkraft). Entscheiden, ob die neue Startseite (Zweig `lehrraum-phase-1`) veröffentlicht wird.
 2. Etappe 1.2: Lernübersicht und Werkzeuge auf `gemeinsam/` umstellen, QR-Fenster als gemeinsames Modul.
 3. Zusammenführen mit `main` und Veröffentlichen erst nach ausdrücklicher Zustimmung.
 4. Lautstärkeampel am iPad im Unterricht ausprobieren, Grenzwerte ggf. anpassen.
