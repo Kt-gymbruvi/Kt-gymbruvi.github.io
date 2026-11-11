@@ -36,7 +36,7 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 - Materialliste ist leer.
 
 ## Schwesterprojekt Lehrraum
-- Seit 11.11.2026 gibt es `../Lehrraum` (nur lokal, kein GitHub-Repository): Gerüst und Tafel mit Stift, Textmarker, Radierer, Rückgängig, Autospeichern (Etappen 1.3 und 2a). Stand dort in `docs/PROJECT-STATUS.md`.
+- Seit 11.11.2026 gibt es `../Lehrraum` (nur lokal, kein GitHub-Repository): Gerüst und Tafel mit Stift, Textmarker, Radierer, Rückgängig, Autospeichern sowie Fenstern (Uhr, Timer, Stoppuhr, Würfel, Notizen) – Etappen 1.3, 2a und 3a. Stand dort in `docs/PROJECT-STATUS.md`.
 - Der Navigationspunkt „Tafel“ in `js/inhalte.js` bleibt ohne Adresse, bis Lehrraum unter `/Lehrraum/` veröffentlicht ist.
 
 ## Nächste Schritte (priorisiert, siehe `IMPLEMENTATION_ROADMAP.md`)
