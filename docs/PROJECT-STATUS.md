@@ -1,18 +1,18 @@
 # Projektstand – Startseite kt-gymbruvi.github.io
 
-Stand: 12.11.2026 · live unter https://kt-gymbruvi.github.io/ ist weiterhin der Stand von `main` (`68fe986`).
-**In Arbeit, nicht veröffentlicht:** Zweig `lehrraum-phase-1` – Ausbau zur Unterrichtsplattform „Lehrraum“.
+Stand: 12.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`, veröffentlicht am 12.11.2026). Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
 ## Implementiert
-- **Startseite „Lehrraum“** (`index.html`, `startseite.css`, `js/app.js`, `js/inhalte.js`) – *nur auf dem Zweig*, nach dem Bildentwurf der Lehrkraft:
+- **Rückwege (geprüft am 12.11.2026 an den veröffentlichten Seiten):** Quizzo (Knopf „← Lehrraum“ auf Startseite, Anmeldung und in der Lehrkraft-Kopfzeile), Klassenfunk (Knopf „Lehrraum“ in jeder Ansicht), Lehrraum-App (Haus-Knopf), Lernübersicht und Werkzeuge („← Startseite“) führen alle auf `https://kt-gymbruvi.github.io/`. Lernangebote führen über „← Lernangebote“ zur Lernübersicht und von dort zur Startseite.
+- **Startseite „Lehrraum“** (`index.html`, `startseite.css`, `js/app.js`, `js/inhalte.js`), nach dem Bildentwurf der Lehrkraft:
   - Kopfzeile mit Logo, Suche über Bereiche, Werkzeuge, Lernangebote und Materialien, Anmelden bzw. Konto-Kürzel mit Abmelden.
   - Seitenleiste links (auf schmalen Bildschirmen als aufklappbares Menü), darin der Umschalter hell/dunkel.
   - **Volle Fassung für angemeldete Lehrkräfte:** Begrüßung mit „Zur Tafel“, fünf Kacheln (Meine Klassen, Quizzo, Klassenfunk, Lernangebote, Interaktive Tafel), Bereich **„Meine Klassen“** mit „Zur Tafel“ je Klasse und „Neue Klasse anlegen“, „Zuletzt benutzt“, Schnellzugriff, Werkzeuge.
   - Die Klassen liest `gemeinsam/klassen.js` aus dem Speicher des Geräts (IndexedDB der Lehrraum-App, nur lesend). Angelegt werden sie in der Lehrraum-App (`/Lehrraum/#/klassen`).
   - **Schlanke Fassung ohne Anmeldung:** „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Kacheln Quizzo, Klassenfunk, Lernangebote, Werkzeuge.
   - Materialliste mit Suche/Fachfilter/QR (derzeit leer und deshalb ausgeblendet).
-- **Gemeinsame Gestaltung** (`gemeinsam/`) – *nur auf dem Zweig*: `tokens.css` (Dunkelblau/Türkis aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
+- **Gemeinsame Gestaltung** (`gemeinsam/`): `tokens.css` (Dunkelblau/Türkis aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
 - **Werkzeuge** (`werkzeuge/`): Timer (Beamer, Signalton, Bildschirm bleibt an), Gruppen & Zufall (Namen nur im Gerät), Lautstärkeampel (Mikrofon nur lokal ausgewertet, „Ruhe messen“, Grenzen/Reaktionszeit einstellbar, optionaler Ton, Vollbild). Noch im alten Design (`style.css`, `werkzeug.css`).
 - **Lernangebote** (`lernen/`): 41 Einträge in `angebote.js` (32 Biologie Kl. 5–13, 9 Sport inkl. Oberstufe), Übersicht nach Fach › Jahrgang › Thema mit Suche und QR; Bearbeitungsmodus `lernen/#bearbeiten` für die angemeldete Lehrkraft (Supabase-Tabelle `lernangebote`, nutzt auch eine bestehende Quizzo-Anmeldung). Übersicht noch im alten Design.
 - Herzfrequenz-Zonen liegen seit 08.11.2026 unter `lernen/herzfrequenz-zonen/` (Sport, Kl. 11 und 12/13); `werkzeuge/herzfrequenz/` leitet weiter.
@@ -33,11 +33,11 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 
 ## Bekannte Probleme / offen
 - Neue Startseite nur in der Vorschau geprüft (1280 px und Handy 375 px, hell und dunkel, beide Fassungen) – nicht auf echtem iPad, Smartboard oder Beamer.
-- **Die Anmeldung auf der Startseite ist nicht mit einem echten Konto geprüft.** Die volle Fassung wurde mit einer nachgestellten Sitzung angesehen. Ungeprüft ist insbesondere, ob Quizzo, Klassenfunk und die Tafel eine hier begonnene Anmeldung übernehmen (umgekehrt – erst dort anmelden – nutzt die Startseite den schon bisher verwendeten Weg).
+- **Die Anmeldung auf der Startseite ist auch nach der Veröffentlichung nicht mit einem echten Konto geprüft** (das muss die Lehrkraft tun). Die volle Fassung wurde mit einer nachgestellten Sitzung angesehen. Ungeprüft ist insbesondere, ob Quizzo, Klassenfunk und die Tafel eine hier begonnene Anmeldung übernehmen (umgekehrt – erst dort anmelden – nutzt die Startseite den schon bisher verwendeten Weg).
 - Das Begrüßungsbild ist eine einfache Zeichnung; das Foto aus dem Entwurf liegt nicht als Datei vor.
 - Die Lehrraum-App (Tafel) verwendet im dunklen Modus noch Gelb als Akzent; Umstellung auf Türkis steht aus.
 - Lernübersicht und Werkzeuge haben noch das alte, dunkle Design und den Rückweg „← Startseite“; das wirkt neben der neuen Startseite uneinheitlich, bis Etappe 1.2 erledigt ist.
-- **„Meine Klassen“ verweist auf `/Lehrraum/#/klassen` und `/Lehrraum/#/tafel?klasse=…` – diese Seiten gibt es in der veröffentlichten Lehrraum-App noch nicht.** Startseite und Lehrraum müssen zusammen veröffentlicht werden (erst Lehrraum, dann die Startseite). In der lokalen Vorschau laufen beide unter verschiedenen Adressen und teilen sich deshalb keinen Speicher; der Bereich wurde mit eingesetzten Beispielklassen geprüft, das Zusammenspiel auf derselben Adresse nicht.
+- „Meine Klassen“: Zusammenspiel live geprüft (in der Lehrraum-App angelegte Klasse erscheint auf der Startseite, „Zur Tafel“ öffnet ihre Tafel). In der lokalen Vorschau teilen sich Startseite und Lehrraum keinen Speicher.
 - Frühere Notiz, erledigt: Sie brauchen die Klassenverwaltung und die Tafel aus dem Repository `Lehrraum`, das es noch nicht gibt.
 - `.claude/launch.json` (Vorschau über das Vite aus `../Quizzo`) ist lokal angelegt und bewusst nicht committet.
 - Lautstärkeampel nur mit künstlichem Testsignal geprüft, nicht mit echtem Mikrofon im Klassenraum.

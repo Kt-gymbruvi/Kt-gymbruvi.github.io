@@ -2,6 +2,12 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-12 – Veröffentlichung und Rückwege zur Startseite
+- Auf Wunsch der Lehrkraft führen alle Anwendungen zur neuen Startseite „Lehrraum“ (`https://kt-gymbruvi.github.io/`), nicht mehr zu einer alten Übersicht. Da die neue Startseite unter derselben Adresse liegt wie die alte, stimmten die vorhandenen Verweise; ergänzt wurde der fehlende Rückweg in Quizzo, in Klassenfunk nur die Beschriftung („Lehrraum“ statt „Homepage – Lernen mit Spaß“).
+- In Quizzo steht der Knopf bewusst nicht in den Spielansichten (Beamer, Handy im Spiel), damit ihn niemand mitten im Quiz antippt.
+- Reihenfolge der Veröffentlichung: erst Lehrraum, Quizzo und Klassenfunk, dann die Startseite – so verweist die Startseite nie auf Seiten, die es noch nicht gibt.
+- Der Zweig `lehrraum-phase-1` wurde ohne Umweg in `main` übernommen; weitere Arbeit wieder auf einem eigenen Zweig, veröffentlicht wird nur nach Zustimmung.
+
 ## 2026-11-12 – „Meine Klassen“ auf der Startseite
 - Die Startseite zeigt angemeldeten Lehrkräften ihre Klassen mit „Zur Tafel“. Die Klassen liegen im IndexedDB-Speicher der Lehrraum-App auf dem Gerät; `gemeinsam/klassen.js` liest sie nur (gleiche Adresse), ändert nichts und schließt die Verbindung sofort.
 - Anlegen und Verwalten geschieht in der Lehrraum-App – dort gibt es Tests und das Datenmodell; die Startseite bleibt ohne Build und ohne eigene Klassenlogik.

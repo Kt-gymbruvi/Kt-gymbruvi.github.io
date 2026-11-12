@@ -38,5 +38,6 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 ## Arbeitsweise
 - Vor dem Veröffentlichen prüfen: `node werkzeuge/pruefen.mjs` (alle Werkzeuge) bzw. `node werkzeuge/pruefen.mjs <datei>`; muss „Keine Probleme gefunden“ melden. Es gibt keine automatischen Tests.
 - Lokal ansehen: `index.html` öffnen oder Vite-Vorschau (`.claude/launch.json`, Eintrag „startseite“, Port 5180; nutzt das Vite aus `../Quizzo`). Neues immer hell und dunkel sowie in Handy- und Beamerbreite ansehen.
-- Der Ausbau läuft auf dem Zweig `lehrraum-phase-1`; `main` ist der veröffentlichte Stand.
+- `main` ist der veröffentlichte Stand (jeder Push auf `main` geht sofort live). Größere Umbauten auf einem eigenen Zweig vorbereiten und erst nach Zustimmung in `main` übernehmen.
+- Alle Anwendungen der Plattform verweisen auf `https://kt-gymbruvi.github.io/` als Startseite; diese Adresse darf sich nicht ändern.
 - Nichts veröffentlichen (Push auf `main`) und nichts löschen ohne ausdrückliche Zustimmung der Lehrkraft.
