@@ -8,7 +8,8 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
 - **Startseite „Lehrraum“** (`index.html`, `startseite.css`, `js/app.js`, `js/inhalte.js`) – *nur auf dem Zweig*, nach dem Bildentwurf der Lehrkraft:
   - Kopfzeile mit Logo, Suche über Bereiche, Werkzeuge, Lernangebote und Materialien, Anmelden bzw. Konto-Kürzel mit Abmelden.
   - Seitenleiste links (auf schmalen Bildschirmen als aufklappbares Menü), darin der Umschalter hell/dunkel.
-  - **Volle Fassung für angemeldete Lehrkräfte:** Begrüßung mit „Zur Tafel“, fünf Kacheln (Meine Klassen als „folgt“, Quizzo, Klassenfunk, Lernangebote, Interaktive Tafel), „Zuletzt benutzt“, Schnellzugriff, Werkzeuge.
+  - **Volle Fassung für angemeldete Lehrkräfte:** Begrüßung mit „Zur Tafel“, fünf Kacheln (Meine Klassen, Quizzo, Klassenfunk, Lernangebote, Interaktive Tafel), Bereich **„Meine Klassen“** mit „Zur Tafel“ je Klasse und „Neue Klasse anlegen“, „Zuletzt benutzt“, Schnellzugriff, Werkzeuge.
+  - Die Klassen liest `gemeinsam/klassen.js` aus dem Speicher des Geräts (IndexedDB der Lehrraum-App, nur lesend). Angelegt werden sie in der Lehrraum-App (`/Lehrraum/#/klassen`).
   - **Schlanke Fassung ohne Anmeldung:** „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Kacheln Quizzo, Klassenfunk, Lernangebote, Werkzeuge.
   - Materialliste mit Suche/Fachfilter/QR (derzeit leer und deshalb ausgeblendet).
 - **Gemeinsame Gestaltung** (`gemeinsam/`) – *nur auf dem Zweig*: `tokens.css` (Dunkelblau/Türkis aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
@@ -36,7 +37,8 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 - Das Begrüßungsbild ist eine einfache Zeichnung; das Foto aus dem Entwurf liegt nicht als Datei vor.
 - Die Lehrraum-App (Tafel) verwendet im dunklen Modus noch Gelb als Akzent; Umstellung auf Türkis steht aus.
 - Lernübersicht und Werkzeuge haben noch das alte, dunkle Design und den Rückweg „← Startseite“; das wirkt neben der neuen Startseite uneinheitlich, bis Etappe 1.2 erledigt ist.
-- Der Bereich „Meine Klassen“ mit „Zur Tafel“ je Klasse fehlt noch (Kachel und Seitenleiste zeigen „folgt“): Sie brauchen die Klassenverwaltung und die Tafel aus dem Repository `Lehrraum`, das es noch nicht gibt.
+- **„Meine Klassen“ verweist auf `/Lehrraum/#/klassen` und `/Lehrraum/#/tafel?klasse=…` – diese Seiten gibt es in der veröffentlichten Lehrraum-App noch nicht.** Startseite und Lehrraum müssen zusammen veröffentlicht werden (erst Lehrraum, dann die Startseite). In der lokalen Vorschau laufen beide unter verschiedenen Adressen und teilen sich deshalb keinen Speicher; der Bereich wurde mit eingesetzten Beispielklassen geprüft, das Zusammenspiel auf derselben Adresse nicht.
+- Frühere Notiz, erledigt: Sie brauchen die Klassenverwaltung und die Tafel aus dem Repository `Lehrraum`, das es noch nicht gibt.
 - `.claude/launch.json` (Vorschau über das Vite aus `../Quizzo`) ist lokal angelegt und bewusst nicht committet.
 - Lautstärkeampel nur mit künstlichem Testsignal geprüft, nicht mit echtem Mikrofon im Klassenraum.
 - README nennt noch die Schritte „Vor der ersten Veröffentlichung“ (erledigt); ob die Schulleitung das Impressum freigegeben hat, ist hier nicht dokumentiert. Der Impressumstext wurde am 11.11.2026 ergänzt (Lautstärkeampel, Speicherung auf dem Gerät).

@@ -35,7 +35,7 @@ const PLATTFORM = 'https://kt-gymbruvi.github.io'
  */
 window.NAVIGATION = [
   { titel: 'Startseite', symbol: 'haus', adresse: './', hier: true },
-  { titel: 'Meine Klassen', symbol: 'klassen', adresse: null, nur: 'lehrkraft' },
+  { titel: 'Meine Klassen', symbol: 'klassen', adresse: PLATTFORM + '/Lehrraum/#/klassen', nur: 'lehrkraft' },
   { titel: 'Quizzo', symbol: 'pokal', adresse: PLATTFORM + '/Quizzo/' },
   { titel: 'Klassenfunk', symbol: 'megafon', adresse: PLATTFORM + '/Klassenfunk/' },
   { titel: 'Lernangebote', symbol: 'lernen', adresse: 'lernen/' },
@@ -64,7 +64,8 @@ window.LINKS = [
     farbe: 'unterrichten',
     titel: 'Meine Klassen',
     text: 'Klassenräume verwalten und starten',
-    adresse: null, // folgt mit der Klassenverwaltung
+    adresse: PLATTFORM + '/Lehrraum/#/klassen',
+    qr: false, // Klassen liegen nur auf dem eigenen Gerät – ein QR-Code dorthin nützt niemandem
     nur: 'lehrkraft',
   },
   {
@@ -100,6 +101,17 @@ window.LINKS = [
     nur: 'lehrkraft',
   },
 ]
+
+/**
+ * Meine Klassen (nur für angemeldete Lehrkräfte). Die Klassen selbst liegen auf dem Gerät und werden in der
+ * Lehrraum-App angelegt; hier stehen nur die Adressen.
+ */
+window.KLASSEN = {
+  verwalten: PLATTFORM + '/Lehrraum/#/klassen',
+  neu: PLATTFORM + '/Lehrraum/#/klassen?neu=1',
+  tafel: PLATTFORM + '/Lehrraum/#/tafel?klasse=', // dahinter kommt die Kennung der Klasse
+  hoechstens: 7, // so viele Klassen zeigt die Startseite; alle stehen unter „Alle Klassen anzeigen“
+}
 
 /** Schnellzugriff (nur für angemeldete Lehrkräfte) */
 window.SCHNELLZUGRIFF = [

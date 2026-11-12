@@ -2,6 +2,12 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-12 – „Meine Klassen“ auf der Startseite
+- Die Startseite zeigt angemeldeten Lehrkräften ihre Klassen mit „Zur Tafel“. Die Klassen liegen im IndexedDB-Speicher der Lehrraum-App auf dem Gerät; `gemeinsam/klassen.js` liest sie nur (gleiche Adresse), ändert nichts und schließt die Verbindung sofort.
+- Anlegen und Verwalten geschieht in der Lehrraum-App – dort gibt es Tests und das Datenmodell; die Startseite bleibt ohne Build und ohne eigene Klassenlogik.
+- Auf einem Gerät ohne Klassen (z. B. Schülerhandy, falls sich dort jemand anmeldete) ist die Liste leer; es wird nichts übertragen.
+- Kein QR-Knopf an der Kachel „Meine Klassen“: Die Klassen gibt es nur auf dem eigenen Gerät.
+
 ## 2026-11-12 – Startseite nach dem Entwurf der Lehrkraft: Seitenleiste, Logo, Türkis, zwei Fassungen
 Vorlage: Bildentwurf der Lehrkraft (Seitenleiste links, Kopfzeile mit Logo und Suche, Begrüßung, fünf Kacheln, Klassen, Schnellzugriff). Entscheidungen der Lehrkraft dazu:
 - **Zwei Fassungen einer Seite:** Angemeldete Lehrkräfte sehen alles; ohne Anmeldung erscheint die schlanke Fassung (Mitmachen mit PIN, Quizzo, Klassenfunk, Lernangebote, Werkzeuge). Umgeschaltet wird über `<body data-rolle>` und `nur:` in `js/inhalte.js`. Die Seite selbst bleibt öffentlich – geschützt sind Daten, nicht Seiten.

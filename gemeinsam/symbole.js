@@ -37,6 +37,7 @@
     zahnrad: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
     suche: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
     menue: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
     blitz: '<path d="M13 3L5 13h6l-1 8 8-10h-6z"/>',
     uhr: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     schluessel: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>',

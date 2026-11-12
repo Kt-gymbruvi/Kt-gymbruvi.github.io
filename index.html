@@ -71,6 +71,15 @@
           <ul id="links" class="kacheln"></ul>
         </section>
 
+        <section class="karte klassen nur-lehrkraft" aria-labelledby="klassen-titel">
+          <div class="karten-kopf">
+            <h2 id="klassen-titel"><span id="klassen-symbol"></span>Meine Klassen</h2>
+            <a id="klassen-alle" href="#">Alle Klassen anzeigen</a>
+          </div>
+          <ul id="klassen" class="klassen-liste"></ul>
+          <p class="hinweis klein">Klassen liegen nur auf diesem Gerät.</p>
+        </section>
+
         <div class="zweispaltig nur-lehrkraft">
           <section class="karte" aria-labelledby="zuletzt-titel">
             <h2 id="zuletzt-titel"><span id="zuletzt-symbol"></span>Zuletzt benutzt</h2>
@@ -128,6 +137,7 @@
     </dialog>
 
     <script src="gemeinsam/symbole.js"></script>
+    <script src="gemeinsam/klassen.js"></script>
     <script src="js/inhalte.js"></script>
     <script src="lernen/angebote.js"></script>
     <script src="lernen/datenbank.js"></script>

@@ -10,6 +10,7 @@
   const MITMACHEN = window.MITMACHEN || {}
   const LINKS = window.LINKS || []
   const SCHNELLZUGRIFF = window.SCHNELLZUGRIFF || []
+  const KLASSEN = window.KLASSEN || null
   const WERKZEUGE = window.WERKZEUGE || []
   const MATERIALIEN = window.MATERIALIEN || []
   const ANGEBOTE = window.ANGEBOTE || []
@@ -130,6 +131,7 @@
   }
   $('zeile').textContent = SEITE.zeile || ''
   $('such-symbol').replaceWith(zeichen('suche'))
+  $('klassen-symbol').replaceWith(zeichen('klassen', 'titel-symbol'))
   $('zuletzt-symbol').replaceWith(zeichen('uhr', 'titel-symbol'))
   $('schnell-symbol').replaceWith(zeichen('blitz', 'titel-symbol'))
 
@@ -257,6 +259,37 @@
       if (l.adresse && l.qr !== false) li.append(qrKnopf(l.titel, volleAdresse(l.adresse)))
       liste.append(li)
     })
+  }
+
+  // ---------- Meine Klassen (nur Lehrkraft; die Klassen liegen auf diesem Gerät) ----------
+  let klassenLauf = 0
+  async function zeichneKlassen() {
+    const bereich = document.querySelector('.klassen')
+    const liste = $('klassen')
+    if (!KLASSEN || !window.LehrraumKlassen) return (bereich.hidden = true)
+    $('klassen-alle').href = KLASSEN.verwalten
+    if (!lehrkraft) return
+    const lauf = ++klassenLauf
+    const klassen = await window.LehrraumKlassen.laden()
+    if (lauf !== klassenLauf) return // inzwischen wurde neu gezeichnet
+    liste.textContent = ''
+    klassen.slice(0, KLASSEN.hoechstens).forEach((k) => {
+      const name = [k.bezeichnung, k.fach].filter(Boolean).join(' ')
+      const li = el('li', 'klassen-karte')
+      li.append(el('span', 'klassen-name', k.bezeichnung), el('span', 'klassen-fach', k.fach || 'ohne Fach'))
+      const a = verweis('knopf dunkel', 'Tafel ' + name, KLASSEN.tafel + k.id, 'bildschirm')
+      a.setAttribute('aria-label', 'Zur Tafel von ' + name)
+      a.append(el('span', null, 'Zur Tafel'), zeichen('pfeil', 'knopf-pfeil'))
+      li.append(a)
+      liste.append(li)
+    })
+    const neu = el('li', 'klassen-karte neu')
+    const a = el('a', 'klassen-neu')
+    a.href = KLASSEN.neu
+    a.append(zeichen('plus', 'klassen-plus'), el('span', null, 'Neue Klasse anlegen'))
+    neu.append(a)
+    liste.append(neu)
+    if (klassen.length > KLASSEN.hoechstens) $('klassen-alle').textContent = `Alle ${klassen.length} Klassen anzeigen`
   }
 
   // ---------- Zuletzt benutzt und Schnellzugriff (nur Lehrkraft) ----------
@@ -455,6 +488,7 @@
     zeichneNavigation()
     zeichneBegruessung()
     zeichneKacheln()
+    void zeichneKlassen()
     zeichneListen()
     suche()
   }
