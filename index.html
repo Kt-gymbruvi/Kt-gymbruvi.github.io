@@ -4,67 +4,107 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lehrraum</title>
-    <meta name="description" content="Quiz, Abstimmungen, Lernangebote und Werkzeuge für den Unterricht" />
-    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <meta name="description" content="Lehrraum – dein digitaler Unterrichtsraum: Tafel, Quiz, Abstimmungen, Lernangebote und Werkzeuge" />
+    <link rel="icon" href="gemeinsam/logo-klein.png" type="image/png" />
     <link rel="stylesheet" href="gemeinsam/tokens.css" />
     <link rel="stylesheet" href="gemeinsam/grundlage.css" />
     <link rel="stylesheet" href="startseite.css" />
     <script src="gemeinsam/design.js"></script>
   </head>
-  <body>
-    <header class="kopfleiste">
-      <div class="kopfleiste-innen">
-        <h1 class="marke"><a href="./" id="titel">Lehrraum</a></h1>
-        <nav class="hauptnavigation" aria-label="Hauptnavigation">
-          <ul id="navigation"></ul>
-        </nav>
-        <button type="button" class="rund-knopf" id="design-knopf" aria-label="Zum dunklen Modus wechseln"></button>
-      </div>
-    </header>
-
-    <main class="inhalt">
-      <p id="untertitel" class="untertitel"></p>
-
-      <section class="mitmachen" id="mitmachen" aria-labelledby="mitmachen-titel">
-        <h2 id="mitmachen-titel">Mitmachen</h2>
-        <form id="pin-form" class="pin-form" novalidate>
-          <label for="pin">PIN vom Beamer</label>
-          <input id="pin" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="123456" aria-describedby="pin-fehler" />
-          <div class="pin-knoepfe">
-            <button class="knopf" type="button" data-ziel="quiz">Zum Quiz</button>
-            <button class="knopf" type="button" data-ziel="abstimmung">Zur Abstimmung</button>
-          </div>
-          <p id="pin-fehler" class="fehler" role="alert" hidden></p>
-        </form>
-      </section>
-
-      <section id="interaktion" aria-labelledby="links-titel">
-        <h2 id="links-titel">Schnellstart</h2>
-        <ul id="links" class="kacheln"></ul>
-      </section>
-
-      <section aria-labelledby="werkzeuge-titel" class="werkzeuge" id="werkzeuge-bereich">
-        <h2 id="werkzeuge-titel">Werkzeuge</h2>
-        <ul id="werkzeuge" class="werkzeug-liste"></ul>
-      </section>
-
-      <section aria-labelledby="material-titel" class="material" id="material-bereich">
-        <div class="material-kopf">
-          <h2 id="material-titel">Materialien</h2>
-          <label class="suche">
-            <span class="unsichtbar">Materialien durchsuchen</span>
-            <input id="suche" type="search" placeholder="Suchen …" autocomplete="off" />
-          </label>
+  <body data-rolle="gast">
+    <div class="geruest" id="geruest">
+      <header class="seitenkopf">
+        <button type="button" class="leiste-knopf" id="leiste-knopf" aria-label="Menü öffnen" aria-expanded="false" aria-controls="seitenleiste"></button>
+        <a class="marke" href="./">
+          <img src="gemeinsam/logo-klein.png" alt="" width="56" height="56" />
+          <span class="marke-text">
+            <span class="marke-name" id="titel">Lehrraum</span>
+            <span class="marke-zeile" id="zeile"></span>
+          </span>
+        </a>
+        <div class="suchfeld" role="search">
+          <span id="such-symbol"></span>
+          <input id="plattform-suche" type="search" placeholder="Suche nach Inhalten oder Werkzeugen …" aria-label="Lehrraum durchsuchen" autocomplete="off" aria-controls="suchtreffer" />
+          <ul id="suchtreffer" class="suchtreffer" hidden></ul>
         </div>
-        <div id="faecher" class="faecher" role="group" aria-label="Nach Fach filtern"></div>
-        <div id="materialien"></div>
-      </section>
-    </main>
+        <div class="kopf-rechts">
+          <button type="button" class="knopf zweit" id="anmelde-knopf">Anmelden</button>
+          <div class="konto" id="konto" hidden>
+            <button type="button" class="konto-knopf" id="konto-knopf" aria-haspopup="true" aria-expanded="false" aria-controls="konto-menue"></button>
+            <div class="konto-menue" id="konto-menue" hidden>
+              <p id="konto-name"></p>
+              <button type="button" class="knopf zweit" id="abmelde-knopf">Abmelden</button>
+            </div>
+          </div>
+        </div>
+      </header>
 
-    <footer class="fuss">
-      <p>Diese Seite setzt keine Cookies und lädt nichts von fremden Servern. Einstellungen merkt sich nur dieses Gerät.</p>
-      <p><a href="impressum.html">Impressum &amp; Datenschutz</a></p>
-    </footer>
+      <nav class="seitenleiste" id="seitenleiste" aria-label="Hauptnavigation">
+        <ul id="navigation"></ul>
+        <div class="trenner"></div>
+        <button type="button" class="leisten-punkt" id="design-knopf"></button>
+      </nav>
+
+      <main class="hauptbereich">
+        <h1 class="unsichtbar">Lehrraum</h1>
+
+        <section class="begruessung" aria-labelledby="begruessung-titel">
+          <div class="begruessung-text">
+            <h2 id="begruessung-titel"></h2>
+            <p id="begruessung-zeile"></p>
+            <a class="knopf nur-lehrkraft" id="begruessung-knopf" href="#"></a>
+            <form id="pin-form" class="pin-form nur-gast" novalidate>
+              <label for="pin">PIN vom Beamer</label>
+              <input id="pin" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="123456" aria-describedby="pin-fehler" />
+              <div class="pin-knoepfe">
+                <button class="knopf" type="button" data-ziel="quiz">Zum Quiz</button>
+                <button class="knopf" type="button" data-ziel="abstimmung">Zur Abstimmung</button>
+              </div>
+              <p id="pin-fehler" class="fehler" role="alert" hidden></p>
+            </form>
+          </div>
+          <div class="begruessung-bild" id="begruessung-bild" aria-hidden="true"></div>
+        </section>
+
+        <section aria-labelledby="links-titel">
+          <h2 id="links-titel" class="unsichtbar">Bereiche</h2>
+          <ul id="links" class="kacheln"></ul>
+        </section>
+
+        <div class="zweispaltig nur-lehrkraft">
+          <section class="karte" aria-labelledby="zuletzt-titel">
+            <h2 id="zuletzt-titel"><span id="zuletzt-symbol"></span>Zuletzt benutzt</h2>
+            <ul id="zuletzt" class="zeilen"></ul>
+          </section>
+          <section class="karte" aria-labelledby="schnell-titel">
+            <h2 id="schnell-titel"><span id="schnell-symbol"></span>Schnellzugriff</h2>
+            <ul id="schnellzugriff" class="zeilen"></ul>
+          </section>
+        </div>
+
+        <section aria-labelledby="werkzeuge-titel" class="werkzeuge" id="werkzeuge-bereich">
+          <h2 id="werkzeuge-titel">Werkzeuge</h2>
+          <ul id="werkzeuge" class="werkzeug-liste"></ul>
+        </section>
+
+        <section aria-labelledby="material-titel" class="material" id="material-bereich">
+          <div class="material-kopf">
+            <h2 id="material-titel">Materialien</h2>
+            <label class="suche">
+              <span class="unsichtbar">Materialien durchsuchen</span>
+              <input id="suche" type="search" placeholder="Suchen …" autocomplete="off" />
+            </label>
+          </div>
+          <div id="faecher" class="faecher" role="group" aria-label="Nach Fach filtern"></div>
+          <div id="materialien"></div>
+        </section>
+
+        <footer class="fuss">
+          <p>Diese Seite setzt keine Cookies und lädt nichts von fremden Servern. Einstellungen merkt sich nur dieses Gerät.</p>
+          <p><a href="impressum.html">Impressum &amp; Datenschutz</a></p>
+        </footer>
+      </main>
+    </div>
 
     <dialog id="qr-dialog" aria-labelledby="qr-titel">
       <h2 id="qr-titel"></h2>
@@ -73,8 +113,24 @@
       <button type="button" id="qr-schliessen" class="knopf">Schließen</button>
     </dialog>
 
+    <dialog id="anmelde-dialog" class="schmal" aria-labelledby="anmelde-titel">
+      <h2 id="anmelde-titel">Anmeldung für Lehrkräfte</h2>
+      <form id="anmelde-form" class="formular" novalidate>
+        <p class="hinweis">Dasselbe Konto wie bei Quizzo und Klassenfunk.</p>
+        <label>E-Mail <input id="anmelde-email" type="email" autocomplete="username" /></label>
+        <label>Passwort <input id="anmelde-passwort" type="password" autocomplete="current-password" /></label>
+        <p id="anmelde-fehler" class="fehler" role="alert" hidden></p>
+        <div class="reihe">
+          <button type="submit" class="knopf" id="anmelde-senden">Anmelden</button>
+          <button type="button" class="knopf zweit" id="anmelde-abbrechen">Abbrechen</button>
+        </div>
+      </form>
+    </dialog>
+
     <script src="gemeinsam/symbole.js"></script>
     <script src="js/inhalte.js"></script>
+    <script src="lernen/angebote.js"></script>
+    <script src="lernen/datenbank.js"></script>
     <script src="js/qrcode.min.js"></script>
     <script src="js/app.js"></script>
   </body>

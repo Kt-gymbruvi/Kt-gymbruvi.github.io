@@ -9,64 +9,104 @@
  * Alles hier ist öffentlich sichtbar – keine Schülerdaten, keine Prüfungslösungen,
  * keine Scans aus Schulbüchern.
  *
- * Symbole: Namen aus gemeinsam/symbole.js (z. B. 'tafel', 'quiz', 'timer'). Ein Emoji geht auch.
+ * Symbole: Namen aus gemeinsam/symbole.js (z. B. 'pokal', 'megafon', 'timer'). Ein Emoji geht auch.
+ * „nur“: wer einen Eintrag sieht – 'lehrkraft' (nur angemeldet), 'gast' (nur ohne Anmeldung), sonst alle.
  */
 
-/** Name und Untertitel der Seite */
+/** Name und Begrüßung der Seite */
 window.SEITE = {
   titel: 'Lehrraum',
-  untertitel: 'Unterrichten, mitmachen und lernen an einem Ort',
-  // Bereiche, die es noch nicht gibt, in der Navigation mit dem Hinweis „folgt“ zeigen (false = weglassen)
+  zeile: 'Dein digitaler Unterrichtsraum',
+  // Begrüßung für angemeldete Lehrkräfte
+  willkommen: 'Willkommen in deinem Lehrraum!',
+  willkommenText: 'Dein zentraler Ort für einen modernen, interaktiven und individuellen Unterricht.',
+  // Begrüßung ohne Anmeldung (Schülerinnen und Schüler)
+  gastTitel: 'Mitmachen und lernen',
+  gastText: 'Gib die PIN vom Beamer ein – oder stöbere in den Lernangeboten.',
+  // Bereiche, die es noch nicht gibt, in der Seitenleiste mit dem Hinweis „folgt“ zeigen (false = weglassen)
   geplantesZeigen: true,
 }
 
+const PLATTFORM = 'https://kt-gymbruvi.github.io'
+
 /**
- * Hauptnavigation oben.
- *   adresse: Ziel des Bereichs. Solange sie fehlt (null), ist der Bereich noch nicht gebaut.
+ * Seitenleiste links.
+ *   adresse: Ziel. Solange sie fehlt (null), ist der Bereich noch nicht gebaut („folgt“, nur für Lehrkräfte sichtbar).
  */
 window.NAVIGATION = [
-  { titel: 'Tafel', symbol: 'tafel', adresse: null },
-  { titel: 'Unterrichten', symbol: 'unterrichten', adresse: null },
-  { titel: 'Interaktion', symbol: 'interaktion', adresse: '#interaktion' },
-  { titel: 'Lernen', symbol: 'lernen', adresse: 'lernen/' },
-  { titel: 'Bibliothek', symbol: 'bibliothek', adresse: null },
+  { titel: 'Startseite', symbol: 'haus', adresse: './', hier: true },
+  { titel: 'Meine Klassen', symbol: 'klassen', adresse: null, nur: 'lehrkraft' },
+  { titel: 'Quizzo', symbol: 'pokal', adresse: PLATTFORM + '/Quizzo/' },
+  { titel: 'Klassenfunk', symbol: 'megafon', adresse: PLATTFORM + '/Klassenfunk/' },
+  { titel: 'Lernangebote', symbol: 'lernen', adresse: 'lernen/' },
+  { titel: 'Interaktive Tafel', symbol: 'bildschirm', adresse: PLATTFORM + '/Lehrraum/#/tafel', nur: 'lehrkraft' },
+  { titel: 'Materialien', symbol: 'bibliothek', adresse: '#material-bereich', nur: 'material' }, // erscheint nur, wenn es Materialien gibt
+  { titel: 'Werkzeuge', symbol: 'werkzeug', adresse: '#werkzeuge-bereich' },
 ]
 
 /**
- * Mitmachen mit der PIN vom Beamer: Die PIN wird an diese Adressen angehängt.
+ * Mitmachen mit der PIN vom Beamer (Fassung ohne Anmeldung): Die PIN wird an diese Adressen angehängt.
  * (Quiz und Abstimmung haben getrennte PINs; deshalb wählt man, wohin es geht.)
  */
 window.MITMACHEN = {
-  quiz: 'https://kt-gymbruvi.github.io/Quizzo/#/mitspielen?pin=',
-  abstimmung: 'https://kt-gymbruvi.github.io/Klassenfunk/#/mitmachen?pin=',
+  quiz: PLATTFORM + '/Quizzo/#/mitspielen?pin=',
+  abstimmung: PLATTFORM + '/Klassenfunk/#/mitmachen?pin=',
 }
 
 /**
  * Große Kacheln (Links auf eigene Seiten).
- *   farbe: 'lernen' | 'quizzo' | 'klassenfunk' | 'tafel' | 'unterrichten' | 'interaktion' | 'bibliothek' (optional)
+ *   farbe: 'unterrichten' | 'lernen' | 'tafel' | 'interaktion' | 'bibliothek' | 'quizzo' | 'klassenfunk'
+ *   textGast: anderer Text ohne Anmeldung (optional)
  */
 window.LINKS = [
   {
-    symbol: 'quiz',
-    farbe: 'quizzo',
-    titel: 'Quizzo',
-    text: 'Das Live-Quiz: mit PIN oder Aufgaben-Code mitspielen – oder als Lehrkraft ein Quiz starten.',
-    adresse: 'https://kt-gymbruvi.github.io/Quizzo/',
+    symbol: 'klassen',
+    farbe: 'unterrichten',
+    titel: 'Meine Klassen',
+    text: 'Klassenräume verwalten und starten',
+    adresse: null, // folgt mit der Klassenverwaltung
+    nur: 'lehrkraft',
   },
   {
-    symbol: 'funk',
-    farbe: 'klassenfunk',
+    symbol: 'pokal',
+    farbe: 'bibliothek',
+    titel: 'Quizzo',
+    text: 'Interaktive Quizze erstellen und spielen',
+    textGast: 'Mit PIN oder Aufgaben-Code beim Quiz mitspielen',
+    adresse: PLATTFORM + '/Quizzo/',
+  },
+  {
+    symbol: 'megafon',
+    farbe: 'interaktion',
     titel: 'Klassenfunk',
-    text: 'Live abstimmen im Unterricht: Wortwolke, Umfrage, Fragen an die Lehrkraft. Mitmachen mit PIN, anonym.',
-    adresse: 'https://kt-gymbruvi.github.io/Klassenfunk/',
+    text: 'Abstimmungen und Umfragen',
+    textGast: 'Live abstimmen – mit PIN, anonym',
+    adresse: PLATTFORM + '/Klassenfunk/',
   },
   {
     symbol: 'lernen',
     farbe: 'lernen',
     titel: 'Lernangebote',
-    text: 'Simulationen, Erklärungen und Übungen – nach Fach, Jahrgang und Thema.',
+    text: 'Materialien und Lernpfade',
+    textGast: 'Simulationen, Erklärungen und Übungen – nach Fach und Jahrgang',
     adresse: 'lernen/',
   },
+  {
+    symbol: 'bildschirm',
+    farbe: 'tafel',
+    titel: 'Interaktive Tafel',
+    text: 'Digital unterrichten',
+    adresse: PLATTFORM + '/Lehrraum/#/tafel',
+    nur: 'lehrkraft',
+  },
+]
+
+/** Schnellzugriff (nur für angemeldete Lehrkräfte) */
+window.SCHNELLZUGRIFF = [
+  { symbol: 'bildschirm', farbe: 'tafel', titel: 'Tafel öffnen', adresse: PLATTFORM + '/Lehrraum/#/tafel' },
+  { symbol: 'pokal', farbe: 'bibliothek', titel: 'Quizzo starten', adresse: PLATTFORM + '/Quizzo/#/leiten' },
+  { symbol: 'megafon', farbe: 'interaktion', titel: 'Klassenfunk öffnen', adresse: PLATTFORM + '/Klassenfunk/#/leiten' },
+  { symbol: 'lernen', farbe: 'lernen', titel: 'Lernangebote ordnen', adresse: 'lernen/#bearbeiten' },
 ]
 
 /**

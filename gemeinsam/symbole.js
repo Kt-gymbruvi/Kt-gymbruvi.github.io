@@ -28,6 +28,18 @@
     pfeil: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     sonne: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
     mond: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+    // Seitengerüst
+    haus: '<path d="M4 11l8-7 8 7M6 10v10h12V10M10 20v-6h4v6"/>',
+    klassen: '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 5.2a3 3 0 0 1 0 5.6M17.5 14.3A6 6 0 0 1 21 20"/>',
+    pokal: '<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M10 17h4"/>',
+    megafon: '<path d="M4 10v4h3l7 4V6l-7 4zM17 9a4 4 0 0 1 0 6M8 14v4h3v-2.5"/>',
+    bildschirm: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/>',
+    zahnrad: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+    suche: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+    menue: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    blitz: '<path d="M13 3L5 13h6l-1 8 8-10h-6z"/>',
+    uhr: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    schluessel: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>',
   }
 
   /** Erzeugt ein dekoratives Symbol. Die Größe kommt aus dem CSS (.symbol), die Farbe aus der Textfarbe. */

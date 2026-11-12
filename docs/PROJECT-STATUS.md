@@ -1,12 +1,17 @@
 # Projektstand – Startseite kt-gymbruvi.github.io
 
-Stand: 11.11.2026 · live unter https://kt-gymbruvi.github.io/ ist weiterhin der Stand von `main` (`68fe986`).
+Stand: 12.11.2026 · live unter https://kt-gymbruvi.github.io/ ist weiterhin der Stand von `main` (`68fe986`).
 **In Arbeit, nicht veröffentlicht:** Zweig `lehrraum-phase-1` – Ausbau zur Unterrichtsplattform „Lehrraum“.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
 ## Implementiert
-- **Startseite „Lehrraum“** (`index.html`, `startseite.css`, `js/app.js`, `js/inhalte.js`) – *nur auf dem Zweig*: Kopfleiste mit Hauptnavigation (Tafel, Unterrichten, Interaktion, Lernen, Bibliothek; noch nicht gebaute Bereiche als „folgt“), Umschalter hell/dunkel, „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Schnellstart-Kacheln mit QR-Knopf (Quizzo, Klassenfunk, Lernangebote), Werkzeugliste, Materialliste mit Suche/Fachfilter/QR (derzeit leer).
-- **Gemeinsame Gestaltung** (`gemeinsam/`) – *nur auf dem Zweig*: `tokens.css` (Farben hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Kopfleiste, Knöpfe, QR-Fenster, Fuß), `symbole.js` (17 eigene SVG-Symbole), `design.js` (Umschalter).
+- **Startseite „Lehrraum“** (`index.html`, `startseite.css`, `js/app.js`, `js/inhalte.js`) – *nur auf dem Zweig*, nach dem Bildentwurf der Lehrkraft:
+  - Kopfzeile mit Logo, Suche über Bereiche, Werkzeuge, Lernangebote und Materialien, Anmelden bzw. Konto-Kürzel mit Abmelden.
+  - Seitenleiste links (auf schmalen Bildschirmen als aufklappbares Menü), darin der Umschalter hell/dunkel.
+  - **Volle Fassung für angemeldete Lehrkräfte:** Begrüßung mit „Zur Tafel“, fünf Kacheln (Meine Klassen als „folgt“, Quizzo, Klassenfunk, Lernangebote, Interaktive Tafel), „Zuletzt benutzt“, Schnellzugriff, Werkzeuge.
+  - **Schlanke Fassung ohne Anmeldung:** „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Kacheln Quizzo, Klassenfunk, Lernangebote, Werkzeuge.
+  - Materialliste mit Suche/Fachfilter/QR (derzeit leer und deshalb ausgeblendet).
+- **Gemeinsame Gestaltung** (`gemeinsam/`) – *nur auf dem Zweig*: `tokens.css` (Dunkelblau/Türkis aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
 - **Werkzeuge** (`werkzeuge/`): Timer (Beamer, Signalton, Bildschirm bleibt an), Gruppen & Zufall (Namen nur im Gerät), Lautstärkeampel (Mikrofon nur lokal ausgewertet, „Ruhe messen“, Grenzen/Reaktionszeit einstellbar, optionaler Ton, Vollbild). Noch im alten Design (`style.css`, `werkzeug.css`).
 - **Lernangebote** (`lernen/`): 41 Einträge in `angebote.js` (32 Biologie Kl. 5–13, 9 Sport inkl. Oberstufe), Übersicht nach Fach › Jahrgang › Thema mit Suche und QR; Bearbeitungsmodus `lernen/#bearbeiten` für die angemeldete Lehrkraft (Supabase-Tabelle `lernangebote`, nutzt auch eine bestehende Quizzo-Anmeldung). Übersicht noch im alten Design.
 - Herzfrequenz-Zonen liegen seit 08.11.2026 unter `lernen/herzfrequenz-zonen/` (Sport, Kl. 11 und 12/13); `werkzeuge/herzfrequenz/` leitet weiter.
@@ -15,9 +20,9 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
 
 ## Struktur
 ```
-index.html, startseite.css, favicon.svg, impressum.html, .nojekyll
+index.html, startseite.css, impressum.html, .nojekyll, favicon.svg (alt, nicht mehr eingebunden)
 style.css   altes Design – nur noch für lernen/ und werkzeuge/, bis Etappe 1.2
-gemeinsam/  tokens.css, grundlage.css, symbole.js, design.js
+gemeinsam/  tokens.css, grundlage.css, symbole.js, design.js, logo.png, logo-klein.png
 js/         app.js, inhalte.js, qrcode.min.js
 werkzeuge/  ANLEITUNG.md, pruefen.mjs, werkzeug.css, timer/, gruppen/, lautstaerke/, herzfrequenz/ (Weiterleitung)
 lernen/     index.html, lernen.js, angebote.js, datenbank.js, schriften/, werkzeug/, <41 Angebotsordner>
@@ -26,9 +31,12 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 ```
 
 ## Bekannte Probleme / offen
-- Neue Startseite nur in der Vorschau geprüft (Desktop 1024 px, Handy 375 px, hell und dunkel) – nicht auf echtem iPad, Smartboard oder Beamer.
+- Neue Startseite nur in der Vorschau geprüft (1280 px und Handy 375 px, hell und dunkel, beide Fassungen) – nicht auf echtem iPad, Smartboard oder Beamer.
+- **Die Anmeldung auf der Startseite ist nicht mit einem echten Konto geprüft.** Die volle Fassung wurde mit einer nachgestellten Sitzung angesehen. Ungeprüft ist insbesondere, ob Quizzo, Klassenfunk und die Tafel eine hier begonnene Anmeldung übernehmen (umgekehrt – erst dort anmelden – nutzt die Startseite den schon bisher verwendeten Weg).
+- Das Begrüßungsbild ist eine einfache Zeichnung; das Foto aus dem Entwurf liegt nicht als Datei vor.
+- Die Lehrraum-App (Tafel) verwendet im dunklen Modus noch Gelb als Akzent; Umstellung auf Türkis steht aus.
 - Lernübersicht und Werkzeuge haben noch das alte, dunkle Design und den Rückweg „← Startseite“; das wirkt neben der neuen Startseite uneinheitlich, bis Etappe 1.2 erledigt ist.
-- Die Klassen-Kacheln („Klassen zuerst“) fehlen noch: Sie brauchen die Klassenverwaltung und die Tafel aus dem Repository `Lehrraum`, das es noch nicht gibt.
+- Der Bereich „Meine Klassen“ mit „Zur Tafel“ je Klasse fehlt noch (Kachel und Seitenleiste zeigen „folgt“): Sie brauchen die Klassenverwaltung und die Tafel aus dem Repository `Lehrraum`, das es noch nicht gibt.
 - `.claude/launch.json` (Vorschau über das Vite aus `../Quizzo`) ist lokal angelegt und bewusst nicht committet.
 - Lautstärkeampel nur mit künstlichem Testsignal geprüft, nicht mit echtem Mikrofon im Klassenraum.
 - README nennt noch die Schritte „Vor der ersten Veröffentlichung“ (erledigt); ob die Schulleitung das Impressum freigegeben hat, ist hier nicht dokumentiert. Der Impressumstext wurde am 11.11.2026 ergänzt (Lautstärkeampel, Speicherung auf dem Gerät).

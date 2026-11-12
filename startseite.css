@@ -1,43 +1,66 @@
-/* Startseite „Lehrraum“. Braucht gemeinsam/tokens.css und gemeinsam/grundlage.css. */
+/* Startseite „Lehrraum“. Braucht gemeinsam/tokens.css und gemeinsam/grundlage.css.
+   <body data-rolle="lehrkraft|gast"> entscheidet, welche Teile zu sehen sind. */
 
-.untertitel {
-  margin: 1.5rem 0 0;
-  font-size: 1.25rem;
-  color: var(--text-2);
+body[data-rolle='gast'] .nur-lehrkraft,
+body[data-rolle='lehrkraft'] .nur-gast {
+  display: none !important;
 }
 
-main h2 {
-  margin: 0 0 1rem;
-  font-size: 1.5rem;
+.hauptbereich h2 {
+  margin: 0 0 0.9rem;
+  font-size: 1.35rem;
   font-weight: 900;
 }
-main > section {
-  margin-top: 2.5rem;
+.hauptbereich > section,
+.hauptbereich > .zweispaltig {
+  margin-top: 1.5rem;
   scroll-margin-top: 1rem;
 }
 
-/* ---------- Mitmachen mit PIN ---------- */
-.mitmachen {
-  padding: 1.25rem 1.5rem;
-  border-radius: var(--radius-gross);
-  background: var(--flaeche);
-  box-shadow: inset 0 0 0 1px var(--linie);
+/* ---------- Begrüßung ---------- */
+.hauptbereich > .begruessung {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 0;
+  padding: 2rem 2.25rem;
+  border-radius: 1.5rem;
+  background: var(--akzent-hell);
+  overflow: hidden;
 }
-main .mitmachen {
-  margin-top: 1.5rem;
+.begruessung-text {
+  flex: 1;
+  min-width: 0;
 }
-.mitmachen h2 {
-  margin-bottom: 0.5rem;
+.begruessung h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+  line-height: 1.15;
 }
+.begruessung p {
+  max-width: 34rem;
+  margin: 0.6rem 0 1.25rem;
+  font-size: 1.2rem;
+}
+.begruessung-bild {
+  flex: 0 1 20rem;
+  min-width: 0;
+}
+.begruessung-bild svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mitmachen mit PIN (schlanke Fassung) */
 .pin-form {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1rem;
+  gap: 0.6rem 0.9rem;
 }
 .pin-form label {
-  font-weight: 700;
-  color: var(--text-2);
+  font-weight: 800;
 }
 .pin-form input {
   width: 9.5rem;
@@ -45,7 +68,7 @@ main .mitmachen {
   padding: 0.25rem 0.9rem;
   border: 2px solid var(--linie-stark);
   border-radius: var(--radius);
-  background: var(--seite);
+  background: var(--flaeche);
   color: var(--text);
   font: inherit;
   font-size: 1.5rem;
@@ -64,11 +87,9 @@ main .mitmachen {
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-.fehler {
+.pin-form .fehler {
   flex-basis: 100%;
   margin: 0;
-  color: var(--fehler);
-  font-weight: 700;
 }
 
 /* ---------- Kacheln ---------- */
@@ -78,17 +99,18 @@ main .mitmachen {
   padding: 0;
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
 }
 .kacheln li {
   position: relative;
 }
 .kachel {
+  position: relative;
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 1.25rem 1.5rem;
+  gap: 0.2rem;
+  padding: 1.1rem 2.75rem 1.1rem 1.25rem;
   border-radius: var(--radius-gross);
   background: var(--flaeche);
   box-shadow: inset 0 0 0 1px var(--linie);
@@ -96,63 +118,145 @@ main .mitmachen {
   text-decoration: none;
   transition: transform 0.1s;
 }
-.kachel:hover,
-.kachel:focus-visible {
+a.kachel:hover,
+a.kachel:focus-visible {
   transform: translateY(-2px);
-}
-.kachel.mit-qr {
-  padding-right: 5rem;
+  box-shadow: inset 0 0 0 2px var(--linie-stark);
 }
 .kachel-symbol {
   display: flex;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   line-height: 1;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 .kachel-titel {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 900;
 }
 .kachel-text {
-  font-size: 1.05rem;
+  color: var(--text-2);
+  font-size: 0.98rem;
+}
+.kachel-pfeil {
+  position: absolute;
+  right: 1rem;
+  bottom: 1.1rem;
+  display: flex;
+  font-size: 0.9rem;
+}
+.kachel.geplant {
+  opacity: 0.75;
+}
+.kachel-folgt {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  padding: 0.05rem 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: var(--text-2);
+  font-size: 0.75rem;
 }
 .kacheln .qr-knopf {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.75rem;
+  right: 0.75rem;
+  min-height: 2.25rem;
+  padding: 0.1rem 0.7rem;
+  font-size: 0.85rem;
 }
 
-/* Bereichsfarben */
+/* Bereichsfarben: dezent als getönte Fläche, Symbol und Pfeil kräftig */
 .kachel.farbe-tafel { background: var(--tafel-hell); box-shadow: none; }
-.kachel.farbe-tafel .kachel-symbol, .kachel.farbe-tafel .kachel-titel { color: var(--tafel); }
+.kachel.farbe-tafel .kachel-symbol, .kachel.farbe-tafel .kachel-pfeil { color: var(--tafel); }
 .kachel.farbe-unterrichten { background: var(--unterrichten-hell); box-shadow: none; }
-.kachel.farbe-unterrichten .kachel-symbol, .kachel.farbe-unterrichten .kachel-titel { color: var(--unterrichten); }
+.kachel.farbe-unterrichten .kachel-symbol, .kachel.farbe-unterrichten .kachel-pfeil { color: var(--unterrichten); }
 .kachel.farbe-interaktion { background: var(--interaktion-hell); box-shadow: none; }
-.kachel.farbe-interaktion .kachel-symbol, .kachel.farbe-interaktion .kachel-titel { color: var(--interaktion); }
+.kachel.farbe-interaktion .kachel-symbol, .kachel.farbe-interaktion .kachel-pfeil { color: var(--interaktion); }
 .kachel.farbe-lernen { background: var(--lernen-hell); box-shadow: none; }
-.kachel.farbe-lernen .kachel-symbol, .kachel.farbe-lernen .kachel-titel { color: var(--lernen); }
+.kachel.farbe-lernen .kachel-symbol, .kachel.farbe-lernen .kachel-pfeil { color: var(--lernen); }
 .kachel.farbe-bibliothek { background: var(--bibliothek-hell); box-shadow: none; }
-.kachel.farbe-bibliothek .kachel-symbol, .kachel.farbe-bibliothek .kachel-titel { color: var(--bibliothek); }
+.kachel.farbe-bibliothek .kachel-symbol, .kachel.farbe-bibliothek .kachel-pfeil { color: var(--bibliothek); }
 
-/* Quizzo und Klassenfunk behalten ihre eigenen Farben */
-.kachel.farbe-quizzo,
-.kachel.farbe-klassenfunk {
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+/* ---------- Zuletzt benutzt und Schnellzugriff ---------- */
+.zweispaltig {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
 }
-.kachel.farbe-quizzo { background: var(--quizzo); }
-.kachel.farbe-quizzo .kachel-symbol, .kachel.farbe-quizzo .kachel-titel { color: var(--quizzo-text); }
-.kachel.farbe-klassenfunk { background: var(--klassenfunk); }
-.kachel.farbe-klassenfunk .kachel-symbol, .kachel.farbe-klassenfunk .kachel-titel { color: var(--klassenfunk-text); }
-.kachel.farbe-quizzo + .qr-knopf,
-.kachel.farbe-klassenfunk + .qr-knopf {
-  background: rgb(255 255 255 / 0.16);
-  color: #fff;
+.karte {
+  padding: 1.25rem 1.25rem 0.75rem;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: inset 0 0 0 1px var(--linie);
 }
-.kachel.farbe-quizzo:focus-visible,
-.kachel.farbe-klassenfunk:focus-visible {
-  outline-color: var(--gelb);
-  outline-offset: 3px;
+.karte h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.titel-symbol {
+  display: flex;
+  font-size: 1rem;
+}
+.zeilen {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.zeilen li + li {
+  border-top: 1px solid var(--linie);
+}
+.zeile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--tippflaeche);
+  padding: 0.4rem 0.25rem;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+}
+.zeile:hover,
+.zeile:focus-visible {
+  background: var(--flaeche-2);
+}
+.zeilen-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 0.6rem;
+  background: var(--flaeche-2);
+  font-size: 0.85rem;
+}
+.zeilen-symbol.farbe-tafel { background: var(--tafel-hell); color: var(--tafel); }
+.zeilen-symbol.farbe-unterrichten { background: var(--unterrichten-hell); color: var(--unterrichten); }
+.zeilen-symbol.farbe-interaktion { background: var(--interaktion-hell); color: var(--interaktion); }
+.zeilen-symbol.farbe-lernen { background: var(--lernen-hell); color: var(--lernen); }
+.zeilen-symbol.farbe-bibliothek { background: var(--bibliothek-hell); color: var(--bibliothek); }
+.zeilen-titel {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.zeilen-zusatz {
+  color: var(--text-2);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.zeilen-pfeil {
+  display: flex;
+  font-size: 0.75rem;
+  color: var(--text-2);
+}
+.zeilen .leer {
+  padding: 0.6rem 0.25rem 1rem;
+  color: var(--text-2);
 }
 
 /* ---------- Werkzeuge ---------- */
@@ -164,7 +268,7 @@ main .mitmachen {
 }
 .werkzeug-gruppe h3 {
   margin: 1.25rem 0 0.75rem;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--text-2);
 }
 .werkzeug-liste > li:first-child h3 {
@@ -202,8 +306,9 @@ main .mitmachen {
   height: 3rem;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--flaeche-2);
-  font-size: 1.15rem;
+  background: var(--akzent-hell);
+  color: var(--tafel);
+  font-size: 1.1rem;
   line-height: 1;
 }
 .werkzeug-text {
@@ -212,12 +317,12 @@ main .mitmachen {
   min-width: 0;
 }
 .werkzeug-titel {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 800;
 }
 .werkzeug-info {
   color: var(--text-2);
-  font-size: 1rem;
+  font-size: 0.98rem;
 }
 .werkzeug-karten .qr-knopf {
   position: absolute;
@@ -266,15 +371,15 @@ main .mitmachen {
   cursor: pointer;
 }
 .fach-knopf[aria-pressed='true'] {
-  background: var(--navy);
-  color: #fff;
+  background: var(--akzent);
+  color: var(--akzent-text);
 }
 .fach-gruppe + .fach-gruppe {
   margin-top: 2rem;
 }
 .fach-gruppe h3 {
   margin: 0 0 0.75rem;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--text-2);
 }
 .liste {
@@ -306,14 +411,14 @@ main .mitmachen {
   text-decoration: underline;
 }
 .eintrag-titel {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 800;
   overflow-wrap: anywhere;
 }
 .eintrag-info,
 .leer {
   color: var(--text-2);
-  font-size: 1rem;
+  font-size: 0.98rem;
 }
 .typ {
   flex-shrink: 0;
@@ -326,11 +431,21 @@ main .mitmachen {
   text-align: center;
 }
 
-/* ---------- Handy ---------- */
+/* ---------- Schmale Bildschirme ---------- */
+@media (max-width: 60rem) {
+  .zweispaltig {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 @media (max-width: 40rem) {
-  .untertitel {
-    margin-top: 1rem;
-    font-size: 1.1rem;
+  .hauptbereich > .begruessung {
+    padding: 1.25rem;
+  }
+  .begruessung-bild {
+    display: none;
+  }
+  .begruessung p {
+    font-size: 1.05rem;
   }
   .pin-form label {
     flex-basis: 100%;
@@ -350,8 +465,7 @@ main .mitmachen {
     flex-wrap: wrap;
   }
   /* QR-Codes braucht man am Beamer, nicht auf dem Handy */
-  .eintrag .qr-knopf,
-  .werkzeug-karten .qr-knopf {
+  .qr-knopf {
     display: none;
   }
   .werkzeug {
@@ -360,7 +474,8 @@ main .mitmachen {
 }
 
 @media print {
-  .mitmachen {
+  .begruessung,
+  .zweispaltig {
     display: none;
   }
 }

@@ -2,6 +2,19 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-12 – Startseite nach dem Entwurf der Lehrkraft: Seitenleiste, Logo, Türkis, zwei Fassungen
+Vorlage: Bildentwurf der Lehrkraft (Seitenleiste links, Kopfzeile mit Logo und Suche, Begrüßung, fünf Kacheln, Klassen, Schnellzugriff). Entscheidungen der Lehrkraft dazu:
+- **Zwei Fassungen einer Seite:** Angemeldete Lehrkräfte sehen alles; ohne Anmeldung erscheint die schlanke Fassung (Mitmachen mit PIN, Quizzo, Klassenfunk, Lernangebote, Werkzeuge). Umgeschaltet wird über `<body data-rolle>` und `nur:` in `js/inhalte.js`. Die Seite selbst bleibt öffentlich – geschützt sind Daten, nicht Seiten.
+- **Türkis ersetzt Gelb** (Farben aus dem Logo: Dunkelblau `#0a2d53`, Türkis `#2cb69c`). Für Knöpfe mit weißer Schrift gilt das kräftigere `#0f7f6c`, weil Weiß auf dem Logo-Türkis zu schwach kontrastiert. Quizzo behält sein Gelb, Klassenfunk seine Farben.
+- **Logo als zugeschnittenes PNG** aus der Datei der Lehrkraft (`gemeinsam/logo.png`, `logo-klein.png`), nicht nachgezeichnet – so ist es genau das entworfene. Es hat weißen Grund und steht deshalb auch im dunklen Modus auf Weiß.
+- **Weggelassen:** Glocke/Benachrichtigungen, „Unsere Vision“, „Noch mehr Möglichkeiten/Community“, Status „Aktiv“ bei Klassen – dahinter stünde keine Funktion.
+- **„Zuletzt benutzt“ statt „Neuigkeiten“:** merkt sich nur im Gerät (`lehrraum-zuletzt`, höchstens sechs Einträge), was auf der Startseite geöffnet wurde.
+- **Suche läuft im Gerät** über Bereiche, Werkzeuge, alle Lernangebote (`lernen/angebote.js`) und Materialien; Quizze und Klassen noch nicht.
+- **Anmeldung über `lernen/datenbank.js`** (vorhanden). Nach dem Anmelden wird die Sitzung zusätzlich unter dem Namen abgelegt, unter dem Quizzo, Klassenfunk und die Tafel sie suchen; „Abmelden“ entfernt sie dort wieder. Das Kürzel im Konto-Knopf entsteht aus der E-Mail-Adresse.
+- **Begrüßungsbild ist eine eigene Zeichnung** (Tafel), kein Foto: Für das Foto im Entwurf liegt keine Datei vor, und auf einer öffentlichen Seite bräuchte es geklärte Rechte.
+- **Noch nicht gebaut und deshalb „folgt“:** „Meine Klassen“ (Kachel und Seitenleiste). „Materialien“ erscheint, sobald es Materialien gibt. „Einstellungen“ ist vorerst der Umschalter hell/dunkel in der Seitenleiste; „Hilfe & Support“ fehlt.
+- Die Hauptnavigation aus Etappe 1.1 (fünf Punkte oben) ist damit durch die Seitenleiste ersetzt.
+
 ## 2026-11-11 – Startseite heißt „Lehrraum“, hell und dunkel (Etappe 1.1)
 - Gestaltungswerte in `gemeinsam/tokens.css`, Grundlage (Kopfleiste, Knöpfe, QR-Fenster) in `gemeinsam/grundlage.css`, Symbole als eigene SVG-Zeichnungen in `gemeinsam/symbole.js`, Umschalter in `gemeinsam/design.js`. Alles ohne Build, damit Startseite, Lernübersicht und Werkzeuge es gleich nutzen können.
 - Heller Modus ist die Grundlage, dunkel folgt dem Gerät oder dem Umschalter (gemerkt nur im Gerät, `lehrraum-design`). Die Kopfleiste bleibt in beiden Modi dunkelblau.

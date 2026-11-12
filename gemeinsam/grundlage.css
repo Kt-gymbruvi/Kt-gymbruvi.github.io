@@ -1,5 +1,6 @@
 /*
- * Lehrraum – gemeinsame Grundlage: Seite, Kopfleiste mit Hauptnavigation, Knöpfe, QR-Fenster, Fuß.
+ * Lehrraum – gemeinsame Grundlage: Seite, Seitengerüst (Kopfzeile, Seitenleiste, Hauptbereich),
+ * einfache Kopfleiste für Unterseiten, Knöpfe, Fenster (QR, Anmeldung), Fuß.
  * Braucht gemeinsam/tokens.css. Seitenspezifisches steht in eigenen Dateien (z. B. startseite.css).
  */
 * {
@@ -16,7 +17,7 @@ body {
   background: var(--seite);
   color: var(--text);
   font-family: var(--schrift);
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -28,6 +29,11 @@ a {
 :focus-visible {
   outline: 3px solid var(--fokus);
   outline-offset: 2px;
+}
+
+/* Ausgeblendetes bleibt ausgeblendet, auch wenn eine Klasse display setzt */
+[hidden] {
+  display: none !important;
 }
 
 .unsichtbar {
@@ -51,7 +57,293 @@ a {
   margin-inline: auto;
 }
 
-/* ---------- Kopfleiste ---------- */
+/* ---------- Seitengerüst: Kopfzeile oben, Seitenleiste links, Inhalt rechts ---------- */
+.geruest {
+  display: grid;
+  grid-template-columns: var(--leiste) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: 'kopf kopf' 'leiste haupt';
+  min-height: 100vh;
+}
+.seitenkopf {
+  grid-area: kopf;
+  display: flex;
+  align-items: center;
+  gap: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--flaeche);
+}
+.marke {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  color: var(--text);
+  text-decoration: none;
+}
+.marke img {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.6rem;
+  background: #ffffff; /* das Logo hat weißen Grund – auch im dunklen Modus */
+}
+.marke-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.marke-name {
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+.marke-zeile {
+  font-size: 0.8rem;
+  color: var(--text-2);
+}
+.kopf-rechts {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* Suche */
+.suchfeld {
+  position: relative;
+  flex: 1;
+  max-width: 36rem;
+}
+.suchfeld .symbol {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  transform: translateY(-50%);
+  color: var(--text-2);
+  pointer-events: none;
+}
+.suchfeld input {
+  width: 100%;
+  min-height: var(--tippflaeche);
+  padding: 0.5rem 1rem 0.5rem 2.9rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--flaeche-2);
+  color: var(--text);
+  font: inherit;
+}
+.suchfeld input:focus {
+  border-color: var(--akzent);
+  outline: 0;
+}
+.suchtreffer {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.4rem);
+  max-height: min(26rem, 70vh);
+  margin: 0;
+  padding: 0.4rem;
+  overflow-y: auto;
+  list-style: none;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: 0 0 0 1px var(--linie), 0 12px 32px rgb(6 29 56 / 0.2);
+}
+.suchtreffer a {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+}
+.suchtreffer a:hover,
+.suchtreffer a:focus-visible {
+  background: var(--flaeche-2);
+}
+.suchtreffer b {
+  font-weight: 800;
+}
+.suchtreffer small,
+.suchtreffer .leer {
+  color: var(--text-2);
+}
+.suchtreffer .leer {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Konto */
+.konto-knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tippflaeche);
+  height: var(--tippflaeche);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--tuerkis-kraeftig);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.konto {
+  position: relative;
+}
+.konto-menue {
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  top: calc(100% + 0.4rem);
+  min-width: 15rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: 0 0 0 1px var(--linie), 0 12px 32px rgb(6 29 56 / 0.2);
+}
+.konto-menue p {
+  margin: 0 0 0.6rem;
+  color: var(--text-2);
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+/* Seitenleiste */
+.seitenleiste {
+  grid-area: leiste;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 1.25rem 0.75rem 1.5rem;
+  border-top-right-radius: 1.5rem;
+  background: var(--kopf);
+  color: var(--kopf-text);
+}
+.seitenleiste ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.leisten-punkt {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  min-height: var(--tippflaeche);
+  padding: 0.4rem 0.9rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--kopf-text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.leisten-punkt:hover,
+.leisten-punkt:focus-visible {
+  background: rgb(255 255 255 / 0.1);
+}
+.leisten-punkt[aria-current='page'] {
+  background: var(--tuerkis);
+  color: #06241f;
+  font-weight: 800;
+}
+.leisten-punkt.geplant {
+  color: var(--kopf-text-2);
+  cursor: default;
+}
+.leisten-punkt.geplant:hover {
+  background: transparent;
+}
+.leisten-punkt small {
+  margin-left: auto;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.72rem;
+}
+.seitenleiste :focus-visible {
+  outline-color: var(--tuerkis-hell);
+}
+.seitenleiste .trenner {
+  height: 1px;
+  margin: 0.6rem 0.5rem;
+  background: rgb(255 255 255 / 0.14);
+}
+.leiste-knopf {
+  display: none;
+}
+
+.hauptbereich {
+  grid-area: haupt;
+  min-width: 0;
+  padding: 0 1.5rem 2rem;
+}
+
+/* Schmale Bildschirme: Seitenleiste wird zum ausklappbaren Menü */
+@media (max-width: 60rem) {
+  .geruest {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'kopf' 'leiste' 'haupt';
+    grid-template-rows: auto auto 1fr;
+  }
+  .seitenkopf {
+    flex-wrap: wrap;
+    padding: 0.5rem 1rem;
+    gap: 0.5rem 0.75rem;
+  }
+  .marke img {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .marke-name {
+    font-size: 1.3rem;
+  }
+  .marke-zeile {
+    display: none;
+  }
+  .suchfeld {
+    order: 5;
+    flex-basis: 100%;
+    max-width: none;
+  }
+  .leiste-knopf {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tippflaeche);
+    height: var(--tippflaeche);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--flaeche-2);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .seitenleiste {
+    display: none;
+    border-radius: 0;
+    padding: 0.5rem 0.75rem 0.75rem;
+  }
+  .geruest.leiste-offen .seitenleiste {
+    display: flex;
+  }
+  .hauptbereich {
+    padding: 0 1rem 2rem;
+  }
+}
+
+/* ---------- Einfache Kopfleiste für Unterseiten (Impressum) ---------- */
 .kopfleiste {
   background: var(--kopf);
   color: var(--kopf-text);
@@ -65,34 +357,15 @@ a {
   flex-wrap: wrap;
   padding: 0.5rem 0;
 }
-.marke {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 900;
-  line-height: 1.2;
-}
-.marke a {
+.kopfleiste .marke a,
+.kopfleiste a.marke {
   display: inline-flex;
   align-items: center;
   min-height: var(--tippflaeche);
-  color: var(--gelb);
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 900;
   text-decoration: none;
-}
-.hauptnavigation {
-  flex: 1;
-  min-width: 0;
-}
-.hauptnavigation ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 0.25rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.hauptnavigation ul::-webkit-scrollbar {
-  display: none;
 }
 .nav-punkt {
   display: inline-flex;
@@ -110,36 +383,8 @@ a.nav-punkt:hover,
 a.nav-punkt:focus-visible {
   background: rgb(255 255 255 / 0.14);
 }
-.nav-punkt.geplant {
-  color: var(--kopf-text-2);
-  font-weight: 600;
-}
-.nav-punkt small {
-  padding: 0.05rem 0.5rem;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
 .kopfleiste :focus-visible {
-  outline-color: var(--gelb);
-}
-.rund-knopf {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--tippflaeche);
-  height: var(--tippflaeche);
-  flex-shrink: 0;
-  margin-left: auto;
-  border: 0;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.12);
-  color: var(--kopf-text);
-  cursor: pointer;
-}
-.rund-knopf:hover {
-  background: rgb(255 255 255 / 0.22);
+  outline-color: var(--tuerkis-hell);
 }
 
 /* ---------- Knöpfe ---------- */
@@ -151,7 +396,7 @@ a.nav-punkt:focus-visible {
   gap: 0.5rem;
   flex-shrink: 0;
   min-height: var(--tippflaeche);
-  padding: 0.5rem 1.1rem;
+  padding: 0.5rem 1.25rem;
   border: 0;
   border-radius: 999px;
   font: inherit;
@@ -160,10 +405,17 @@ a.nav-punkt:focus-visible {
   cursor: pointer;
 }
 .knopf {
-  background: var(--navy);
-  color: #fff;
+  background: var(--akzent);
+  color: var(--akzent-text);
 }
 .knopf:hover {
+  background: var(--akzent-schwebe);
+}
+.knopf.dunkel {
+  background: var(--navy);
+  color: #ffffff;
+}
+.knopf.dunkel:hover {
   background: var(--navy-hell);
 }
 .knopf.zweit,
@@ -175,18 +427,12 @@ a.nav-punkt:focus-visible {
 .qr-knopf:hover {
   box-shadow: inset 0 0 0 2px var(--linie-stark);
 }
-:root[data-design='dunkel'] .knopf:not(.zweit) {
-  background: var(--gelb);
-  color: var(--navy);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-design='hell']) .knopf:not(.zweit) {
-    background: var(--gelb);
-    color: var(--navy);
-  }
+.knopf:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
-/* ---------- QR-Anzeige für den Beamer ---------- */
+/* ---------- Fenster: QR-Anzeige für den Beamer, Anmeldung ---------- */
 dialog {
   width: min(44rem, 100% - 2rem);
   max-height: calc(100% - 2rem);
@@ -198,7 +444,7 @@ dialog {
   text-align: center;
 }
 dialog::backdrop {
-  background: rgb(3 11 34 / 0.8);
+  background: rgb(4 20 39 / 0.8);
 }
 dialog h2 {
   margin: 0 0 1rem;
@@ -217,42 +463,61 @@ dialog h2 {
   overflow-wrap: anywhere;
   color: var(--text-2);
 }
+dialog.schmal {
+  width: min(26rem, 100% - 2rem);
+  text-align: left;
+}
+dialog.schmal h2 {
+  font-size: 1.5rem;
+}
+.formular {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.formular label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-weight: 700;
+}
+.formular input {
+  min-height: var(--tippflaeche);
+  padding: 0.4rem 0.8rem;
+  border: 2px solid var(--linie-stark);
+  border-radius: var(--radius);
+  background: var(--seite);
+  color: var(--text);
+  font: inherit;
+}
+.formular .reihe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.fehler {
+  margin: 0;
+  color: var(--fehler);
+  font-weight: 700;
+}
+.hinweis {
+  margin: 0;
+  color: var(--text-2);
+}
 
 /* ---------- Fuß ---------- */
 .fuss {
-  margin-top: 4rem;
-  padding: 1.5rem 0 2.5rem;
+  margin-top: 3rem;
+  padding: 1.25rem 0 2rem;
   border-top: 1px solid var(--linie);
   font-size: 0.95rem;
   color: var(--text-2);
 }
+.hauptbereich .fuss {
+  width: auto;
+}
 .fuss p {
   margin: 0.25rem 0;
-}
-
-/* Schmale Bildschirme: Navigation in eine eigene Zeile, bei Bedarf seitlich wischen */
-@media (max-width: 72rem) {
-  .hauptnavigation {
-    order: 3;
-    flex-basis: 100%;
-  }
-  .nav-punkt {
-    padding-inline: 0.7rem;
-  }
-  .hauptnavigation li:first-child .nav-punkt {
-    padding-left: 0;
-  }
-}
-
-/* Handy: Bereiche, die es noch nicht gibt, gar nicht erst zeigen */
-@media (max-width: 40rem) {
-  .hauptnavigation .nav-geplant {
-    display: none;
-  }
-  .hauptnavigation li:not(.nav-geplant) .nav-punkt {
-    padding-left: 0;
-    padding-right: 1.25rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -268,6 +533,9 @@ dialog h2 {
     color: #000;
   }
   .kopfleiste,
+  .seitenleiste,
+  .suchfeld,
+  .kopf-rechts,
   .qr-knopf {
     display: none;
   }

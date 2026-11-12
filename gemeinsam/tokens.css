@@ -1,5 +1,6 @@
 /*
  * Lehrraum – gemeinsame Gestaltungswerte (Farben, Abstände, Schrift) für alle Seiten ohne Build-Schritt.
+ * Farben aus dem Logo: Dunkelblau und Türkis (Türkis ersetzt das frühere Gelb).
  * Heller Modus ist die Grundlage; der dunkle Modus gilt, wenn das Gerät ihn verlangt oder wenn
  * <html data-design="dunkel"> gesetzt ist (Umschalter: gemeinsam/design.js).
  * Wer hier eine Farbe ändert, muss sie im dunklen Block zweimal ändern (Gerät und Umschalter).
@@ -7,41 +8,46 @@
 :root {
   color-scheme: light;
 
-  /* Marke */
-  --navy: #0b1f4d;
-  --navy-hell: #16327a;
-  --navy-dunkel: #061233;
-  --gelb: #ffc928;
-  --gelb-dunkel: #e6ac00;
+  /* Marke (in beiden Modi gleich) */
+  --navy: #0a2d53;
+  --navy-hell: #14407a;
+  --navy-dunkel: #061d38;
+  --tuerkis: #2cb69c; /* Logo, Flächen, Schmuck */
+  --tuerkis-hell: #6fd3bf;
+  --tuerkis-kraeftig: #0f7f6c; /* Knöpfe mit weißer Schrift, Text auf Hell */
 
   /* Flächen und Text */
-  --seite: #f2f4f8;
+  --seite: #f4f7fb;
   --flaeche: #ffffff;
-  --flaeche-2: #e8ecf3;
-  --text: #0b1f4d;
-  --text-2: #46557a;
-  --linie: #cdd5e3;
-  --linie-stark: #9aa7c2;
-  --verweis: #1d4fc4;
-  --fokus: #1d5fd1;
+  --flaeche-2: #e9eef5;
+  --text: #0a2d53;
+  --text-2: #4a5c78;
+  --linie: #d5ddea;
+  --linie-stark: #9aa9c2;
+  --verweis: #0f6f8f;
+  --akzent: #0f7f6c; /* Hauptknopf */
+  --akzent-schwebe: #0c6a5a;
+  --akzent-text: #ffffff;
+  --akzent-hell: #e1f5f0;
+  --fokus: #0f7f6c;
   --fehler: #b3261e;
 
-  /* Kopfleiste (in beiden Modi dunkelblau) */
-  --kopf: #0b1f4d;
+  /* Seitenleiste und einfache Kopfleiste (in beiden Modi dunkelblau) */
+  --kopf: #0a2d53;
   --kopf-text: #ffffff;
-  --kopf-text-2: #c3cce3;
+  --kopf-text-2: #b9c7dc;
 
   /* Akzentfarben der Bereiche: kräftig (Text, Symbol) und hell (Fläche) */
-  --tafel: #1d4fc4;
-  --tafel-hell: #e3ecfc;
-  --unterrichten: #1b6b43;
-  --unterrichten-hell: #e1f2e9;
-  --interaktion: #a83418;
-  --interaktion-hell: #fde9e3;
-  --lernen: #7a5800;
-  --lernen-hell: #fff2c7;
-  --bibliothek: #5237a8;
-  --bibliothek-hell: #ece7fb;
+  --tafel: #0f7f6c;
+  --tafel-hell: #e1f5f0;
+  --unterrichten: #1d4fc4;
+  --unterrichten-hell: #e6eefc;
+  --interaktion: #6a3fb8;
+  --interaktion-hell: #efe9fb;
+  --lernen: #b25a00;
+  --lernen-hell: #fff0dc;
+  --bibliothek: #2d6a2f;
+  --bibliothek-hell: #e6f4e3;
 
   /* Eigene Farben der Anwendungen (bleiben in beiden Modi gleich) */
   --quizzo: #0b1f4d;
@@ -53,58 +59,67 @@
   --radius: 0.75rem;
   --radius-gross: 1.25rem;
   --tippflaeche: 3rem;
-  --breite: 72rem;
+  --breite: 76rem;
+  --leiste: 14.5rem;
   --schrift: ui-rounded, 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-design='hell']) {
     color-scheme: dark;
-    --seite: #061233;
-    --flaeche: #0f2558;
-    --flaeche-2: #16327a;
+    --seite: #061a33;
+    --flaeche: #0d2a4e;
+    --flaeche-2: #163a69;
     --text: #ffffff;
-    --text-2: #c3cce3;
-    --linie: #2a4489;
-    --linie-stark: #5570b8;
-    --verweis: #ffc928;
-    --fokus: #ffc928;
+    --text-2: #b9c7dc;
+    --linie: #24497d;
+    --linie-stark: #4f74ab;
+    --verweis: #6fd3bf;
+    --akzent: #2cb69c;
+    --akzent-schwebe: #6fd3bf;
+    --akzent-text: #06241f;
+    --akzent-hell: #0f3d3a;
+    --fokus: #6fd3bf;
     --fehler: #ffb4ab;
-    --kopf: #030b22;
-    --tafel: #a9c5ff;
-    --tafel-hell: #17357a;
-    --unterrichten: #8fdcb2;
-    --unterrichten-hell: #12452e;
-    --interaktion: #ffb4a0;
-    --interaktion-hell: #5e2212;
-    --lernen: #ffd866;
-    --lernen-hell: #4a3800;
-    --bibliothek: #c9bbff;
-    --bibliothek-hell: #36257a;
+    --kopf: #041427;
+    --tafel: #6fd3bf;
+    --tafel-hell: #0f3d3a;
+    --unterrichten: #a9c5ff;
+    --unterrichten-hell: #17357a;
+    --interaktion: #cdbbff;
+    --interaktion-hell: #36257a;
+    --lernen: #ffc980;
+    --lernen-hell: #4d3105;
+    --bibliothek: #a6dba2;
+    --bibliothek-hell: #1c4320;
   }
 }
 
 :root[data-design='dunkel'] {
   color-scheme: dark;
-  --seite: #061233;
-  --flaeche: #0f2558;
-  --flaeche-2: #16327a;
+  --seite: #061a33;
+  --flaeche: #0d2a4e;
+  --flaeche-2: #163a69;
   --text: #ffffff;
-  --text-2: #c3cce3;
-  --linie: #2a4489;
-  --linie-stark: #5570b8;
-  --verweis: #ffc928;
-  --fokus: #ffc928;
+  --text-2: #b9c7dc;
+  --linie: #24497d;
+  --linie-stark: #4f74ab;
+  --verweis: #6fd3bf;
+  --akzent: #2cb69c;
+  --akzent-schwebe: #6fd3bf;
+  --akzent-text: #06241f;
+  --akzent-hell: #0f3d3a;
+  --fokus: #6fd3bf;
   --fehler: #ffb4ab;
-  --kopf: #030b22;
-  --tafel: #a9c5ff;
-  --tafel-hell: #17357a;
-  --unterrichten: #8fdcb2;
-  --unterrichten-hell: #12452e;
-  --interaktion: #ffb4a0;
-  --interaktion-hell: #5e2212;
-  --lernen: #ffd866;
-  --lernen-hell: #4a3800;
-  --bibliothek: #c9bbff;
-  --bibliothek-hell: #36257a;
+  --kopf: #041427;
+  --tafel: #6fd3bf;
+  --tafel-hell: #0f3d3a;
+  --unterrichten: #a9c5ff;
+  --unterrichten-hell: #17357a;
+  --interaktion: #cdbbff;
+  --interaktion-hell: #36257a;
+  --lernen: #ffc980;
+  --lernen-hell: #4d3105;
+  --bibliothek: #a6dba2;
+  --bibliothek-hell: #1c4320;
 }
