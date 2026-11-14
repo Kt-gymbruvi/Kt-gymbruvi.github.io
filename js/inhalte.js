@@ -36,6 +36,7 @@ const PLATTFORM = 'https://kt-gymbruvi.github.io'
 window.NAVIGATION = [
   { titel: 'Startseite', symbol: 'haus', adresse: './', hier: true },
   { titel: 'Meine Klassen', symbol: 'klassen', adresse: PLATTFORM + '/Lehrraum/#/klassen', nur: 'lehrkraft' },
+  { titel: 'Notenbuch', symbol: 'notenbuch', adresse: PLATTFORM + '/Notenbuch/', nur: 'lehrkraft' },
   { titel: 'Quizzo', symbol: 'pokal', adresse: PLATTFORM + '/Quizzo/' },
   { titel: 'Klassenfunk', symbol: 'megafon', adresse: PLATTFORM + '/Klassenfunk/' },
   { titel: 'Lernangebote', symbol: 'lernen', adresse: 'lernen/' },
@@ -119,6 +120,7 @@ window.SCHNELLZUGRIFF = [
   { symbol: 'pokal', farbe: 'bibliothek', titel: 'Quizzo starten', adresse: PLATTFORM + '/Quizzo/#/leiten' },
   { symbol: 'megafon', farbe: 'interaktion', titel: 'Klassenfunk öffnen', adresse: PLATTFORM + '/Klassenfunk/#/leiten' },
   { symbol: 'lernen', farbe: 'lernen', titel: 'Lernangebote ordnen', adresse: 'lernen/#bearbeiten' },
+  { symbol: 'notenbuch', farbe: 'unterrichten', titel: 'Notenbuch öffnen', adresse: PLATTFORM + '/Notenbuch/' },
 ]
 
 /**

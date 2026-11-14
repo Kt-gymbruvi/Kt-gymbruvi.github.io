@@ -49,6 +49,10 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 - Seit 11.11.2026 gibt es `../Lehrraum`, veröffentlicht unter https://kt-gymbruvi.github.io/Lehrraum/ (Repository `Kt-gymbruvi/Lehrraum`): Gerüst und Tafel mit Stift, Textmarker, Radierer, Text, Formen, Bildern, Auswahl, Seiten, PDF öffnen und speichern, Rückgängig, Autospeichern sowie Fenstern (Uhr, Timer, Stoppuhr, Würfel, Notizen, Quizzo, Klassenfunk, Lernangebote) – Etappen 1.3, 2a, 2b, 2c, 3a und 5a. Stand dort in `docs/PROJECT-STATUS.md`.
 - Der Navigationspunkt „Tafel“ in `js/inhalte.js` hat auf dem Zweig noch keine Adresse. Lehrraum ist jetzt live; beim Veröffentlichen der neuen Startseite `adresse: '/Lehrraum/#/tafel'` eintragen.
 
+## Notenbuch (seit 14.11.2026 live)
+- Das Notenbuch ist vom Claude-Artefakt nach `../Notenbuch` umgezogen (https://kt-gymbruvi.github.io/Notenbuch/), Plan in `../Lehrraum/docs/SPEC-klassen-namen-und-notenbuch.md`. Abgleich zwischen zwei Geräten von der Lehrkraft geprüft.
+- Auf der Startseite: Eintrag „Notenbuch“ in Seitenleiste und Schnellzugriff (nur angemeldet), Symbol `notenbuch`, Absatz im Impressum (veröffentlicht am 14.11.2026).
+
 ## Nächste Schritte (priorisiert, siehe `IMPLEMENTATION_ROADMAP.md`)
 1. Tafel am iPad (Apple Pencil) und am Smartboard erproben (Lehrkraft). Entscheiden, ob die neue Startseite (Zweig `lehrraum-phase-1`) veröffentlicht wird.
 2. Etappe 1.2: Lernübersicht und Werkzeuge auf `gemeinsam/` umstellen, QR-Fenster als gemeinsames Modul.
