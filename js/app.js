@@ -531,13 +531,61 @@
       $('anmelde-passwort').value = ''
       anmeldeDialog.close()
       setzeRolle(sitzung)
+      void fragePasswort(sitzung)
     } catch (err) {
       zeige(fehlerText(err))
     } finally {
       knopf.disabled = false
     }
   })
+  // ---------- Notenbuch-Passwort einmal je Gerät (gemeinsamer Schlüsselbund, gemeinsam/schluesselbund.js) ----------
+  const SB = window.LehrraumSchluessel
+  const passwortDialog = $('passwort-dialog')
+  let passwortSitzung = null
+  /** Direkt nach der Anmeldung: gibt es schon Notenbuch oder Klassen, aber noch keinen Bund, einmal fragen. */
+  async function fragePasswort(sitzung) {
+    if (!SB || !DB || (await SB.laden())) return
+    try {
+      const t = sitzung.access_token
+      const da = (await DB.tresor('namen', t)) || (await DB.tresor('klassen', t)) || (await DB.tresor('notenbuch', t))
+      if (!da) return // noch kein Notenbuch: das Passwort wird in Tafel oder Notenbuch festgelegt
+    } catch {
+      return // ohne Verbindung nicht fragen – Tafel und Notenbuch fragen dann selbst
+    }
+    passwortSitzung = sitzung
+    $('passwort-feld').value = ''
+    $('passwort-fehler').hidden = true
+    passwortDialog.showModal()
+    $('passwort-feld').focus()
+  }
+  $('passwort-spaeter').addEventListener('click', () => passwortDialog.close())
+  $('passwort-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const feld = $('passwort-feld')
+    const fehler = $('passwort-fehler')
+    const zeige = (text) => {
+      fehler.textContent = text
+      fehler.hidden = !text
+    }
+    if (!feld.value) return zeige('Bitte das Passwort eingeben.')
+    const knopf = $('passwort-senden')
+    knopf.disabled = true
+    zeige('Wird geprüft …')
+    try {
+      const t = passwortSitzung && passwortSitzung.access_token
+      const erg = await SB.entsperre(feld.value, (art) => DB.tresor(art, t))
+      if (erg === 'falsch') return zeige('Das Passwort passt nicht zum Notenbuch.')
+      feld.value = ''
+      passwortDialog.close()
+    } catch {
+      zeige('Keine Verbindung zum Server.')
+    } finally {
+      knopf.disabled = false
+    }
+  })
+
   $('abmelde-knopf').addEventListener('click', () => {
+    if (SB) void SB.loeschen() // Schlüsselbund weg: Notenbuch und Tafel fragen wieder nach dem Passwort
     if (DB) DB.abmelden()
     try {
       localStorage.removeItem(GEMEINSAM) // meldet auch bei Quizzo, Klassenfunk und der Tafel ab
@@ -549,5 +597,11 @@
 
   // ---------- Start: erst die schlanke Fassung, dann nachsehen, ob jemand angemeldet ist ----------
   setzeRolle(null)
+  try {
+    // Abgemeldet (auch in Quizzo, Klassenfunk, Tafel oder Notenbuch): dann gehört auch der Schlüsselbund weg
+    if (SB && localStorage.getItem(GEMEINSAM) === null) void SB.loeschen()
+  } catch {
+    /* egal */
+  }
   if (DB) DB.sitzung().then(setzeRolle, () => setzeRolle(null))
 })()

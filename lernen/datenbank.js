@@ -93,5 +93,14 @@
     )
   }
 
-  window.LernDB = { sitzung, anmelden, abmelden, laden, speichern }
+  /** Verschlüsselte Zeile eines Tresors der Lehrkraft (lr_tresore) oder null – nur, um das Notenbuch-Passwort zu prüfen.
+   *  Die Startseite entschlüsselt damit nichts weiter (siehe gemeinsam/schluesselbund.js). */
+  async function tresor(art, token) {
+    const zeilen = await antwort(
+      await fetch(URL_BASIS + '/rest/v1/lr_tresore?select=salt,iv,daten&art=eq.' + encodeURIComponent(art), { headers: kopf(token) }),
+    )
+    return (zeilen && zeilen[0]) || null
+  }
+
+  window.LernDB = { sitzung, anmelden, abmelden, laden, speichern, tresor }
 })()

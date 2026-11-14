@@ -3,6 +3,10 @@
 Stand: 12.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`, veröffentlicht am 12.11.2026). Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
+## Ein Passwort für Notenbuch, Tafel und Startseite (gebaut 14.11.2026, nicht veröffentlicht)
+- Nach der Anmeldung fragt die Startseite einmal je Gerät nach dem Notenbuch-Passwort (Dialog „Notenbuch-Passwort für dieses Gerät“, „Später“ möglich) – nur, wenn es schon Notenbuch oder Klassen gibt und noch kein Schlüsselbund da ist. Geprüft wird an den verschlüsselten Tresoren (`LernDB.tresor`), abgelegt nur ein nicht exportierbarer Schlüssel (`gemeinsam/schluesselbund.js`). Abmelden löscht ihn; fehlt beim Start die gemeinsame Anmeldung, ebenso.
+- Geprüft in der Vorschau: Prüfung „passt nicht“ / „passt“ / „noch nichts da“ mit nachgestelltem Tresor, Löschen, Dialog hell/dunkel am Handy. Mit echtem Konto ungeprüft. Spezifikation: `../Lehrraum/docs/SPEC-tafeln-abgleich-pdf-tabelle.md`, Etappe B.
+
 ## Implementiert
 - **Rückwege (geprüft am 12.11.2026 an den veröffentlichten Seiten):** Quizzo (Knopf „← Lehrraum“ auf Startseite, Anmeldung und in der Lehrkraft-Kopfzeile), Klassenfunk (Knopf „Lehrraum“ in jeder Ansicht), Lehrraum-App (Haus-Knopf), Lernübersicht und Werkzeuge („← Startseite“) führen alle auf `https://kt-gymbruvi.github.io/`. Lernangebote führen über „← Lernangebote“ zur Lernübersicht und von dort zur Startseite.
 - **Startseite „Lehrraum“** (`index.html`, `startseite.css`, `js/app.js`, `js/inhalte.js`), nach dem Bildentwurf der Lehrkraft:

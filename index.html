@@ -136,7 +136,24 @@
       </form>
     </dialog>
 
+    <dialog id="passwort-dialog" class="schmal" aria-labelledby="passwort-titel">
+      <h2 id="passwort-titel">Notenbuch-Passwort für dieses Gerät</h2>
+      <form id="passwort-form" class="formular" novalidate>
+        <p class="hinweis">
+          Einmal eingegeben, öffnen sich Notenbuch, Tafel und „Meine Klassen“ auf diesem Gerät ohne weitere Rückfrage. Gespeichert wird nur ein nicht
+          auslesbarer Schlüssel, nie das Passwort. Abmelden löscht ihn.
+        </p>
+        <label>Passwort des Notenbuchs <input id="passwort-feld" type="password" autocomplete="off" /></label>
+        <p id="passwort-fehler" class="fehler" role="alert" hidden></p>
+        <div class="reihe">
+          <button type="submit" class="knopf" id="passwort-senden">Entsperren</button>
+          <button type="button" class="knopf zweit" id="passwort-spaeter">Später</button>
+        </div>
+      </form>
+    </dialog>
+
     <script src="gemeinsam/symbole.js"></script>
+    <script src="gemeinsam/schluesselbund.js"></script>
     <script src="gemeinsam/klassen.js"></script>
     <script src="js/inhalte.js"></script>
     <script src="lernen/angebote.js"></script>
