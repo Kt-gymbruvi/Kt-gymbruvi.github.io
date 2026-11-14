@@ -1,6 +1,7 @@
 /* Lehrraum – liest die Klassen der Lehrkraft aus dem Speicher dieses Geräts (IndexedDB „lehrraum“, Lager „klassen“).
    Angelegt und geändert werden sie in der Lehrraum-App (/Lehrraum/#/klassen); hier wird nur gelesen.
-   Die Klassen liegen nur auf dem Gerät – es wird nichts gesendet. Auf einem Gerät ohne Klassen ist die Liste leer. */
+   Hier wird nichts gesendet (den verschlüsselten Abgleich zwischen Geräten macht die Lehrraum-App). Gelesen werden nur
+   Kennung, Bezeichnung, Fach und Jahrgang – nie die Namen. Auf einem Gerät ohne Klassen ist die Liste leer. */
 ;(function () {
   'use strict'
 
