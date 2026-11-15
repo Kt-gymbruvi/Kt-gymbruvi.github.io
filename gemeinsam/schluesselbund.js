@@ -1,7 +1,8 @@
 /* Lehrraum – Schlüsselbund dieses Geräts, gemeinsam mit Notenbuch und Tafel (gleiche Adresse, gleicher Speicher).
    IndexedDB „lehrraum-schluessel“, Lager „bund“, Eintrag „bund“: { version: 1, basis: CryptoKey, am: ISO-Zeit }.
    `basis` ist das Notenbuch-Passwort als nicht exportierbarer PBKDF2-Schlüssel; das Passwort selbst wird nie gespeichert.
-   Daraus leiten Notenbuch und Tafel ihre Schlüssel ab – einmal je Gerät eingegeben, öffnen sie ohne Rückfrage.
+   Daraus leiten Tafel und „Meine Klassen“ ihre Schlüssel ab – einmal je Gerät eingegeben, öffnen sie ohne Rückfrage.
+   Das Notenbuch fragt dagegen bei jedem Öffnen nach dem Passwort (es legt den Bund nur an).
    Hier wird das Passwort nur geprüft (an den verschlüsselten Tresoren, die Startseite liest nichts davon im Klartext
    weiter) und der Bund angelegt bzw. beim Abmelden gelöscht. Gleiches Format in ../Lehrraum (schluesselbund.ts) und
    ../Notenbuch (index.html). */

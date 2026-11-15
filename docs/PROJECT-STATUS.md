@@ -8,7 +8,7 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
 - Geprüft in der Vorschau mit nachgestellter Anmeldung und Beispielklassen: iPad hoch und quer, Handy, Beamer (1920 px), hell und dunkel, Suche. Auf einem echten iPad ungeprüft.
 
 ## Ein Passwort für Notenbuch, Tafel und Startseite (gebaut 14.11.2026, nicht veröffentlicht)
-- Nach der Anmeldung fragt die Startseite einmal je Gerät nach dem Notenbuch-Passwort (Dialog „Notenbuch-Passwort für dieses Gerät“, „Später“ möglich) – nur, wenn es schon Notenbuch oder Klassen gibt und noch kein Schlüsselbund da ist. Geprüft wird an den verschlüsselten Tresoren (`LernDB.tresor`), abgelegt nur ein nicht exportierbarer Schlüssel (`gemeinsam/schluesselbund.js`). Abmelden löscht ihn; fehlt beim Start die gemeinsame Anmeldung, ebenso.
+- Nach der Anmeldung fragt die Startseite einmal je Gerät nach dem Notenbuch-Passwort (Dialog „Notenbuch-Passwort für dieses Gerät“, „Später“ möglich) – nur, wenn es schon Notenbuch oder Klassen gibt und noch kein Schlüsselbund da ist. Geprüft wird an den verschlüsselten Tresoren (`LernDB.tresor`), abgelegt nur ein nicht exportierbarer Schlüssel (`gemeinsam/schluesselbund.js`). Abmelden löscht ihn; fehlt beim Start die gemeinsame Anmeldung, ebenso. Der Schlüssel öffnet nur Tafel und „Meine Klassen“; das Notenbuch fragt seit 15.11.2026 bei jedem Öffnen nach dem Passwort.
 - Geprüft in der Vorschau: Prüfung „passt nicht“ / „passt“ / „noch nichts da“ mit nachgestelltem Tresor, Löschen, Dialog hell/dunkel am Handy. Mit echtem Konto ungeprüft. Spezifikation: `../Lehrraum/docs/SPEC-tafeln-abgleich-pdf-tabelle.md`, Etappe B.
 
 ## Implementiert

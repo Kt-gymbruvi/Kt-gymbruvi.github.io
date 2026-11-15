@@ -2,6 +2,9 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-15 – Notenbuch fragt bei jedem Öffnen nach dem Passwort
+- Auf Wunsch der Lehrkraft (Sicherheit am unbeaufsichtigten Gerät). Umgesetzt im Notenbuch-Repo; die Startseite fragt nach der Anmeldung weiterhin einmal je Gerät, der Schlüssel gilt aber nur noch für Tafel und „Meine Klassen“. Hinweistext im Passwort-Dialog angepasst.
+
 ## 2026-11-15 – Startseite kompakter, ohne Schnellzugriff und „Zuletzt benutzt“
 - Auf Wunsch der Lehrkraft: übersichtlicher, vor allem auf dem iPad; Symbole kleiner. **Schnellzugriff und „Zuletzt benutzt“ entfallen ganz** – sie wiederholten nur, was Kacheln und Seitenleiste schon bieten. Der Geräteeintrag `lehrraum-zuletzt` wird beim Öffnen der Seite gelöscht.
 - **Alles nebeneinander:** Kacheln immer in einer Reihe (Handy: drei je Reihe, nur Symbol und Titel), Werkzeuge nebeneinander mit höchstens zwei Zeilen Beschreibung (Handy: drei je Reihe), Klassen als kleine Karten in einer Reihe (Handy: zum Wischen). Die Startseite zeigt höchstens sechs Klassen, damit sie mit „Neue Klasse“ auf dem iPad hochkant in eine Reihe passen.

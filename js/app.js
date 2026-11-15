@@ -542,7 +542,7 @@
   })
 
   $('abmelde-knopf').addEventListener('click', () => {
-    if (SB) void SB.loeschen() // Schlüsselbund weg: Notenbuch und Tafel fragen wieder nach dem Passwort
+    if (SB) void SB.loeschen() // Schlüsselbund weg: Tafel und „Meine Klassen“ fragen wieder nach dem Passwort
     if (DB) DB.abmelden()
     try {
       localStorage.removeItem(GEMEINSAM) // meldet auch bei Quizzo, Klassenfunk und der Tafel ab
