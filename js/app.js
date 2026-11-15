@@ -1,7 +1,7 @@
-/* Startseite „Lehrraum“: baut Seitenleiste, Begrüßung, Kacheln, Schnellzugriff, Werkzeuge und Materialliste
+/* Startseite „Lehrraum“: baut Seitenleiste, Begrüßung, Kacheln, Meine Klassen, Werkzeuge und Materialliste
    aus js/inhalte.js. Zwei Fassungen: angemeldete Lehrkräfte sehen alles, ohne Anmeldung gibt es die schlanke
    Fassung (Mitmachen mit PIN, Lernangebote, Werkzeuge).
-   Zum Server geht nur die Anmeldung (lernen/datenbank.js). Suche und „Zuletzt benutzt“ laufen im Gerät. */
+   Zum Server geht nur die Anmeldung (lernen/datenbank.js). Die Suche läuft im Gerät. */
 ;(function () {
   'use strict'
 
@@ -9,7 +9,6 @@
   const NAVIGATION = window.NAVIGATION || []
   const MITMACHEN = window.MITMACHEN || {}
   const LINKS = window.LINKS || []
-  const SCHNELLZUGRIFF = window.SCHNELLZUGRIFF || []
   const KLASSEN = window.KLASSEN || null
   const WERKZEUGE = window.WERKZEUGE || []
   const MATERIALIEN = window.MATERIALIEN || []
@@ -35,42 +34,24 @@
   }
 
   const volleAdresse = (pfad) => new URL(pfad, location.href).href
-  const klein = (s) => (s || '').toLocaleLowerCase('de')
+  const klein = (s) => (s || '').replace(/­/g, '').toLocaleLowerCase('de') // ohne Trennstellen suchen
 
   /** Wer sieht einen Eintrag? nur: 'lehrkraft' | 'gast' | 'material' (nur wenn es Materialien gibt) | nichts = alle */
   let lehrkraft = false
   const sichtbar = (e) => (e.nur === 'lehrkraft' ? lehrkraft : e.nur === 'gast' ? !lehrkraft : e.nur === 'material' ? MATERIALIEN.length > 0 : true)
 
-  // ---------- Zuletzt benutzt (nur in diesem Gerät gemerkt) ----------
-  const ZULETZT = 'lehrraum-zuletzt'
-  const MAX_ZULETZT = 6
-  function ladeZuletzt() {
-    try {
-      const liste = JSON.parse(localStorage.getItem(ZULETZT) || '[]')
-      return Array.isArray(liste) ? liste.filter((z) => z && typeof z.titel === 'string' && typeof z.adresse === 'string' && typeof z.zeit === 'number').slice(0, MAX_ZULETZT) : []
-    } catch {
-      return []
-    }
+  // Die frühere Liste „Zuletzt benutzt“ gibt es nicht mehr: alten Eintrag im Gerät aufräumen
+  try {
+    localStorage.removeItem('lehrraum-zuletzt')
+  } catch {
+    /* egal */
   }
-  function merke(titel, adresse, symbol) {
-    try {
-      const liste = [{ titel, adresse, symbol: symbol || 'verweis', zeit: Date.now() }, ...ladeZuletzt().filter((z) => z.adresse !== adresse)].slice(0, MAX_ZULETZT)
-      localStorage.setItem(ZULETZT, JSON.stringify(liste))
-    } catch {
-      /* ohne Speicher gibt es eben keine Liste */
-    }
-  }
-  /** Verweis, der sich beim Anklicken in „Zuletzt benutzt“ einträgt */
-  function verweis(klasse, titel, adresse, symbol) {
+  /** Verweis; fremde Seiten ohne Rückgriff auf diese Seite öffnen */
+  function verweis(klasse, adresse) {
     const a = el('a', klasse)
     a.href = adresse
     if (/^https?:/i.test(adresse) && !adresse.startsWith(location.origin)) a.rel = 'noopener'
-    a.addEventListener('click', () => merke(titel, adresse, symbol))
     return a
-  }
-  function wann(zeit) {
-    const tage = Math.floor((new Date().setHours(0, 0, 0, 0) - new Date(zeit).setHours(0, 0, 0, 0)) / 86400000)
-    return tage <= 0 ? 'heute' : tage === 1 ? 'gestern' : new Date(zeit).toLocaleDateString('de-DE', { day: 'numeric', month: 'long' })
   }
 
   const TYPEN = {
@@ -132,8 +113,6 @@
   $('zeile').textContent = SEITE.zeile || ''
   $('such-symbol').replaceWith(zeichen('suche'))
   $('klassen-symbol').replaceWith(zeichen('klassen', 'titel-symbol'))
-  $('zuletzt-symbol').replaceWith(zeichen('uhr', 'titel-symbol'))
-  $('schnell-symbol').replaceWith(zeichen('blitz', 'titel-symbol'))
 
   // Seitenleiste auf schmalen Bildschirmen auf- und zuklappen
   const geruest = $('geruest')
@@ -169,7 +148,7 @@
       if (!n.adresse && !SEITE.geplantesZeigen) return
       const li = el('li')
       // Bereiche ohne Adresse gibt es noch nicht: kein Link, sondern Text mit dem Hinweis „folgt“
-      const punkt = n.adresse ? verweis('leisten-punkt', n.titel, n.adresse, n.symbol) : el('span', 'leisten-punkt geplant')
+      const punkt = n.adresse ? verweis('leisten-punkt', n.adresse) : el('span', 'leisten-punkt geplant')
       if (n.hier) punkt.setAttribute('aria-current', 'page')
       punkt.append(zeichen(n.symbol), el('span', null, n.titel))
       if (!n.adresse) punkt.append(el('small', null, 'folgt'))
@@ -204,7 +183,6 @@
     if (tafel) {
       knopf.href = tafel.adresse
       knopf.append(zeichen('bildschirm'), el('span', null, 'Zur Tafel'))
-      knopf.onclick = () => merke(tafel.titel, tafel.adresse, tafel.symbol)
     }
   }
 
@@ -247,7 +225,7 @@
     LINKS.filter(sichtbar).forEach((l) => {
       if (!l.adresse && !SEITE.geplantesZeigen) return
       const li = el('li')
-      const a = l.adresse ? verweis('kachel', l.titel, l.adresse, l.symbol) : el('div', 'kachel geplant')
+      const a = l.adresse ? verweis('kachel', l.adresse) : el('div', 'kachel geplant')
       if (l.farbe) a.classList.add('farbe-' + l.farbe)
       a.append(zeichen(l.symbol || 'verweis', 'kachel-symbol'))
       a.append(el('span', 'kachel-titel', l.titel))
@@ -275,43 +253,23 @@
     liste.textContent = ''
     klassen.slice(0, KLASSEN.hoechstens).forEach((k) => {
       const name = [k.bezeichnung, k.fach].filter(Boolean).join(' ')
-      const li = el('li', 'klassen-karte')
-      li.append(el('span', 'klassen-name', k.bezeichnung), el('span', 'klassen-fach', k.fach || 'ohne Fach'))
-      const a = verweis('knopf dunkel', 'Tafel ' + name, KLASSEN.tafel + k.id, 'bildschirm')
+      const li = el('li')
+      const a = verweis('klassen-karte', KLASSEN.tafel + k.id)
       a.setAttribute('aria-label', 'Zur Tafel von ' + name)
-      a.append(el('span', null, 'Zur Tafel'), zeichen('pfeil', 'knopf-pfeil'))
+      a.append(el('span', 'klassen-name', k.bezeichnung), el('span', 'klassen-fach', k.fach || 'ohne Fach'))
+      const ziel = el('span', 'klassen-ziel')
+      ziel.append(el('span', null, 'Zur Tafel'), zeichen('pfeil', 'knopf-pfeil'))
+      a.append(ziel)
       li.append(a)
       liste.append(li)
     })
-    const neu = el('li', 'klassen-karte neu')
+    const neu = el('li')
     const a = el('a', 'klassen-neu')
     a.href = KLASSEN.neu
     a.append(zeichen('plus', 'klassen-plus'), el('span', null, 'Neue Klasse anlegen'))
     neu.append(a)
     liste.append(neu)
     if (klassen.length > KLASSEN.hoechstens) $('klassen-alle').textContent = `Alle ${klassen.length} Klassen anzeigen`
-  }
-
-  // ---------- Zuletzt benutzt und Schnellzugriff (nur Lehrkraft) ----------
-  function zeile(titel, adresse, symbol, farbe, zusatz) {
-    const li = el('li')
-    const a = verweis('zeile', titel, adresse, symbol)
-    a.append(zeichen(symbol, 'zeilen-symbol' + (farbe ? ' farbe-' + farbe : '')), el('span', 'zeilen-titel', titel))
-    if (zusatz) a.append(el('span', 'zeilen-zusatz', zusatz))
-    a.append(zeichen('pfeil', 'zeilen-pfeil'))
-    li.append(a)
-    return li
-  }
-  function zeichneListen() {
-    const zuletzt = $('zuletzt')
-    zuletzt.textContent = ''
-    const liste = ladeZuletzt()
-    liste.forEach((z) => zuletzt.append(zeile(z.titel, z.adresse, z.symbol, null, wann(z.zeit))))
-    if (!liste.length) zuletzt.append(el('li', 'leer', 'Hier erscheint, was du zuletzt geöffnet hast.'))
-
-    const schnell = $('schnellzugriff')
-    schnell.textContent = ''
-    SCHNELLZUGRIFF.forEach((s) => schnell.append(zeile(s.titel, s.adresse, s.symbol, s.farbe)))
   }
 
   // ---------- Werkzeuge (nach Bereich gruppiert) ----------
@@ -324,7 +282,7 @@
     const ul = el('ul', 'werkzeug-karten')
     WERKZEUGE.filter((w) => (w.bereich || 'Allgemein') === b).forEach((w) => {
       const li = el('li')
-      const a = verweis('werkzeug mit-qr', w.titel, w.adresse, w.symbol)
+      const a = verweis('werkzeug', w.adresse)
       a.append(zeichen(w.symbol || 'werkzeug', 'werkzeug-symbol'))
       const textteil = el('span', 'werkzeug-text')
       textteil.append(el('span', 'werkzeug-titel', w.titel))
@@ -390,7 +348,7 @@
       eintraege.forEach((m) => {
         const li = el('li', 'eintrag')
         li.append(el('span', 'typ', typ(m.datei)))
-        const a = verweis('eintrag-link', m.titel, m.datei, 'datei')
+        const a = verweis('eintrag-link', m.datei)
         a.append(el('span', 'eintrag-titel', m.titel))
         const info = [m.klasse && 'Klasse ' + m.klasse, m.text].filter(Boolean).join(' · ')
         if (info) a.append(el('span', 'eintrag-info', info))
@@ -409,7 +367,6 @@
   function suchbestand() {
     return [
       ...LINKS.filter((l) => l.adresse && sichtbar(l)).map((l) => ({ titel: l.titel, text: (!lehrkraft && l.textGast) || l.text, adresse: l.adresse, symbol: l.symbol, art: 'Bereich' })),
-      ...(lehrkraft ? SCHNELLZUGRIFF.map((s) => ({ titel: s.titel, text: '', adresse: s.adresse, symbol: s.symbol, art: 'Schnellzugriff' })) : []),
       ...WERKZEUGE.map((w) => ({ titel: w.titel, text: w.text, adresse: w.adresse, symbol: w.symbol, art: 'Werkzeug' })),
       ...ANGEBOTE.filter((a) => a.sichtbar !== false).map((a) => ({ titel: a.titel, text: a.text, adresse: 'lernen/' + a.ordner + '/', symbol: 'lernen', art: 'Lernangebot · ' + (FACHNAMEN[a.fach] || a.fach || '') })),
       ...MATERIALIEN.map((m) => ({ titel: m.titel, text: m.text, adresse: m.datei, symbol: 'datei', art: 'Material' })),
@@ -430,7 +387,7 @@
       .sort((a, b) => Number(b.imTitel) - Number(a.imTitel))
     treffer.slice(0, MAX_TREFFER).forEach(({ e }) => {
       const li = el('li')
-      const a = verweis(null, e.titel, e.adresse, e.symbol)
+      const a = verweis(null, e.adresse)
       a.append(el('b', null, e.titel), el('small', null, e.art))
       li.append(a)
       trefferListe.append(li)
@@ -489,7 +446,6 @@
     zeichneBegruessung()
     zeichneKacheln()
     void zeichneKlassen()
-    zeichneListen()
     suche()
   }
 

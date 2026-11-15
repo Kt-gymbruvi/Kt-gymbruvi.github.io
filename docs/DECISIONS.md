@@ -2,6 +2,12 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-15 – Startseite kompakter, ohne Schnellzugriff und „Zuletzt benutzt“
+- Auf Wunsch der Lehrkraft: übersichtlicher, vor allem auf dem iPad; Symbole kleiner. **Schnellzugriff und „Zuletzt benutzt“ entfallen ganz** – sie wiederholten nur, was Kacheln und Seitenleiste schon bieten. Der Geräteeintrag `lehrraum-zuletzt` wird beim Öffnen der Seite gelöscht.
+- **Alles nebeneinander:** Kacheln immer in einer Reihe (Handy: drei je Reihe, nur Symbol und Titel), Werkzeuge nebeneinander mit höchstens zwei Zeilen Beschreibung (Handy: drei je Reihe), Klassen als kleine Karten in einer Reihe (Handy: zum Wischen). Die Startseite zeigt höchstens sechs Klassen, damit sie mit „Neue Klasse“ auf dem iPad hochkant in eine Reihe passen.
+- Die ganze Klassenkarte führt zur Tafel der Klasse (statt eines eigenen Knopfs) – das spart Platz bei gleicher Funktion.
+- Begrüßung flacher; die Tafel-Zeichnung erscheint erst ab Querformat/Rechner.
+
 ## 2026-11-12 – Veröffentlichung und Rückwege zur Startseite
 - Auf Wunsch der Lehrkraft führen alle Anwendungen zur neuen Startseite „Lehrraum“ (`https://kt-gymbruvi.github.io/`), nicht mehr zu einer alten Übersicht. Da die neue Startseite unter derselben Adresse liegt wie die alte, stimmten die vorhandenen Verweise; ergänzt wurde der fehlende Rückweg in Quizzo, in Klassenfunk nur die Beschriftung („Lehrraum“ statt „Homepage – Lernen mit Spaß“).
 - In Quizzo steht der Knopf bewusst nicht in den Spielansichten (Beamer, Handy im Spiel), damit ihn niemand mitten im Quiz antippt.
@@ -20,7 +26,7 @@ Vorlage: Bildentwurf der Lehrkraft (Seitenleiste links, Kopfzeile mit Logo und S
 - **Türkis ersetzt Gelb** (Farben aus dem Logo: Dunkelblau `#0a2d53`, Türkis `#2cb69c`). Für Knöpfe mit weißer Schrift gilt das kräftigere `#0f7f6c`, weil Weiß auf dem Logo-Türkis zu schwach kontrastiert. Quizzo behält sein Gelb, Klassenfunk seine Farben.
 - **Logo als zugeschnittenes PNG** aus der Datei der Lehrkraft (`gemeinsam/logo.png`, `logo-klein.png`), nicht nachgezeichnet – so ist es genau das entworfene. Es hat weißen Grund und steht deshalb auch im dunklen Modus auf Weiß.
 - **Weggelassen:** Glocke/Benachrichtigungen, „Unsere Vision“, „Noch mehr Möglichkeiten/Community“, Status „Aktiv“ bei Klassen – dahinter stünde keine Funktion.
-- **„Zuletzt benutzt“ statt „Neuigkeiten“:** merkt sich nur im Gerät (`lehrraum-zuletzt`, höchstens sechs Einträge), was auf der Startseite geöffnet wurde.
+- **„Zuletzt benutzt“ statt „Neuigkeiten“** (am 15.11.2026 wieder entfernt): merkt sich nur im Gerät (`lehrraum-zuletzt`, höchstens sechs Einträge), was auf der Startseite geöffnet wurde.
 - **Suche läuft im Gerät** über Bereiche, Werkzeuge, alle Lernangebote (`lernen/angebote.js`) und Materialien; Quizze und Klassen noch nicht.
 - **Anmeldung über `lernen/datenbank.js`** (vorhanden). Nach dem Anmelden wird die Sitzung zusätzlich unter dem Namen abgelegt, unter dem Quizzo, Klassenfunk und die Tafel sie suchen; „Abmelden“ entfernt sie dort wieder. Das Kürzel im Konto-Knopf entsteht aus der E-Mail-Adresse.
 - **Begrüßungsbild ist eine eigene Zeichnung** (Tafel), kein Foto: Für das Foto im Entwurf liegt keine Datei vor, und auf einer öffentlichen Seite bräuchte es geklärte Rechte.

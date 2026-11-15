@@ -2,7 +2,7 @@
 
 Öffentliche Startseite „Lehrraum“ einer Lehrkraft (Biologie/Sport, Gymnasium Bruchhausen-Vilsen):
 Übersicht der Unterrichtsplattform mit Seitenleiste, Suche und zwei Fassungen: angemeldete Lehrkräfte sehen
-alles (Tafel, Schnellzugriff, zuletzt Benutztes), ohne Anmeldung gibt es Mitmachen per PIN, Quizzo, Klassenfunk,
+alles (Tafel, Meine Klassen), ohne Anmeldung gibt es Mitmachen per PIN, Quizzo, Klassenfunk,
 Lernangebote (übernommene Claude-Artefakte) und Werkzeuge.
 Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECISIONS.md` – beide nach größeren
 Änderungen aktualisieren. Ausbau zur Unterrichtsplattform (Tafel, Klassen, Unterrichtseinheiten):
@@ -12,7 +12,7 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Reines HTML/CSS/JavaScript ohne Build-Schritt und ohne npm-Abhängigkeiten. Was im Repo liegt, wird so ausgeliefert.
 - Hosting: GitHub Pages, Repository `Kt-gymbruvi/Kt-gymbruvi.github.io`, „Deploy from a branch“ (`main`, Root). `.nojekyll` vorhanden.
 - Gleiche Herkunft (Origin) wie Quizzo (`/Quizzo/`) und Klassenfunk (`/Klassenfunk/`) – diese sind eigene Repos und werden hier nie geändert.
-- Inhalte der Startseite: `js/inhalte.js` (`SEITE`, `NAVIGATION` = Seitenleiste, `MITMACHEN`, `LINKS` = Kacheln, `SCHNELLZUGRIFF`, `WERKZEUGE`, `MATERIALIEN`; `nur: 'lehrkraft'` zeigt einen Eintrag nur angemeldet), gezeichnet von `js/app.js`, Aussehen `startseite.css`.
+- Inhalte der Startseite: `js/inhalte.js` (`SEITE`, `NAVIGATION` = Seitenleiste, `MITMACHEN`, `LINKS` = Kacheln, `KLASSEN`, `WERKZEUGE`, `MATERIALIEN`; `nur: 'lehrkraft'` zeigt einen Eintrag nur angemeldet), gezeichnet von `js/app.js`, Aussehen `startseite.css`.
 - Gemeinsame Gestaltung ohne Build in `gemeinsam/`: `tokens.css` (Dunkelblau/Türkis aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile, Seitenleiste, Suche, Konto; Knöpfe, Fenster), `logo.png`/`logo-klein.png`, `symbole.js` (eigene SVG-Symbole, `LehrraumSymbol(name)`), `design.js` (Umschalter hell/dunkel, im `<head>` laden), `klassen.js` (liest die Klassen der Lehrkraft aus dem IndexedDB-Speicher der Lehrraum-App auf dem Gerät, nur lesend), `schluesselbund.js` (gemeinsamer Schlüsselbund mit Tafel und Notenbuch: Notenbuch-Passwort einmal je Gerät nach der Anmeldung, nur als nicht exportierbarer Schlüssel; Abmelden löscht ihn).
 - Werkzeuge: `werkzeuge/<ordner>/index.html`, gemeinsames Aussehen `werkzeuge/werkzeug.css` + `style.css`.
 - Lernangebote: `lernen/<ordner>/index.html`, Liste in `lernen/angebote.js` (Fach › Jahrgang › Thema), Übersicht `lernen/index.html` + `lernen/lernen.js`.
@@ -24,7 +24,7 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Design: Dunkelblau und Türkis (Türkis ersetzt das frühere Gelb), helle Arbeitsflächen, heller und dunkler Modus – Werte nur aus `gemeinsam/tokens.css`, keine festen Farben in Seiten. Quizzo und Klassenfunk behalten ihre eigenen Farben. Symbole aus `gemeinsam/symbole.js` statt Emojis.
 - `style.css` ist das alte dunkle Design und gilt nur noch für `lernen/` und `werkzeuge/`, bis diese umgestellt sind. Werkzeuge mit Kopfzeile „← Startseite“, Lernangebote mit Leiste „← Lernangebote“.
 - Navigationspunkte ohne `adresse` sind noch nicht gebaute Bereiche („folgt“); nie auf eine Seite verlinken, die es nicht gibt.
-- Handy (Hochformat) und Beamer müssen funktionieren.
+- Handy (Hochformat), iPad und Beamer müssen funktionieren. Startseite kompakt halten: Kacheln, Klassen und Werkzeuge stehen nebeneinander, nicht untereinander.
 - Claude-Artefakt übernehmen: `node lernen/werkzeug/uebernehmen.mjs <datei.html> <ordner>` (lokale Schriften, Leiste, Prüfung), dann Eintrag in `lernen/angebote.js`. Anleitung: `werkzeuge/ANLEITUNG.md`.
 - Wird ein Werkzeug/Angebot verschoben: alte Adresse als Weiterleitungsseite stehen lassen (QR-Codes, Lesezeichen).
 
@@ -32,7 +32,7 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Alles ist öffentlich: keine Schülerdaten, Noten, Prüfungslösungen, keine Scans aus Schulbüchern.
 - Nichts von fremden Servern laden (Schriften, Bibliotheken wie `qrcode.min.js`, `three.min.js` liegen im Repo).
 - Keine KI-Aufrufe, keine API-Schlüssel. Einzige Server-Verbindung: Supabase (Frankfurt) in `lernen/datenbank.js`, nur mit dem öffentlichen publishable-Schlüssel. Die verschlüsselten Tresore (`lr_tresore`) liest die Startseite nur, um das Notenbuch-Passwort zu prüfen – nie im Klartext weiterverwendet.
-- `localStorage` nur für Einstellungen/Listen auf dem Gerät (`lehrraum-design`, `lehrraum-zuletzt`); nichts davon an Server schicken. Ausnahme: die Anmeldung der Lehrkraft (Supabase-Sitzung, gemeinsam mit Quizzo, Klassenfunk und der Tafel).
+- `localStorage` nur für Einstellungen/Listen auf dem Gerät (`lehrraum-design`); nichts davon an Server schicken. Ausnahme: die Anmeldung der Lehrkraft (Supabase-Sitzung, gemeinsam mit Quizzo, Klassenfunk und der Tafel).
 - Impressum/Datenschutz: `impressum.html` (verweist auf die Schule, enthält Abschnitte zu Quizzo und Klassenfunk).
 
 ## Arbeitsweise

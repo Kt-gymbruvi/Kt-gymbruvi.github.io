@@ -111,17 +111,8 @@ window.KLASSEN = {
   verwalten: PLATTFORM + '/Lehrraum/#/klassen',
   neu: PLATTFORM + '/Lehrraum/#/klassen?neu=1',
   tafel: PLATTFORM + '/Lehrraum/#/tafel?klasse=', // dahinter kommt die Kennung der Klasse
-  hoechstens: 7, // so viele Klassen zeigt die Startseite; alle stehen unter „Alle Klassen anzeigen“
+  hoechstens: 6, // so viele (passt mit „Neue Klasse“ auf dem iPad in eine Reihe) Klassen zeigt die Startseite; alle stehen unter „Alle Klassen anzeigen“
 }
-
-/** Schnellzugriff (nur für angemeldete Lehrkräfte) */
-window.SCHNELLZUGRIFF = [
-  { symbol: 'bildschirm', farbe: 'tafel', titel: 'Tafel öffnen', adresse: PLATTFORM + '/Lehrraum/#/tafel' },
-  { symbol: 'pokal', farbe: 'bibliothek', titel: 'Quizzo starten', adresse: PLATTFORM + '/Quizzo/#/leiten' },
-  { symbol: 'megafon', farbe: 'interaktion', titel: 'Klassenfunk öffnen', adresse: PLATTFORM + '/Klassenfunk/#/leiten' },
-  { symbol: 'lernen', farbe: 'lernen', titel: 'Lernangebote ordnen', adresse: 'lernen/#bearbeiten' },
-  { symbol: 'notenbuch', farbe: 'unterrichten', titel: 'Notenbuch öffnen', adresse: PLATTFORM + '/Notenbuch/' },
-]
 
 /**
  * Werkzeuge: kleine Web-Apps im Ordner werkzeuge/<name>/index.html
@@ -146,7 +137,7 @@ window.WERKZEUGE = [
   {
     bereich: 'Unterricht',
     symbol: 'ampel',
-    titel: 'Lautstärkeampel',
+    titel: 'Lautstärke­ampel', // ­ = Trennstelle, falls der Platz (Handy) nicht reicht
     text: 'Zeigt am Beamer, wie laut es in der Klasse ist. Das Mikrofon wird nur auf diesem Gerät ausgewertet, nichts aufgenommen.',
     adresse: 'werkzeuge/lautstaerke/',
   },

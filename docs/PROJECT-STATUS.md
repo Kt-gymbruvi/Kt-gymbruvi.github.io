@@ -3,6 +3,10 @@
 Stand: 12.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`, veröffentlicht am 12.11.2026). Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
+## Startseite kompakter (gebaut 15.11.2026, nicht veröffentlicht)
+- Schnellzugriff und „Zuletzt benutzt“ entfernt; Kacheln, Meine Klassen (höchstens sechs) und Werkzeuge kompakt nebeneinander, Symbole kleiner, Begrüßung flacher.
+- Geprüft in der Vorschau mit nachgestellter Anmeldung und Beispielklassen: iPad hoch und quer, Handy, Beamer (1920 px), hell und dunkel, Suche. Auf einem echten iPad ungeprüft.
+
 ## Ein Passwort für Notenbuch, Tafel und Startseite (gebaut 14.11.2026, nicht veröffentlicht)
 - Nach der Anmeldung fragt die Startseite einmal je Gerät nach dem Notenbuch-Passwort (Dialog „Notenbuch-Passwort für dieses Gerät“, „Später“ möglich) – nur, wenn es schon Notenbuch oder Klassen gibt und noch kein Schlüsselbund da ist. Geprüft wird an den verschlüsselten Tresoren (`LernDB.tresor`), abgelegt nur ein nicht exportierbarer Schlüssel (`gemeinsam/schluesselbund.js`). Abmelden löscht ihn; fehlt beim Start die gemeinsame Anmeldung, ebenso.
 - Geprüft in der Vorschau: Prüfung „passt nicht“ / „passt“ / „noch nichts da“ mit nachgestelltem Tresor, Löschen, Dialog hell/dunkel am Handy. Mit echtem Konto ungeprüft. Spezifikation: `../Lehrraum/docs/SPEC-tafeln-abgleich-pdf-tabelle.md`, Etappe B.
@@ -12,7 +16,7 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
 - **Startseite „Lehrraum“** (`index.html`, `startseite.css`, `js/app.js`, `js/inhalte.js`), nach dem Bildentwurf der Lehrkraft:
   - Kopfzeile mit Logo, Suche über Bereiche, Werkzeuge, Lernangebote und Materialien, Anmelden bzw. Konto-Kürzel mit Abmelden.
   - Seitenleiste links (auf schmalen Bildschirmen als aufklappbares Menü), darin der Umschalter hell/dunkel.
-  - **Volle Fassung für angemeldete Lehrkräfte:** Begrüßung mit „Zur Tafel“, fünf Kacheln (Meine Klassen, Quizzo, Klassenfunk, Lernangebote, Interaktive Tafel), Bereich **„Meine Klassen“** mit „Zur Tafel“ je Klasse und „Neue Klasse anlegen“, „Zuletzt benutzt“, Schnellzugriff, Werkzeuge.
+  - **Volle Fassung für angemeldete Lehrkräfte:** Begrüßung mit „Zur Tafel“, fünf Kacheln (Meine Klassen, Quizzo, Klassenfunk, Lernangebote, Interaktive Tafel), Bereich **„Meine Klassen“** mit „Zur Tafel“ je Klasse und „Neue Klasse anlegen“, Werkzeuge.
   - Die Klassen liest `gemeinsam/klassen.js` aus dem Speicher des Geräts (IndexedDB der Lehrraum-App, nur lesend). Angelegt werden sie in der Lehrraum-App (`/Lehrraum/#/klassen`).
   - **Schlanke Fassung ohne Anmeldung:** „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Kacheln Quizzo, Klassenfunk, Lernangebote, Werkzeuge.
   - Materialliste mit Suche/Fachfilter/QR (derzeit leer und deshalb ausgeblendet).
