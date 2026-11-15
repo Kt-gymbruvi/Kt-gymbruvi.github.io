@@ -251,14 +251,15 @@
     const klassen = await window.LehrraumKlassen.laden()
     if (lauf !== klassenLauf) return // inzwischen wurde neu gezeichnet
     liste.textContent = ''
-    klassen.slice(0, KLASSEN.hoechstens).forEach((k) => {
+    // immer alle Klassen in einer Reihe; die Karten werden dafür schmaler (startseite.css)
+    klassen.forEach((k) => {
       const name = [k.bezeichnung, k.fach].filter(Boolean).join(' ')
       const li = el('li')
       const a = verweis('klassen-karte', KLASSEN.tafel + k.id)
       a.setAttribute('aria-label', 'Zur Tafel von ' + name)
       a.append(el('span', 'klassen-name', k.bezeichnung), el('span', 'klassen-fach', k.fach || 'ohne Fach'))
       const ziel = el('span', 'klassen-ziel')
-      ziel.append(el('span', null, 'Zur Tafel'), zeichen('pfeil', 'knopf-pfeil'))
+      ziel.append(el('span', 'klassen-ziel-text', 'Zur Tafel'), zeichen('pfeil', 'knopf-pfeil'))
       a.append(ziel)
       li.append(a)
       liste.append(li)
@@ -266,10 +267,10 @@
     const neu = el('li')
     const a = el('a', 'klassen-neu')
     a.href = KLASSEN.neu
-    a.append(zeichen('plus', 'klassen-plus'), el('span', null, 'Neue Klasse anlegen'))
+    a.title = 'Neue Klasse anlegen'
+    a.append(zeichen('plus', 'klassen-plus'), el('span', 'klassen-neu-text', 'Neue Klasse anlegen'))
     neu.append(a)
     liste.append(neu)
-    if (klassen.length > KLASSEN.hoechstens) $('klassen-alle').textContent = `Alle ${klassen.length} Klassen anzeigen`
   }
 
   // ---------- Werkzeuge (nach Bereich gruppiert) ----------

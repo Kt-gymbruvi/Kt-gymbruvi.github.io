@@ -111,7 +111,7 @@ window.KLASSEN = {
   verwalten: PLATTFORM + '/Lehrraum/#/klassen',
   neu: PLATTFORM + '/Lehrraum/#/klassen?neu=1',
   tafel: PLATTFORM + '/Lehrraum/#/tafel?klasse=', // dahinter kommt die Kennung der Klasse
-  hoechstens: 6, // so viele (passt mit „Neue Klasse“ auf dem iPad in eine Reihe) Klassen zeigt die Startseite; alle stehen unter „Alle Klassen anzeigen“
+  // Die Startseite zeigt immer alle Klassen in einer Reihe; die Karten passen ihre Größe an.
 }
 
 /**
