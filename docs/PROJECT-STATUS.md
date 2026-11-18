@@ -8,7 +8,7 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
 - Schritt 2 erledigt (18.11.2026): Übersicht der Lernangebote neu (`lernen/index.html`, `lernen/lernen.css`): Glas-Navigationsleiste „‹ Lehrraum“ mit Umschalter hell/dunkel, Seitenleiste Fach › Jahrgang › Thema wie in den Einstellungen, Angebote als gruppierte Listen mit Fach-Symbol (neue Symbole `blatt`, `laufen` statt Emojis), leiser QR-Knopf, Chips. Handy: Fächer als Segment-Umschalter, Jahrgänge und Themen als Chips. Bearbeiten-Modus und Speicherleiste im selben Stil. Geprüft hell/dunkel, Handy, Beamer 1920 px, Bearbeiten mit nachgestellter Anmeldung.
 - Schritt 3 erledigt (18.11.2026, nach Entwurf und Zustimmung der Lehrkraft): Startseite mit heller, schwebender Seitenleiste (statt dunkelblau), Kopfzeile ohne Fläche und kleinerem Logo, Begrüßung als weiße Karte mit großem Titel, weiße Kacheln mit Bereichsfarbe nur im Symbol-Quadrat, leise QR-Symbole statt „QR“-Plaketten, Klassen als graue Felder, Werkzeuge im selben Stil; Handy als Raster wie App-Symbole. Geprüft hell/dunkel, Gast und angemeldet (mit Beispielklassen nachgestellt), Handy mit offenem Menü, Beamer 1920 px.
 - Schritt 4 erledigt (18.11.2026): Werkzeuge (Timer, Gruppen & Zufall, Lautstärkeampel) und Herzfrequenz-Zonen mit Glas-Kopfzeile „‹ Startseite“/„‹ Lernangebote“ und Umschalter hell/dunkel (`werkzeuge/werkzeug.js`), weißen Karten, grauen Feldern, ohne Emojis; Ampelfarben als Tokens `--signal-rot/-gelb/-gruen`. Leiste „‹ Lernangebote“ in allen 40 übernommenen Angeboten hell im Stil der Tafel, zentral in `lernen/werkzeug/leiste.mjs` (auch von `uebernehmen.mjs` genutzt). Impressum mit heller Glas-Kopfleiste. Geprüft hell/dunkel, Handy; `pruefen.mjs` ohne Befund.
-- `style.css` wird von keiner Seite mehr geladen und könnte gelöscht werden (nur mit Zustimmung der Lehrkraft).
+- Das alte dunkle Design `style.css` ist gelöscht (18.11.2026, mit Zustimmung der Lehrkraft).
 - Veröffentlicht nach Zustimmung der Lehrkraft. Offen: auf echtem iPad und am Beamer ansehen.
 
 ## Startseite kompakter (veröffentlicht am 15.11.2026)
@@ -29,7 +29,7 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
   - **Schlanke Fassung ohne Anmeldung:** „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Kacheln Quizzo, Klassenfunk, Lernangebote, Werkzeuge.
   - Materialliste mit Suche/Fachfilter/QR (derzeit leer und deshalb ausgeblendet).
 - **Gemeinsame Gestaltung** (`gemeinsam/`): `tokens.css` (Dunkelblau/Türkis aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
-- **Werkzeuge** (`werkzeuge/`): Timer (Beamer, Signalton, Bildschirm bleibt an), Gruppen & Zufall (Namen nur im Gerät), Lautstärkeampel (Mikrofon nur lokal ausgewertet, „Ruhe messen“, Grenzen/Reaktionszeit einstellbar, optionaler Ton, Vollbild). Noch im alten Design (`style.css`, `werkzeug.css`).
+- **Werkzeuge** (`werkzeuge/`): Timer (Beamer, Signalton, Bildschirm bleibt an), Gruppen & Zufall (Namen nur im Gerät), Lautstärkeampel (Mikrofon nur lokal ausgewertet, „Ruhe messen“, Grenzen/Reaktionszeit einstellbar, optionaler Ton, Vollbild). Aussehen aus `gemeinsam/` und `werkzeug.css`.
 - **Lernangebote** (`lernen/`): 41 Einträge in `angebote.js` (32 Biologie Kl. 5–13, 9 Sport inkl. Oberstufe), Übersicht nach Fach › Jahrgang › Thema mit Suche und QR; Bearbeitungsmodus `lernen/#bearbeiten` für die angemeldete Lehrkraft (Supabase-Tabelle `lernangebote`, nutzt auch eine bestehende Quizzo-Anmeldung). Übersicht noch im alten Design.
 - Herzfrequenz-Zonen liegen seit 08.11.2026 unter `lernen/herzfrequenz-zonen/` (Sport, Kl. 11 und 12/13); `werkzeuge/herzfrequenz/` leitet weiter.
 - **Hilfsskripte:** `werkzeuge/pruefen.mjs` (fremde Server, KI-Aufrufe, Datenversand, Grundlagen; `--veroeffentlichen` prüft Impressum), `lernen/werkzeug/uebernehmen.mjs` (Artefakt übernehmen), `lernen/werkzeug/schriften-holen.mjs`.
@@ -38,10 +38,9 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
 ## Struktur
 ```
 index.html, startseite.css, impressum.html, .nojekyll, favicon.svg (alt, nicht mehr eingebunden)
-style.css   altes Design – nur noch für lernen/ und werkzeuge/, bis Etappe 1.2
 gemeinsam/  tokens.css, grundlage.css, symbole.js, design.js, logo.png, logo-klein.png
 js/         app.js, inhalte.js, qrcode.min.js
-werkzeuge/  ANLEITUNG.md, pruefen.mjs, werkzeug.css, timer/, gruppen/, lautstaerke/, herzfrequenz/ (Weiterleitung)
+werkzeuge/  ANLEITUNG.md, pruefen.mjs, werkzeug.css, werkzeug.js, timer/, gruppen/, lautstaerke/, herzfrequenz/ (Weiterleitung)
 lernen/     index.html, lernen.js, angebote.js, datenbank.js, schriften/, werkzeug/, <41 Angebotsordner>
 materialien/ (leer)
 docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY.md, ARCHITECTURE.md, IMPLEMENTATION_ROADMAP.md
