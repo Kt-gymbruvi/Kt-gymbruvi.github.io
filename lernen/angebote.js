@@ -15,8 +15,9 @@
  */
 
 window.FAECHER = [
-  { id: 'bio', name: 'Biologie', symbol: '🧬' },
-  { id: 'sport', name: 'Sport', symbol: '🏃' },
+  // symbol: Name aus gemeinsam/symbole.js, farbe: Bereichsfarbe aus gemeinsam/tokens.css
+  { id: 'bio', name: 'Biologie', symbol: 'blatt', farbe: 'bibliothek' },
+  { id: 'sport', name: 'Sport', symbol: 'laufen', farbe: 'unterrichten' },
 ]
 
 window.STUFEN = [

@@ -1,0 +1,573 @@
+/*
+ * Lernangebote – Übersicht im Stil der Tafel: Navigationsleiste aus Glas, Seitenleiste wie in den
+ * Einstellungen (Fach › Jahrgang › Thema), Angebote als gruppierte Listen. Braucht gemeinsam/tokens.css
+ * und gemeinsam/grundlage.css; Farben nur aus den Tokens.
+ */
+
+/* ---------- Navigationsleiste oben ---------- */
+.navleiste {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: var(--rand);
+  padding-top: max(var(--rand), env(safe-area-inset-top));
+}
+.navleiste-innen {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(var(--breite), 100%);
+  min-height: 3.25rem;
+  margin-inline: auto;
+  padding: 0.25rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: 999px;
+  background: var(--glas);
+  box-shadow: var(--schatten);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+.zurueck {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0 1rem 0 0.6rem;
+  border-radius: 999px;
+  color: var(--verweis);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--schnell);
+}
+.zurueck .symbol {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+.zurueck:hover {
+  background: var(--schwebe);
+}
+.navleiste-titel {
+  font-weight: var(--gewicht-betont);
+  opacity: 0;
+  transition: opacity var(--sanft);
+}
+/* Kleiner Titel erscheint erst, wenn der große weggescrollt ist (lernen.js setzt .gescrollt) */
+.gescrollt .navleiste-titel {
+  opacity: 1;
+}
+.rund-knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--schnell), transform var(--schnell);
+}
+.rund-knopf:hover {
+  background: var(--schwebe);
+}
+.rund-knopf:active {
+  transform: scale(0.93);
+}
+.rund-knopf .symbol {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+/* ---------- Aufbau: Seitenleiste links, Liste rechts ---------- */
+.lernen {
+  display: grid;
+  grid-template-columns: 15.5rem minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+  width: min(var(--breite), 100% - 2rem);
+  margin: 1rem auto 0;
+  padding-bottom: 6rem;
+}
+
+/* ---------- Seitenleiste (Baum) ---------- */
+.baum {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  padding: 0.375rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--rund);
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+  scrollbar-width: thin;
+}
+.baum ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.baum ul ul {
+  margin: 0.125rem 0 0.25rem 1.25rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--haarlinie);
+}
+.ast {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.3rem 0.6rem;
+  border: 0;
+  border-radius: 0.875rem;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--schnell), color var(--schnell);
+}
+@media (hover: hover) {
+  .ast:hover {
+    background: var(--schwebe);
+  }
+}
+.ast:active {
+  background: var(--druecken);
+}
+.ast[aria-current='true'] {
+  background: var(--gewaehlt);
+  color: var(--gewaehlt-text);
+  font-weight: var(--gewicht-betont);
+}
+.ast .name {
+  flex: 1;
+  min-width: 0;
+}
+.ast .zahl {
+  color: var(--text-2);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.ast[aria-current='true'] .zahl {
+  color: inherit;
+  opacity: 0.75;
+}
+.ebene-2 .ast,
+.ebene-3 .ast {
+  min-height: 2.5rem;
+  font-size: 0.9375rem;
+}
+.symbol-feld.klein {
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 0.5rem;
+}
+.symbol-feld.klein .symbol {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.ast[aria-current='true'] .symbol-feld {
+  background: rgb(255 255 255 / 0.2);
+  color: inherit;
+}
+
+.nur-handy {
+  display: none;
+}
+
+/* ---------- Kopf der Liste ---------- */
+.kopfzeile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+.kopfzeile h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 4vw, 2.5rem);
+  line-height: 1.1;
+}
+.pfad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 1.4rem;
+  margin: 0 0 0.2rem;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+}
+.pfad button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--verweis);
+  font: inherit;
+  cursor: pointer;
+}
+.pfad button:hover {
+  text-decoration: underline;
+}
+.werkzeugleiste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+.werkzeugleiste .suchfeld {
+  flex: 1 1 16rem;
+  max-width: none;
+}
+.sortierung {
+  min-height: var(--tippflaeche);
+  padding: 0 2.25rem 0 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--flaeche-2)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a6b85' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E")
+    no-repeat right 0.8rem center / 1rem;
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* ---------- Gruppierte Listen ---------- */
+.karten .liste-titel:first-child {
+  margin-top: 1rem;
+}
+.eintrag {
+  position: relative;
+}
+.eintrag .liste-eintrag {
+  align-items: flex-start;
+  padding: 0.85rem 4.75rem 0.85rem 1rem;
+}
+/* Pfeil › rechts am Rand, QR-Knopf links davon */
+.eintrag .liste-eintrag::after {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.eintrag .inhalt {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.eintrag .titel {
+  font-size: 1.0625rem;
+  font-weight: var(--gewicht-betont);
+  line-height: 1.3;
+}
+.eintrag .info {
+  max-width: 62rem;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.marken {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding-top: 0.3rem;
+}
+.qr-knopf.rund {
+  position: absolute;
+  top: 50%;
+  right: 2.25rem;
+  width: 2.5rem;
+  min-height: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: transparent;
+  color: var(--text-2);
+  transform: translateY(-50%);
+}
+.qr-knopf.rund:hover {
+  background: var(--schwebe);
+  color: var(--text);
+}
+.qr-knopf.rund:active {
+  transform: translateY(-50%) scale(0.93);
+}
+.qr-knopf.rund .symbol {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.leer {
+  margin: 2rem 0;
+  padding: 3rem 1rem;
+  border-radius: var(--radius-gross);
+  background: var(--flaeche-2);
+  color: var(--text-2);
+  text-align: center;
+}
+
+/* ---------- Lehrkraft: Anmeldung und Bearbeiten ---------- */
+.lehrkraft {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem;
+  padding: 0.75rem 1rem;
+}
+.lehrkraft .hinweis {
+  flex-basis: 100%;
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+}
+.anmelden {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+.anmelden strong {
+  flex-basis: 100%;
+  font-weight: var(--gewicht-betont);
+}
+.anmelden .eingabe {
+  flex: 1 1 12rem;
+}
+.anmelden .fehler {
+  flex-basis: 100%;
+}
+.lehrkraft-meldung {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-gross);
+  background: var(--akzent-hell);
+  color: var(--text);
+  font-weight: 500;
+}
+.eintrag.bearbeiten {
+  padding: 0.9rem 1rem;
+  transition: background-color var(--schnell);
+}
+.eintrag.bearbeiten.geaendert {
+  box-shadow: inset 4px 0 0 var(--akzent);
+}
+.eintrag.bearbeiten.versteckt {
+  background: var(--flaeche-2);
+}
+.eintrag.bearbeiten.versteckt .felder {
+  opacity: 0.65;
+}
+.editor {
+  display: flex;
+  gap: 0.8rem;
+}
+.pfeile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.pfeile .knopf {
+  width: 2.5rem;
+  padding: 0;
+}
+.felder {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+.felder .eingabe {
+  width: 100%;
+  min-height: 2.5rem;
+}
+.felder .titel-feld {
+  font-weight: var(--gewicht-betont);
+}
+.felder textarea.eingabe {
+  padding-block: 0.5rem;
+  resize: vertical;
+  font-size: 0.9375rem;
+}
+.felder .reihe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.felder .reihe select {
+  width: auto;
+}
+.schalter,
+.stufen-wahl label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+}
+.schalter input,
+.stufen-wahl input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--akzent);
+}
+.stufen-wahl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+}
+.stufen-hinweis {
+  color: var(--text-2);
+  font-size: 0.8125rem;
+}
+.oeffnen-klein {
+  margin-left: auto;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+.speicherleiste {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: calc(100% - 2rem);
+  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+  border-radius: 999px;
+  box-shadow: var(--schatten-hoch);
+  transform: translateX(-50%);
+  font-weight: var(--gewicht-betont);
+}
+#speicher-meldung {
+  color: var(--text-2);
+  font-weight: 400;
+}
+
+/* ---------- Handy und iPad hochkant: Baum wird zu Leisten zum Tippen ---------- */
+@media (max-width: 52rem) {
+  .lernen {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .baum {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  /* Fächer als Segment-Umschalter */
+  .baum .ebene-1 {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.125rem;
+    padding: 0.2rem;
+    border-radius: 1.25rem;
+    background: var(--flaeche-2);
+  }
+  .baum li {
+    display: contents;
+  }
+  .ebene-1 > li > .ast {
+    flex: 1;
+    justify-content: center;
+    width: auto;
+    min-height: 2.5rem;
+    border-radius: 999px;
+  }
+  .werkzeugleiste .suchfeld {
+    order: 0;
+  }
+  .ebene-1 > li > .ast[aria-current='true'],
+  .ebene-1 > li > .ast.offen {
+    background: var(--flaeche-hoch);
+    color: var(--text);
+    box-shadow: var(--schatten-klein);
+  }
+  .ebene-1 > li > .ast .name {
+    flex: 0 1 auto;
+  }
+  .ebene-1 .symbol-feld,
+  .ebene-1 > li > .ast .zahl {
+    display: none;
+  }
+  /* Jahrgänge und Themen als Reihen von Chips darunter (eigene Kopie in .nur-handy) */
+  .ebene-1 ul {
+    display: none;
+  }
+  .nur-handy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+  .nur-handy ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .nur-handy .ast {
+    width: auto;
+    min-height: 2.25rem;
+    padding: 0.2rem 0.85rem;
+    border-radius: 999px;
+    background: var(--flaeche);
+    box-shadow: inset 0 0 0 1px var(--haarlinie);
+  }
+  .nur-handy .ast .zahl {
+    font-size: 0.8125rem;
+  }
+  .nur-handy .ast[aria-current='true'],
+  .nur-handy .ast.offen {
+    background: var(--gewaehlt);
+    color: var(--gewaehlt-text);
+    box-shadow: none;
+  }
+  .nur-handy .ast.offen .zahl {
+    color: inherit;
+  }
+  .nur-handy .ebene-3 .ast {
+    background: var(--flaeche-2);
+    box-shadow: none;
+  }
+  .qr-knopf.rund,
+  #qr-auswahl {
+    display: none;
+  }
+  .eintrag .liste-eintrag {
+    padding-right: 2.25rem;
+  }
+  .eintrag .symbol-feld {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+/* Beamer: etwas größer lesbar */
+@media (min-width: 110rem) {
+  .lernen {
+    font-size: 1.125rem;
+  }
+}

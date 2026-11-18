@@ -2,453 +2,57 @@
 <html lang="de">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Lernangebote</title>
     <meta name="description" content="Simulationen, Erklärungen und Übungen für Biologie und Sport" />
     <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../werkzeuge/werkzeug.css" />
-    <style>
-      .raster {
-        display: grid;
-        gap: 1.75rem;
-        grid-template-columns: 16rem 1fr;
-        align-items: start;
-      }
-      /* ---------- Baum links ---------- */
-      .baum {
-        position: sticky;
-        top: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-      }
-      .baum ul {
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-      .baum ul ul {
-        margin: 0.35rem 0 0.25rem 1.1rem;
-      }
-      .ast {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        width: 100%;
-        padding: 0.7rem 0.9rem;
-        border: 0;
-        border-radius: 1rem;
-        background: rgb(255 255 255 / 0.06);
-        color: rgb(255 255 255 / 0.88);
-        font: inherit;
-        font-weight: 700;
-        text-align: left;
-        cursor: pointer;
-      }
-      .ast:hover {
-        background: rgb(255 255 255 / 0.14);
-      }
-      .ast[aria-current='true'] {
-        background: var(--gelb);
-        color: var(--navy);
-      }
-      .ast .name {
-        flex: 1;
-        min-width: 0;
-      }
-      .ast .zahl {
-        padding: 0 0.5rem;
-        border-radius: 999px;
-        background: rgb(255 255 255 / 0.12);
-        font-size: 0.9rem;
-        font-variant-numeric: tabular-nums;
-      }
-      .ast[aria-current='true'] .zahl {
-        background: rgb(11 31 77 / 0.15);
-      }
-      .ebene-2 .ast {
-        padding: 0.55rem 0.85rem;
-        font-size: 1rem;
-      }
-      .ebene-3 .ast {
-        padding: 0.45rem 0.8rem;
-        font-size: 0.95rem;
-        font-weight: 600;
-      }
-
-      /* ---------- Inhalt rechts ---------- */
-      .pfad {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-        margin: 0;
-        color: rgb(255 255 255 / 0.65);
-      }
-      .pfad button {
-        padding: 0;
-        border: 0;
-        background: none;
-        color: inherit;
-        font: inherit;
-        cursor: pointer;
-      }
-      .pfad button:hover {
-        color: var(--gelb);
-        text-decoration: underline;
-      }
-      .kopfzeile {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem 1rem;
-        margin-bottom: 1rem;
-      }
-      .kopfzeile h2 {
-        margin: 0;
-        font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-        font-weight: 900;
-      }
-      .werkzeugleiste {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.6rem;
-        margin-bottom: 1.25rem;
-      }
-      .werkzeugleiste input {
-        flex: 1 1 14rem;
-        padding: 0.7rem 1rem;
-        border: 0;
-        border-radius: 999px;
-        font: inherit;
-      }
-      .werkzeugleiste select {
-        padding: 0.7rem 1rem;
-        border: 0;
-        border-radius: 999px;
-        background: rgb(255 255 255 / 0.12);
-        color: #fff;
-        font: inherit;
-        font-weight: 700;
-      }
-      .werkzeugleiste select option {
-        color: var(--navy);
-      }
-      .karten {
-        display: flex;
-        flex-direction: column;
-        gap: 0.6rem;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-      .gruppe {
-        margin: 0.9rem 0 0.1rem;
-        padding-left: 0.75rem;
-        border-left: 5px solid var(--gelb);
-        font-size: 1.2rem;
-        font-weight: 800;
-      }
-      .gruppe:first-child {
-        margin-top: 0;
-      }
-      .karte {
-        position: relative;
-      }
-      .karte a {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.9rem 5.5rem 0.9rem 1.2rem;
-        border-radius: 1.1rem;
-        background: rgb(22 50 122 / 0.75);
-        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
-        color: #fff;
-        text-decoration: none;
-      }
-      .karte a:hover,
-      .karte a:focus-visible {
-        box-shadow: inset 0 0 0 2px var(--gelb);
-      }
-      .karte .inhalt {
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        gap: 0.25rem;
-        min-width: 0;
-      }
-      .karte .titel {
-        font-size: 1.2rem;
-        font-weight: 800;
-        line-height: 1.25;
-      }
-      .karte .info {
-        max-width: 60rem;
-        color: rgb(255 255 255 / 0.78);
-        font-size: 1rem;
-        line-height: 1.45;
-      }
-      .marken {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-        padding-top: 0.2rem;
-      }
-      .marke {
-        padding: 0.05rem 0.55rem;
-        border-radius: 999px;
-        background: rgb(255 255 255 / 0.12);
-        font-size: 0.82rem;
-        font-weight: 700;
-      }
-      .marke.fach {
-        background: var(--gelb);
-        color: var(--navy);
-      }
-      .karte .oeffnen {
-        flex-shrink: 0;
-        color: var(--gelb);
-        font-weight: 800;
-        white-space: nowrap;
-      }
-      .karte .qr-knopf {
-        position: absolute;
-        top: 50%;
-        right: 0.9rem;
-        transform: translateY(-50%);
-      }
-      .leer {
-        padding: 3rem 1rem;
-        border: 3px dashed rgb(255 255 255 / 0.2);
-        border-radius: 1.5rem;
-        text-align: center;
-        color: rgb(255 255 255 / 0.65);
-      }
-
-      /* ---------- Lehrkraft: Anmeldung und Bearbeiten ---------- */
-      .lehrkraft {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.6rem;
-        margin-bottom: 1rem;
-        padding: 0.8rem 1rem;
-        border-radius: 1rem;
-        background: rgb(255 201 40 / 0.12);
-        box-shadow: inset 0 0 0 1px rgb(255 201 40 / 0.4);
-      }
-      .lehrkraft .hinweis {
-        flex-basis: 100%;
-        margin: 0.2rem 0 0;
-      }
-      .anmelden {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.6rem;
-        width: 100%;
-      }
-      .anmelden strong {
-        flex-basis: 100%;
-      }
-      .anmelden input {
-        flex: 1 1 12rem;
-        padding: 0.6rem 0.9rem;
-        border: 0;
-        border-radius: 0.8rem;
-        font: inherit;
-      }
-      .anmelden .fehler {
-        flex-basis: 100%;
-        color: #ff9a9a;
-        font-weight: 700;
-      }
-      .lehrkraft-meldung {
-        margin: 0 0 1rem;
-        padding: 0.7rem 1rem;
-        border-radius: 0.9rem;
-        background: rgb(74 222 128 / 0.18);
-        font-weight: 700;
-      }
-      .karte.bearbeiten {
-        padding: 0.9rem 1rem;
-        border-radius: 1.1rem;
-        background: rgb(22 50 122 / 0.75);
-        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
-      }
-      .karte.bearbeiten.geaendert {
-        box-shadow: inset 0 0 0 2px var(--gelb);
-      }
-      .karte.bearbeiten.versteckt {
-        opacity: 0.6;
-        background: rgb(255 255 255 / 0.05);
-      }
-      .editor {
-        display: flex;
-        gap: 0.8rem;
-      }
-      .pfeile {
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-      }
-      .pfeile .knopf {
-        min-height: 2.6rem;
-        padding: 0.3rem 0.8rem;
-      }
-      .felder {
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        gap: 0.45rem;
-        min-width: 0;
-      }
-      .felder input:not([type='checkbox']),
-      .felder textarea,
-      .felder select {
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        border: 0;
-        border-radius: 0.7rem;
-        font: inherit;
-      }
-      .felder input:not([type='checkbox']) {
-        font-weight: 800;
-      }
-      .felder textarea {
-        resize: vertical;
-        font-size: 0.98rem;
-      }
-      .felder .reihe {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      .felder .reihe select {
-        width: auto;
-      }
-      .schalter,
-      .stufen-wahl label {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        font-weight: 700;
-      }
-      .stufen-wahl {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.4rem 0.9rem;
-      }
-      .stufen-hinweis {
-        color: rgb(255 255 255 / 0.55);
-        font-size: 0.85rem;
-      }
-      .oeffnen-klein {
-        margin-left: auto;
-        font-weight: 700;
-      }
-      .speicherleiste {
-        position: fixed;
-        left: 50%;
-        bottom: 1rem;
-        z-index: 20;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.7rem;
-        max-width: calc(100% - 2rem);
-        padding: 0.7rem 0.9rem 0.7rem 1.2rem;
-        border-radius: 1.2rem;
-        background: var(--navy-dunkel);
-        box-shadow: 0 8px 30px rgb(0 0 0 / 0.45), inset 0 0 0 2px var(--gelb);
-        transform: translateX(-50%);
-        font-weight: 800;
-      }
-      #speicher-meldung {
-        color: #ffd27a;
-        font-weight: 600;
-      }
-
-      /* ---------- Handy: Baum wird zu Leisten zum Tippen ---------- */
-      @media (max-width: 52rem) {
-        .raster {
-          grid-template-columns: 1fr;
-        }
-        .baum {
-          position: static;
-        }
-        .baum ul {
-          flex-direction: row;
-          flex-wrap: wrap;
-        }
-        .baum ul ul {
-          flex-basis: 100%;
-          margin: 0.2rem 0 0.2rem 0;
-          padding: 0.5rem;
-          border-radius: 1rem;
-          background: rgb(255 255 255 / 0.04);
-        }
-        .baum li {
-          display: contents;
-        }
-        .baum li > ul {
-          order: 99;
-        }
-        .ast {
-          width: auto;
-        }
-        .karte .qr-knopf,
-        #qr-auswahl {
-          display: none;
-        }
-        .karte a {
-          padding-right: 1.2rem;
-        }
-        .karte .oeffnen {
-          display: none;
-        }
-      }
-    </style>
+    <script src="../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="lernen.css" />
   </head>
   <body>
-    <header class="werkzeug-kopf">
-      <a href="../">← Startseite</a>
-      <h1>📚 Lernangebote</h1>
+    <header class="navleiste">
+      <div class="navleiste-innen">
+        <a class="zurueck" href="../" aria-label="Zurück zur Startseite Lehrraum"><span id="zurueck-symbol" aria-hidden="true">‹</span>Lehrraum</a>
+        <span class="navleiste-titel" aria-hidden="true">Lernangebote</span>
+        <button class="rund-knopf" id="design-knopf" type="button" aria-label="Hell oder dunkel umschalten"></button>
+      </div>
     </header>
-    <main class="werkzeug-inhalt raster">
+
+    <main class="lernen">
       <nav class="baum" id="baum" aria-label="Nach Fach, Jahrgang und Thema filtern"></nav>
-      <section aria-labelledby="ueberschrift">
+      <section class="spalte" aria-labelledby="ueberschrift">
         <div class="kopfzeile">
-          <div>
+          <div class="titelblock">
             <p class="pfad" id="pfad"></p>
-            <h2 id="ueberschrift">Alle Lernangebote</h2>
+            <h1 id="ueberschrift">Alle Lernangebote</h1>
           </div>
-          <button class="qr-knopf" id="qr-auswahl" type="button" title="QR-Code zu dieser Auswahl für den Beamer">QR zu dieser Auswahl</button>
+          <button class="knopf zweit klein" id="qr-auswahl" type="button" title="QR-Code zu dieser Auswahl für den Beamer">QR zu dieser Auswahl</button>
         </div>
         <div class="werkzeugleiste">
-          <input id="suche" type="search" placeholder="Suchen, z. B. Herz, Enzym …" aria-label="Lernangebote durchsuchen" autocomplete="off" />
-          <select id="sortierung" aria-label="Sortieren">
+          <label class="suchfeld">
+            <span class="unsichtbar">Lernangebote durchsuchen</span>
+            <span id="such-symbol"></span>
+            <input id="suche" type="search" placeholder="Suchen, z. B. Herz, Enzym …" autocomplete="off" />
+          </label>
+          <select id="sortierung" class="sortierung" aria-label="Sortieren">
             <option value="jahrgang">Nach Jahrgang</option>
             <option value="name">A–Z</option>
             <option value="datum">Neueste zuerst</option>
           </select>
         </div>
-        <div class="lehrkraft" id="lehrkraft" hidden></div>
+        <div class="lehrkraft karte-flaeche" id="lehrkraft" hidden></div>
         <p class="lehrkraft-meldung" id="lehrkraft-meldung" role="status" hidden></p>
-        <ul class="karten" id="karten"></ul>
+        <div class="karten" id="karten"></div>
       </section>
     </main>
 
-    <div class="speicherleiste" id="speicherleiste" hidden>
+    <div class="speicherleiste glas" id="speicherleiste" hidden>
       <span id="aenderungen-zahl"></span>
       <span id="speicher-meldung" role="status"></span>
-      <button type="button" class="knopf" id="speichern">Speichern</button>
-      <button type="button" class="knopf zweit" id="verwerfen">Verwerfen</button>
+      <button type="button" class="knopf klein" id="speichern">Speichern</button>
+      <button type="button" class="knopf zweit klein" id="verwerfen">Verwerfen</button>
     </div>
 
     <dialog id="qr-dialog" aria-labelledby="qr-titel">
@@ -458,6 +62,7 @@
       <button type="button" id="qr-schliessen" class="knopf">Schließen</button>
     </dialog>
 
+    <script src="../gemeinsam/symbole.js"></script>
     <script src="angebote.js"></script>
     <script src="../js/qrcode.min.js"></script>
     <script src="datenbank.js"></script>

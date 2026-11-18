@@ -27,6 +27,7 @@
   --seite: #eef2f7; /* Hintergrund der Seite */
   --flaeche: #ffffff; /* Karten, Fenster, Aufklappfelder */
   --flaeche-2: #e9eef5; /* Eingabefelder, ruhige Knöpfe */
+  --flaeche-hoch: #ffffff; /* gewähltes Segment, über --flaeche-2 */
   --glas: rgb(255 255 255 / 0.78); /* schwebende Leisten, mit Unschärfe dahinter */
   --schwebe: rgb(10 45 83 / 0.07); /* Fläche unter der Maus */
   --druecken: rgb(10 45 83 / 0.12); /* Fläche beim Drücken */
@@ -98,6 +99,7 @@
     --seite: #061a33;
     --flaeche: #10294a;
     --flaeche-2: #163a69;
+    --flaeche-hoch: #2a5288;
     --glas: rgb(16 41 74 / 0.92);
     --schwebe: rgb(255 255 255 / 0.08);
     --druecken: rgb(255 255 255 / 0.14);
@@ -138,6 +140,7 @@
   --seite: #061a33;
   --flaeche: #10294a;
   --flaeche-2: #163a69;
+  --flaeche-hoch: #2a5288;
   --glas: rgb(16 41 74 / 0.92);
   --schwebe: rgb(255 255 255 / 0.08);
   --druecken: rgb(255 255 255 / 0.14);

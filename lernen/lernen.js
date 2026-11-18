@@ -60,13 +60,26 @@
     return s.split(/\s+/).every((w) => heu.includes(w))
   }
 
+  // Symbol eines Fachs im farbigen Quadrat (gemeinsam/symbole.js, Farben aus tokens.css)
+  function symbolFeld(symbolName, farbe, klein) {
+    const feld = el('span', 'symbol-feld' + (klein ? ' klein' : ''))
+    if (farbe) {
+      feld.style.setProperty('--farbe', 'var(--' + farbe + ')')
+      feld.style.setProperty('--farbe-hell', 'var(--' + farbe + '-hell)')
+    }
+    const svg = window.LehrraumSymbol && window.LehrraumSymbol(symbolName)
+    if (svg) feld.append(svg)
+    else feld.textContent = symbolName || ''
+    return feld
+  }
+
   // ---------- Baum ----------
-  function ast(text, anzahl, aktiv, onClick, symbol) {
+  function ast(text, anzahl, aktiv, onClick, fach) {
     const li = el('li')
     const b = el('button', 'ast')
     b.type = 'button'
     if (aktiv) b.setAttribute('aria-current', 'true')
-    if (symbol) b.append(el('span', null, symbol))
+    if (fach) b.append(symbolFeld(fach.symbol, fach.farbe, true))
     b.append(el('span', 'name', text), el('span', 'zahl', String(anzahl)))
     b.addEventListener('click', onClick)
     li.append(b)
@@ -84,38 +97,62 @@
     const nav = $('baum')
     nav.textContent = ''
     const alle = angezeigt()
+    let mobil = null
     const ul = el('ul', 'ebene-1')
-    ul.append(ast('Alle', alle.length, !zustand.fach, () => waehle({}), '📚'))
+    ul.append(ast('Alle', alle.length, !zustand.fach, () => waehle({}), { symbol: 'lernen', farbe: 'lernen' }))
     FAECHER.forEach((f) => {
       const imF = alle.filter((a) => a.fach === f.id)
       if (!imF.length) return
-      const li = ast(f.name, imF.length, zustand.fach === f.id && !zustand.stufe, () => waehle({ fach: f.id }), f.symbol)
+      const li = ast(f.name, imF.length, zustand.fach === f.id && !zustand.stufe, () => waehle({ fach: f.id }), f)
       if (zustand.fach === f.id) {
-        const stufen = el('ul', 'ebene-2')
-        STUFEN.forEach((s) => {
-          if (!imF.some((a) => a.stufen.includes(s.id))) return
-          const n = imF.filter((a) => inStufe(a, s.id)).length // inkl. „für alle Jahrgänge“
-          const sLi = ast(s.name, n, zustand.stufe === s.id && !zustand.thema, () => waehle({ fach: f.id, stufe: s.id }))
-          const imS = imF.filter((a) => a.stufen.includes(s.id))
-          if (zustand.stufe === s.id && imS.some((a) => a.thema)) {
-            const themen = el('ul', 'ebene-3')
-            THEMEN.forEach((t) => {
-              const m = imS.filter((a) => a.thema === t.id).length
-              if (m) themen.append(ast(t.name, m, zustand.thema === t.id, () => waehle({ fach: f.id, stufe: s.id, thema: t.id })))
-            })
-            const ohne = imS.filter((a) => !a.thema).length
-            if (ohne) themen.append(ast('Ohne Thema', ohne, zustand.thema === OHNE_THEMA, () => waehle({ fach: f.id, stufe: s.id, thema: OHNE_THEMA })))
-            sLi.append(themen)
-          }
-          stufen.append(sLi)
-        })
-        const ohneJg = imF.filter((a) => !a.stufen.length).length
-        if (ohneJg) stufen.append(ast('Für alle Jahrgänge', ohneJg, zustand.stufe === ALLE_JG, () => waehle({ fach: f.id, stufe: ALLE_JG })))
-        li.append(stufen)
+        li.firstChild.classList.add('offen')
+        li.append(stufenListe(f, imF, true))
+        // Handy: Jahrgänge und Themen als eigene Reihen unter den Fächern
+        const handy = el('div', 'nur-handy')
+        handy.append(stufenListe(f, imF, false))
+        const themen = themenListe(f, imF)
+        if (themen) handy.append(themen)
+        mobil = handy
       }
       ul.append(li)
     })
     nav.append(ul)
+    if (mobil) nav.append(mobil)
+  }
+
+  // Jahrgänge eines Fachs; am Rechner stehen die Themen des gewählten Jahrgangs darunter eingerückt
+  function stufenListe(f, imF, mitThemen) {
+    const stufen = el('ul', 'ebene-2')
+    STUFEN.forEach((s) => {
+      if (!imF.some((a) => a.stufen.includes(s.id))) return
+      const n = imF.filter((a) => inStufe(a, s.id)).length // inkl. „für alle Jahrgänge“
+      const sLi = ast(s.name, n, zustand.stufe === s.id && !zustand.thema, () => waehle({ fach: f.id, stufe: s.id }))
+      if (zustand.stufe === s.id) {
+        sLi.firstChild.classList.add('offen')
+        const themen = mitThemen && themenListe(f, imF)
+        if (themen) sLi.append(themen)
+      }
+      stufen.append(sLi)
+    })
+    const ohneJg = imF.filter((a) => !a.stufen.length).length
+    if (ohneJg) stufen.append(ast('Für alle Jahrgänge', ohneJg, zustand.stufe === ALLE_JG, () => waehle({ fach: f.id, stufe: ALLE_JG })))
+    return stufen
+  }
+
+  // Themen des gewählten Jahrgangs (null, wenn es dort keine Themen gibt)
+  function themenListe(f, imF) {
+    const s = zustand.stufe
+    if (!s || s === ALLE_JG) return null
+    const imS = imF.filter((a) => a.stufen.includes(s))
+    if (!imS.some((a) => a.thema)) return null
+    const themen = el('ul', 'ebene-3')
+    THEMEN.forEach((t) => {
+      const m = imS.filter((a) => a.thema === t.id).length
+      if (m) themen.append(ast(t.name, m, zustand.thema === t.id, () => waehle({ fach: f.id, stufe: s, thema: t.id })))
+    })
+    const ohne = imS.filter((a) => !a.thema).length
+    if (ohne) themen.append(ast('Ohne Thema', ohne, zustand.thema === OHNE_THEMA, () => waehle({ fach: f.id, stufe: s, thema: OHNE_THEMA })))
+    return themen
   }
 
   // ---------- Überschrift und Pfad ----------
@@ -149,19 +186,20 @@
   const nachPosition = (a, b) => a.position - b.position || nachName(a, b)
 
   function zeile(a) {
-    const li = el('li', 'karte')
-    const link = el('a')
+    const li = el('li', 'eintrag')
+    const link = el('a', 'liste-eintrag')
     link.href = a.ordner + '/'
+    const fach = FAECHER.find((f) => f.id === a.fach) || {}
     const text = el('span', 'inhalt')
     text.append(el('span', 'titel', a.titel))
     if (a.text) text.append(el('span', 'info', a.text))
     const marken = el('span', 'marken')
-    marken.append(el('span', 'marke fach', name(FAECHER, a.fach)))
-    if (!a.stufen.length) marken.append(el('span', 'marke', 'alle Jahrgänge'))
-    a.stufen.forEach((s) => marken.append(el('span', 'marke', name(STUFEN, s))))
-    if (a.thema) marken.append(el('span', 'marke', name(THEMEN, a.thema)))
+    marken.append(el('span', 'chip', name(FAECHER, a.fach)))
+    if (!a.stufen.length) marken.append(el('span', 'chip', 'alle Jahrgänge'))
+    a.stufen.forEach((s) => marken.append(el('span', 'chip', name(STUFEN, s))))
+    if (a.thema) marken.append(el('span', 'chip', name(THEMEN, a.thema)))
     text.append(marken)
-    link.append(text, el('span', 'oeffnen', 'Öffnen ›'))
+    link.append(symbolFeld(fach.symbol, fach.farbe), text)
     li.append(link, qrKnopf(a.titel, new URL(a.ordner + '/', location.href).href))
     return li
   }
@@ -171,12 +209,19 @@
   function karten() {
     const suche = $('suche').value.trim().toLocaleLowerCase('de')
     const liste = angezeigt().filter((a) => passt(a, zustand) && suchtreffer(a, suche))
-    const ul = $('karten')
-    ul.textContent = ''
+    const box = $('karten')
+    box.textContent = ''
     aktuelleGruppen = []
     if (!liste.length) {
-      ul.append(el('li', 'leer', suche ? 'Nichts gefunden.' : 'Hier gibt es noch keine Lernangebote.'))
+      box.append(el('p', 'leer', suche ? 'Nichts gefunden.' : 'Hier gibt es noch keine Lernangebote.'))
       return
+    }
+    // Jede Gruppe ist eine eigene Liste (wie in den Einstellungen), darüber ihr Titel
+    let ul = null
+    const neueListe = (titel) => {
+      if (titel) box.append(el('h3', 'liste-titel', titel))
+      ul = el('ul', 'liste-gruppe' + (bearbeiten ? ' bearbeiten' : ''))
+      box.append(ul)
     }
     if (sortierung === 'datum') liste.sort((a, b) => (b.datum || '').localeCompare(a.datum || '') || nachName(a, b))
     else if (sortierung === 'name') liste.sort(nachName)
@@ -191,10 +236,13 @@
       const rang = stufenRang(a)
       if (gruppieren && rang !== letzte) {
         letzte = rang
-        ul.append(el('li', 'gruppe', rang < STUFEN.length ? STUFEN[rang].name : 'Für alle Jahrgänge'))
+        neueListe(rang < STUFEN.length ? STUFEN[rang].name : 'Für alle Jahrgänge')
         gruppe = []
         aktuelleGruppen.push(gruppe)
-      } else if (!aktuelleGruppen.length) aktuelleGruppen.push(gruppe)
+      } else if (!aktuelleGruppen.length) {
+        neueListe(null)
+        aktuelleGruppen.push(gruppe)
+      }
       gruppe.push(a)
       ul.append(bearbeiten ? editierZeile(a, gruppe.length - 1, gruppe) : zeile(a))
     })
@@ -220,16 +268,16 @@
   }
 
   function editierZeile(a, i, gruppe) {
-    const li = el('li', 'karte bearbeiten' + (a.sichtbar ? '' : ' versteckt') + (aenderungen.has(a.ordner) ? ' geaendert' : ''))
+    const li = el('li', 'eintrag bearbeiten' + (a.sichtbar ? '' : ' versteckt') + (aenderungen.has(a.ordner) ? ' geaendert' : ''))
     const box = el('div', 'editor')
 
     const pfeile = el('div', 'pfeile')
-    const hoch = el('button', 'knopf zweit', '↑')
+    const hoch = el('button', 'knopf zweit klein', '↑')
     hoch.type = 'button'
     hoch.disabled = sortierung !== 'jahrgang' || i === 0
     hoch.setAttribute('aria-label', a.titel + ' nach oben')
     hoch.addEventListener('click', () => verschieben(gruppe, i, -1))
-    const runter = el('button', 'knopf zweit', '↓')
+    const runter = el('button', 'knopf zweit klein', '↓')
     runter.type = 'button'
     runter.disabled = sortierung !== 'jahrgang' || i === gruppe.length - 1
     runter.setAttribute('aria-label', a.titel + ' nach unten')
@@ -237,12 +285,12 @@
     pfeile.append(hoch, runter)
 
     const felder = el('div', 'felder')
-    const titel = el('input')
+    const titel = el('input', 'eingabe titel-feld')
     titel.value = a.titel
     titel.maxLength = 200
     titel.setAttribute('aria-label', 'Titel')
     titel.addEventListener('input', () => aendern(a, 'titel', titel.value))
-    const text = el('textarea')
+    const text = el('textarea', 'eingabe')
     text.value = a.text
     text.maxLength = 600
     text.rows = 2
@@ -250,11 +298,11 @@
     text.addEventListener('input', () => aendern(a, 'text', text.value))
 
     const reihe = el('div', 'reihe')
-    const fach = el('select')
+    const fach = el('select', 'eingabe')
     fach.setAttribute('aria-label', 'Fach von ' + a.titel)
     FAECHER.forEach((f) => fach.append(new Option(f.name, f.id, false, f.id === a.fach)))
     fach.addEventListener('change', () => (aendern(a, 'fach', fach.value), zeichne()))
-    const thema = el('select')
+    const thema = el('select', 'eingabe')
     thema.setAttribute('aria-label', 'Thema von ' + a.titel)
     thema.append(new Option('ohne Thema', '', false, !a.thema))
     THEMEN.forEach((t) => thema.append(new Option(t.name, t.id, false, t.id === a.thema)))
@@ -348,7 +396,7 @@
     box.textContent = ''
     if (sitzung) {
       box.hidden = false
-      const umschalter = el('button', 'knopf' + (bearbeiten ? '' : ' zweit'), bearbeiten ? '✓ Bearbeiten beenden' : '✎ Ordnung bearbeiten')
+      const umschalter = el('button', 'knopf klein' + (bearbeiten ? '' : ' zweit'), bearbeiten ? 'Bearbeiten beenden' : 'Ordnung bearbeiten')
       umschalter.type = 'button'
       umschalter.addEventListener('click', () => {
         if (bearbeiten && aenderungen.size && !confirm('Es gibt ungespeicherte Änderungen. Trotzdem beenden? Sie gehen verloren.')) return
@@ -357,7 +405,7 @@
         lehrkraftBereich()
         zeichne()
       })
-      const ab = el('button', 'knopf zweit', 'Abmelden')
+      const ab = el('button', 'knopf leise klein', 'Abmelden')
       ab.type = 'button'
       ab.addEventListener('click', () => {
         window.LernDB.abmelden()
@@ -380,12 +428,12 @@
     box.hidden = false
     const form = el('form', 'anmelden')
     form.append(el('strong', null, 'Lehrkraft-Anmeldung (Quizzo-Konto)'))
-    const email = el('input')
+    const email = el('input', 'eingabe')
     email.type = 'email'
     email.placeholder = 'E-Mail'
     email.autocomplete = 'username'
     email.setAttribute('aria-label', 'E-Mail')
-    const pw = el('input')
+    const pw = el('input', 'eingabe')
     pw.type = 'password'
     pw.placeholder = 'Passwort'
     pw.autocomplete = 'current-password'
@@ -456,7 +504,10 @@
     dialog.showModal()
   }
   function qrKnopf(titel, adresse) {
-    const k = el('button', 'qr-knopf', 'QR')
+    const k = el('button', 'qr-knopf rund')
+    const svg = window.LehrraumSymbol && window.LehrraumSymbol('qr')
+    if (svg) k.append(svg)
+    else k.textContent = 'QR'
     k.type = 'button'
     k.setAttribute('aria-label', 'QR-Code für „' + titel + '“ zeigen')
     k.addEventListener('click', () => zeigeQr(titel, adresse))
@@ -496,6 +547,26 @@
     if (aenderungen.size) e.preventDefault()
   })
   window.addEventListener('hashchange', lehrkraftBereich)
+
+  // ---------- Navigationsleiste: Symbole, hell/dunkel, kleiner Titel beim Scrollen ----------
+  const sym = (n) => window.LehrraumSymbol && window.LehrraumSymbol(n)
+  if (sym('zurueck')) $('zurueck-symbol').replaceChildren(sym('zurueck'))
+  if (sym('suche')) $('such-symbol').replaceWith(sym('suche'))
+  const designKnopf = $('design-knopf')
+  function designSymbol() {
+    const dunkel = window.LehrraumDesign && window.LehrraumDesign.aktuell() === 'dunkel'
+    designKnopf.replaceChildren(sym(dunkel ? 'sonne' : 'mond') || document.createTextNode(dunkel ? '☀' : '☾'))
+    designKnopf.setAttribute('aria-label', dunkel ? 'Heller Modus' : 'Dunkler Modus')
+    designKnopf.title = dunkel ? 'Heller Modus' : 'Dunkler Modus'
+  }
+  if (window.LehrraumDesign) {
+    designKnopf.addEventListener('click', () => window.LehrraumDesign.umschalten())
+    document.addEventListener('lehrraum-design', designSymbol)
+    designSymbol()
+  } else designKnopf.hidden = true
+  const grosserTitel = $('ueberschrift')
+  if ('IntersectionObserver' in window)
+    new IntersectionObserver(([e]) => document.body.classList.toggle('gescrollt', !e.isIntersecting), { rootMargin: '-64px 0px 0px 0px' }).observe(grosserTitel)
 
   zeichne() // sofort mit dem Stand aus angebote.js
   ;(async () => {

@@ -700,7 +700,7 @@ a.liste-eintrag::after {
 .segmente [aria-pressed='true'],
 .segmente [aria-current='true'],
 .segmente [aria-current='page'] {
-  background: var(--flaeche);
+  background: var(--flaeche-hoch);
   box-shadow: var(--schatten-klein);
   font-weight: var(--gewicht-betont);
 }

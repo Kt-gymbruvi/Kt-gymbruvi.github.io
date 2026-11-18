@@ -21,7 +21,12 @@
     wuerfel: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 8.5h.01M15.5 8.5h.01M12 12h.01M8.5 15.5h.01M15.5 15.5h.01"/>',
     ampel: '<rect x="8" y="2" width="8" height="20" rx="4"/><circle cx="12" cy="7" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="17" r="1.5"/>',
     werkzeug: '<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L3 18l3 3 6.2-6.2a4 4 0 0 0 5.3-5.3l-2.7 2.7-2.5-.5-.5-2.5z"/>',
+    // Fächer
+    blatt: '<path d="M5 19C5 10 11 5 20 4c0 9-5 15-14 15z"/><path d="M5 19l8-8"/>',
+    laufen: '<circle cx="15" cy="4" r="2"/><path d="M13.5 7.5 11 13M8 9.5l3-2 4 1 2.5 2.5M11 13l3 3-1 5M11 13l-2.5 3.5H5"/>',
     // Allgemein
+    zurueck: '<path d="M15 5l-7 7 7 7"/>',
+    weiter: '<path d="M9 5l7 7-7 7"/>',
     qr: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2M14 18v2M18 18h2v2"/>',
     datei: '<path d="M6 3h8l4 4v14H6zM14 3v4h4"/>',
     verweis: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',

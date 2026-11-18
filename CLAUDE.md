@@ -22,7 +22,8 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Oberfläche, Bezeichner, Kommentare und Commit-Nachrichten auf Deutsch.
 - Ordnernamen klein, ohne Umlaute/Leerzeichen (`a-z0-9-`).
 - Design: Dunkelblau und Türkis (Türkis ersetzt das frühere Gelb), helle Arbeitsflächen, heller und dunkler Modus – Werte nur aus `gemeinsam/tokens.css`, keine festen Farben in Seiten. Quizzo und Klassenfunk behalten ihre eigenen Farben. Symbole aus `gemeinsam/symbole.js` statt Emojis.
-- `style.css` ist das alte dunkle Design und gilt nur noch für `lernen/` und `werkzeuge/`, bis diese umgestellt sind. Werkzeuge mit Kopfzeile „← Startseite“, Lernangebote mit Leiste „← Lernangebote“.
+- Vorbild für das Aussehen ist die Tafel (ruhig wie bei Apple): Systemschrift, weiße Flächen mit Haarlinie, Glasleisten, Pillenknöpfe; Bausteine dafür in `gemeinsam/grundlage.css`. Die Übersicht `lernen/index.html` nutzt sie schon (`lernen/lernen.css`).
+- `style.css` ist das alte dunkle Design und gilt nur noch für `werkzeuge/` und die Leiste in den einzelnen Lernangeboten, bis diese umgestellt sind. Werkzeuge mit Kopfzeile „← Startseite“, Lernangebote mit Leiste „← Lernangebote“.
 - Navigationspunkte ohne `adresse` sind noch nicht gebaute Bereiche („folgt“); nie auf eine Seite verlinken, die es nicht gibt.
 - Handy (Hochformat), iPad und Beamer müssen funktionieren. Startseite kompakt halten: Kacheln, Klassen und Werkzeuge stehen nebeneinander, nicht untereinander.
 - Claude-Artefakt übernehmen: `node lernen/werkzeug/uebernehmen.mjs <datei.html> <ordner>` (lokale Schriften, Leiste, Prüfung), dann Eintrag in `lernen/angebote.js`. Anleitung: `werkzeuge/ANLEITUNG.md`.

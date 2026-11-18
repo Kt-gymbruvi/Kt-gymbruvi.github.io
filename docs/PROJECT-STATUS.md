@@ -5,7 +5,8 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
 
 ## Einheitliche Gestaltung im Stil der Tafel (Zweig `gestaltung-basis`, nicht veröffentlicht)
 - Schritt 1 von 4 erledigt (18.11.2026): gemeinsame Basis. `gemeinsam/tokens.css` hat die Werte der Tafel (Systemschrift, Glas, Haarlinie, Schatten, Rundung, Bewegung); `gemeinsam/grundlage.css` hat leichtere Schriftstärken, Knöpfe, die beim Drücken nachgeben, graue Eingabefelder mit Fokusring, Fenster mit unscharfem Hintergrund und neue Bausteine (`.glas`, `.karte-flaeche`, `.symbol-feld`, `.liste-gruppe`, `.segmente`, `.chip`, `.eingabe`).
-- Offen: 2. Lernangebote auf Tokens und Bausteine umstellen (Gelb weg), 3. Startseite ruhiger (helle Seitenleiste, weiße Kacheln, leise QR-Knöpfe, Schriftstärken in `startseite.css`), 4. Werkzeuge und Leiste der Lernangebote.
+- Schritt 2 erledigt (18.11.2026): Übersicht der Lernangebote neu (`lernen/index.html`, `lernen/lernen.css`): Glas-Navigationsleiste „‹ Lehrraum“ mit Umschalter hell/dunkel, Seitenleiste Fach › Jahrgang › Thema wie in den Einstellungen, Angebote als gruppierte Listen mit Fach-Symbol (neue Symbole `blatt`, `laufen` statt Emojis), leiser QR-Knopf, Chips. Handy: Fächer als Segment-Umschalter, Jahrgänge und Themen als Chips. Bearbeiten-Modus und Speicherleiste im selben Stil. Geprüft hell/dunkel, Handy, Beamer 1920 px, Bearbeiten mit nachgestellter Anmeldung.
+- Offen: 3. Startseite ruhiger (helle Seitenleiste, weiße Kacheln, leise QR-Knöpfe, Schriftstärken in `startseite.css`), 4. Werkzeuge und Leiste der Lernangebote.
 - Geprüft: Startseite hell/dunkel, Handy, Anmeldefenster. Startseite sieht bis Schritt 3 fast unverändert aus (neue Schrift auf Apple-Geräten, Fenster, Felder).
 
 ## Startseite kompakter (veröffentlicht am 15.11.2026)
