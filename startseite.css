@@ -1,6 +1,7 @@
 /* Startseite „Lehrraum“. Braucht gemeinsam/tokens.css und gemeinsam/grundlage.css.
    <body data-rolle="lehrkraft|gast"> entscheidet, welche Teile zu sehen sind.
-   Kompakt gehalten: Kacheln, Klassen und Werkzeuge stehen nebeneinander (auch auf dem iPad). */
+   Kompakt gehalten: Kacheln, Klassen und Werkzeuge stehen nebeneinander (auch auf dem iPad).
+   Stil wie die Tafel: weiße Karten mit Haarlinie, Farbe nur im Symbol, leise QR-Knöpfe. */
 
 body[data-rolle='gast'] .nur-lehrkraft,
 body[data-rolle='lehrkraft'] .nur-gast {
@@ -8,24 +9,25 @@ body[data-rolle='lehrkraft'] .nur-gast {
 }
 
 .hauptbereich h2 {
-  margin: 0 0 0.6rem;
-  font-size: 1.1rem;
-  font-weight: 900;
+  margin: 0 0 0.65rem;
+  font-size: 1.25rem;
 }
 .hauptbereich > section {
-  margin-top: 1.1rem;
+  margin-top: 1.75rem;
   scroll-margin-top: 1rem;
 }
 
-/* ---------- Begrüßung ---------- */
+/* ---------- Begrüßung: weiße Karte, großer Titel ---------- */
 .hauptbereich > .begruessung {
   display: flex;
   align-items: center;
   gap: 1.25rem;
   margin-top: 0;
-  padding: 1.1rem 1.5rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid var(--haarlinie);
   border-radius: var(--radius-gross);
-  background: var(--akzent-hell);
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
   overflow: hidden;
 }
 .begruessung-text {
@@ -34,16 +36,17 @@ body[data-rolle='lehrkraft'] .nur-gast {
 }
 .begruessung h2 {
   margin: 0;
-  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
-  line-height: 1.2;
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  line-height: 1.1;
 }
 .begruessung p {
   max-width: 40rem;
-  margin: 0.3rem 0 0.8rem;
-  font-size: 1rem;
+  margin: 0.4rem 0 1.1rem;
+  color: var(--text-2);
+  font-size: 1.0625rem;
 }
 .begruessung-bild {
-  flex: 0 1 10rem;
+  flex: 0 1 9rem;
   min-width: 0;
 }
 .begruessung-bild svg {
@@ -60,45 +63,59 @@ body[data-rolle='lehrkraft'] .nur-gast {
   gap: 0.6rem 0.9rem;
 }
 .pin-form label {
-  font-weight: 800;
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  font-weight: var(--gewicht-betont);
 }
 .pin-form input {
-  width: 9.5rem;
+  width: 10.5rem;
   min-height: var(--tippflaeche);
   padding: 0.25rem 0.9rem;
-  border: 2px solid var(--linie-stark);
+  border: 0;
   border-radius: var(--radius);
-  background: var(--flaeche);
+  background: var(--flaeche-2);
   color: var(--text);
   font: inherit;
   font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: 0.15em;
+  font-weight: var(--gewicht-betont);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2em;
+  transition: box-shadow var(--schnell), background-color var(--schnell);
 }
 .pin-form input::placeholder {
-  color: var(--linie-stark);
-  font-weight: 600;
+  color: var(--text-2);
+  opacity: 0.45;
+}
+.pin-form input:focus {
+  background: var(--flaeche);
+  box-shadow: 0 0 0 1px var(--haarlinie), 0 0 0 4px color-mix(in srgb, var(--fokus) 35%, transparent);
+  outline: 0;
 }
 .pin-form input[aria-invalid='true'] {
-  border-color: var(--fehler);
+  box-shadow: 0 0 0 2px var(--fehler);
 }
 .pin-knoepfe {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+/* zweiter Knopf leiser: Quiz ist der häufigere Weg */
+.pin-knoepfe .knopf + .knopf {
+  background: var(--flaeche-2);
+  color: var(--text);
+}
 .pin-form .fehler {
   flex-basis: 100%;
   margin: 0;
 }
 
-/* ---------- Kacheln: immer eine Reihe (auf dem Handy drei je Reihe) ---------- */
+/* ---------- Kacheln: immer eine Reihe (auf dem Handy drei je Reihe), weiß, Farbe nur im Symbol ---------- */
 .kacheln {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
 }
@@ -111,37 +128,57 @@ body[data-rolle='lehrkraft'] .nur-gast {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.7rem 0.8rem;
-  border-radius: var(--radius);
+  gap: 0.2rem;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--radius-gross);
   background: var(--flaeche);
-  box-shadow: inset 0 0 0 1px var(--linie);
+  box-shadow: var(--schatten-klein);
   color: var(--text);
   text-decoration: none;
-  transition: transform 0.1s;
+  transition: box-shadow var(--sanft), transform var(--sanft);
 }
-a.kachel:hover,
-a.kachel:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: inset 0 0 0 2px var(--linie-stark);
+@media (hover: hover) {
+  a.kachel:hover {
+    box-shadow: var(--schatten);
+    transform: translateY(-2px);
+  }
 }
+a.kachel:active {
+  transform: scale(0.98);
+}
+/* Symbol im farbigen Quadrat wie ein App-Symbol; Farbe aus der Bereichsfarbe (farbe-…) */
 .kachel-symbol {
   display: flex;
-  font-size: 1.1rem;
-  line-height: 1;
-  margin-bottom: 0.3rem;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.55rem;
+  border-radius: 0.7rem;
+  background: var(--farbe-hell, var(--akzent-hell));
+  color: var(--farbe, var(--akzent));
 }
+.kachel-symbol .symbol {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+.kachel.farbe-tafel { --farbe: var(--tafel); --farbe-hell: var(--tafel-hell); }
+.kachel.farbe-unterrichten { --farbe: var(--unterrichten); --farbe-hell: var(--unterrichten-hell); }
+.kachel.farbe-interaktion { --farbe: var(--interaktion); --farbe-hell: var(--interaktion-hell); }
+.kachel.farbe-lernen { --farbe: var(--lernen); --farbe-hell: var(--lernen-hell); }
+.kachel.farbe-bibliothek { --farbe: var(--bibliothek); --farbe-hell: var(--bibliothek-hell); }
 .kachel-titel {
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: 1.0625rem;
+  font-weight: var(--gewicht-betont);
   line-height: 1.2;
   hyphens: auto;
   overflow-wrap: break-word;
 }
 .kachel-text {
   color: var(--text-2);
-  font-size: 0.85rem;
-  line-height: 1.3;
+  font-size: 0.875rem;
+  line-height: 1.35;
 }
 .kachel-pfeil {
   display: none;
@@ -158,35 +195,54 @@ a.kachel:focus-visible {
   color: var(--text-2);
   font-size: 0.72rem;
 }
-.qr-knopf {
-  min-height: 1.9rem;
-  padding: 0.05rem 0.55rem;
-  font-size: 0.75rem;
-}
-.kacheln .qr-knopf {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
 
-/* Bereichsfarben: dezent als getönte Fläche, Symbol kräftig */
-.kachel.farbe-tafel { background: var(--tafel-hell); box-shadow: none; }
-.kachel.farbe-tafel .kachel-symbol { color: var(--tafel); }
-.kachel.farbe-unterrichten { background: var(--unterrichten-hell); box-shadow: none; }
-.kachel.farbe-unterrichten .kachel-symbol { color: var(--unterrichten); }
-.kachel.farbe-interaktion { background: var(--interaktion-hell); box-shadow: none; }
-.kachel.farbe-interaktion .kachel-symbol { color: var(--interaktion); }
-.kachel.farbe-lernen { background: var(--lernen-hell); box-shadow: none; }
-.kachel.farbe-lernen .kachel-symbol { color: var(--lernen); }
-.kachel.farbe-bibliothek { background: var(--bibliothek-hell); box-shadow: none; }
-.kachel.farbe-bibliothek .kachel-symbol { color: var(--bibliothek); }
+/* ---------- QR-Knöpfe auf Kacheln und Werkzeugen: leises Symbol, deutlich erst unter der Maus ---------- */
+.kacheln .qr-knopf,
+.werkzeug-karten .qr-knopf {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2.25rem;
+  min-height: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 0; /* die Beschriftung „QR“ bleibt für Vorleseprogramme, sichtbar ist das Symbol */
+}
+.kacheln .qr-knopf::before,
+.werkzeug-karten .qr-knopf::before {
+  content: '';
+  width: 1.15rem;
+  height: 1.15rem;
+  background: var(--text-2);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2M14 18v2M18 18h2v2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2M14 18v2M18 18h2v2'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.kacheln .qr-knopf:hover,
+.werkzeug-karten .qr-knopf:hover {
+  background: var(--schwebe);
+}
+@media (hover: hover) {
+  .kacheln .qr-knopf,
+  .werkzeug-karten .qr-knopf {
+    opacity: 0.55;
+    transition: opacity var(--schnell), background-color var(--schnell);
+  }
+  .kacheln li:hover .qr-knopf,
+  .werkzeug-karten li:hover .qr-knopf,
+  .qr-knopf:focus-visible {
+    opacity: 1;
+  }
+}
 
 /* ---------- Karten (Meine Klassen) ---------- */
 .karte {
-  padding: 0.9rem 1rem 0.6rem;
+  padding: 1.1rem 1.25rem 0.75rem;
+  border: 1px solid var(--haarlinie);
   border-radius: var(--radius-gross);
   background: var(--flaeche);
-  box-shadow: inset 0 0 0 1px var(--linie);
+  box-shadow: var(--schatten-klein);
 }
 .karte h2 {
   display: flex;
@@ -208,7 +264,8 @@ a.kachel:focus-visible {
 }
 .karten-kopf a {
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 500;
+  text-decoration: none;
 }
 .klassen-liste {
   list-style: none;
@@ -229,18 +286,22 @@ a.kachel:focus-visible {
   flex-direction: column;
   height: 100%;
   padding: clamp(0.25rem, 8cqi, 0.55rem) clamp(0.25rem, 9cqi, 0.65rem);
-  border-radius: var(--radius);
-  background: var(--tafel-hell);
+  border-radius: 0.875rem;
+  background: var(--flaeche-2);
   color: var(--text);
   text-decoration: none;
+  transition: background-color var(--schnell), transform var(--schnell);
 }
 .klassen-karte:hover,
 .klassen-karte:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--linie-stark);
+  background: color-mix(in srgb, var(--flaeche-2), var(--text) 7%);
+}
+.klassen-karte:active {
+  transform: scale(0.97);
 }
 .klassen-name {
   font-size: clamp(0.75rem, 20cqi, 1.1rem);
-  font-weight: 900;
+  font-weight: var(--gewicht-titel);
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
@@ -259,7 +320,7 @@ a.kachel:focus-visible {
   padding-top: 0.35rem;
   color: var(--tafel);
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: var(--gewicht-betont);
   white-space: nowrap;
 }
 .knopf-pfeil {
@@ -275,18 +336,18 @@ a.kachel:focus-visible {
   height: 100%;
   min-height: 5rem;
   padding: 0.5rem;
-  border: 2px dashed var(--linie-stark);
-  border-radius: var(--radius);
-  color: var(--text);
+  border: 1.5px dashed var(--linie-stark);
+  border-radius: 0.875rem;
+  color: var(--text-2);
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1.2;
   text-align: center;
   text-decoration: none;
 }
 .klassen-neu:hover,
 .klassen-neu:focus-visible {
-  background: var(--flaeche-2);
+  background: var(--schwebe);
 }
 .klassen-plus {
   display: flex;
@@ -325,7 +386,7 @@ a.kachel:focus-visible {
 }
 .werkzeug-karten {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
   grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
 }
 .werkzeug-karten li {
@@ -335,31 +396,40 @@ a.kachel:focus-visible {
 .werkzeug {
   display: flex;
   align-items: flex-start;
-  gap: 0.65rem;
+  gap: 0.75rem;
   height: 100%;
-  padding: 0.7rem 3.25rem 0.7rem 0.8rem;
-  border-radius: var(--radius);
+  padding: 0.85rem 3rem 0.85rem 0.9rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--radius-gross);
   background: var(--flaeche);
-  box-shadow: inset 0 0 0 1px var(--linie);
+  box-shadow: var(--schatten-klein);
   color: var(--text);
   text-decoration: none;
+  transition: box-shadow var(--sanft), transform var(--sanft);
 }
-.werkzeug:hover,
-.werkzeug:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--linie-stark);
+@media (hover: hover) {
+  .werkzeug:hover {
+    box-shadow: var(--schatten);
+    transform: translateY(-2px);
+  }
+}
+.werkzeug:active {
+  transform: scale(0.98);
 }
 .werkzeug-symbol {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   flex-shrink: 0;
-  border-radius: 50%;
+  border-radius: 0.625rem;
   background: var(--akzent-hell);
   color: var(--tafel);
-  font-size: 0.85rem;
-  line-height: 1;
+}
+.werkzeug-symbol .symbol {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 .werkzeug-text {
   display: flex;
@@ -368,7 +438,7 @@ a.kachel:focus-visible {
 }
 .werkzeug-titel {
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: var(--gewicht-betont);
   line-height: 1.25;
 }
 .werkzeug-info {
@@ -379,11 +449,6 @@ a.kachel:focus-visible {
   color: var(--text-2);
   font-size: 0.85rem;
   line-height: 1.3;
-}
-.werkzeug-karten .qr-knopf {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
 }
 
 /* ---------- Materialien ---------- */
@@ -402,9 +467,9 @@ a.kachel:focus-visible {
   width: min(20rem, 100%);
   min-height: var(--tippflaeche);
   padding: 0.5rem 1rem;
-  border: 2px solid var(--linie);
+  border: 0;
   border-radius: 999px;
-  background: var(--flaeche);
+  background: var(--flaeche-2);
   color: var(--text);
   font: inherit;
 }
@@ -415,19 +480,20 @@ a.kachel:focus-visible {
   margin: 0 0 1rem;
 }
 .fach-knopf {
-  min-height: var(--tippflaeche);
-  padding: 0.5rem 1rem;
+  min-height: 2.5rem;
+  padding: 0.25rem 1rem;
   border: 0;
   border-radius: 999px;
   background: var(--flaeche-2);
   color: var(--text);
   font: inherit;
-  font-weight: 700;
+  font-weight: 500;
   cursor: pointer;
 }
 .fach-knopf[aria-pressed='true'] {
-  background: var(--akzent);
-  color: var(--akzent-text);
+  background: var(--gewaehlt);
+  color: var(--gewaehlt-text);
+  font-weight: var(--gewicht-betont);
 }
 .fach-gruppe + .fach-gruppe {
   margin-top: 1.5rem;
@@ -449,9 +515,9 @@ a.kachel:focus-visible {
   align-items: center;
   gap: 0.75rem;
   padding: 0.7rem 0.9rem;
+  border: 1px solid var(--haarlinie);
   border-radius: var(--radius);
   background: var(--flaeche);
-  box-shadow: inset 0 0 0 1px var(--linie);
 }
 .eintrag-link {
   flex: 1;
@@ -467,7 +533,7 @@ a.kachel:focus-visible {
 }
 .eintrag-titel {
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: var(--gewicht-betont);
   overflow-wrap: anywhere;
 }
 .eintrag-info,
@@ -482,8 +548,14 @@ a.kachel:focus-visible {
   border-radius: 0.5rem;
   background: var(--flaeche-2);
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: var(--gewicht-betont);
   text-align: center;
+}
+
+/* ---------- Fuß ---------- */
+.fuss {
+  border-top-color: var(--haarlinie);
+  font-size: 0.875rem;
 }
 
 /* ---------- Schmale Bildschirme ---------- */
@@ -495,13 +567,14 @@ a.kachel:focus-visible {
 }
 @media (max-width: 40rem) {
   .hauptbereich > .begruessung {
-    padding: 1rem;
+    padding: 1.25rem;
   }
   .pin-form label {
     flex-basis: 100%;
   }
   .pin-form input {
     flex: 1;
+    width: auto;
     min-width: 0;
   }
   .pin-knoepfe {
@@ -515,13 +588,20 @@ a.kachel:focus-visible {
     flex-wrap: wrap;
   }
   /* QR-Codes braucht man am Beamer, nicht auf dem Handy */
-  .qr-knopf {
+  .qr-knopf,
+  .kacheln .qr-knopf,
+  .werkzeug-karten .qr-knopf {
     display: none;
   }
-  /* Handy: Kacheln und Werkzeuge zu dritt nebeneinander, nur Symbol und Titel */
+  /* Handy: Kacheln und Werkzeuge zu dritt nebeneinander wie App-Symbole, nur Symbol und Titel */
   .kacheln {
     grid-auto-flow: row;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .werkzeug-karten {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
   }
   .kachel-text,
   .werkzeug-info {
@@ -529,20 +609,24 @@ a.kachel:focus-visible {
   }
   .kachel,
   .werkzeug {
-    padding: 0.6rem 0.55rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.8rem 0.4rem 0.7rem;
+    text-align: center;
+  }
+  .kachel-symbol {
+    margin-bottom: 0;
+  }
+  .werkzeug-text {
+    align-items: center;
   }
   .kachel-titel,
   .werkzeug-titel {
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
     hyphens: auto;
     overflow-wrap: break-word;
-  }
-  .werkzeug-karten {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .werkzeug {
-    flex-direction: column;
-    gap: 0.4rem;
   }
 }
 
