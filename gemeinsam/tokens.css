@@ -4,6 +4,13 @@
  * Heller Modus ist die Grundlage; der dunkle Modus gilt, wenn das Gerät ihn verlangt oder wenn
  * <html data-design="dunkel"> gesetzt ist (Umschalter: gemeinsam/design.js).
  * Wer hier eine Farbe ändert, muss sie im dunklen Block zweimal ändern (Gerät und Umschalter).
+ *
+ * Diese Datei ist die Quelle für das Aussehen der ganzen Plattform. Tafel (Repo Lehrraum, src/index.css) und
+ * Notenbuch (Repo Notenbuch, index.html) haben eine Kopie derselben Werte, weil sie eigene Repos sind.
+ * Wer hier etwas ändert, gleicht es dort an (Liste der Entsprechungen: docs/DECISIONS.md, 2026-11-18).
+ *
+ * Stil: ruhig und hell wie ein Werkzeug von Apple – Systemschrift, weiße Flächen mit Haarlinie und weichem
+ * Schatten, schwebende Leisten aus „Glas“, Pillenknöpfe. Dunkelblau zeigt das Gewählte, Türkis den Fokus.
  */
 :root {
   color-scheme: light;
@@ -16,21 +23,31 @@
   --tuerkis-hell: #6fd3bf;
   --tuerkis-kraeftig: #0f7f6c; /* Knöpfe mit weißer Schrift, Text auf Hell */
 
-  /* Flächen und Text */
-  --seite: #f4f7fb;
-  --flaeche: #ffffff;
-  --flaeche-2: #e9eef5;
+  /* Flächen und Text (wie Tafel und Notenbuch) */
+  --seite: #eef2f7; /* Hintergrund der Seite */
+  --flaeche: #ffffff; /* Karten, Fenster, Aufklappfelder */
+  --flaeche-2: #e9eef5; /* Eingabefelder, ruhige Knöpfe */
+  --glas: rgb(255 255 255 / 0.78); /* schwebende Leisten, mit Unschärfe dahinter */
+  --schwebe: rgb(10 45 83 / 0.07); /* Fläche unter der Maus */
+  --druecken: rgb(10 45 83 / 0.12); /* Fläche beim Drücken */
   --text: #0a2d53;
-  --text-2: #4a5c78;
-  --linie: #d5ddea;
+  --text-2: #5a6b85;
+  --haarlinie: rgb(10 45 83 / 0.1); /* feine Ränder um Karten und Leisten, Trenner in Listen */
+  --linie: #dce3ed; /* feste Linie, z. B. Fuß */
   --linie-stark: #9aa9c2;
   --verweis: #0f6f8f;
   --akzent: #0f7f6c; /* Hauptknopf */
   --akzent-schwebe: #0c6a5a;
   --akzent-text: #ffffff;
   --akzent-hell: #e1f5f0;
+  --gewaehlt: #0a2d53; /* gewählter Punkt in Leisten und Segmenten */
+  --gewaehlt-text: #ffffff;
   --fokus: #0f7f6c;
-  --fehler: #b3261e;
+  --fehler: #c4291f;
+  --schatten: 0 1px 2px rgb(10 45 83 / 0.06), 0 8px 28px rgb(10 45 83 / 0.1);
+  --schatten-hoch: 0 2px 6px rgb(10 45 83 / 0.08), 0 18px 48px rgb(10 45 83 / 0.18);
+  --schatten-klein: 0 1px 2px rgb(10 45 83 / 0.06), 0 2px 8px rgb(10 45 83 / 0.05);
+  --abdunkeln: rgb(6 26 51 / 0.45); /* hinter Fenstern */
 
   /* Seitenleiste und einfache Kopfleiste (in beiden Modi dunkelblau) */
   --kopf: #0a2d53;
@@ -55,32 +72,53 @@
   --klassenfunk: #0d3b42;
   --klassenfunk-text: #ff9a82;
 
+  /* Schrift: die des Geräts (SF Pro auf iPad/Mac, Segoe UI Variable unter Windows) */
+  --schrift: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, Arial, sans-serif;
+  --gewicht-titel: 700; /* Überschriften */
+  --gewicht-betont: 600; /* Knöpfe, Namen, Gewähltes */
+  --abstand-titel: -0.02em; /* große Schrift etwas enger, wie bei Apple */
+
   /* Maße */
-  --radius: 0.75rem;
-  --radius-gross: 1.25rem;
+  --radius: 0.75rem; /* kleine Flächen: Listenpunkte, Felder */
+  --radius-gross: 1.25rem; /* Karten */
+  --rund: 1.375rem; /* schwebende Leisten, Fenster (wie die Tafel) */
   --tippflaeche: 3rem;
   --breite: 76rem;
   --leiste: 14.5rem;
-  --schrift: ui-rounded, 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --rand: 0.5rem; /* Abstand schwebender Leisten zum Rand */
+
+  /* Bewegung */
+  --schnell: 160ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --sanft: 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-design='hell']) {
     color-scheme: dark;
     --seite: #061a33;
-    --flaeche: #0d2a4e;
+    --flaeche: #10294a;
     --flaeche-2: #163a69;
+    --glas: rgb(16 41 74 / 0.92);
+    --schwebe: rgb(255 255 255 / 0.08);
+    --druecken: rgb(255 255 255 / 0.14);
     --text: #ffffff;
     --text-2: #b9c7dc;
-    --linie: #24497d;
+    --haarlinie: rgb(255 255 255 / 0.1);
+    --linie: #23446f;
     --linie-stark: #4f74ab;
     --verweis: #6fd3bf;
     --akzent: #2cb69c;
     --akzent-schwebe: #6fd3bf;
     --akzent-text: #06241f;
     --akzent-hell: #0f3d3a;
+    --gewaehlt: #2cb69c;
+    --gewaehlt-text: #06241f;
     --fokus: #6fd3bf;
     --fehler: #ffb4ab;
+    --schatten: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 28px rgb(0 0 0 / 0.35);
+    --schatten-hoch: 0 2px 6px rgb(0 0 0 / 0.35), 0 18px 48px rgb(0 0 0 / 0.5);
+    --schatten-klein: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.2);
+    --abdunkeln: rgb(0 0 0 / 0.6);
     --kopf: #041427;
     --tafel: #6fd3bf;
     --tafel-hell: #0f3d3a;
@@ -98,19 +136,29 @@
 :root[data-design='dunkel'] {
   color-scheme: dark;
   --seite: #061a33;
-  --flaeche: #0d2a4e;
+  --flaeche: #10294a;
   --flaeche-2: #163a69;
+  --glas: rgb(16 41 74 / 0.92);
+  --schwebe: rgb(255 255 255 / 0.08);
+  --druecken: rgb(255 255 255 / 0.14);
   --text: #ffffff;
   --text-2: #b9c7dc;
-  --linie: #24497d;
+  --haarlinie: rgb(255 255 255 / 0.1);
+  --linie: #23446f;
   --linie-stark: #4f74ab;
   --verweis: #6fd3bf;
   --akzent: #2cb69c;
   --akzent-schwebe: #6fd3bf;
   --akzent-text: #06241f;
   --akzent-hell: #0f3d3a;
+  --gewaehlt: #2cb69c;
+  --gewaehlt-text: #06241f;
   --fokus: #6fd3bf;
   --fehler: #ffb4ab;
+  --schatten: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 28px rgb(0 0 0 / 0.35);
+  --schatten-hoch: 0 2px 6px rgb(0 0 0 / 0.35), 0 18px 48px rgb(0 0 0 / 0.5);
+  --schatten-klein: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.2);
+  --abdunkeln: rgb(0 0 0 / 0.6);
   --kopf: #041427;
   --tafel: #6fd3bf;
   --tafel-hell: #0f3d3a;

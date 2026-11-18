@@ -2,6 +2,13 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-18 – Eine Gestaltung für die ganze Plattform, Vorbild Tafel („wie Apple“)
+- Auf Wunsch der Lehrkraft: möglichst schöne, einheitliche Oberfläche. Tafel und Notenbuch waren schon ruhig im Apple-Stil, Startseite und Lernangebote nicht (andere Schrift, sehr fett, Lernangebote noch dunkel mit Gelb). Quizzo und Klassenfunk bleiben bei ihren eigenen Farben.
+- **Quelle ist `gemeinsam/tokens.css`.** Tafel (`Lehrraum/src/index.css`) und Notenbuch (`index.html`) behalten eine Kopie, weil es eigene Repos mit eigenem Build bzw. eigener Vorschau sind. Entsprechungen: `--seite` = Tafel `--umgebung` = Notenbuch `--bg`; `--flaeche` = `--leiste` / `--surface`; `--schwebe`/`--druecken` = `--leiste-2`/`--leiste-3`; `--haarlinie` = Tafel `--linie`; `--gewaehlt`, `--glas`, `--schatten`, `--schatten-hoch`, `--rund`, `--schnell`, `--fokus`, `--fehler` gleich benannt.
+- Schrift: die des Geräts (SF Pro / Segoe UI Variable) statt `ui-rounded`/Nunito; Überschriften 700, Betontes 600 statt 800–900.
+- Reihenfolge: Basis → Lernangebote → Startseite → Werkzeuge, alles auf dem Zweig `gestaltung-basis`, veröffentlicht erst nach Zustimmung.
+- Verworfen: Tafel und Notenbuch laden `tokens.css` zur Laufzeit von der Startseite – in der lokalen Vorschau laufen sie auf anderen Ports, und ein Fehler hier würde beide Apps mit verändern.
+
 ## 2026-11-15 – Notenbuch fragt bei jedem Öffnen nach dem Passwort
 - Auf Wunsch der Lehrkraft (Sicherheit am unbeaufsichtigten Gerät). Umgesetzt im Notenbuch-Repo; die Startseite fragt nach der Anmeldung weiterhin einmal je Gerät, der Schlüssel gilt aber nur noch für Tafel und „Meine Klassen“. Hinweistext im Passwort-Dialog angepasst.
 

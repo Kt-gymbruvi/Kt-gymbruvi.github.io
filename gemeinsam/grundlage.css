@@ -1,6 +1,7 @@
 /*
  * Lehrraum – gemeinsame Grundlage: Seite, Seitengerüst (Kopfzeile, Seitenleiste, Hauptbereich),
- * einfache Kopfleiste für Unterseiten, Knöpfe, Fenster (QR, Anmeldung), Fuß.
+ * einfache Kopfleiste für Unterseiten, Knöpfe, Felder, Fenster (QR, Anmeldung), Fuß und Bausteine im Stil
+ * der Tafel: .glas, .karte-flaeche, .symbol-feld, .liste-gruppe/.liste-eintrag, .segmente, .chip, .eingabe.
  * Braucht gemeinsam/tokens.css. Seitenspezifisches steht in eigenen Dateien (z. B. startseite.css).
  */
 * {
@@ -19,7 +20,25 @@ body {
   font-family: var(--schrift);
   font-size: 1.0625rem;
   line-height: 1.5;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: var(--gewicht-titel);
+  letter-spacing: var(--abstand-titel);
+}
+
+/* Am iPad: zwei schnelle Tipper sind sonst ein Doppeltipp zum Zoomen */
+button,
+a,
+label,
+select,
+input {
+  touch-action: manipulation;
 }
 
 a {
@@ -94,7 +113,8 @@ a {
 }
 .marke-name {
   font-size: 1.6rem;
-  font-weight: 900;
+  font-weight: var(--gewicht-titel);
+  letter-spacing: var(--abstand-titel);
 }
 .marke-zeile {
   font-size: 0.8rem;
@@ -127,14 +147,19 @@ a {
   width: 100%;
   min-height: var(--tippflaeche);
   padding: 0.5rem 1rem 0.5rem 2.9rem;
-  border: 2px solid transparent;
+  border: 0;
   border-radius: 999px;
   background: var(--flaeche-2);
   color: var(--text);
   font: inherit;
+  transition: box-shadow var(--schnell), background-color var(--schnell);
+}
+.suchfeld input::placeholder {
+  color: var(--text-2);
 }
 .suchfeld input:focus {
-  border-color: var(--akzent);
+  background: var(--flaeche);
+  box-shadow: 0 0 0 1px var(--haarlinie), 0 0 0 4px color-mix(in srgb, var(--fokus) 35%, transparent);
   outline: 0;
 }
 .suchtreffer {
@@ -148,9 +173,10 @@ a {
   padding: 0.4rem;
   overflow-y: auto;
   list-style: none;
-  border-radius: var(--radius-gross);
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--rund);
   background: var(--flaeche);
-  box-shadow: 0 0 0 1px var(--linie), 0 12px 32px rgb(6 29 56 / 0.2);
+  box-shadow: var(--schatten-hoch);
 }
 .suchtreffer a {
   display: flex;
@@ -162,10 +188,10 @@ a {
 }
 .suchtreffer a:hover,
 .suchtreffer a:focus-visible {
-  background: var(--flaeche-2);
+  background: var(--schwebe);
 }
 .suchtreffer b {
-  font-weight: 800;
+  font-weight: var(--gewicht-betont);
 }
 .suchtreffer small,
 .suchtreffer .leer {
@@ -188,7 +214,7 @@ a {
   background: var(--tuerkis-kraeftig);
   color: #ffffff;
   font: inherit;
-  font-weight: 800;
+  font-weight: var(--gewicht-betont);
   letter-spacing: 0.02em;
   cursor: pointer;
 }
@@ -202,9 +228,10 @@ a {
   top: calc(100% + 0.4rem);
   min-width: 15rem;
   padding: 0.75rem;
-  border-radius: var(--radius-gross);
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--rund);
   background: var(--flaeche);
-  box-shadow: 0 0 0 1px var(--linie), 0 12px 32px rgb(6 29 56 / 0.2);
+  box-shadow: var(--schatten-hoch);
 }
 .konto-menue p {
   margin: 0 0 0.6rem;
@@ -400,9 +427,15 @@ a.nav-punkt:focus-visible {
   border: 0;
   border-radius: 999px;
   font: inherit;
-  font-weight: 800;
+  font-weight: var(--gewicht-betont);
   text-decoration: none;
   cursor: pointer;
+  transition: background-color var(--schnell), color var(--schnell), box-shadow var(--schnell), transform var(--schnell);
+}
+/* Knöpfe geben beim Drücken leicht nach (wie in der Tafel) */
+.knopf:active:not(:disabled),
+.qr-knopf:active {
+  transform: scale(0.96);
 }
 .knopf {
   background: var(--akzent);
@@ -425,7 +458,20 @@ a.nav-punkt:focus-visible {
 }
 .knopf.zweit:hover,
 .qr-knopf:hover {
-  box-shadow: inset 0 0 0 2px var(--linie-stark);
+  background: color-mix(in srgb, var(--flaeche-2), var(--text) 7%);
+}
+/* leiser Knopf ohne Fläche, z. B. „Abbrechen“ */
+.knopf.leise {
+  background: transparent;
+  color: var(--verweis);
+}
+.knopf.leise:hover {
+  background: var(--schwebe);
+}
+.knopf.klein {
+  min-height: 2.25rem;
+  padding: 0.25rem 0.9rem;
+  font-size: 0.9375rem;
 }
 .knopf:disabled {
   opacity: 0.5;
@@ -437,14 +483,17 @@ dialog {
   width: min(44rem, 100% - 2rem);
   max-height: calc(100% - 2rem);
   padding: 2rem;
-  border: 0;
-  border-radius: 2rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: calc(var(--rund) + 0.5rem);
   background: var(--flaeche);
   color: var(--text);
+  box-shadow: var(--schatten-hoch);
   text-align: center;
 }
 dialog::backdrop {
-  background: rgb(4 20 39 / 0.8);
+  background: var(--abdunkeln);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 dialog h2 {
   margin: 0 0 1rem;
@@ -478,17 +527,32 @@ dialog.schmal h2 {
 .formular label {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  font-weight: 700;
+  gap: 0.25rem;
+  font-size: 0.9375rem;
+  font-weight: var(--gewicht-betont);
 }
-.formular input {
+/* Eingabefelder: graue Fläche ohne Rand, beim Tippen weiß mit Fokusring */
+.formular input,
+.formular select,
+.formular textarea,
+.eingabe {
   min-height: var(--tippflaeche);
-  padding: 0.4rem 0.8rem;
-  border: 2px solid var(--linie-stark);
+  padding: 0.4rem 0.9rem;
+  border: 0;
   border-radius: var(--radius);
-  background: var(--seite);
+  background: var(--flaeche-2);
   color: var(--text);
   font: inherit;
+  font-weight: 400;
+  transition: box-shadow var(--schnell), background-color var(--schnell);
+}
+.formular input:focus,
+.formular select:focus,
+.formular textarea:focus,
+.eingabe:focus {
+  background: var(--flaeche);
+  box-shadow: 0 0 0 1px var(--haarlinie), 0 0 0 4px color-mix(in srgb, var(--fokus) 35%, transparent);
+  outline: 0;
 }
 .formular .reihe {
   display: flex;
@@ -498,11 +562,161 @@ dialog.schmal h2 {
 .fehler {
   margin: 0;
   color: var(--fehler);
-  font-weight: 700;
+  font-weight: var(--gewicht-betont);
 }
 .hinweis {
   margin: 0;
   color: var(--text-2);
+}
+
+/* ---------- Bausteine für alle Seiten (Startseite, Lernangebote, Werkzeuge) ---------- */
+
+/* Glas: schwebende Leiste mit Unschärfe dahinter (Kopfzeilen, Speicherleiste, Werkzeugleisten) */
+.glas {
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--rund);
+  background: var(--glas);
+  box-shadow: var(--schatten);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* Karte: weiße Fläche mit Haarlinie und weichem Schatten; als Link hebt sie sich unter der Maus leicht */
+.karte-flaeche {
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+}
+a.karte-flaeche,
+button.karte-flaeche {
+  color: var(--text);
+  text-decoration: none;
+  transition: box-shadow var(--sanft), transform var(--sanft);
+}
+@media (hover: hover) {
+  a.karte-flaeche:hover,
+  button.karte-flaeche:hover {
+    box-shadow: var(--schatten);
+    transform: translateY(-1px);
+  }
+}
+a.karte-flaeche:active,
+button.karte-flaeche:active {
+  transform: scale(0.985);
+}
+
+/* Symbol in einem farbigen Quadrat mit runden Ecken (wie App-Symbole). Farbe über --farbe und --farbe-hell. */
+.symbol-feld {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.7rem;
+  background: var(--farbe-hell, var(--akzent-hell));
+  color: var(--farbe, var(--akzent));
+}
+.symbol-feld .symbol {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+/* Gruppierte Liste (wie in den Einstellungen): eine Karte, Einträge durch Haarlinien getrennt */
+.liste-titel {
+  margin: 1.5rem 0 0.4rem 1rem;
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  font-weight: var(--gewicht-betont);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.liste-gruppe {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+}
+.liste-gruppe > li + li {
+  border-top: 1px solid var(--haarlinie);
+}
+.liste-eintrag {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: var(--tippflaeche);
+  padding: 0.7rem 1rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color var(--schnell);
+}
+a.liste-eintrag:hover,
+a.liste-eintrag:focus-visible {
+  background: var(--schwebe);
+}
+a.liste-eintrag:active {
+  background: var(--druecken);
+}
+a.liste-eintrag::after {
+  content: '›';
+  margin-left: auto;
+  padding-left: 0.5rem;
+  color: var(--linie-stark);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Segment-Umschalter: Kapsel mit gleich breiten Teilen, das Gewählte als weiße Fläche */
+.segmente {
+  display: inline-flex;
+  gap: 0.125rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: var(--flaeche-2);
+}
+.segmente button,
+.segmente a {
+  flex: 1;
+  min-height: 2.5rem;
+  padding: 0.25rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--schnell), box-shadow var(--schnell);
+}
+.segmente [aria-pressed='true'],
+.segmente [aria-current='true'],
+.segmente [aria-current='page'] {
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+  font-weight: var(--gewicht-betont);
+}
+
+/* Chip: kleine Marke, z. B. Jahrgang oder Fach */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  background: var(--flaeche-2);
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* ---------- Fuß ---------- */
@@ -524,6 +738,12 @@ dialog.schmal h2 {
   * {
     transition: none !important;
     animation: none !important;
+  }
+  .knopf:active:not(:disabled),
+  .qr-knopf:active,
+  a.karte-flaeche:active,
+  button.karte-flaeche:active {
+    transform: none;
   }
 }
 

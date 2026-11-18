@@ -3,6 +3,11 @@
 Stand: 12.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`, veröffentlicht am 12.11.2026). Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
+## Einheitliche Gestaltung im Stil der Tafel (Zweig `gestaltung-basis`, nicht veröffentlicht)
+- Schritt 1 von 4 erledigt (18.11.2026): gemeinsame Basis. `gemeinsam/tokens.css` hat die Werte der Tafel (Systemschrift, Glas, Haarlinie, Schatten, Rundung, Bewegung); `gemeinsam/grundlage.css` hat leichtere Schriftstärken, Knöpfe, die beim Drücken nachgeben, graue Eingabefelder mit Fokusring, Fenster mit unscharfem Hintergrund und neue Bausteine (`.glas`, `.karte-flaeche`, `.symbol-feld`, `.liste-gruppe`, `.segmente`, `.chip`, `.eingabe`).
+- Offen: 2. Lernangebote auf Tokens und Bausteine umstellen (Gelb weg), 3. Startseite ruhiger (helle Seitenleiste, weiße Kacheln, leise QR-Knöpfe, Schriftstärken in `startseite.css`), 4. Werkzeuge und Leiste der Lernangebote.
+- Geprüft: Startseite hell/dunkel, Handy, Anmeldefenster. Startseite sieht bis Schritt 3 fast unverändert aus (neue Schrift auf Apple-Geräten, Fenster, Felder).
+
 ## Startseite kompakter (veröffentlicht am 15.11.2026)
 - Schnellzugriff und „Zuletzt benutzt“ entfernt; Kacheln, Meine Klassen (höchstens sechs) und Werkzeuge kompakt nebeneinander, Symbole kleiner, Begrüßung flacher.
 - Geprüft in der Vorschau mit nachgestellter Anmeldung und Beispielklassen: iPad hoch und quer, Handy, Beamer (1920 px), hell und dunkel, Suche. Auf einem echten iPad ungeprüft.
