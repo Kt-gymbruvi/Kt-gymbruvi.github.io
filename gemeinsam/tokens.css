@@ -73,6 +73,11 @@
   --klassenfunk: #0d3b42;
   --klassenfunk-text: #ff9a82;
 
+  /* Signalfarben (Ampel, Warnungen) – in beiden Modi gleich, wie die Systemfarben von Apple */
+  --signal-rot: #ff3b30;
+  --signal-gelb: #ffcc00;
+  --signal-gruen: #34c759;
+
   /* Schrift: die des Geräts (SF Pro auf iPad/Mac, Segoe UI Variable unter Windows) */
   --schrift: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, Arial, sans-serif;
   --gewicht-titel: 700; /* Überschriften */

@@ -49,8 +49,10 @@ Auf der Startseite erscheint ein Werkzeug, sobald es in `js/inhalte.js` unter `W
    - *Speichern* (`localStorage`, `indexedDB`): nur für Einstellungen oder Listen, die auf dem Gerät bleiben.
      Keine Namen, Noten oder Gesundheitsdaten an einen Server schicken.
    - *Fehlende Grundlagen*: `<html lang="de">`, `<meta name="viewport" …>` und ein `<title>` ergänzen.
-4. **Aussehen angleichen (optional):** im `<head>` `../../style.css` und `../werkzeug.css` einbinden und oben
-   eine Kopfzeile mit „← Startseite“ einfügen – wie in `timer/index.html`.
+4. **Aussehen angleichen (optional):** im `<head>` `../../gemeinsam/design.js`, `../../gemeinsam/tokens.css`,
+   `../../gemeinsam/grundlage.css` und `../werkzeug.css` einbinden, oben `<header class="werkzeug-kopf"><a href="../../">Startseite</a><h1>…</h1></header>`
+   und vor dem eigenen Skript `../../gemeinsam/symbole.js` und `../werkzeug.js` (Pfeil, Umschalter hell/dunkel) – wie in
+   `timer/index.html`. Farben nur aus `tokens.css`, Symbole statt Emojis.
 5. **Ausprobieren:** am Handy (Hochformat) und am Beamer; Inhalt fachlich prüfen.
 6. **Eintragen** in `js/inhalte.js` → `WERKZEUGE`.
 

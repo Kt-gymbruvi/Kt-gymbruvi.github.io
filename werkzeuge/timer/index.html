@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Timer</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../style.css" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
     <link rel="stylesheet" href="../werkzeug.css" />
     <style>
       body {
@@ -24,19 +26,20 @@
         margin: 0 auto;
         padding-bottom: 1.5rem;
       }
+      /* große, schlanke Ziffern wie in der Uhr-App */
       #anzeige {
         font-size: clamp(5rem, 24vw, 22rem);
-        font-weight: 900;
+        font-weight: 300;
         line-height: 1;
         font-variant-numeric: tabular-nums;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.03em;
         transition: color 0.2s;
       }
       #anzeige.knapp {
-        color: var(--gelb);
+        color: var(--lernen);
       }
       #anzeige.ende {
-        color: #ff5a5a;
+        color: var(--fehler);
         animation: blinken 1s steps(2) infinite;
       }
       @keyframes blinken {
@@ -46,35 +49,47 @@
       }
       #fortschritt {
         width: min(48rem, 100%);
-        height: 0.9rem;
+        height: 0.6rem;
         border-radius: 999px;
-        background: rgb(255 255 255 / 0.12);
+        background: var(--flaeche-2);
         overflow: hidden;
       }
       #fortschritt span {
         display: block;
         height: 100%;
-        background: var(--gelb);
+        border-radius: inherit;
+        background: var(--akzent);
         transition: width 0.25s linear;
+      }
+      #anzeige.knapp + #fortschritt span {
+        background: var(--lernen);
       }
       #aufgabe {
         width: min(48rem, 100%);
         padding: 0.6rem 1rem;
         border: 0;
-        border-radius: 1rem;
+        border-radius: var(--radius-gross);
         background: transparent;
-        color: #fff;
+        color: var(--text);
         font: inherit;
         font-size: clamp(1.25rem, 3vw, 2.25rem);
-        font-weight: 800;
+        font-weight: var(--gewicht-betont);
         text-align: center;
-        outline: 2px dashed rgb(255 255 255 / 0.15);
+        transition: background-color var(--schnell);
       }
+      #aufgabe:hover,
       #aufgabe:focus {
-        outline-color: var(--gelb);
+        background: var(--flaeche-2);
+        outline: 0;
       }
       #aufgabe::placeholder {
-        color: rgb(255 255 255 / 0.35);
+        color: var(--text-2);
+        opacity: 0.6;
+      }
+      .knopf-reihe .knopf[data-min] {
+        min-height: 2.5rem;
+        padding: 0.25rem 1rem;
+        font-weight: 500;
       }
       .einstellen {
         display: flex;
@@ -95,8 +110,8 @@
   </head>
   <body>
     <header class="werkzeug-kopf">
-      <a href="../../">← Startseite</a>
-      <h1>⏱ Timer</h1>
+      <a href="../../">Startseite</a>
+      <h1>Timer</h1>
     </header>
     <main>
       <input id="aufgabe" placeholder="Arbeitsauftrag (optional)" aria-label="Arbeitsauftrag" maxlength="80" />
@@ -104,10 +119,10 @@
       <div id="fortschritt" aria-hidden="true"><span style="width: 100%"></span></div>
 
       <div class="knopf-reihe" style="justify-content: center">
-        <button id="start" class="knopf gross" type="button">▶ Start</button>
-        <button id="zuruecksetzen" class="knopf gross zweit" type="button">↺ Zurück</button>
-        <button id="vollbild" class="knopf gross zweit" type="button">⛶ Vollbild</button>
-        <button id="ton" class="knopf gross zweit" type="button" aria-pressed="true">🔔 Ton an</button>
+        <button id="start" class="knopf gross" type="button">Start</button>
+        <button id="zuruecksetzen" class="knopf gross zweit" type="button">Zurücksetzen</button>
+        <button id="vollbild" class="knopf gross zweit" type="button">Vollbild</button>
+        <button id="ton" class="knopf gross zweit" type="button" aria-pressed="true">Ton an</button>
       </div>
 
       <div class="einstellen">
@@ -126,6 +141,8 @@
       <p class="hinweis">Tipp: Leertaste startet und pausiert. Der Bildschirm bleibt an, solange der Timer läuft (wenn das Gerät es erlaubt).</p>
     </main>
 
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../werkzeug.js"></script>
     <script>
       ;(function () {
         'use strict'
@@ -178,7 +195,7 @@
         function starten() {
           if (ende || rest <= 0) return
           ende = Date.now() + rest
-          $('start').textContent = '⏸ Pause'
+          $('start').textContent = 'Pause'
           tonVorbereiten()
           bildschirmAn(true)
         }
@@ -186,13 +203,13 @@
           if (!ende) return
           rest = Math.max(0, ende - Date.now())
           ende = null
-          $('start').textContent = '▶ Weiter'
+          $('start').textContent = 'Weiter'
           bildschirmAn(false)
         }
         function fertig() {
           ende = null
           rest = 0
-          $('start').textContent = '▶ Start'
+          $('start').textContent = 'Start'
           bildschirmAn(false)
           if (ton) gong()
         }
@@ -227,12 +244,12 @@
         $('start').addEventListener('click', () => (ende ? anhalten() : rest > 0 ? starten() : (setzen(gesamt), starten())))
         $('zuruecksetzen').addEventListener('click', () => {
           setzen(gesamt)
-          $('start').textContent = '▶ Start'
+          $('start').textContent = 'Start'
         })
         $('ton').addEventListener('click', (e) => {
           ton = !ton
           e.currentTarget.setAttribute('aria-pressed', String(ton))
-          e.currentTarget.textContent = ton ? '🔔 Ton an' : '🔕 Ton aus'
+          e.currentTarget.textContent = ton ? 'Ton an' : 'Ton aus'
         })
         $('vollbild').addEventListener('click', () => {
           if (document.fullscreenElement) document.exitFullscreen()
@@ -241,12 +258,12 @@
         document.querySelectorAll('[data-min]').forEach((k) =>
           k.addEventListener('click', () => {
             setzen(Number(k.dataset.min) * 60)
-            $('start').textContent = '▶ Start'
+            $('start').textContent = 'Start'
           }),
         )
         const eingabe = () => {
           setzen((Number($('minuten').value) || 0) * 60 + (Number($('sekunden').value) || 0))
-          $('start').textContent = '▶ Start'
+          $('start').textContent = 'Start'
         }
         $('minuten').addEventListener('change', eingabe)
         $('sekunden').addEventListener('change', eingabe)

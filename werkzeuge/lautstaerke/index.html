@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lautstärkeampel</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../style.css" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
     <link rel="stylesheet" href="../werkzeug.css" />
     <style>
       body {
@@ -38,8 +40,8 @@
         gap: clamp(0.6rem, 2vh, 1.2rem);
         padding: clamp(0.8rem, 2.5vh, 1.5rem);
         border-radius: 2.5rem;
-        background: #10141c;
-        box-shadow: 0 0.6rem 0 rgb(0 0 0 / 0.35), inset 0 0 0 0.35rem #2a3140;
+        background: var(--navy-dunkel); /* Gehäuse in beiden Modi dunkel, wie eine echte Ampel */
+        box-shadow: var(--schatten-hoch), inset 0 0 0 0.3rem var(--navy-hell);
       }
       .licht {
         --groesse: min(22vh, 34vw, 12rem);
@@ -49,17 +51,17 @@
         background: var(--aus);
         transition: background 0.25s, box-shadow 0.25s;
       }
+      .licht {
+        --aus: color-mix(in srgb, var(--an) 20%, var(--navy-dunkel));
+      }
       .licht.rot {
-        --aus: #3a1414;
-        --an: #ff3b30;
+        --an: var(--signal-rot);
       }
       .licht.gelb {
-        --aus: #3a3112;
-        --an: #ffcc00;
+        --an: var(--signal-gelb);
       }
       .licht.gruen {
-        --aus: #13301c;
-        --an: #34c759;
+        --an: var(--signal-gruen);
       }
       .licht.an {
         background: var(--an);
@@ -78,45 +80,46 @@
       #zustand {
         margin: 0;
         font-size: clamp(2.5rem, 7vw, 5rem);
-        font-weight: 900;
+        font-weight: var(--gewicht-titel);
+        letter-spacing: var(--abstand-titel);
         line-height: 1.05;
       }
       #zustand-text {
         margin: 0;
         font-size: clamp(1.1rem, 2.4vw, 1.6rem);
-        color: rgb(255 255 255 / 0.8);
+        color: var(--text-2);
       }
       .pegel {
         position: relative;
-        height: 2.25rem;
-        border-radius: 1.2rem;
-        background: linear-gradient(90deg, #34c759 0 var(--gelb-ab), #ffcc00 var(--gelb-ab) var(--rot-ab), #ff3b30 var(--rot-ab) 100%);
-        opacity: 0.95;
+        height: 1.5rem;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--signal-gruen) 0 var(--gelb-ab), var(--signal-gelb) var(--gelb-ab) var(--rot-ab), var(--signal-rot) var(--rot-ab) 100%);
         overflow: hidden;
       }
       .pegel .rest {
         position: absolute;
         inset: 0 0 0 auto;
-        background: rgb(6 18 51 / 0.82);
+        background: var(--flaeche-2);
         transition: width 0.1s linear;
       }
       .pegel .marke {
         position: absolute;
         top: 0;
         bottom: 0;
-        width: 0.25rem;
-        margin-left: -0.125rem;
-        background: #fff;
+        width: 0.2rem;
+        margin-left: -0.1rem;
+        background: var(--text);
+        opacity: 0.6;
       }
       .zaehler {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem 1.5rem;
         font-size: 1.15rem;
-        color: rgb(255 255 255 / 0.75);
+        color: var(--text-2);
       }
       .zaehler b {
-        color: #fff;
+        color: var(--text);
         font-variant-numeric: tabular-nums;
       }
 
@@ -124,25 +127,17 @@
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-        padding: 1.25rem;
-        border-radius: 1.25rem;
-        background: rgb(22 50 122 / 0.7);
-      }
-      .feld input[type='range'] {
-        padding: 0;
-        accent-color: var(--gelb);
-        background: transparent;
       }
       .hinweis {
         margin: 0;
-        color: rgb(255 255 255 / 0.65);
       }
       #fehler {
         margin: 0;
         padding: 0.9rem 1.2rem;
-        border-radius: 1rem;
-        background: rgb(255 59 48 / 0.2);
-        font-weight: 700;
+        border-radius: var(--radius-gross);
+        background: color-mix(in srgb, var(--fehler) 14%, transparent);
+        color: var(--fehler);
+        font-weight: var(--gewicht-betont);
       }
       /* Im Vollbild nur Ampel und Pegel */
       :fullscreen .einstellungen,
@@ -154,15 +149,15 @@
   </head>
   <body>
     <header class="werkzeug-kopf">
-      <a href="../../">← Startseite</a>
-      <h1>🚦 Lautstärkeampel</h1>
+      <a href="../../">Startseite</a>
+      <h1>Lautstärkeampel</h1>
     </header>
     <main>
       <div class="knopf-reihe">
-        <button class="knopf gross" id="start" type="button">🎤 Ampel starten</button>
-        <button class="knopf zweit gross" id="eichen" type="button" disabled title="3 Sekunden still sein – dann passen sich die Grenzen an den Raum an">🤫 Ruhe messen</button>
-        <button class="knopf zweit gross" id="ton" type="button" aria-pressed="false">🔕 Ton aus</button>
-        <button class="knopf zweit gross" id="vollbild" type="button">⛶ Vollbild</button>
+        <button class="knopf gross" id="start" type="button">Ampel starten</button>
+        <button class="knopf zweit gross" id="eichen" type="button" disabled title="3 Sekunden still sein – dann passen sich die Grenzen an den Raum an">Ruhe messen</button>
+        <button class="knopf zweit gross" id="ton" type="button" aria-pressed="false">Ton aus</button>
+        <button class="knopf zweit gross" id="vollbild" type="button">Vollbild</button>
       </div>
       <p id="fehler" role="alert" hidden></p>
 
@@ -187,7 +182,7 @@
         </div>
       </div>
 
-      <div class="einstellungen">
+      <div class="einstellungen werkzeug-karte">
         <label class="feld"
           >Gelb ab <span id="gelb-wert"></span>
           <input id="gelb" type="range" min="5" max="90" step="1" value="45" />
@@ -212,13 +207,15 @@
       </p>
     </main>
 
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../werkzeug.js"></script>
     <script>
       ;(function () {
         'use strict'
         const $ = (id) => document.getElementById(id)
         const SPEICHER = 'lautstaerkeampel'
         const ZUSTAENDE = {
-          gruen: { titel: 'Gut so 👍', text: 'Angenehme Lautstärke.' },
+          gruen: { titel: 'Gut so', text: 'Angenehme Lautstärke.' },
           gelb: { titel: 'Etwas leiser', text: 'Es wird lauter – bitte etwas ruhiger.' },
           rot: { titel: 'Zu laut!', text: 'Bitte jetzt leise sein.' },
         }
@@ -320,7 +317,7 @@
           $('rot-wert').textContent = '(' + einst.rot + ')'
           $('traegheit').value = String(einst.traegheit)
           $('ton').setAttribute('aria-pressed', String(einst.ton))
-          $('ton').textContent = einst.ton ? '🔔 Ton bei Rot' : '🔕 Ton aus'
+          $('ton').textContent = einst.ton ? 'Ton bei Rot' : 'Ton aus'
         }
 
         function fehler(text) {
@@ -356,7 +353,7 @@
           laeuft = true
           ruhigSeit = Date.now()
           wechsle('gruen')
-          $('start').textContent = '⏹ Ampel stoppen'
+          $('start').textContent = 'Ampel stoppen'
           $('eichen').disabled = false
           bildschirmAn(true)
           requestAnimationFrame(schritt)
@@ -368,9 +365,9 @@
           strom?.getTracks().forEach((t) => t.stop())
           strom = null
           pegel = 0
-          $('start').textContent = '🎤 Ampel starten'
+          $('start').textContent = 'Ampel starten'
           $('eichen').disabled = true
-          $('eichen').textContent = '🤫 Ruhe messen'
+          $('eichen').textContent = 'Ruhe messen'
           $('zustand').textContent = 'Gestoppt'
           $('zustand-text').textContent = 'Das Mikrofon ist aus.'
           bildschirmAn(false)
@@ -381,7 +378,7 @@
         function eichenStarten() {
           eichen = { ende: performance.now() + 3000, werte: [] }
           $('eichen').disabled = true
-          $('eichen').textContent = '🤫 Bitte still … (3 s)'
+          $('eichen').textContent = 'Bitte still … (3 s)'
         }
         function eichenFertig() {
           const w = eichen.werte.sort((a, b) => a - b)
@@ -392,7 +389,7 @@
           merken()
           grenzenZeigen()
           $('eichen').disabled = false
-          $('eichen').textContent = '🤫 Ruhe messen'
+          $('eichen').textContent = 'Ruhe messen'
         }
 
         // kurzer, freundlicher Doppelton (kein Alarm)

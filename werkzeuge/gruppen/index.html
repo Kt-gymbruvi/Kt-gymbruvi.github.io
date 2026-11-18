@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Gruppen &amp; Zufall</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../style.css" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
     <link rel="stylesheet" href="../werkzeug.css" />
     <style>
       .raster {
@@ -19,13 +21,10 @@
           grid-template-columns: 1fr;
         }
       }
-      .eingabe {
+      .einstellungen {
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        padding: 1.25rem;
-        border-radius: 1.25rem;
-        background: rgb(22 50 122 / 0.7);
       }
       .modi {
         display: grid;
@@ -33,19 +32,25 @@
         gap: 0.5rem;
       }
       .modi .knopf {
-        min-height: 3rem;
+        min-height: 2.75rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
       }
       .zahl {
         display: flex;
         align-items: center;
         gap: 0.6rem;
-        font-weight: 700;
+        font-weight: var(--gewicht-betont);
       }
       .zahl input {
         width: 5rem;
-        padding: 0.6rem;
+        min-height: var(--tippflaeche);
+        padding: 0.5rem;
         border: 0;
-        border-radius: 0.8rem;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
         font: inherit;
         text-align: center;
       }
@@ -58,6 +63,7 @@
       .merken input {
         width: 1.25rem;
         height: 1.25rem;
+        accent-color: var(--akzent);
       }
 
       #ergebnis {
@@ -73,22 +79,32 @@
       }
       .gruppe {
         padding: 1rem 1.25rem;
-        border-radius: 1.25rem;
-        background: #fff;
-        color: var(--navy);
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche);
+        box-shadow: var(--schatten-klein);
+        animation: erscheinen var(--sanft) both;
       }
       .gruppe h3 {
         margin: 0 0 0.4rem;
-        font-size: 1.2rem;
-        color: var(--navy-hell);
+        color: var(--text-2);
+        font-size: 0.8125rem;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
       }
       .gruppe ul {
         margin: 0;
         padding: 0;
         list-style: none;
         font-size: clamp(1.15rem, 2vw, 1.6rem);
-        font-weight: 800;
+        font-weight: var(--gewicht-betont);
         line-height: 1.35;
+      }
+      @keyframes erscheinen {
+        from {
+          opacity: 0;
+          transform: translateY(6px) scale(0.98);
+        }
       }
       .gezogen {
         display: flex;
@@ -98,35 +114,45 @@
         gap: 0.75rem;
         min-height: 16rem;
         padding: 2rem;
-        border-radius: 1.5rem;
-        background: var(--gelb);
-        color: var(--navy);
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--rund);
+        background: var(--flaeche);
+        box-shadow: var(--schatten);
+        color: var(--text);
         text-align: center;
+      }
+      .gezogen span {
+        color: var(--text-2);
       }
       .gezogen strong {
         font-size: clamp(2.5rem, 8vw, 6rem);
+        font-weight: var(--gewicht-titel);
+        letter-spacing: var(--abstand-titel);
         line-height: 1.05;
         overflow-wrap: anywhere;
+        color: var(--akzent);
       }
       .gezogen.wirbeln strong {
-        opacity: 0.6;
+        opacity: 0.45;
+        color: var(--text);
       }
       .leer {
+        margin: 0;
         padding: 3rem 1rem;
-        border: 3px dashed rgb(255 255 255 / 0.2);
-        border-radius: 1.5rem;
+        border-radius: var(--radius-gross);
+        background: var(--flaeche-2);
         text-align: center;
-        color: rgb(255 255 255 / 0.65);
+        color: var(--text-2);
       }
     </style>
   </head>
   <body>
     <header class="werkzeug-kopf">
-      <a href="../../">← Startseite</a>
-      <h1>🎲 Gruppen &amp; Zufall</h1>
+      <a href="../../">Startseite</a>
+      <h1>Gruppen &amp; Zufall</h1>
     </header>
     <main class="werkzeug-inhalt raster">
-      <section class="eingabe" aria-label="Einstellungen">
+      <section class="einstellungen werkzeug-karte" aria-label="Einstellungen">
         <label class="feld"
           >Namen (einer pro Zeile)
           <textarea id="namen" rows="10" placeholder="Anna&#10;Ben&#10;Can&#10;…" spellcheck="false"></textarea>
@@ -144,7 +170,7 @@
         <label class="zahl" id="zahl-feld"><span id="zahl-text">Personen pro Gruppe</span> <input id="zahl" type="number" min="2" max="30" value="4" inputmode="numeric" /></label>
         <label class="merken" id="ohne-wdh-feld" hidden><input type="checkbox" id="ohne-wdh" checked /> Niemanden zweimal ziehen</label>
 
-        <button id="los" class="knopf gross" type="button">🎲 Auslosen</button>
+        <button id="los" class="knopf gross" type="button">Auslosen</button>
       </section>
 
       <section id="ergebnis" aria-live="polite" aria-label="Ergebnis">
@@ -152,6 +178,8 @@
       </section>
     </main>
 
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../werkzeug.js"></script>
     <script>
       ;(function () {
         'use strict'
@@ -260,7 +288,7 @@
           $('zahl-feld').hidden = m === 'paare' || m === 'ziehen'
           $('ohne-wdh-feld').hidden = m !== 'ziehen'
           $('zahl-text').textContent = m === 'anzahl' ? 'Anzahl Gruppen' : 'Personen pro Gruppe'
-          $('los').textContent = m === 'ziehen' ? '🎲 Ziehen' : '🎲 Auslosen'
+          $('los').textContent = m === 'ziehen' ? 'Ziehen' : 'Auslosen'
         }
 
         function speichern() {

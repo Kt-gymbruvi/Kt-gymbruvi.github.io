@@ -7,6 +7,7 @@ Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Altern
 - **Quelle ist `gemeinsam/tokens.css`.** Tafel (`Lehrraum/src/index.css`) und Notenbuch (`index.html`) behalten eine Kopie, weil es eigene Repos mit eigenem Build bzw. eigener Vorschau sind. Entsprechungen: `--seite` = Tafel `--umgebung` = Notenbuch `--bg`; `--flaeche` = `--leiste` / `--surface`; `--schwebe`/`--druecken` = `--leiste-2`/`--leiste-3`; `--haarlinie` = Tafel `--linie`; `--gewaehlt`, `--glas`, `--schatten`, `--schatten-hoch`, `--rund`, `--schnell`, `--fokus`, `--fehler` gleich benannt.
 - Schrift: die des Geräts (SF Pro / Segoe UI Variable) statt `ui-rounded`/Nunito; Überschriften 700, Betontes 600 statt 800–900.
 - Reihenfolge: Basis → Lernangebote → Startseite → Werkzeuge, alles auf dem Zweig `gestaltung-basis`, veröffentlicht erst nach Zustimmung.
+- Übernommene Lernangebote laden `tokens.css` nicht (eigenes CSS des Artefakts); ihre Leiste „‹ Lernangebote“ hat deshalb feste Werte mit `!important` in `lernen/werkzeug/leiste.mjs` – die einzige Stelle mit festen Farben, entsprechend den Tokens.
 - Verworfen: Tafel und Notenbuch laden `tokens.css` zur Laufzeit von der Startseite – in der lokalen Vorschau laufen sie auf anderen Ports, und ein Fehler hier würde beide Apps mit verändern.
 
 ## 2026-11-15 – Notenbuch fragt bei jedem Öffnen nach dem Passwort

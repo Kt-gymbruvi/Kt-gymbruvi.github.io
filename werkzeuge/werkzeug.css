@@ -1,32 +1,86 @@
-/* Gemeinsames Aussehen der Werkzeuge (dunkelblau/gelb wie Startseite und Quizzo).
-   Werkzeuge binden zusätzlich ../../style.css ein. */
+/* Gemeinsames Aussehen der Werkzeuge (und des Lernangebots Herzfrequenz-Zonen) im Stil der Tafel.
+   Braucht gemeinsam/tokens.css und gemeinsam/grundlage.css; werkzeug.js setzt Symbole und den Umschalter hell/dunkel.
+   Kopf:  <header class="werkzeug-kopf"><a class="zurueck" href="../../">Startseite</a><h1>Titel</h1></header> */
 
-/* „hidden“ gilt immer – auch bei Elementen mit display: flex */
-[hidden] {
-  display: none !important;
-}
-
+/* ---------- Navigationsleiste aus Glas ---------- */
 .werkzeug-kopf {
-  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: min(72rem, 100% - 2rem);
-  margin: 0 auto;
-  padding: 1rem 0;
+  gap: 0.5rem;
+  width: min(72rem, 100% - 1rem);
+  min-height: 3.25rem;
+  margin: 0.5rem auto 1rem;
+  padding: 0.25rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: 999px;
+  background: var(--glas);
+  box-shadow: var(--schatten);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
 }
-.werkzeug-kopf a {
-  font-weight: 700;
+.werkzeug-kopf .zurueck {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0 1rem 0 0.6rem;
+  border-radius: 999px;
+  color: var(--verweis);
+  font-weight: 500;
   text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--schnell);
 }
-.werkzeug-kopf a:hover {
-  text-decoration: underline;
+.werkzeug-kopf .zurueck:hover {
+  background: var(--schwebe);
+}
+.werkzeug-kopf .zurueck .symbol {
+  width: 1.3rem;
+  height: 1.3rem;
 }
 .werkzeug-kopf h1 {
   margin: 0;
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
-  font-weight: 900;
-  color: var(--gelb);
+  overflow: hidden;
+  font-size: 1.0625rem;
+  font-weight: var(--gewicht-betont);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.design-knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--schnell), transform var(--schnell);
+}
+.design-knopf:hover {
+  background: var(--schwebe);
+}
+.design-knopf:active {
+  transform: scale(0.93);
+}
+.design-knopf .symbol {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+@media (max-width: 30rem) {
+  /* Handy: Titel steht ohnehin groß auf der Seite – die Leiste bleibt schmal */
+  .werkzeug-kopf .zurueck span.text {
+    display: none;
+  }
 }
 
 .werkzeug-inhalt {
@@ -35,58 +89,82 @@
   padding-bottom: 2rem;
 }
 
+/* ---------- Karte für Einstellungen ---------- */
+.werkzeug-karte {
+  padding: 1.25rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--radius-gross);
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+}
+
+/* ---------- Felder ---------- */
 .feld {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  font-weight: 700;
+  gap: 0.3rem;
+  font-size: 0.9375rem;
+  font-weight: var(--gewicht-betont);
 }
 .feld input,
 .feld select,
 .feld textarea {
-  padding: 0.7rem 0.9rem;
+  min-height: var(--tippflaeche);
+  padding: 0.5rem 0.9rem;
   border: 0;
-  border-radius: 0.9rem;
-  background: #fff;
-  color: var(--navy);
+  border-radius: var(--radius);
+  background: var(--flaeche-2);
+  color: var(--text);
   font: inherit;
-  font-weight: 600;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  transition: box-shadow var(--schnell), background-color var(--schnell);
+}
+.feld input:focus,
+.feld select:focus,
+.feld textarea:focus {
+  background: var(--flaeche);
+  box-shadow: 0 0 0 1px var(--haarlinie), 0 0 0 4px color-mix(in srgb, var(--fokus) 35%, transparent);
+  outline: 0;
+}
+.feld input[type='range'] {
+  min-height: 2rem;
+  padding: 0;
+  background: transparent;
+  accent-color: var(--akzent);
+}
+.feld input[type='range']:focus {
+  box-shadow: none;
 }
 .feld textarea {
   resize: vertical;
   min-height: 8rem;
 }
 .feld small {
+  color: var(--text-2);
   font-weight: 400;
-  color: rgb(255 255 255 / 0.65);
 }
 
+/* ---------- Knöpfe ---------- */
 .knopf-reihe {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
 }
-.knopf.zweit {
-  background: rgb(255 255 255 / 0.12);
-  color: #fff;
-}
 .knopf.gross {
   min-height: 3.5rem;
   padding: 0.75rem 1.75rem;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
 }
-.knopf[aria-pressed='true'] {
-  background: var(--gelb);
-  color: var(--navy);
-}
-.knopf:disabled {
-  opacity: 0.45;
-  cursor: default;
+/* Umschalter (z. B. Ton an/aus, Modus): gewählt = dunkelblau bzw. türkis */
+.knopf.zweit[aria-pressed='true'] {
+  background: var(--gewaehlt);
+  color: var(--gewaehlt-text);
 }
 
 .hinweis {
-  color: rgb(255 255 255 / 0.65);
-  font-size: 0.95rem;
+  color: var(--text-2);
+  font-size: 0.9375rem;
 }
 
 /* Vollbild (Beamer): Kopf ausblenden */
