@@ -176,7 +176,7 @@
   function zeichneBegruessung() {
     $('begruessung-titel').textContent = lehrkraft ? SEITE.willkommen || 'Willkommen!' : SEITE.gastTitel || 'Mitmachen und lernen'
     $('begruessung-zeile').textContent = (lehrkraft ? SEITE.willkommenText : SEITE.gastText) || ''
-    const tafel = NAVIGATION.find((n) => n.symbol === 'bildschirm' && n.adresse)
+    const tafel = NAVIGATION.find((n) => n.symbol === 'bildschirm' && n.adresse && sichtbar(n))
     const knopf = $('begruessung-knopf')
     knopf.textContent = ''
     knopf.hidden = !tafel

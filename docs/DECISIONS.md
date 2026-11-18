@@ -80,3 +80,7 @@ Grundlage: `docs/PROJECT_AUDIT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.m
 ## Kein Build-Schritt, GitHub Pages aus dem Branch
 - Reines HTML/CSS/JS, damit die Lehrkraft Inhalte direkt in `js/inhalte.js` bzw. `lernen/angebote.js` pflegen kann.
 - Bewusst kein Vite/React wie bei Quizzo: Für eine Inhaltsseite wäre ein Build- und Actions-Schritt nur zusätzlicher Aufwand.
+
+## Tafel als Gast (ohne Anmeldung)
+- Ohne Anmeldung zeigt die Startseite „Tafel als Gast“ → `/Lehrraum/#/tafel?gast=1`. Der Gast arbeitet in einer eigenen, beim Start geleerten IndexedDB (`lehrraum-gast`), ohne Klassen, ohne Server-Abgleich; die Daten der Lehrkraft auf dem Gerät bleiben unberührt.
+- Umgesetzt im Repo `Lehrraum` (`src/speicher/gast.ts`); dort noch nicht veröffentlicht – erst Lehrraum veröffentlichen, dann die Startseite, sonst führt der Link in die normale Tafel.

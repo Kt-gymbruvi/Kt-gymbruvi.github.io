@@ -41,6 +41,7 @@ window.NAVIGATION = [
   { titel: 'Klassenfunk', symbol: 'megafon', adresse: PLATTFORM + '/Klassenfunk/' },
   { titel: 'Lernangebote', symbol: 'lernen', adresse: 'lernen/' },
   { titel: 'Interaktive Tafel', symbol: 'bildschirm', adresse: PLATTFORM + '/Lehrraum/#/tafel', nur: 'lehrkraft' },
+  { titel: 'Tafel (Gast)', symbol: 'bildschirm', adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1', nur: 'gast' }, // ohne Anmeldung, nichts wird gespeichert
   { titel: 'Materialien', symbol: 'bibliothek', adresse: '#material-bereich', nur: 'material' }, // erscheint nur, wenn es Materialien gibt
   { titel: 'Werkzeuge', symbol: 'werkzeug', adresse: '#werkzeuge-bereich' },
 ]
@@ -100,6 +101,15 @@ window.LINKS = [
     text: 'Digital unterrichten',
     adresse: PLATTFORM + '/Lehrraum/#/tafel',
     nur: 'lehrkraft',
+  },
+  {
+    symbol: 'bildschirm',
+    farbe: 'tafel',
+    titel: 'Tafel als Gast',
+    text: 'Ohne Anmeldung schreiben und zeichnen – nichts wird gespeichert',
+    adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1',
+    qr: false,
+    nur: 'gast',
   },
 ]
 
