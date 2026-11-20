@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Timer">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9174"/><stop offset="1" stop-color="#ee4f38"/></linearGradient></defs>
-  <rect width="512" height="512" rx="112" fill="url(#g)"/>
-  <g stroke="#0a2d53" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
-    <rect x="222" y="62" width="68" height="40" rx="12" fill="#ffc928"/>
-    <rect x="242" y="100" width="28" height="36" fill="#0a2d53"/>
-    <path d="M388 132L416 106" fill="none" stroke-width="28"/>
-    <circle cx="256" cy="294" r="150" fill="#fffaf0"/>
-    <path d="M256 294L256 168A126 126 0 0 1 365 231Z" fill="#ffc928" stroke="none"/>
-    <circle cx="256" cy="294" r="150" fill="none"/>
-    <path d="M256 294V206M256 294L316 328" fill="none" stroke-width="18"/>
-    <circle cx="256" cy="294" r="14" fill="#0a2d53" stroke="none"/>
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <path d="M392 136L420 108" fill="none" stroke="#0f5c47" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="218" y="62" width="76" height="42" rx="12" fill="#ff8a14" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <rect x="242" y="100" width="28" height="44" fill="#0f5c47" stroke-linejoin="round"/>
+    <circle cx="256" cy="296" r="152" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <circle cx="256" cy="296" r="118" fill="#ffffff" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M256 296V192A104 104 0 0 1 346 244Z" fill="#ff8a14" stroke-linejoin="round"/>
+    <path d="M256 296V212M256 296L314 330" fill="none" stroke="#0f5c47" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="256" cy="296" r="14" fill="#0f5c47" stroke-linejoin="round"/>
   </g>
-  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffc928" stroke-width="12"/>
+  
 </svg>

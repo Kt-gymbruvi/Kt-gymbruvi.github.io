@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Interaktive Tafel">
-  <defs><linearGradient id="t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22b89d"/><stop offset="1" stop-color="#0f7f6c"/></linearGradient></defs>
-  <rect width="512" height="512" rx="112" fill="url(#t)"/>
-  <g stroke="#0a2d53" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M196 366L150 452M316 366L362 452" fill="none" stroke-width="20"/>
-    <rect x="64" y="96" width="384" height="280" rx="30" fill="#fff"/>
-    <rect x="90" y="122" width="332" height="228" rx="14" fill="#0a2d53" stroke="none"/>
-    <path d="M122 190c24-30 44 30 68 0s44 30 68 0" fill="none" stroke="#ffc928" stroke-width="12"/>
-    <path d="M122 244h120M122 288h86" fill="none" stroke="#fff" stroke-width="12"/>
-    <circle cx="338" cy="262" r="56" fill="#ffc928" stroke="#fff" stroke-width="10"/>
-    <path d="M312 262l20 22 38-44" fill="none" stroke="#0a2d53" stroke-width="16"/>
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <path d="M200 372L152 452M312 372L360 452" fill="none" stroke="#0f5c47" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="66" y="100" width="380" height="282" rx="32" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <rect x="94" y="128" width="324" height="226" rx="14" fill="#ffffff" stroke-linejoin="round"/>
+    <path d="M124 196c24-30 44 30 68 0s44 30 68 0" fill="none" stroke="#ff8a14" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M124 252h120M124 296h86" fill="none" stroke="#0f5c47" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="338" cy="266" r="54" fill="#ff8a14" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M314 266l20 22 36-44" fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffc928" stroke-width="12"/>
+  
 </svg>

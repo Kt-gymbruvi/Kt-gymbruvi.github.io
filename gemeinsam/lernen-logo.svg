@@ -1,15 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Lernangebote">
-  <defs><linearGradient id="l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb23d"/><stop offset="1" stop-color="#f07800"/></linearGradient></defs>
-  <rect width="512" height="512" rx="112" fill="url(#l)"/>
-  <g stroke="#0a2d53" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M74 232L74 392C150 380 214 384 256 412C298 384 362 380 438 392L438 232Z" fill="#1d4fc4"/>
-    <path d="M256 412L256 238C216 214 150 208 90 220L90 368C156 358 218 362 256 412Z" fill="#fffaf0"/>
-    <path d="M256 412L256 238C296 214 362 208 422 220L422 368C356 358 294 362 256 412Z" fill="#fffaf0"/>
-    <path d="M122 262C158 256 196 260 226 274M122 298C158 292 196 296 226 310M286 274C316 260 354 256 390 262M286 310C316 296 354 292 390 298" fill="none" stroke="#f07800" stroke-width="10"/>
-    <path d="M256 198c-44 0-72-30-72-68 0-40 32-70 72-70s72 30 72 70c0 38-28 68-72 68Z" fill="#ffc928"/>
-    <path d="M232 200h48v22a10 10 0 0 1-10 10h-28a10 10 0 0 1-10-10Z" fill="#fff"/>
-    <path d="M232 128c0-14 10-24 24-24" fill="none" stroke="#fff" stroke-width="12"/>
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <path d="M66 252V412C148 398 212 402 256 432C300 402 364 398 446 412V252Z" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M256 432V268C216 244 150 238 92 250V386C156 378 218 382 256 432Z" fill="#ffffff" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M256 432V268C296 244 362 238 420 250V386C356 378 294 382 256 432Z" fill="#ffffff" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M126 288C158 284 190 288 220 302M126 326C158 322 190 326 220 340" fill="none" stroke="#0f5c47" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M292 302C322 288 354 284 386 288M292 340C322 326 354 322 386 326" fill="none" stroke="#0f5c47" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M112 96l22 22M400 96l-22 22M70 160h28M414 160h28" fill="none" stroke="#0f5c47" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M256 222c-46 0-74-30-74-70 0-42 32-72 74-72s74 30 74 72c0 40-28 70-74 70Z" fill="#ff8a14" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <rect x="228" y="214" width="56" height="34" rx="12" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M226 150c0-18 10-30 28-32" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  <g stroke="#fff" stroke-width="12" stroke-linecap="round" fill="none"><path d="M120 76l20 22M392 76l-20 22M80 140h26M406 140h26"/></g>
-  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffc928" stroke-width="12"/>
+  
 </svg>

@@ -1,14 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Meine Klassen">
-  <defs><linearGradient id="k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a86f5"/><stop offset="1" stop-color="#1d4fc4"/></linearGradient>
-  <clipPath id="kt"><rect width="512" height="512" rx="112"/></clipPath></defs>
-  <rect width="512" height="512" rx="112" fill="url(#k)"/>
-  <g clip-path="url(#kt)" stroke="#0a2d53" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
-    <circle cx="140" cy="236" r="46" fill="#e8f0ff"/>
-    <path d="M52 440C52 360 90 316 140 316S228 360 228 440Z" fill="#e8f0ff"/>
-    <circle cx="372" cy="236" r="46" fill="#e8f0ff"/>
-    <path d="M284 440C284 360 322 316 372 316S460 360 460 440Z" fill="#e8f0ff"/>
-    <circle cx="256" cy="186" r="62" fill="#ffc928"/>
-    <path d="M132 456C132 368 188 318 256 318S380 368 380 456Z" fill="#ffc928"/>
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <circle cx="140" cy="230" r="46" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M52 440C52 360 90 316 140 316S228 360 228 440Z" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <circle cx="372" cy="230" r="46" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M284 440C284 360 322 316 372 316S460 360 460 440Z" fill="#0f5c47" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <circle cx="256" cy="178" r="62" fill="#ff8a14" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M132 456C132 368 188 316 256 316S380 368 380 456Z" fill="#ff8a14" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
   </g>
-  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffc928" stroke-width="12"/>
+  
 </svg>
