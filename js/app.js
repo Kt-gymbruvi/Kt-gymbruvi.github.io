@@ -24,9 +24,18 @@
   }
 
   /** Symbol aus gemeinsam/symbole.js; unbekannte Namen (z. B. ein Emoji) erscheinen als Text */
-  function zeichen(name, klasse) {
+  function zeichen(name, klasse, bild) {
     const huelle = el('span', klasse)
     huelle.setAttribute('aria-hidden', 'true')
+    if (bild) {
+      // eigenes Logo (Quizzo, Klassenfunk) statt Symbol
+      const b = el('img', 'logo-bild')
+      b.src = bild
+      b.alt = ''
+      huelle.classList.add('hat-bild')
+      huelle.append(b)
+      return huelle
+    }
     const svg = name && window.LehrraumSymbol ? window.LehrraumSymbol(name) : null
     if (svg) huelle.append(svg)
     else huelle.textContent = name || ''
@@ -150,7 +159,7 @@
       // Bereiche ohne Adresse gibt es noch nicht: kein Link, sondern Text mit dem Hinweis „folgt“
       const punkt = n.adresse ? verweis('leisten-punkt', n.adresse) : el('span', 'leisten-punkt geplant')
       if (n.hier) punkt.setAttribute('aria-current', 'page')
-      punkt.append(zeichen(n.symbol), el('span', null, n.titel))
+      punkt.append(zeichen(n.symbol, null, n.bild), el('span', null, n.titel))
       if (!n.adresse) punkt.append(el('small', null, 'folgt'))
       li.append(punkt)
       liste.append(li)
@@ -227,7 +236,7 @@
       const li = el('li')
       const a = l.adresse ? verweis('kachel', l.adresse) : el('div', 'kachel geplant')
       if (l.farbe) a.classList.add('farbe-' + l.farbe)
-      a.append(zeichen(l.symbol || 'verweis', 'kachel-symbol'))
+      a.append(zeichen(l.symbol || 'verweis', 'kachel-symbol', l.bild))
       a.append(el('span', 'kachel-titel', l.titel))
       const text = (!lehrkraft && l.textGast) || l.text
       if (text) a.append(el('span', 'kachel-text', text))

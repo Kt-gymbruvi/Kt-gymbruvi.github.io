@@ -73,3 +73,6 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 2. Etappe 1.2: Lernübersicht und Werkzeuge auf `gemeinsam/` umstellen, QR-Fenster als gemeinsames Modul.
 3. Zusammenführen mit `main` und Veröffentlichen erst nach ausdrücklicher Zustimmung.
 4. Lautstärkeampel am iPad im Unterricht ausprobieren, Grenzwerte ggf. anpassen.
+
+## Logos Quizzo und Klassenfunk
+Kacheln und Seitenleiste zeigen die Logos (`gemeinsam/quizzo-symbol.png`, `gemeinsam/klassenfunk-symbol.png`; Feld `bild` in `js/inhalte.js`). Noch nicht veröffentlicht.

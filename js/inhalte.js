@@ -37,8 +37,8 @@ window.NAVIGATION = [
   { titel: 'Startseite', symbol: 'haus', adresse: './', hier: true },
   { titel: 'Meine Klassen', symbol: 'klassen', adresse: PLATTFORM + '/Lehrraum/#/klassen', nur: 'lehrkraft' },
   { titel: 'Notenbuch', symbol: 'notenbuch', adresse: PLATTFORM + '/Notenbuch/', nur: 'lehrkraft' },
-  { titel: 'Quizzo', symbol: 'pokal', adresse: PLATTFORM + '/Quizzo/' },
-  { titel: 'Klassenfunk', symbol: 'megafon', adresse: PLATTFORM + '/Klassenfunk/' },
+  { titel: 'Quizzo', symbol: 'pokal', bild: 'gemeinsam/quizzo-symbol.png', adresse: PLATTFORM + '/Quizzo/' },
+  { titel: 'Klassenfunk', symbol: 'megafon', bild: 'gemeinsam/klassenfunk-symbol.png', adresse: PLATTFORM + '/Klassenfunk/' },
   { titel: 'Lernangebote', symbol: 'lernen', adresse: 'lernen/' },
   { titel: 'Interaktive Tafel', symbol: 'bildschirm', adresse: PLATTFORM + '/Lehrraum/#/tafel', nur: 'lehrkraft' },
   { titel: 'Tafel (Gast)', symbol: 'bildschirm', adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1', nur: 'gast' }, // ohne Anmeldung, nichts wird gespeichert
@@ -58,6 +58,7 @@ window.MITMACHEN = {
 /**
  * Große Kacheln (Links auf eigene Seiten).
  *   farbe: 'unterrichten' | 'lernen' | 'tafel' | 'interaktion' | 'bibliothek' | 'quizzo' | 'klassenfunk'
+ *   bild: eigenes Logo (Pfad) statt Symbol, nur für Quizzo und Klassenfunk
  *   textGast: anderer Text ohne Anmeldung (optional)
  */
 window.LINKS = [
@@ -72,6 +73,7 @@ window.LINKS = [
   },
   {
     symbol: 'pokal',
+    bild: 'gemeinsam/quizzo-symbol.png',
     farbe: 'bibliothek',
     titel: 'Quizzo',
     text: 'Interaktive Quizze erstellen und spielen',
@@ -80,6 +82,7 @@ window.LINKS = [
   },
   {
     symbol: 'megafon',
+    bild: 'gemeinsam/klassenfunk-symbol.png',
     farbe: 'interaktion',
     titel: 'Klassenfunk',
     text: 'Abstimmungen und Umfragen',
