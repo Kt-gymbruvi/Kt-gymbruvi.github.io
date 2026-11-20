@@ -20,34 +20,37 @@ body[data-rolle='lehrkraft'] .nur-gast {
 /* ---------- Begrüßung: weiße Karte, großer Titel ---------- */
 .hauptbereich > .begruessung {
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
   margin-top: 0;
-  padding: 1.5rem 1.75rem;
+  padding: 0.9rem 1.5rem;
   border: 1px solid var(--haarlinie);
   border-radius: var(--radius-gross);
   background: var(--flaeche);
   box-shadow: var(--schatten-klein);
   overflow: hidden;
 }
+.begruessung-kopf {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
 .begruessung-text {
-  flex: 1;
   min-width: 0;
+}
+.begruessung-text:not(:has(.pin-form:not([hidden]))) {
+  display: none;
 }
 .begruessung h2 {
   margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
   line-height: 1.1;
 }
-.begruessung p {
-  max-width: 40rem;
-  margin: 0.4rem 0 1.1rem;
-  color: var(--text-2);
-  font-size: 1.0625rem;
-}
 .begruessung-bild {
-  flex: 0 1 9rem;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: 3.5rem;
 }
 .begruessung-bild svg,
 .begruessung-bild img {
@@ -594,15 +597,12 @@ a.kachel:active {
 }
 
 /* ---------- Schmale Bildschirme ---------- */
-@media (max-width: 60rem) {
-  /* iPad hochkant: die Zeichnung nimmt nur Platz weg */
-  .begruessung-bild {
-    display: none;
-  }
-}
 @media (max-width: 40rem) {
   .hauptbereich > .begruessung {
-    padding: 1.25rem;
+    padding: 0.9rem 1rem;
+  }
+  .begruessung-bild {
+    width: 2.75rem;
   }
   .pin-form label {
     flex-basis: 100%;

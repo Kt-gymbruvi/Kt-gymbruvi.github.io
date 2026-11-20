@@ -49,10 +49,12 @@
         <h1 class="unsichtbar">Lehrraum</h1>
 
         <section class="begruessung" aria-labelledby="begruessung-titel">
-          <div class="begruessung-text">
+          <div class="begruessung-kopf">
             <h2 id="begruessung-titel"></h2>
-            <p id="begruessung-zeile"></p>
-            <a class="knopf nur-lehrkraft" id="begruessung-knopf" href="#"></a>
+            <a class="knopf" id="begruessung-knopf" href="#"></a>
+            <div class="begruessung-bild" id="begruessung-bild" aria-hidden="true"></div>
+          </div>
+          <div class="begruessung-text">
             <form id="pin-form" class="pin-form nur-gast" novalidate>
               <label for="pin">PIN vom Beamer</label>
               <input id="pin" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="123456" aria-describedby="pin-fehler" />
@@ -63,7 +65,6 @@
               <p id="pin-fehler" class="fehler" role="alert" hidden></p>
             </form>
           </div>
-          <div class="begruessung-bild" id="begruessung-bild" aria-hidden="true"></div>
         </section>
 
         <section aria-labelledby="links-titel">
