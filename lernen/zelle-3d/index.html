@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zelle 3D – Tier- und Pflanzenzelle</title>
+<style>
+:root{
+  --bg:#E8F0EF; --stage1:#F6FAF9; --stage2:#C9DBDA;
+  --surface:rgba(255,255,255,.94); --surface-2:#EEF4F3;
+  --text:#12222B; --muted:#4D626C; --line:#C2D2D3;
+  --accent:#2456C8; --accent-ink:#FFFFFF; --accent-soft:#DDE7FB;
+  --ok:#17794E; --ok-soft:#D9F1E5; --bad:#B82C61; --bad-soft:#FADFE9;
+  --label-bg:rgba(18,34,43,.88); --label-text:#FFFFFF; --leader:rgba(18,34,43,.55);
+  --shadow:0 6px 24px rgba(18,34,43,.16);
+  --font:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1C23; --stage1:#1D3A48; --stage2:#0A151B;
+    --surface:rgba(21,39,48,.94); --surface-2:#1E3540;
+    --text:#E6EFF0; --muted:#9DB2B8; --line:#2F4A56;
+    --accent:#8FB1FF; --accent-ink:#0E1C23; --accent-soft:#23395F;
+    --ok:#62D6A0; --ok-soft:#173F30; --bad:#FF8DB4; --bad-soft:#4A1F31;
+    --label-bg:rgba(238,245,245,.94); --label-text:#12222B; --leader:rgba(230,239,240,.6);
+    --shadow:0 6px 24px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1C23; --stage1:#1D3A48; --stage2:#0A151B;
+  --surface:rgba(21,39,48,.94); --surface-2:#1E3540;
+  --text:#E6EFF0; --muted:#9DB2B8; --line:#2F4A56;
+  --accent:#8FB1FF; --accent-ink:#0E1C23; --accent-soft:#23395F;
+  --ok:#62D6A0; --ok-soft:#173F30; --bad:#FF8DB4; --bad-soft:#4A1F31;
+  --label-bg:rgba(238,245,245,.94); --label-text:#12222B; --leader:rgba(230,239,240,.6);
+  --shadow:0 6px 24px rgba(0,0,0,.45);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.45;
+  display:flex;flex-direction:column;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+
+/* Kopfzeile */
+.bar{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding:8px 14px;
+  background:var(--surface);border-bottom:1px solid var(--line);z-index:5}
+.brand{font-weight:700;font-size:1.15rem;letter-spacing:-.01em;margin-right:auto;white-space:nowrap}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{padding:7px 14px;border-radius:999px;min-height:38px;white-space:nowrap;color:var(--muted);font-weight:700;font-size:.95rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* Bühne */
+#stage{position:relative;flex:1;min-height:0;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 35%, var(--stage1) 0%, var(--stage2) 100%)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#gl:active{cursor:grabbing}
+#leaders{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#leaders line{stroke:var(--leader);stroke-width:1.2}
+#leaders circle{fill:var(--label-bg)}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lab{position:absolute;left:0;top:0;transform:translate(-50%,-50%);pointer-events:auto;
+  background:var(--label-bg);color:var(--label-text);border-radius:6px;padding:2px 8px;font-size:.82rem;font-weight:700;
+  white-space:nowrap;line-height:1.5;will-change:transform}
+.lab.on{background:var(--accent);color:var(--accent-ink)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+
+/* Strukturliste */
+#list{position:absolute;left:12px;top:12px;width:236px;max-height:calc(100% - 84px);display:flex;flex-direction:column;z-index:3}
+#list header{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px 12px 10px;border-bottom:1px solid var(--line)}
+#list h2{font-size:1rem}
+.lvl{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.lvl button{flex:1;padding:4px 8px;font-size:.85rem;font-weight:700;color:var(--muted);min-height:30px}
+.lvl button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+#rows{overflow:auto;padding:6px;-webkit-overflow-scrolling:touch}
+.row{display:flex;align-items:center;border-radius:9px}
+.row.sel{background:var(--accent-soft)}
+.row .pick{flex:1;display:flex;align-items:center;gap:9px;text-align:left;padding:7px 8px;min-height:40px;border-radius:9px;font-size:.95rem}
+.row .pick:hover{background:var(--surface-2)}
+.row.sel .pick:hover{background:transparent}
+.sw{width:13px;height:13px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.row.off .pick{color:var(--muted);text-decoration:line-through}
+.eye{width:40px;height:40px;display:grid;place-items:center;border-radius:9px;color:var(--muted);flex:none}
+.eye:hover{background:var(--surface-2);color:var(--text)}
+.eye svg{width:20px;height:20px}
+.seen{margin-left:auto;color:var(--ok);font-weight:700;font-size:.9rem}
+
+/* Infofenster */
+#panel{position:absolute;right:12px;top:12px;width:348px;max-height:calc(100% - 24px);overflow:auto;z-index:4;padding:16px;-webkit-overflow-scrolling:touch}
+#panel h2{font-size:1.45rem;line-height:1.15;letter-spacing:-.015em;margin-bottom:6px;padding-right:36px}
+#panel h3{font-size:.95rem;color:var(--muted);font-weight:700;margin:14px 0 2px}
+#panel p{max-width:62ch}
+.x{position:absolute;right:8px;top:8px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;color:var(--muted)}
+.x:hover{background:var(--surface-2);color:var(--text)}
+.where{display:inline-block;font-size:.82rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin-bottom:10px}
+.merke{margin-top:14px;padding:10px 12px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.btn{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:8px 12px;min-height:40px;font-weight:700;font-size:.92rem}
+.btn:hover{border-color:var(--muted)}
+.btn[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn[disabled]{opacity:.45;cursor:default}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.prog{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:6px 0 12px;border:1px solid var(--line)}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.small{font-size:.88rem;color:var(--muted)}
+.keys{margin:10px 0 0;padding:0;list-style:none}
+.keys li{display:flex;gap:10px;padding:5px 0;border-top:1px solid var(--line)}
+.keys li:first-child{border-top:0}
+.keys b{min-width:8.5em}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--surface-2);border-radius:10px;padding:10px 12px;min-height:46px;font-weight:700}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.fb{margin-top:12px;padding:10px 12px;border-radius:10px}
+.fb.ok{background:var(--ok-soft);border:1px solid var(--ok)}
+.fb.no{background:var(--bad-soft);border:1px solid var(--bad)}
+.fb strong{display:block;margin-bottom:2px}
+.score{font-size:2.6rem;font-weight:700;line-height:1;margin:6px 0 4px;letter-spacing:-.02em}
+.miss{margin:8px 0 0;padding-left:1.1em}
+.task{font-size:1.12rem;font-weight:700;margin-top:4px}
+
+/* Werkzeuge */
+#tools{position:absolute;left:12px;bottom:12px;display:flex;gap:6px;z-index:3;max-width:calc(100% - 24px);overflow-x:auto;padding:6px;-webkit-overflow-scrolling:touch}
+#tools .btn{white-space:nowrap;background:transparent;border-color:transparent}
+#tools .btn:hover{background:var(--surface-2)}
+#tools .btn[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+#listToggle{display:none}
+#fail{position:absolute;inset:0;display:none;place-items:center;padding:24px;text-align:center}
+
+body.quiz #list, body.quiz #listToggle{display:none !important}
+
+@media (max-width: 980px){
+  #list{display:none;width:min(280px, calc(100% - 24px));max-height:calc(100% - 96px)}
+  body.list-open #list{display:flex}
+  #listToggle{display:inline-block}
+  #panel{width:320px}
+}
+@media (max-width: 700px){
+  .bar{padding:6px 10px;gap:6px}
+  .brand{display:none}
+  .seg{flex:1}
+  .seg button{flex:1;padding:6px 8px;font-size:.88rem}
+  #panel h2{font-size:1.2rem}
+  .lab{font-size:.74rem;padding:1px 6px}
+}
+@media (max-width: 700px), (max-width: 1000px) and (orientation: portrait){
+  #panel{left:8px;right:8px;top:auto;bottom:70px;width:auto;max-height:42%;padding:14px}
+  #tools{left:6px;bottom:6px;max-width:calc(100% - 12px)}
+}
+@media (prefers-reduced-motion: reduce){ .prog i{transition:none} }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" aria-label="Zurück"><style>.lernangebot-leiste{all:initial!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;width:100%!important;min-height:44px!important;padding:0 8px!important;background:#eef2f7!important;border-bottom:1px solid rgba(10,45,83,.1)!important;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI Variable Text","Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:-.01em!important}.lernangebot-leiste a{all:initial!important;display:inline-flex!important;align-items:center!important;gap:2px!important;box-sizing:border-box!important;min-height:36px!important;padding:0 12px 0 6px!important;border-radius:999px!important;color:#0f6f8f!important;font:inherit!important;cursor:pointer!important}.lernangebot-leiste a:hover{background:rgba(10,45,83,.07)!important}.lernangebot-leiste a:focus-visible{outline:3px solid #0f7f6c!important;outline-offset:2px!important}.lernangebot-leiste svg{display:block!important;width:20px!important;height:20px!important;flex:none!important}@media (prefers-color-scheme:dark){.lernangebot-leiste{background:#061a33!important;border-bottom-color:rgba(255,255,255,.1)!important}.lernangebot-leiste a{color:#6fd3bf!important}.lernangebot-leiste a:hover{background:rgba(255,255,255,.08)!important}.lernangebot-leiste a:focus-visible{outline-color:#6fd3bf!important}}@media print{.lernangebot-leiste{display:none!important}}</style><a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>Lernangebote</a></nav>
+<div class="bar">
+  <div class="brand">Zelle 3D</div>
+  <div class="seg" role="group" aria-label="Zelltyp">
+    <button data-cell="tier" aria-pressed="true">Tierzelle</button>
+    <button data-cell="pflanze" aria-pressed="false">Pflanzenzelle</button>
+  </div>
+  <div class="seg" role="group" aria-label="Lernmodus">
+    <button data-mode="entdecken" aria-pressed="true">Entdecken</button>
+    <button data-mode="lernen" aria-pressed="false">Lernen</button>
+    <button data-mode="pruefen" aria-pressed="false">Überprüfen</button>
+  </div>
+</div>
+
+<main id="stage">
+  <canvas id="gl" aria-label="3D-Modell der Zelle. Ziehen dreht, Mausrad oder zwei Finger zoomen."></canvas>
+  <svg id="leaders" aria-hidden="true"></svg>
+  <div id="labels"></div>
+
+  <aside id="list" class="card" aria-label="Strukturen der Zelle">
+    <header>
+      <h2>Strukturen</h2>
+      <div class="lvl" role="group" aria-label="Niveau">
+        <button data-level="1" aria-pressed="false" title="Nur die lichtmikroskopisch wichtigen Strukturen">Grundlagen</button>
+        <button data-level="2" aria-pressed="true" title="Alle Organellen">Erweitert</button>
+      </div>
+    </header>
+    <div id="rows"></div>
+  </aside>
+
+  <section id="panel" class="card" aria-live="polite"></section>
+
+  <div id="tools" class="card">
+    <button class="btn" id="listToggle" aria-pressed="false">Strukturen</button>
+    <button class="btn" id="tLabels" aria-pressed="true">Beschriftungen</button>
+    <button class="btn" id="tShell" aria-pressed="false">Hülle durchsichtig</button>
+    <button class="btn" id="tShowAll">Alles einblenden</button>
+    <button class="btn" id="tReset">Ansicht zurücksetzen</button>
+  </div>
+  <div id="fail"><p>Das 3D-Modell konnte nicht geladen werden. Bitte die Seite neu laden oder einen aktuellen Browser (Safari, Chrome, Edge, Firefox) verwenden.</p></div>
+</main>
+
+<script src="three.min.js"></script>
+<script>
+(function(){
+'use strict';
+if(!window.THREE){ document.getElementById('fail').style.display='grid'; return; }
+const T = THREE;
+const $ = s => document.querySelector(s);
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ───────────── Inhalte ───────────── */
+const DEFS = {
+  zellwand:{name:'Zellwand', find:'die Zellwand', cells:'pflanze', level:1, color:'#8DB255',
+    kurz:'Feste Hülle aus Cellulose, die der Pflanzenzelle Form und Stabilität gibt.',
+    bau:'Liegt außen auf der Zellmembran und besteht vor allem aus Cellulosefasern. Sie ist für Wasser und gelöste Stoffe durchlässig.',
+    funktion:'Stützt und schützt die Zelle und hält dem Innendruck der Vakuole stand. So bleibt die Pflanze auch ohne Skelett aufrecht.',
+    merke:'Tierzellen haben keine Zellwand – deshalb sind sie verformbar.',
+    quiz:'Gibt der Zelle eine feste Form und hält dem Innendruck stand.'},
+  zellmembran:{name:'Zellmembran', find:'die Zellmembran', cells:'beide', level:1, color:'#E7A98F',
+    kurz:'Dünne Biomembran, die die Zelle abgrenzt und den Stoffaustausch kontrolliert.',
+    bau:'Doppelschicht aus Lipiden mit eingelagerten Proteinen. In der Pflanzenzelle liegt sie der Zellwand von innen an.',
+    funktion:'Grenzt das Zellinnere ab, lässt Stoffe gezielt hinein und hinaus (selektiv permeabel) und nimmt Signale aus der Umgebung auf.',
+    merke:'Wie ein Türsteher: Nicht jeder Stoff kommt durch.',
+    quiz:'Grenzt die Zelle nach außen ab und kontrolliert, welche Stoffe hinein- und hinausgelangen.'},
+  cytoplasma:{name:'Cytoplasma', find:'das Cytoplasma', cells:'beide', level:1, color:'#F1DDB8',
+    kurz:'Zähflüssige Grundsubstanz, die die Zelle ausfüllt und in der die Organellen liegen.',
+    bau:'Besteht zum größten Teil aus Wasser mit gelösten Salzen, Zuckern und Proteinen. Im Modell ist es als durchscheinende Schicht dargestellt.',
+    funktion:'Ort vieler Stoffwechselreaktionen. Stoffe und Organellen werden hier transportiert.',
+    merke:'Das Cytoplasma ist kein leerer Raum, sondern ein dicht gefüllter Reaktionsraum.',
+    quiz:'Füllt die Zelle aus; hier liegen die Organellen und laufen viele Stoffwechselreaktionen ab.'},
+  zellkern:{name:'Zellkern', find:'den Zellkern', cells:'beide', level:1, color:'#7A5CC6',
+    kurz:'Enthält die Erbinformation (DNA) und steuert die Vorgänge in der Zelle.',
+    bau:'Von einer doppelten Membran umgeben, der Kernhülle. Kernporen (dunkle Punkte) verbinden das Kerninnere mit dem Cytoplasma. Im Inneren liegt die DNA als fädiges Chromatin. Im Modell ist der Kern aufgeschnitten.',
+    funktion:'Speichert die Erbinformation und gibt sie bei der Zellteilung weiter. Von hier gehen die Baupläne für Proteine als mRNA ins Cytoplasma.',
+    merke:'Steuerzentrale der Zelle.',
+    quiz:'Enthält die DNA und steuert die Vorgänge in der Zelle.'},
+  nukleolus:{name:'Nukleolus', find:'den Nukleolus (das Kernkörperchen)', cells:'beide', level:2, color:'#3D2A85',
+    kurz:'Dichtes Kernkörperchen im Zellkern, in dem die Bausteine der Ribosomen entstehen.',
+    bau:'Kugeliger, dichter Bereich im Zellkern. Er ist nicht von einer Membran umgeben.',
+    funktion:'Bildet die rRNA und setzt daraus die Untereinheiten der Ribosomen zusammen.',
+    merke:'Die „Ribosomenfabrik“ im Zellkern.',
+    quiz:'Liegt im Zellkern und stellt die Untereinheiten der Ribosomen her.'},
+  rer:{name:'Raues ER', find:'das raue ER', cells:'beide', level:2, color:'#3C8AD4',
+    kurz:'Membransystem mit Ribosomen auf der Oberfläche; stellt Proteine her und transportiert sie.',
+    bau:'Flache, miteinander verbundene Membransäcke (Zisternen), die in die Kernhülle übergehen. Die Außenseite ist mit Ribosomen besetzt – daher „rau“. ER steht für endoplasmatisches Retikulum.',
+    funktion:'An den Ribosomen entstehen Proteine, die ins ER gelangen, dort gefaltet und in Vesikeln zum Golgi-Apparat geschickt werden.',
+    merke:'Rau = mit Ribosomen = Proteine.',
+    quiz:'Membransystem mit Ribosomen auf der Oberfläche; hier entstehen Proteine für den Export und für Membranen.'},
+  ser:{name:'Glattes ER', find:'das glatte ER', cells:'beide', level:2, color:'#4DBFC6',
+    kurz:'Röhrenförmiges Membransystem ohne Ribosomen; stellt Lipide her und entgiftet.',
+    bau:'Netz aus verzweigten Membranröhren, das mit dem rauen ER verbunden ist. Es trägt keine Ribosomen.',
+    funktion:'Bildet Lipide (zum Beispiel für Membranen), speichert Calcium-Ionen und baut in Leberzellen Giftstoffe ab.',
+    merke:'Glatt = ohne Ribosomen = Lipide.',
+    quiz:'Röhrenförmiges Membransystem ohne Ribosomen; bildet Lipide und baut Giftstoffe ab.'},
+  ribosomen:{name:'Ribosomen', find:'ein Ribosom', cells:'beide', level:2, color:'#27386A',
+    kurz:'Winzige Körnchen, an denen Proteine zusammengebaut werden.',
+    bau:'Bestehen aus rRNA und Proteinen, aufgebaut aus einer großen und einer kleinen Untereinheit. Sie haben keine Membran und liegen frei im Cytoplasma oder sitzen am rauen ER.',
+    funktion:'Übersetzen die mRNA in eine Kette aus Aminosäuren – die Proteinbiosynthese (Translation).',
+    merke:'Im Modell stark vergrößert: Echte Ribosomen sind im Lichtmikroskop nicht sichtbar.',
+    quiz:'Hier werden Aminosäuren nach dem Bauplan der mRNA zu Proteinen verknüpft.'},
+  golgi:{name:'Golgi-Apparat', find:'den Golgi-Apparat', cells:'beide', level:2, color:'#EDAE35',
+    kurz:'Stapel flacher Membransäcke, der Proteine verändert, sortiert und verpackt.',
+    bau:'Mehrere gebogene, übereinanderliegende Membransäcke (Zisternen). Ein einzelner Stapel heißt Dictyosom. Am Rand schnüren sich Vesikel ab.',
+    funktion:'Nimmt Proteine vom ER auf, verändert sie, sortiert sie und verschickt sie in Vesikeln. In Pflanzenzellen entstehen hier auch Bausteine der Zellwand.',
+    merke:'Die Poststelle der Zelle.',
+    quiz:'Verändert, sortiert und verpackt Proteine in Vesikel – die „Poststelle“ der Zelle.'},
+  vesikel:{name:'Vesikel', find:'ein Vesikel', cells:'beide', level:2, color:'#F5D36B',
+    kurz:'Kleine Membranbläschen, die Stoffe innerhalb der Zelle transportieren.',
+    bau:'Kugelige Bläschen, von einer einfachen Membran umgeben. Sie schnüren sich vom ER, vom Golgi-Apparat oder von der Zellmembran ab.',
+    funktion:'Transportieren Stoffe zwischen ER, Golgi-Apparat und Zellmembran. Durch Verschmelzen mit der Zellmembran geben sie ihren Inhalt nach außen ab (Exocytose).',
+    merke:'Die Pakete der Zelle.',
+    quiz:'Kleine Membranbläschen, die Stoffe zwischen ER, Golgi-Apparat und Zellmembran transportieren.'},
+  mitochondrien:{name:'Mitochondrien', find:'ein Mitochondrium', cells:'beide', level:1, color:'#E05C3C',
+    kurz:'Orte der Zellatmung: Sie stellen Energie in Form von ATP bereit.',
+    bau:'Von zwei Membranen umgeben. Die innere Membran ist stark gefaltet (Cristae) und vergrößert so die Oberfläche. Der Innenraum heißt Matrix. Mitochondrien besitzen eigene DNA und eigene Ribosomen.',
+    funktion:'Bei der Zellatmung wird Glucose mit Sauerstoff zu Kohlenstoffdioxid und Wasser abgebaut. Die frei werdende Energie wird als ATP gespeichert.',
+    merke:'Kraftwerke der Zelle – auch Pflanzenzellen haben sie.',
+    quiz:'Hier läuft die Zellatmung ab; dabei wird Energie in Form von ATP bereitgestellt.'},
+  lysosomen:{name:'Lysosomen', find:'ein Lysosom', cells:'tier', level:2, color:'#A2479F',
+    kurz:'Bläschen mit Verdauungsenzymen, die nicht mehr benötigte Stoffe abbauen.',
+    bau:'Kugelige, von einer Membran umgebene Bläschen, gefüllt mit Enzymen. Sie entstehen am Golgi-Apparat.',
+    funktion:'Verdauen aufgenommene Nahrungsteilchen, Krankheitserreger und defekte Organellen. Die Bausteine werden wiederverwendet.',
+    merke:'Magen und Recyclinghof der Tierzelle. In Pflanzenzellen übernimmt die Vakuole diese Aufgabe.',
+    quiz:'Enthalten Verdauungsenzyme und bauen aufgenommene Stoffe und defekte Organellen ab.'},
+  peroxisomen:{name:'Peroxisomen', find:'ein Peroxisom', cells:'beide', level:2, color:'#F08DB3',
+    kurz:'Kleine Bläschen, die Fettsäuren abbauen und giftiges Wasserstoffperoxid unschädlich machen.',
+    bau:'Kugelige Bläschen mit einfacher Membran, gefüllt mit Enzymen wie der Katalase.',
+    funktion:'Bauen Fettsäuren ab. Das dabei entstehende Zellgift Wasserstoffperoxid wird von der Katalase sofort zu Wasser und Sauerstoff zerlegt.',
+    merke:'Die Entgiftungsstation der Zelle.',
+    quiz:'Bauen Fettsäuren ab und zerlegen giftiges Wasserstoffperoxid mit dem Enzym Katalase.'},
+  centriolen:{name:'Centriolen', find:'die Centriolen', cells:'tier', level:2, color:'#3FAE84',
+    kurz:'Zwei kleine Röhrchen, die bei der Zellteilung den Spindelapparat organisieren.',
+    bau:'Zwei zylinderförmige Körperchen, die im rechten Winkel zueinander stehen. Jedes besteht aus neun Dreiergruppen von Mikrotubuli. Zusammen bilden sie das Zentrosom.',
+    funktion:'Organisieren die Mikrotubuli. Bei der Zellteilung geht von ihnen der Spindelapparat aus, der die Chromosomen verteilt.',
+    merke:'Den Zellen höherer Pflanzen fehlen Centriolen.',
+    quiz:'Zwei rechtwinklig angeordnete Röhrchen; von ihnen geht bei der Zellteilung der Spindelapparat aus.'},
+  cytoskelett:{name:'Cytoskelett', find:'das Cytoskelett', cells:'beide', level:2, color:'#8E9CA6',
+    kurz:'Netz aus Proteinfasern, das die Zelle stützt und Transport ermöglicht.',
+    bau:'Besteht aus Mikrotubuli, Aktinfilamenten und Intermediärfilamenten. Im Modell sind nur einige Mikrotubuli dargestellt, die vom Zentrosom ausgehen.',
+    funktion:'Gibt der Zelle ihre Form, hält Organellen an ihrem Platz und dient als Schiene für den Transport von Vesikeln. Auch Zellbewegungen beruhen darauf.',
+    merke:'Skelett und Schienennetz zugleich. Auch Pflanzenzellen besitzen ein Cytoskelett (dort nicht dargestellt).',
+    quiz:'Netz aus Proteinfasern; gibt der Zelle Form und dient als Schiene für den Transport.'},
+  vakuole:{name:'Vakuole', find:'die Vakuole', cells:'pflanze', level:1, color:'#7CC4E6',
+    kurz:'Großer, mit Zellsaft gefüllter Raum, der Stoffe speichert und die Zelle prall hält.',
+    bau:'Von einer eigenen Membran umgeben, dem Tonoplasten. In ausgewachsenen Pflanzenzellen nimmt die Zentralvakuole den größten Teil des Zellvolumens ein.',
+    funktion:'Speichert Wasser, Ionen, Zucker, Farbstoffe und Abfallstoffe. Ihr Innendruck (Turgor) drückt gegen die Zellwand und stabilisiert die Pflanze.',
+    merke:'Welkt eine Pflanze, haben die Vakuolen Wasser verloren.',
+    quiz:'Speichert Wasser und Stoffe; ihr Innendruck hält die Zelle prall.'},
+  chloroplasten:{name:'Chloroplasten', find:'einen Chloroplasten', cells:'pflanze', level:1, color:'#2E9B49',
+    kurz:'Orte der Fotosynthese: Mit Lichtenergie wird hier Glucose aufgebaut.',
+    bau:'Von zwei Membranen umgeben. Im Inneren liegen Membransäckchen (Thylakoide), die zu Stapeln (Grana) geschichtet sind und den Farbstoff Chlorophyll enthalten. Der Innenraum heißt Stroma. Chloroplasten besitzen eigene DNA.',
+    funktion:'Bei der Fotosynthese entstehen aus Kohlenstoffdioxid und Wasser mithilfe von Lichtenergie Glucose und Sauerstoff.',
+    merke:'Chlorophyll macht Pflanzen grün. Einige Chloroplasten im Modell sind aufgeschnitten.',
+    quiz:'Hier läuft die Fotosynthese ab: Aus Kohlenstoffdioxid und Wasser entsteht mit Lichtenergie Glucose.'},
+  plasmodesmen:{name:'Plasmodesmen', find:'ein Plasmodesmos (Plasmabrücke)', cells:'pflanze', level:2, color:'#4C6B28',
+    kurz:'Feine Kanäle durch die Zellwand, die benachbarte Pflanzenzellen verbinden.',
+    bau:'Dünne, von Zellmembran ausgekleidete Plasmabrücken, die durch Öffnungen der Zellwand führen.',
+    funktion:'Verbinden das Cytoplasma benachbarter Zellen. So können Wasser, Nährstoffe und Signalstoffe direkt von Zelle zu Zelle gelangen.',
+    merke:'Trotz Zellwand sind Pflanzenzellen nicht voneinander abgeschottet.',
+    quiz:'Feine Kanäle durch die Zellwand; verbinden das Cytoplasma benachbarter Zellen.'}
+};
+const ORDER = {
+  tier:['zellmembran','cytoplasma','zellkern','nukleolus','rer','ser','ribosomen','golgi','vesikel','mitochondrien','lysosomen','peroxisomen','centriolen','cytoskelett'],
+  pflanze:['zellwand','zellmembran','cytoplasma','zellkern','nukleolus','vakuole','chloroplasten','mitochondrien','rer','ser','ribosomen','golgi','vesikel','peroxisomen','plasmodesmen']
+};
+const SHELL = {tier:['zellmembran'], pflanze:['zellwand','zellmembran']};
+const WHERE = {tier:'Nur in Tierzellen', pflanze:'Nur in Pflanzenzellen', beide:'In Tier- und Pflanzenzellen'};
+
+/* ───────────── Zustand ───────────── */
+const S = {cell:'tier', mode:'entdecken', level:2, labels:true, sel:null, isolate:false, shellGhost:false,
+  hidden:{tier:new Set(), pflanze:new Set()}, ghost:{tier:new Set(), pflanze:new Set()},
+  seen:{tier:new Set(), pflanze:new Set()}, quiz:null, mark:null};
+
+/* ───────────── Renderer ───────────── */
+const canvas = $('#gl'), stage = $('#stage');
+let renderer;
+try{
+  renderer = new T.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:'high-performance'});
+}catch(e){ $('#fail').style.display='grid'; return; }
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+renderer.outputEncoding = T.sRGBEncoding;
+const scene = new T.Scene();
+const camera = new T.PerspectiveCamera(38, 1, 0.5, 300);
+
+scene.add(new T.HemisphereLight(0xffffff, 0x6f7f8c, 0.55));
+const key = new T.DirectionalLight(0xffffff, 0.7); key.position.set(14, 26, 18); scene.add(key);
+const rim = new T.DirectionalLight(0xbfd6ff, 0.3); rim.position.set(-20, 8, -16); scene.add(rim);
+
+// weiche Umgebung für dezente Reflexe (einmalig berechnet)
+try{
+  const pm = new T.PMREMGenerator(renderer);
+  const es = new T.Scene();
+  const eg = new T.SphereGeometry(60, 24, 12);
+  const col = [], p = eg.attributes.position;
+  for(let i=0;i<p.count;i++){ const t=(p.getY(i)/60+1)/2; const c=0.25+0.75*t; col.push(c, c, Math.min(1,c*1.04)); }
+  eg.setAttribute('color', new T.Float32BufferAttribute(col,3));
+  es.add(new T.Mesh(eg, new T.MeshBasicMaterial({vertexColors:true, side:T.BackSide})));
+  const pan = new T.Mesh(new T.PlaneGeometry(40,40), new T.MeshBasicMaterial({color:0xffffff}));
+  pan.position.set(10,45,15); pan.lookAt(0,0,0); es.add(pan);
+  scene.environment = pm.fromScene(es, 0.03).texture; pm.dispose();
+}catch(e){}
+
+let dirty = true;
+const invalidate = () => { dirty = true; };
+
+/* ───────────── Geometrie-Helfer ───────────── */
+function rng(seed){ let a=seed>>>0; return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const V = (x,y,z) => new T.Vector3(x,y,z);
+
+function capsulePts(r,h,n){ n=n||7; const p=[];
+  for(let i=0;i<=n;i++){ const a=-Math.PI/2+(i/n)*Math.PI/2; p.push(new T.Vector2(Math.max(0.0001,Math.cos(a)*r), -h/2+Math.sin(a)*r)); }
+  for(let i=0;i<=n;i++){ const a=(i/n)*Math.PI/2; p.push(new T.Vector2(Math.max(0.0001,Math.cos(a)*r), h/2+Math.sin(a)*r)); }
+  return p; }
+
+// abgeflachter Schlauch (Zisterne) entlang einer Punktfolge
+function ribbon(pts, up, a, b, radial){
+  radial = radial||10; const n=pts.length, pos=[], idx=[];
+  const Tn=V(0,0,0), B=V(0,0,0), N=V(0,0,0);
+  for(let i=0;i<n;i++){
+    Tn.subVectors(pts[Math.min(n-1,i+1)], pts[Math.max(0,i-1)]).normalize();
+    B.crossVectors(Tn, up).normalize(); N.crossVectors(B, Tn).normalize();
+    const t=i/(n-1), s=Math.pow(Math.sin(Math.PI*Math.min(0.999,Math.max(0.001,t))), 0.45);
+    for(let j=0;j<radial;j++){ const an=j/radial*Math.PI*2, ca=Math.cos(an)*a*s, sb=Math.sin(an)*b*Math.max(s,0.35);
+      pos.push(pts[i].x+N.x*ca+B.x*sb, pts[i].y+N.y*ca+B.y*sb, pts[i].z+N.z*ca+B.z*sb); }
+  }
+  for(let i=0;i<n-1;i++) for(let j=0;j<radial;j++){ const a0=i*radial+j, a1=i*radial+(j+1)%radial, b0=a0+radial, b1=a1+radial; idx.push(a0,b0,a1, a1,b0,b1); }
+  const g=new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos,3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+function rrect(w,h,r,path){ const s=path?new T.Path():new T.Shape(), x=-w/2, y=-h/2;
+  s.moveTo(x+r,y); s.lineTo(x+w-r,y); s.quadraticCurveTo(x+w,y,x+w,y+r); s.lineTo(x+w,y+h-r); s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  s.lineTo(x+r,y+h); s.quadraticCurveTo(x,y+h,x,y+h-r); s.lineTo(x,y+r); s.quadraticCurveTo(x,y,x+r,y); return s; }
+
+/* ───────────── Zell-Baukasten ───────────── */
+function makeCell(){
+  const C = {root:new T.Group(), orgs:{}, ribo:[]};
+  C.org = function(id){ if(!C.orgs[id]){ const g=new T.Group(); C.root.add(g); C.orgs[id]={id, group:g, mats:{}, list:[], meshes:[], anchor:V(0,0,0), focus:13}; } return C.orgs[id]; };
+  C.mat = function(id, color, o){ o=o||{}; const org=C.org(id), k=color+JSON.stringify(o); if(org.mats[k]) return org.mats[k];
+    const m=new T.MeshStandardMaterial({color:new T.Color(color).convertSRGBToLinear(), roughness:o.rough!=null?o.rough:0.48, metalness:0.02, side:o.side!=null?o.side:T.FrontSide,
+      transparent:(o.opacity!=null&&o.opacity<1), opacity:o.opacity!=null?o.opacity:1, depthWrite:!(o.opacity!=null&&o.opacity<1), envMapIntensity:0.45});
+    m.userData.base=o.opacity!=null?o.opacity:1; org.mats[k]=m; org.list.push(m); return m; };
+  C.add = function(id, geo, mat, parent){ const m=new T.Mesh(geo, mat); m.userData.org=id; (parent||C.org(id).group).add(m); C.org(id).meshes.push(m); return m; };
+  return C;
+}
+
+function buildNucleus(C, pos, R){
+  const g=new T.Group(); g.position.copy(pos); C.org('zellkern').group.add(g);
+  C.add('zellkern', new T.SphereGeometry(R, 44, 30, Math.PI, Math.PI*1.5), C.mat('zellkern', DEFS.zellkern.color), g);
+  C.add('zellkern', new T.SphereGeometry(R*0.955, 44, 30, Math.PI, Math.PI*1.5), C.mat('zellkern', '#C9B9F2', {side:T.BackSide}), g);
+  // Schnittkante der Kernhülle
+  const edge = new T.RingGeometry(R*0.955, R, 40, 1, 0, Math.PI);
+  const e1 = C.add('zellkern', edge, C.mat('zellkern', '#5A419F', {side:T.DoubleSide}), g); e1.rotation.z = -Math.PI/2; // Ebene x=0? (xy-Ebene, z=0)
+  const e2 = C.add('zellkern', edge, C.mat('zellkern', '#5A419F', {side:T.DoubleSide}), g); e2.rotation.set(0, -Math.PI/2, -Math.PI/2);
+  // Kernporen
+  const n=90, pg=new T.SphereGeometry(R*0.055, 8, 6), im=new T.InstancedMesh(pg, C.mat('zellkern','#3B2A73'), n), d=new T.Object3D(); let c=0;
+  for(let i=0;i<n;i++){ const y=1-(i+0.5)/n*2, r=Math.sqrt(1-y*y), th=i*2.39996; const x=Math.cos(th)*r, z=Math.sin(th)*r;
+    if(x>-0.06 && z>-0.06) continue; d.position.set(x*R,y*R,z*R); d.lookAt(x*2*R,y*2*R,z*2*R); d.scale.set(1,1,0.4); d.updateMatrix(); im.setMatrixAt(c++, d.matrix); }
+  im.count=c; im.userData.org='zellkern'; g.add(im); C.org('zellkern').meshes.push(im);
+  // Chromatin
+  const rnd=rng(11), cm=C.mat('zellkern','#A892E8');
+  for(let k=0;k<7;k++){ const pts=[]; let p=V((rnd()-.5)*R, (rnd()-.5)*R, (rnd()-.5)*R);
+    for(let i=0;i<6;i++){ p=p.clone().add(V((rnd()-.5)*R*0.9,(rnd()-.5)*R*0.9,(rnd()-.5)*R*0.9)); if(p.length()>R*0.78) p.setLength(R*0.78); pts.push(p); }
+    C.add('zellkern', new T.TubeGeometry(new T.CatmullRomCurve3(pts), 36, R*0.03, 5), cm, g); }
+  C.org('zellkern').anchor.copy(pos).add(V(-R*0.45, R*0.86, -R*0.25)); C.org('zellkern').focus=R*5.2;
+  // Nukleolus
+  const ng=new T.Group(); ng.position.copy(pos).add(V(R*0.2, -R*0.05, R*0.2)); C.org('nukleolus').group.add(ng);
+  C.add('nukleolus', new T.SphereGeometry(R*0.3, 24, 18), C.mat('nukleolus', DEFS.nukleolus.color, {rough:0.7}), ng);
+  C.org('nukleolus').anchor.copy(ng.position).add(V(0,R*0.3,0)); C.org('nukleolus').focus=R*3.6;
+}
+
+function buildRER(C, center, radii, a0, a1, y, half, seed){
+  const rnd=rng(seed), up=V(0,1,0), m=C.mat('rer', DEFS.rer.color, {side:T.DoubleSide});
+  radii.forEach((r0,k)=>{ const pts=[], n=46, ph=rnd()*6, s0=a0+(rnd()*0.25), s1=a1-(rnd()*0.25);
+    for(let i=0;i<n;i++){ const t=i/(n-1), an=s0+(s1-s0)*t, r=r0+0.2*Math.sin(an*7+ph), yy=y+0.22*Math.sin(an*3+ph*2)+(k%2?0.12:-0.05);
+      pts.push(V(center.x+r*Math.cos(an), yy, center.z+r*Math.sin(an))); }
+    C.add('rer', ribbon(pts, up, half, 0.19, 10), m);
+    for(let i=0;i<70;i++){ const j=3+Math.floor(rnd()*(n-6)), p=pts[j], an=s0+(s1-s0)*j/(n-1), side=rnd()<.5?-1:1, h=(rnd()*2-1);
+      const off=0.21*Math.sqrt(Math.max(0.05,1-h*h*0.8));
+      C.ribo.push(V(p.x+Math.cos(an)*off*side, p.y+h*half*0.85, p.z+Math.sin(an)*off*side)); }
+  });
+  const rm=radii[Math.floor(radii.length/2)], am=(a0+a1)/2;
+  C.org('rer').anchor.set(center.x+rm*Math.cos(am), y+half, center.z+rm*Math.sin(am)); C.org('rer').focus=14;
+}
+
+function buildSER(C, base, seed, spread){
+  const rnd=rng(seed), m=C.mat('ser', DEFS.ser.color); spread=spread||1;
+  const nodes=[]; for(let i=0;i<9;i++) nodes.push(V(base.x+(rnd()-.5)*4.2*spread, base.y+(rnd()-.5)*1.0, base.z+(rnd()-.5)*3.6*spread));
+  for(let k=0;k<6;k++){ const pts=[]; let i0=Math.floor(rnd()*nodes.length);
+    for(let i=0;i<4;i++){ pts.push(nodes[(i0+i*(k%2?2:1)+k)%nodes.length].clone()); }
+    C.add('ser', new T.TubeGeometry(new T.CatmullRomCurve3(pts,false,'catmullrom',0.6), 40, 0.2, 8), m); }
+  nodes.forEach(p=>{ const s=C.add('ser', new T.SphereGeometry(0.27, 12, 10), m); s.position.copy(p); });
+  C.org('ser').anchor.copy(base).add(V(0,0.6,0)); C.org('ser').focus=12;
+}
+
+function buildGolgi(C, pos, rotY, scale){
+  const g=new T.Group(); g.position.copy(pos); g.rotation.y=rotY; g.scale.setScalar(scale||1); C.org('golgi').group.add(g);
+  const gv=new T.Group(); gv.position.copy(pos); gv.rotation.y=rotY; gv.scale.setScalar(scale||1); C.org('vesikel').group.add(gv);
+  const up=V(0,1,0), cols=['#F4C257','#EFB440','#EAA72E','#E39B22','#DB8F1B'], rnd=rng(5);
+  const vm=C.mat('vesikel', DEFS.vesikel.color, {rough:0.3}), vg=new T.SphereGeometry(1, 12, 10);
+  for(let k=0;k<5;k++){ const L=2.0-k*0.16, pts=[];
+    for(let i=0;i<26;i++){ const u=-1+2*i/25; pts.push(V(-0.85+k*0.42+0.6*u*u, 0, u*L)); }
+    C.add('golgi', ribbon(pts, up, 0.78-k*0.04, 0.13, 10), C.mat('golgi', cols[k], {side:T.DoubleSide}), g);
+    for(const sgn of [-1,1]){ if(rnd()<0.25) continue; const v=C.add('vesikel', vg, vm, gv); const r=0.17+rnd()*0.1; v.scale.setScalar(r);
+      v.position.set(-0.85+k*0.42+0.72, (rnd()-.5)*0.7, sgn*(L+0.28+rnd()*0.3)); }
+  }
+  for(let i=0;i<7;i++){ const v=C.add('vesikel', vg, vm, gv), r=0.16+rnd()*0.13; v.scale.setScalar(r); v.position.set(1.5+rnd()*1.5, (rnd()-.5)*0.9, (rnd()-.5)*3.2); }
+  g.updateMatrixWorld(true);
+  C.org('golgi').anchor.copy(V(-0.4,0.8,0).applyMatrix4(g.matrixWorld)); C.org('golgi').focus=11;
+  gv.updateMatrixWorld(true);
+  C.org('vesikel').anchor.copy(V(2.2,0.45,0).applyMatrix4(gv.matrixWorld)); C.org('vesikel').focus=9;
+}
+
+function buildMito(C, pos, rotY, tilt, r, h, cut){
+  const o=new T.Group(); o.position.copy(pos); o.rotation.set(0, rotY, tilt||0); C.org('mitochondrien').group.add(o);
+  const g=new T.Group(); g.rotation.z=Math.PI/2; o.add(g);
+  const ps=cut?Math.PI/2:0, pl=cut?Math.PI*1.5:Math.PI*2;
+  C.add('mitochondrien', new T.LatheGeometry(capsulePts(r,h), 22, ps, pl), C.mat('mitochondrien', DEFS.mitochondrien.color, {side:T.DoubleSide}), g);
+  if(cut){
+    C.add('mitochondrien', new T.LatheGeometry(capsulePts(r*0.86,h), 22, ps, pl), C.mat('mitochondrien', '#F2A483', {side:T.DoubleSide}), g);
+    const cm=C.mat('mitochondrien','#FAD2BD'), cg=new T.CylinderGeometry(r*0.7, r*0.7, 0.07, 16);
+    const n=Math.round((h+r)/0.34);
+    for(let i=0;i<n;i++){ const d=C.add('mitochondrien', cg, cm, g), s=(i%2?1:-1)*r*0.16; d.position.set(s*0.7, -h/2-r*0.45+ (i+0.5)*(h+r*0.9)/n, -s*0.7); }
+  }
+  return o;
+}
+
+function buildCentrioles(C, pos){
+  const g=new T.Group(); g.position.copy(pos); C.org('centriolen').group.add(g);
+  const m=C.mat('centriolen', DEFS.centriolen.color), tg=new T.CylinderGeometry(0.075,0.075,1.0,8);
+  for(let c=0;c<2;c++){ const cg=new T.Group(); if(c){ cg.rotation.z=Math.PI/2; cg.position.set(0.75,0.1,0.15);} else { cg.rotation.x=0.25; } g.add(cg);
+    for(let i=0;i<9;i++){ const a=i/9*Math.PI*2; for(let t=0;t<3;t++){ const tube=C.add('centriolen', tg, m, cg), rr=0.27+t*0.085, aa=a+t*0.2; tube.position.set(Math.cos(aa)*rr,0,Math.sin(aa)*rr); } } }
+  C.org('centriolen').anchor.copy(pos).add(V(0.3,0.65,0)); C.org('centriolen').focus=8;
+}
+
+function finishRibosomes(C){
+  const n=C.ribo.length, im=new T.InstancedMesh(new T.SphereGeometry(0.105, 7, 5), C.mat('ribosomen', DEFS.ribosomen.color, {rough:0.6}), n), d=new T.Object3D();
+  for(let i=0;i<n;i++){ d.position.copy(C.ribo[i]); d.updateMatrix(); im.setMatrixAt(i, d.matrix); }
+  im.userData.org='ribosomen'; C.org('ribosomen').group.add(im); C.org('ribosomen').meshes.push(im); C.org('ribosomen').focus=9;
+}
+
+/* ───────────── Tierzelle ───────────── */
+function buildAnimal(){
+  const C=makeCell(), R=10, cutY=1.6, th0=Math.acos(cutY/R), rnd=rng(3);
+  // Zellmembran: aufgeschnittene Kugel
+  C.add('zellmembran', new T.SphereGeometry(R, 72, 40, 0, Math.PI*2, th0, Math.PI-th0), C.mat('zellmembran', DEFS.zellmembran.color, {rough:0.55}));
+  C.add('zellmembran', new T.SphereGeometry(R-0.28, 72, 40, 0, Math.PI*2, th0, Math.PI-th0), C.mat('zellmembran', '#F3CDB7', {side:T.BackSide, rough:0.7}));
+  const ro=Math.sqrt(R*R-cutY*cutY), ri=Math.sqrt((R-0.28)*(R-0.28)-cutY*cutY);
+  const ring=C.add('zellmembran', new T.RingGeometry(ri, ro, 72), C.mat('zellmembran', '#C97F62', {side:T.DoubleSide})); ring.rotation.x=-Math.PI/2; ring.position.y=cutY;
+  C.org('zellmembran').anchor.set(-ro*0.72, cutY, ro*0.69); C.org('zellmembran').focus=30;
+  // Cytoplasma
+  const gy=-2.6, gr=Math.sqrt((R-0.28)*(R-0.28)-gy*gy)-0.02;
+  const gel=C.add('cytoplasma', new T.CircleGeometry(gr, 64), C.mat('cytoplasma', DEFS.cytoplasma.color, {opacity:0.5, side:T.DoubleSide, rough:0.25})); gel.rotation.x=-Math.PI/2; gel.position.y=gy;
+  C.org('cytoplasma').anchor.set(-4.6, gy, 7.3); C.org('cytoplasma').focus=24;
+
+  const nc=V(-1.4,-0.3,-1.0);
+  buildNucleus(C, nc, 3.0);
+  buildRER(C, nc, [3.75,4.45,5.15,5.85], 1.85, 4.05, -0.5, 0.85, 21);
+  buildSER(C, V(3.6,-1.2,-5.4), 8, 1);
+  buildGolgi(C, V(5.0,-0.9,2.4), -0.5, 1);
+  const cp=V(2.9,-0.9,-1.6); buildCentrioles(C, cp);
+
+  [[7.4,-1.6,-1.8,0.9,true],[2.4,-1.8,6.7,0.2,true],[-5.6,-1.5,5.6,1.0,true],[-8.1,-1.4,-1.0,0.5,false],[-4.2,-1.6,-7.2,0.1,true],[6.2,-1.9,5.4,0.75,false],[0.8,-1.9,3.9,0.45,true]]
+    .forEach((m,i)=>buildMito(C, V(m[0],m[1],m[2]), m[3], (i%2?0.12:-0.1), 0.62, 1.55, m[4]));
+  C.org('mitochondrien').anchor.set(2.4,-1.05,6.7); C.org('mitochondrien').focus=10;
+
+  const lm=C.mat('lysosomen', DEFS.lysosomen.color, {rough:0.35}), sg=new T.SphereGeometry(1, 20, 14);
+  [[3.6,-1.9,3.9,.58],[8.3,-1.6,1.2,.5],[-2.6,-1.9,6.4,.52],[-7.2,-1.7,2.4,.5],[1.0,-1.8,-7.8,.55],[7.0,-1.9,-4.6,.48]].forEach(l=>{ const s=C.add('lysosomen', sg, lm); s.position.set(l[0],l[1],l[2]); s.scale.setScalar(l[3]); });
+  C.org('lysosomen').anchor.set(8.3,-1.1,1.2); C.org('lysosomen').focus=10;
+  const pm=C.mat('peroxisomen', DEFS.peroxisomen.color, {rough:0.35});
+  [[5.2,-2.0,-2.6,.4],[-0.6,-2.0,7.8,.38],[-6.9,-1.9,-4.6,.4],[4.4,-2.0,7.0,.36],[-8.4,-1.9,1.2,.36]].forEach(l=>{ const s=C.add('peroxisomen', sg, pm); s.position.set(l[0],l[1],l[2]); s.scale.setScalar(l[3]); });
+  C.org('peroxisomen').anchor.set(-0.6,-1.62,7.8); C.org('peroxisomen').focus=9;
+
+  // Cytoskelett: Mikrotubuli vom Zentrosom zur Membran
+  const km=C.mat('cytoskelett', DEFS.cytoskelett.color, {rough:0.6});
+  for(let i=0;i<13;i++){ const a=i/13*Math.PI*2+0.3, yy=-2.2+rnd()*2.6, rr=Math.sqrt(Math.max(1,(R-0.4)*(R-0.4)-yy*yy));
+    const end=V(Math.cos(a)*rr, yy, Math.sin(a)*rr), mid=cp.clone().lerp(end,0.5).add(V((rnd()-.5)*1.6, (rnd()-.5)*0.8-0.3, (rnd()-.5)*1.6));
+    C.add('cytoskelett', new T.TubeGeometry(new T.QuadraticBezierCurve3(cp, mid, end), 16, 0.05, 5), km); }
+  C.org('cytoskelett').anchor.set(6.6,-0.9,-5.0); C.org('cytoskelett').focus=16;
+  { const a=0.3+ (11/13)*Math.PI*2; C.org('cytoskelett').anchor.set(cp.x+Math.cos(a)*3.4, -0.9, cp.z+Math.sin(a)*3.4); }
+
+  // freie Ribosomen
+  let made=0; while(made<150){ const x=(rnd()*2-1)*9, z=(rnd()*2-1)*9, y=-3.2+rnd()*2.2; if(x*x+z*z+y*y>81) continue; const dx=x-nc.x, dz=z-nc.z; if(dx*dx+dz*dz<6.3*6.3) continue; C.ribo.push(V(x,y,z)); made++; }
+  finishRibosomes(C);
+  C.org('ribosomen').anchor.copy(C.ribo[C.ribo.length-7]).add(V(0,0.15,0));
+  { // gut sichtbares freies Ribosom vorne rechts als Ankerpunkt
+    let best=null, bs=-1e9; for(let i=C.ribo.length-150;i<C.ribo.length;i++){ const p=C.ribo[i], sc=p.x+p.z+p.y*2-Math.abs(p.x-p.z)*0.6; if(sc>bs && p.x*p.x+p.z*p.z<60){bs=sc;best=p;} }
+    if(best) C.org('ribosomen').anchor.copy(best).add(V(0,0.15,0)); }
+
+  C.view={t:V(0,-1.8,0), r:29, az:0.72, pol:0.9};
+  return C;
+}
+
+/* ───────────── Pflanzenzelle ───────────── */
+function buildPlant(){
+  const C=makeCell(), rnd=rng(17);
+  const W=21, D=13.6, yB=-5.2, yT=-0.75;
+  const ext=(shape,depth,y)=>{ const g=new T.ExtrudeGeometry(shape,{depth:depth,bevelEnabled:false,curveSegments:10}); g.rotateX(-Math.PI/2); g.translate(0,y,0); return g; };
+  // Zellwand (Wanne) + Boden
+  const ws=rrect(W,D,1.7); ws.holes.push(rrect(W-1.3,D-1.3,1.15,true));
+  C.add('zellwand', ext(ws, yT-yB, yB), C.mat('zellwand', DEFS.zellwand.color, {rough:0.75}));
+  C.add('zellwand', ext(rrect(W,D,1.7), 0.6, yB-0.6), C.mat('zellwand', DEFS.zellwand.color, {rough:0.75}));
+  C.org('zellwand').anchor.set(-W/2+2.0, yT, D/2-0.3); C.org('zellwand').focus=32;
+  // Zellmembran
+  const ms=rrect(W-1.3,D-1.3,1.15); ms.holes.push(rrect(W-1.62,D-1.62,1.0,true));
+  C.add('zellmembran', ext(ms, yT-yB-0.02, yB), C.mat('zellmembran', '#F0C98F', {rough:0.6}));
+  C.add('zellmembran', ext(rrect(W-1.3,D-1.3,1.15), 0.14, yB), C.mat('zellmembran', '#F0C98F', {rough:0.6}));
+  C.org('zellmembran').anchor.set(4.5, yT, D/2-0.75); C.org('zellmembran').focus=30;
+  // Cytoplasma
+  const gy=-2.9, gel=C.add('cytoplasma', new T.ShapeGeometry(rrect(W-1.64,D-1.64,1.0), 10), C.mat('cytoplasma', '#E9E3B0', {opacity:0.5, side:T.DoubleSide, rough:0.25})); gel.rotation.x=-Math.PI/2; gel.position.y=gy;
+  C.org('cytoplasma').anchor.set(-9.2, gy, 5.5); C.org('cytoplasma').focus=24;
+  // Plasmodesmen
+  const pmat=C.mat('plasmodesmen', DEFS.plasmodesmen.color, {rough:0.6}), pg=new T.CylinderGeometry(0.17,0.17,1.0,10);
+  [[-6,-1.5],[-5.3,-2.3],[-0.5,-2.0],[0.3,-1.4],[5.5,-2.2],[6.2,-1.5]].forEach(p=>{ for(const s of [-1,1]){ const c=C.add('plasmodesmen', pg, pmat); c.rotation.x=Math.PI/2; c.position.set(p[0], p[1], s*(D/2-0.42)); } });
+  [[-2.5,-1.7],[2.2,-2.2],[2.9,-1.5]].forEach(p=>{ for(const s of [-1,1]){ const c=C.add('plasmodesmen', pg, pmat); c.rotation.z=Math.PI/2; c.position.set(s*(W/2-0.42), p[1], p[0]); } });
+  C.org('plasmodesmen').anchor.set(0.3,-1.4,-(D/2-0.85)); C.org('plasmodesmen').focus=13;
+
+  // Vakuole
+  const vac=C.add('vakuole', new T.SphereGeometry(1, 48, 32), C.mat('vakuole', DEFS.vakuole.color, {opacity:0.62, rough:0.12}));
+  vac.position.set(3.1,-1.9,0); vac.scale.set(5.6,2.9,3.9); vac.renderOrder=2;
+  C.org('vakuole').anchor.set(3.6,1.0,0); C.org('vakuole').focus=22;
+
+  const nc=V(-5.9,-1.2,-1.5);
+  buildNucleus(C, nc, 2.15);
+  buildRER(C, nc, [2.75,3.3,3.85], 1.95, 3.85, -1.4, 0.68, 31);
+  buildSER(C, V(-7.2,-1.9,3.9), 12, 0.62);
+  buildGolgi(C, V(-3.6,-1.7,4.3), -1.2, 0.72);
+
+  // Chloroplasten
+  const cm=C.mat('chloroplasten', DEFS.chloroplasten.color, {side:T.DoubleSide, rough:0.4}), ci=C.mat('chloroplasten','#7FCB6E',{side:T.DoubleSide}), cg=C.mat('chloroplasten','#1B6A32');
+  const full=new T.SphereGeometry(1, 28, 18), cutg=new T.SphereGeometry(1, 28, 18, Math.PI, Math.PI*1.5), cuti=new T.SphereGeometry(0.9, 24, 16, Math.PI, Math.PI*1.5), disc=new T.CylinderGeometry(0.17,0.17,0.06,12);
+  [[0.2,-0.9,5.05,0.0,true],[3.9,-0.8,5.1,0.1,true],[7.4,-0.9,4.6,-0.35,false],[9.0,-1.0,1.6,1.45,true],[9.0,-1.1,-2.0,1.7,false],[6.6,-0.9,-5.0,0.2,false],[2.8,-0.8,-5.15,-0.1,false],[-1.0,-1.0,-5.1,0.15,false],[-1.9,-0.7,1.9,0.9,true]]
+    .forEach(c=>{ const g=new T.Group(); g.position.set(c[0],c[1],c[2]); g.rotation.y=c[3]; g.scale.set(1.45,0.62,0.9); C.org('chloroplasten').group.add(g);
+      C.add('chloroplasten', c[4]?cutg:full, cm, g);
+      if(c[4]){ C.add('chloroplasten', cuti, ci, g);
+        const st=[[0.35,0.15],[0.1,0.5],[0.62,0.42],[-0.25,0.3],[0.3,-0.3],[-0.45,-0.2],[0.05,-0.05],[-0.1,0.72],[0.72,0.05]], im=new T.InstancedMesh(disc, cg, st.length*5), d=new T.Object3D(); let n=0;
+        st.forEach(q=>{ for(let k=0;k<5;k++){ d.scale.set(1/1.45*1.25, 1/0.62, 1/0.9*1.25); d.position.set(q[0]*0.78, -0.22+k*0.115, q[1]*0.78); d.updateMatrix(); im.setMatrixAt(n++, d.matrix); } });
+        im.userData.org='chloroplasten'; g.add(im); C.org('chloroplasten').meshes.push(im); }
+    });
+  C.org('chloroplasten').anchor.set(3.9,-0.2,5.1); C.org('chloroplasten').focus=11;
+
+  [[-1.6,-2.2,3.6,0.5,true],[-2.6,-2.1,-3.5,0.9,true],[-4.4,-2.2,-5.2,0.1,false],[-9.0,-2.1,1.4,1.3,true]].forEach((m,i)=>buildMito(C, V(m[0],m[1],m[2]), m[3], (i%2?0.1:-0.1), 0.46, 1.15, m[4]));
+  C.org('mitochondrien').anchor.set(-2.6,-1.62,-3.5); C.org('mitochondrien').focus=9;
+
+  const sg=new T.SphereGeometry(1, 20, 14), pm=C.mat('peroxisomen', DEFS.peroxisomen.color, {rough:0.35});
+  [[2.0,-1.9,5.3,.34],[5.0,-2.0,-5.1,.32],[-6.0,-2.2,5.2,.33],[8.4,-2.0,-0.3,.3]].forEach(l=>{ const s=C.add('peroxisomen', sg, pm); s.position.set(l[0],l[1],l[2]); s.scale.setScalar(l[3]); });
+  C.org('peroxisomen').anchor.set(5.0,-1.68,-5.1); C.org('peroxisomen').focus=9;
+
+  let made=0, first=C.ribo.length; while(made<110){ const x=-9.4+rnd()*8.6, z=(rnd()*2-1)*5.6, y=-3.4+rnd()*1.6; const dx=x-nc.x, dz=z-nc.z; if(dx*dx+dz*dz<4.2*4.2) continue; C.ribo.push(V(x,y,z)); made++; }
+  finishRibosomes(C);
+  { let best=null, bs=-1e9; for(let i=first;i<C.ribo.length;i++){ const p=C.ribo[i], sc=p.z+p.y*2-Math.abs(p.x+4.5)*0.5; if(sc>bs && p.z<4.6){bs=sc;best=p;} } if(best) C.org('ribosomen').anchor.copy(best).add(V(0,0.15,0)); }
+
+  C.view={t:V(0,-2.0,0), r:31, az:0.62, pol:0.74};
+  return C;
+}
+
+/* ───────────── Zellen verwalten ───────────── */
+const CELLS={};
+function cell(){ return CELLS[S.cell]; }
+function ensureCell(k){ if(!CELLS[k]){ CELLS[k]=(k==='tier'?buildAnimal():buildPlant()); CELLS[k].root.visible=false; scene.add(CELLS[k].root); CELLS[k].root.updateMatrixWorld(true); } return CELLS[k]; }
+function activeIds(){ return ORDER[S.cell].filter(id=>DEFS[id].level<=S.level && cell().orgs[id]); }
+function isVisible(id){ return DEFS[id].level<=S.level && !S.hidden[S.cell].has(id); }
+function isGhost(id){ if(S.mark===id || (S.sel===id && S.isolate)) return false;
+  if(S.isolate && S.sel && S.sel!==id) return true;
+  if(S.shellGhost && SHELL[S.cell].indexOf(id)>=0) return true;
+  return S.ghost[S.cell].has(id); }
+
+const black=new T.Color(0x000000);
+function applyVisuals(){
+  const C=cell(); const hot=S.mark||S.sel;
+  for(const id in C.orgs){ const o=C.orgs[id], vis=isVisible(id), gh=isGhost(id), hi=(id===hot);
+    o.group.visible=vis;
+    o.list.forEach(m=>{ const op=m.userData.base*(gh?0.13:1), tr=op<0.999;
+      if(m.transparent!==tr){ m.transparent=tr; m.needsUpdate=true; }
+      m.opacity=op; m.depthWrite=!tr;
+      if(hi){ m.emissive.copy(m.color); m.emissiveIntensity=0.42; } else { m.emissive.copy(black); m.emissiveIntensity=1; } });
+  }
+  invalidate();
+}
+let pulseT=0;
+function pulse(){ if(reduceMotion) return; pulseT=performance.now(); invalidate(); }
+
+/* ───────────── Kamera ───────────── */
+const cam={t:V(0,0,0), r:34, az:0.7, pol:0.9}; let tween=null;
+let fitK=1.3;
+const sheetMQ=window.matchMedia('(max-width: 700px), (max-width: 1000px) and (orientation: portrait)');
+function fitR(r){ return r*fitK; }
+function setCam(v, instant){ const to={t:v.t.clone(), r:v.r, az:v.az!=null?v.az:cam.az, pol:v.pol!=null?v.pol:cam.pol};
+  if(instant||reduceMotion){ cam.t.copy(to.t); cam.r=to.r; cam.az=to.az; cam.pol=to.pol; tween=null; invalidate(); return; }
+  let daz=to.az-cam.az; daz=((daz+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI;
+  tween={t0:performance.now(), d:650, from:{t:cam.t.clone(), r:cam.r, az:cam.az, pol:cam.pol}, to:to, daz:daz}; invalidate(); }
+function resetView(instant){ const v=cell().view; setCam({t:v.t, r:fitR(v.r), az:v.az, pol:v.pol}, instant); }
+function flyTo(id, wide){ const o=cell().orgs[id]; if(!o) return; setCam({t:o.anchor, r:Math.min(fitR(wide?Math.max(o.focus*1.6,17):o.focus), fitR(cell().view.r))}); }
+function updateCamera(){ const sp=Math.sin(cam.pol), cp=Math.cos(cam.pol);
+  camera.position.set(cam.t.x+cam.r*sp*Math.sin(cam.az), cam.t.y+cam.r*cp, cam.t.z+cam.r*sp*Math.cos(cam.az)); camera.lookAt(cam.t); }
+
+/* Zeigereingaben */
+const ptrs=new Map(); let moved=0, downT=0, pinch=null;
+canvas.addEventListener('pointerdown', e=>{ canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,b:e.button,sh:e.shiftKey}); if(ptrs.size===1){ moved=0; downT=performance.now(); } pinch=null; tween=null; });
+canvas.addEventListener('pointermove', e=>{ const p=ptrs.get(e.pointerId); if(!p) return; const dx=e.clientX-p.x, dy=e.clientY-p.y; p.x=e.clientX; p.y=e.clientY;
+  if(ptrs.size===1){ moved+=Math.abs(dx)+Math.abs(dy);
+    if(p.b===2||p.sh) panBy(dx,dy); else { cam.az-=dx*0.0065; cam.pol=Math.min(Math.PI-0.12, Math.max(0.12, cam.pol-dy*0.0065)); }
+    invalidate(); }
+  else if(ptrs.size===2){ const a=[...ptrs.values()], d=Math.hypot(a[0].x-a[1].x, a[0].y-a[1].y), mx=(a[0].x+a[1].x)/2, my=(a[0].y+a[1].y)/2;
+    if(pinch){ cam.r=clampR(cam.r*pinch.d/Math.max(1,d)); panBy(mx-pinch.x, my-pinch.y); }
+    pinch={d:d,x:mx,y:my}; moved=99; invalidate(); } });
+function endPtr(e){ const had=ptrs.has(e.pointerId), n=ptrs.size; ptrs.delete(e.pointerId); pinch=null;
+  if(had && n===1 && e.type==='pointerup' && moved<7 && performance.now()-downT<600) pick(e.clientX, e.clientY); }
+canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
+canvas.addEventListener('contextmenu', e=>e.preventDefault());
+canvas.addEventListener('wheel', e=>{ e.preventDefault(); tween=null; cam.r=clampR(cam.r*Math.exp(e.deltaY*0.0012)); invalidate(); }, {passive:false});
+function clampR(r){ return Math.min(fitR(70), Math.max(4.5, r)); }
+const _r=V(0,0,0), _u=V(0,0,0);
+function panBy(dx,dy){ camera.updateMatrixWorld(); _r.setFromMatrixColumn(camera.matrixWorld,0); _u.setFromMatrixColumn(camera.matrixWorld,1);
+  const k=cam.r*0.0016; cam.t.addScaledVector(_r,-dx*k).addScaledVector(_u,dy*k);
+  cam.t.x=Math.max(-12,Math.min(12,cam.t.x)); cam.t.y=Math.max(-8,Math.min(8,cam.t.y)); cam.t.z=Math.max(-12,Math.min(12,cam.t.z)); }
+
+/* Auswahl per Strahl */
+const ray=new T.Raycaster(), ndc=new T.Vector2();
+function pick(cx, cy){
+  const rc=canvas.getBoundingClientRect(); ndc.set((cx-rc.left)/rc.width*2-1, -((cy-rc.top)/rc.height*2-1));
+  ray.setFromCamera(ndc, camera);
+  const C=cell(), objs=[]; for(const id in C.orgs){ if(isVisible(id) && !isGhost(id)) C.orgs[id].meshes.forEach(m=>objs.push(m)); }
+  const hits=ray.intersectObjects(objs, false); let id=null, sawCyto=false;
+  for(const h of hits){ const o=h.object.userData.org; if(o==='cytoplasma'){ sawCyto=true; continue; }
+    if(sawCyto && SHELL[S.cell].indexOf(o)>=0){ id='cytoplasma'; break; } id=o; break; }
+  if(!id && sawCyto) id='cytoplasma';
+  if(S.mode==='pruefen'){ if(S.quiz && S.quiz.cur && S.quiz.cur.type==='find' && !S.quiz.cur.done && id) answer(id); return; }
+  if(id) select(id, false); else select(null);
+}
+
+/* ───────────── Beschriftungen ───────────── */
+const labBox=$('#labels'), svg=$('#leaders'); let labs=[];
+function buildLabels(){ labBox.innerHTML=''; svg.innerHTML=''; labs=[];
+  ORDER[S.cell].forEach(id=>{ if(!cell().orgs[id]) return; const b=document.createElement('button'); b.className='lab'; b.textContent=DEFS[id].name; b.dataset.id=id;
+    b.addEventListener('click', ()=>{ if(S.mode!=='pruefen') select(id, false); }); labBox.appendChild(b);
+    const ln=document.createElementNS('http://www.w3.org/2000/svg','line'), dot=document.createElementNS('http://www.w3.org/2000/svg','circle'); dot.setAttribute('r','3'); svg.appendChild(ln); svg.appendChild(dot);
+    labs.push({id:id, el:b, ln:ln, dot:dot, w:0}); });
+  requestAnimationFrame(()=>{ labs.forEach(l=>{ l.w=l.el.offsetWidth||80; }); invalidate(); }); }
+const _p=V(0,0,0);
+function updateLabels(){ const w=stage.clientWidth, h=stage.clientHeight, show=S.labels && S.mode!=='pruefen', placed=[];
+  const act=[];
+  labs.forEach(l=>{ let on=show && isVisible(l.id) && !(isGhost(l.id) && S.isolate);
+    if(on){ _p.copy(cell().orgs[l.id].anchor).project(camera); if(_p.z>1||_p.x<-1.05||_p.x>1.05||_p.y<-1.05||_p.y>1.05) on=false; else { l.ax=(_p.x+1)/2*w; l.ay=(1-_p.y)/2*h; } }
+    l.on=on; if(on) act.push(l); else { l.el.style.display='none'; l.ln.style.display='none'; l.dot.style.display='none'; } });
+  act.sort((a,b)=>a.ay-b.ay);
+  act.forEach(l=>{ let x=l.ax, y=l.ay-30; const hw=(l.w||80)/2; x=Math.max(hw+4, Math.min(w-hw-4, x)); y=Math.max(14,y);
+    for(let it=0, guard=0; it<placed.length && guard<60; it++){ const q=placed[it]; if(Math.abs(q.x-x)<(q.hw+hw+4) && Math.abs(q.y-y)<24.5){ y=q.y+26; it=-1; guard++; } }
+    placed.push({x:x,y:y,hw:hw});
+    l.el.style.display=''; l.el.style.transform='translate('+Math.round(x)+'px,'+Math.round(y)+'px) translate(-50%,-50%)';
+    l.el.classList.toggle('on', l.id===S.sel);
+    l.ln.style.display=''; l.dot.style.display=''; l.ln.setAttribute('x1',l.ax); l.ln.setAttribute('y1',l.ay); l.ln.setAttribute('x2',x); l.ln.setAttribute('y2',y);
+    l.dot.setAttribute('cx',l.ax); l.dot.setAttribute('cy',l.ay); });
+}
+
+/* ───────────── Oberfläche ───────────── */
+const EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYEOFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.3 6.6A17 17 0 0 0 2 12s3.6 7 10 7a9.6 9.6 0 0 0 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+function renderList(){ const box=$('#rows'); box.innerHTML='';
+  activeIds().forEach(id=>{ const d=DEFS[id], off=S.hidden[S.cell].has(id), row=document.createElement('div'); row.className='row'+(S.sel===id?' sel':'')+(off?' off':'');
+    const seen=(S.mode==='lernen' && S.seen[S.cell].has(id))?'<span class="seen" aria-label="angesehen">✓</span>':'';
+    row.innerHTML='<button class="pick"><span class="sw" style="background:'+d.color+'"></span><span>'+d.name+'</span>'+seen+'</button>'+
+      '<button class="eye" aria-label="'+d.name+(off?' einblenden':' ausblenden')+'" title="'+(off?'Einblenden':'Ausblenden')+'">'+(off?EYEOFF:EYE)+'</button>';
+    row.querySelector('.pick').addEventListener('click', ()=>{ if(off){ S.hidden[S.cell].delete(id); } select(id, true); if(window.innerWidth<=980) toggleList(false); });
+    row.querySelector('.eye').addEventListener('click', ()=>{ toggleHidden(id); });
+    box.appendChild(row); });
+}
+function toggleHidden(id){ const h=S.hidden[S.cell]; if(h.has(id)) h.delete(id); else { h.add(id); if(S.sel===id){ S.sel=null; S.isolate=false; } } applyVisuals(); renderList(); renderPanel(); }
+function toggleList(on){ const v=on!=null?on:!document.body.classList.contains('list-open'); document.body.classList.toggle('list-open', v); $('#listToggle').setAttribute('aria-pressed', v); }
+
+function select(id, fly){
+  if(id && !isVisible(id)) return;
+  if(S.sel!==id) S.isolate=false;
+  S.sel=id; S.mark=null;
+  if(id && S.mode==='lernen') S.seen[S.cell].add(id);
+  applyVisuals(); if(id){ pulse(); if(fly) flyTo(id); }
+  renderList(); renderPanel();
+}
+
+function actsHTML(id){ const g=S.ghost[S.cell].has(id);
+  return '<div class="acts">'+
+    '<button class="btn" data-act="fokus">Heranzoomen</button>'+
+    '<button class="btn" data-act="iso" aria-pressed="'+S.isolate+'">Hervorheben</button>'+
+    '<button class="btn" data-act="ghost" aria-pressed="'+g+'">Durchsichtig</button>'+
+    '<button class="btn" data-act="hide">Ausblenden</button></div>'; }
+
+function renderPanel(){ const el=$('#panel'), id=S.sel, d=id?DEFS[id]:null; let h='';
+  if(S.mode==='pruefen'){ renderQuiz(); return; }
+  if(S.mode==='entdecken'){
+    if(!d){ h='<h2>'+(S.cell==='tier'?'Tierzelle':'Pflanzenzelle')+' erkunden</h2><p>Tippe im Modell oder in der Liste auf eine Struktur, um mehr über sie zu erfahren.</p>'+
+      '<ul class="keys"><li><b>Drehen</b><span>ziehen</span></li><li><b>Zoomen</b><span>Mausrad oder zwei Finger</span></li><li><b>Verschieben</b><span>rechte Maustaste oder zwei Finger ziehen</span></li></ul>'; }
+    else { h='<button class="x" aria-label="Infofenster schließen">×</button><h2>'+d.name+'</h2><span class="where">'+WHERE[d.cells]+'</span><p>'+d.kurz+'</p>'+actsHTML(id)+
+      '<div class="nav"><span></span><button class="btn primary" data-act="mehr">Bau und Funktion ansehen</button></div>'; }
+  } else {
+    const ids=activeIds(), seen=ids.filter(i=>S.seen[S.cell].has(i)).length, pct=Math.round(seen/ids.length*100);
+    const head='<p class="small">'+seen+' von '+ids.length+' Strukturen angesehen</p><div class="prog"><i style="width:'+pct+'%"></i></div>';
+    if(!d){ h='<h2>Bau und Funktion lernen</h2>'+head+'<p>Gehe die Strukturen der Reihe nach durch oder tippe eine im Modell an. Zu jeder erfährst du, wie sie gebaut ist und welche Aufgabe sie hat.</p>'+
+      '<div class="nav"><span></span><button class="btn primary" data-act="start">'+(seen?'Weitermachen':'Tour starten')+'</button></div>'; }
+    else { const i=ids.indexOf(id);
+      h='<button class="x" aria-label="Infofenster schließen">×</button>'+head+'<h2>'+d.name+'</h2><span class="where">'+WHERE[d.cells]+'</span>'+
+        '<p>'+d.kurz+'</p><h3>Bau</h3><p>'+d.bau+'</p><h3>Funktion</h3><p>'+d.funktion+'</p><p class="merke">'+d.merke+'</p>'+actsHTML(id)+
+        '<div class="nav"><button class="btn" data-act="prev"'+(i<=0?' disabled':'')+'>Zurück</button>'+
+        (i<ids.length-1?'<button class="btn primary" data-act="next">Nächste Struktur</button>':'<button class="btn primary" data-act="quiz">Wissen überprüfen</button>')+'</div>'; }
+  }
+  el.innerHTML=h; el.scrollTop=0;
+}
+$('#panel').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return;
+  if(b.classList.contains('x')){ select(null); return; }
+  const a=b.dataset.act, id=S.sel, ids=activeIds(); if(!a) return;
+  if(a==='fokus') flyTo(id);
+  else if(a==='iso'){ S.isolate=!S.isolate; applyVisuals(); renderPanel(); }
+  else if(a==='ghost'){ const g=S.ghost[S.cell]; if(g.has(id)) g.delete(id); else g.add(id); applyVisuals(); renderPanel(); }
+  else if(a==='hide') toggleHidden(id);
+  else if(a==='mehr'){ setMode('lernen', true); }
+  else if(a==='start'){ const next=ids.find(i=>!S.seen[S.cell].has(i))||ids[0]; select(next, true); }
+  else if(a==='prev'){ select(ids[ids.indexOf(id)-1], true); }
+  else if(a==='next'){ select(ids[ids.indexOf(id)+1], true); }
+  else if(a==='quiz'){ setMode('pruefen'); }
+  else if(a==='qstart'){ startQuiz(); }
+  else if(a==='qnext'){ nextQ(); }
+  else if(a==='qlearn'){ const t=b.dataset.id; setMode('lernen', true); select(t, true); }
+  else if(a==='opt'){ answer(b.dataset.v); }
+});
+
+/* ───────────── Überprüfen ───────────── */
+function shuffle(a, r){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function startQuiz(){ const r=Math.random, ids=shuffle(activeIds().slice(), r), types=shuffle(['find','name','funktion','vorkommen'], r), qs=[];
+  const n=Math.min(10, ids.length*2);
+  for(let i=0;i<n;i++){ const id=ids[i%ids.length], type=types[i%4], q={id:id, type:type, done:false};
+    if(type==='name'||type==='funktion'){ const others=shuffle(ids.filter(x=>x!==id), r).slice(0,3); q.opts=shuffle([id].concat(others), r).map(x=>({v:x, t:DEFS[x].name})); }
+    if(type==='vorkommen'){ q.opts=[{v:'tier',t:'Nur in Tierzellen'},{v:'pflanze',t:'Nur in Pflanzenzellen'},{v:'beide',t:'In beiden'}]; }
+    qs.push(q); }
+  S.quiz={qs:qs, i:-1, score:0, miss:[], cur:null}; S.hidden[S.cell].clear(); S.ghost[S.cell].clear(); nextQ(); }
+function nextQ(){ const Q=S.quiz; Q.i++; S.sel=null; S.isolate=false; S.mark=null;
+  if(Q.i>=Q.qs.length){ Q.cur=null; Q.finished=true; applyVisuals(); resetView(); renderQuiz(); return; }
+  Q.cur=Q.qs[Q.i];
+  if(Q.cur.type==='name'){ S.mark=Q.cur.id; applyVisuals(); pulse(); flyTo(Q.cur.id, true); } else { applyVisuals(); if(Q.cur.type==='find') resetView(); }
+  renderQuiz(); }
+function answer(v){ const Q=S.quiz, q=Q.cur; if(!q||q.done) return; q.done=true; q.given=v;
+  const right=(q.type==='vorkommen')?DEFS[q.id].cells:q.id; q.ok=(v===right);
+  if(q.ok) Q.score++; else if(Q.miss.indexOf(q.id)<0) Q.miss.push(q.id);
+  S.mark=q.id; applyVisuals(); pulse(); if(!q.ok || q.type!=='find') flyTo(q.id, true); renderQuiz(); }
+function renderQuiz(){ const el=$('#panel'), Q=S.quiz; let h='';
+  if(!Q){ h='<h2>Wissen überprüfen</h2><p>Bis zu zehn Aufgaben zur '+(S.cell==='tier'?'Tierzelle':'Pflanzenzelle')+': Strukturen im Modell finden, benennen, ihrer Funktion zuordnen und entscheiden, in welchen Zellen sie vorkommen.</p>'+
+      '<p class="small" style="margin-top:8px">Die Beschriftungen sind während der Aufgaben ausgeblendet.</p><div class="nav"><span></span><button class="btn primary" data-act="qstart">Aufgaben starten</button></div>'; }
+  else if(Q.finished){ const n=Q.qs.length, p=Q.score/n;
+    h='<h2>Ergebnis</h2><p class="score">'+Q.score+' von '+n+'</p><p>'+(p===1?'Alles richtig – du kennst die Zelle sehr gut.':p>=0.7?'Gut gemacht. Ein paar Strukturen lohnen einen zweiten Blick.':'Da ist noch Luft nach oben. Schau dir die Strukturen im Lernmodus noch einmal an.')+'</p>';
+    if(Q.miss.length){ h+='<h3>Noch einmal ansehen</h3><div class="acts">'+Q.miss.map(id=>'<button class="btn" data-act="qlearn" data-id="'+id+'">'+DEFS[id].name+'</button>').join('')+'</div>'; }
+    h+='<div class="nav"><span></span><button class="btn primary" data-act="qstart">Neue Aufgaben</button></div>'; }
+  else { const q=Q.cur, d=DEFS[q.id], n=Q.qs.length;
+    h='<p class="small">Aufgabe '+(Q.i+1)+' von '+n+'</p><div class="prog"><i style="width:'+Math.round(Q.i/n*100)+'%"></i></div>';
+    if(q.type==='find') h+='<p class="task">Tippe im Modell auf '+d.find+'.</p>'+(q.done?'':'<p class="small" style="margin-top:6px">Du kannst das Modell drehen und zoomen.</p>');
+    if(q.type==='name') h+='<p class="task">Wie heißt die leuchtend markierte Struktur?</p>';
+    if(q.type==='funktion') h+='<p class="small">Welche Struktur ist gemeint?</p><p class="task">'+d.quiz+'</p>';
+    if(q.type==='vorkommen') h+='<p class="task">Wo kommt diese Struktur vor: '+d.name+'?</p>';
+    if(q.opts){ const right=(q.type==='vorkommen')?d.cells:q.id;
+      h+='<div class="opts">'+q.opts.map(o=>{ let c=''; if(q.done){ if(o.v===right) c=' right'; else if(o.v===q.given) c=' wrong'; }
+        return '<button class="opt'+c+'" data-act="opt" data-v="'+o.v+'"'+(q.done?' disabled':'')+'>'+o.t+'</button>'; }).join('')+'</div>'; }
+    if(q.done){ let extra=d.kurz; if(q.type==='find' && !q.ok && DEFS[q.given]) extra='Du hast '+DEFS[q.given].name+' angetippt. Die gesuchte Struktur leuchtet jetzt im Modell.';
+      if(q.type==='vorkommen') extra=WHERE[d.cells]+'. '+d.merke;
+      h+='<div class="fb '+(q.ok?'ok':'no')+'"><strong>'+(q.ok?'Richtig':'Nicht richtig')+'</strong>'+extra+'</div>'+
+         '<div class="nav"><span></span><button class="btn primary" data-act="qnext">'+(Q.i<n-1?'Nächste Aufgabe':'Ergebnis ansehen')+'</button></div>'; }
+  }
+  el.innerHTML=h; el.scrollTop=0; }
+
+/* ───────────── Umschalten ───────────── */
+function setMode(m, keepSel){ S.mode=m; S.mark=null; S.quiz=null; if(!keepSel||m==='pruefen'){ S.sel=null; S.isolate=false; }
+  if(S.sel && m==='lernen') S.seen[S.cell].add(S.sel);
+  document.body.classList.toggle('quiz', m==='pruefen'); if(m==='pruefen') toggleList(false); resize();
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.mode===m));
+  $('#tShowAll').style.display=(m==='pruefen')?'none':''; $('#tLabels').style.display=(m==='pruefen')?'none':'';
+  applyVisuals(); renderList(); renderPanel(); }
+function setCell(k){ if(CELLS[S.cell]) CELLS[S.cell].root.visible=false; S.cell=k; ensureCell(k).root.visible=true;
+  S.sel=null; S.isolate=false; S.mark=null; S.quiz=null;
+  document.querySelectorAll('[data-cell]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.cell===k));
+  buildLabels(); applyVisuals(); renderList(); renderPanel(); resetView(true); }
+function setLevel(l){ S.level=l; if(S.sel && DEFS[S.sel].level>l){ S.sel=null; S.isolate=false; } S.quiz=null; S.mark=null;
+  document.querySelectorAll('[data-level]').forEach(b=>b.setAttribute('aria-pressed', +b.dataset.level===l));
+  applyVisuals(); renderList(); renderPanel(); }
+
+document.querySelectorAll('[data-cell]').forEach(b=>b.addEventListener('click', ()=>{ if(S.cell!==b.dataset.cell) setCell(b.dataset.cell); }));
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click', ()=>setMode(b.dataset.mode, true)));
+document.querySelectorAll('[data-level]').forEach(b=>b.addEventListener('click', ()=>setLevel(+b.dataset.level)));
+$('#listToggle').addEventListener('click', ()=>toggleList());
+$('#tLabels').addEventListener('click', e=>{ S.labels=!S.labels; e.currentTarget.setAttribute('aria-pressed', S.labels); invalidate(); });
+$('#tShell').addEventListener('click', e=>{ S.shellGhost=!S.shellGhost; e.currentTarget.setAttribute('aria-pressed', S.shellGhost); applyVisuals(); });
+$('#tShowAll').addEventListener('click', ()=>{ S.hidden[S.cell].clear(); S.ghost[S.cell].clear(); S.isolate=false; applyVisuals(); renderList(); renderPanel(); });
+$('#tReset').addEventListener('click', ()=>resetView());
+
+/* ───────────── Schleife ───────────── */
+function resize(){ const w=stage.clientWidth, h=stage.clientHeight; if(!w||!h) return; renderer.setSize(w, h, false); camera.aspect=w/h;
+  // freie Fläche zwischen den Fenstern bestimmen und das Modell dorthin rücken
+  let l=0, r=0, b=0; const listOn=getComputedStyle($('#list')).display!=='none';
+  if(!sheetMQ.matches){ b=56; r=$('#panel').offsetWidth+24; if(listOn && w>980) l=$('#list').offsetWidth+24; } else { b=h*0.36; }
+  fitK=Math.max(1, h/Math.max(1,h-b), 1.35*h/Math.max(1,w-l-r));
+  camera.setViewOffset(w, h, Math.round((r-l)/2), Math.round(b/2), w, h); camera.updateProjectionMatrix(); invalidate(); }
+window.addEventListener('resize', resize);
+if(window.ResizeObserver) new ResizeObserver(resize).observe(stage);
+function frame(now){ requestAnimationFrame(frame);
+  if(tween){ const k=Math.min(1,(now-tween.t0)/tween.d), e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2, f=tween.from, t=tween.to;
+    cam.t.lerpVectors(f.t,t.t,e); cam.r=f.r+(t.r-f.r)*e; cam.az=f.az+tween.daz*e; cam.pol=f.pol+(t.pol-f.pol)*e; if(k>=1) tween=null; dirty=true; }
+  if(pulseT){ const k=(now-pulseT)/700, hot=S.mark||S.sel, o=hot&&cell().orgs[hot];
+    if(k>=1||!o){ pulseT=0; if(o) o.list.forEach(m=>{ m.emissiveIntensity=0.42; }); } else { const v=0.42+0.75*Math.sin(Math.PI*k); o.list.forEach(m=>{ m.emissiveIntensity=v; }); }
+    dirty=true; }
+  if(!dirty) return; dirty=false;
+  updateCamera(); renderer.render(scene, camera); camera.updateMatrixWorld(); updateLabels(); }
+
+ensureCell('tier'); resize(); setCell('tier'); requestAnimationFrame(frame);
+window.__zelle={S:S, cam:cam, cell:cell, info:renderer.info};
+})();
+</script>
+</body>
+</html>

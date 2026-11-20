@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lebensmittel sortieren</title>
+<style>
+:root{
+  --bg:#f6f4ef; --panel:#ffffff; --ink:#2b2a26; --muted:#6f6b62; --line:#e3ded3;
+  --accent:#4f7a5a; --accent-ink:#ffffff; --accent-soft:#e6efe7; --warn:#b5652f; --danger:#a8423a;
+  --radius:14px; --shadow:0 1px 2px rgba(40,35,25,.06),0 4px 14px rgba(40,35,25,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overscroll-behavior-x:none}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.4}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* ---------- Kopfzeile ---------- */
+header.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.brand{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px;margin-right:8px}
+.brand .dot{width:26px;height:26px;border-radius:8px;background:var(--accent);display:inline-grid;place-items:center;color:#fff;font-size:15px}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap}
+nav.tabs a{padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--muted);font-weight:600;min-height:44px;display:flex;align-items:center}
+nav.tabs a.active{background:var(--accent-soft);color:var(--accent)}
+.spacer{flex:1}
+.group-name{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:14px}
+.group-name input{border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:170px;background:#fff}
+
+/* ---------- Buttons ---------- */
+.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;min-height:44px;font-weight:600;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn:hover{border-color:#cfc8b8}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.danger{color:var(--danger)}
+.btn.small{min-height:36px;padding:6px 10px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:default}
+.iconbtn{width:40px;height:40px;border-radius:10px;border:1px solid transparent;background:transparent;display:inline-grid;place-items:center;color:var(--muted);font-size:18px}
+.iconbtn:hover{background:#f1eee7;color:var(--ink)}
+
+/* ---------- Sortieransicht ---------- */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);background:#fbfaf6}
+.toolbar .hint{color:var(--muted);font-size:14px}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:20px;padding:6px 12px;border-radius:10px;background:#fff3e6;color:var(--warn);border:1px solid #f0d6bb}
+.sortwrap{display:grid;grid-template-columns:330px 1fr;height:calc(100vh - 130px);min-height:520px}
+.pool{border-right:1px solid var(--line);background:#efece4;overflow:auto;padding:12px;display:flex;flex-direction:column}
+.pool h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:2px 4px 10px;display:flex;justify-content:space-between}
+.pool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;align-content:start;flex:1 0 auto;min-height:120px;border-radius:12px;padding:2px}
+.board{overflow:auto;padding:14px}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;align-items:start}
+.cat{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);border-top:6px solid var(--c);display:flex;flex-direction:column;min-height:190px}
+.cat-head{display:flex;align-items:center;gap:6px;padding:8px 8px 4px 8px}
+.cdot{width:30px;height:30px;border-radius:50%;background:var(--c);border:3px solid #fff;box-shadow:0 0 0 1px var(--line);flex:none}
+.cat-name{flex:1;min-width:0;border:1px solid transparent;border-radius:8px;padding:6px 8px;font-weight:700;font-size:17px;background:transparent}
+.cat-name:hover{border-color:var(--line)}
+.cat-name:focus{border-color:var(--c);outline:none;background:#fff}
+.count{min-width:30px;height:26px;border-radius:13px;background:color-mix(in srgb,var(--c) 18%,#fff);color:#333;font-weight:700;font-size:14px;display:inline-grid;place-items:center;padding:0 8px}
+.reason{margin:0 10px 6px;width:calc(100% - 20px);border:1px dashed var(--line);border-radius:10px;padding:8px;resize:vertical;min-height:44px;font-size:14px;background:#fcfbf8}
+.reason.missing{border-color:#e0b48f;background:#fff8f1}
+.cat-body{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;padding:8px 10px 12px;align-content:start;min-height:110px;border-radius:0 0 var(--radius) var(--radius)}
+.cat-body:empty::before{content:"Lebensmittel hierher ziehen";color:#b0a998;font-size:14px;grid-column:1/-1;text-align:center;padding:30px 0;border:2px dashed var(--line);border-radius:10px}
+.newcat{min-height:190px;border:2px dashed #cfc7b5;border-radius:var(--radius);display:grid;place-items:center;color:var(--muted);font-weight:700;background:transparent;font-size:17px}
+.newcat:hover{background:#fff;border-color:var(--accent);color:var(--accent)}
+.drop-hover{outline:3px solid var(--accent);outline-offset:2px;background:var(--accent-soft)!important}
+
+/* Lebensmittelkarte */
+.fcard{position:relative;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.08);border:2px solid transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;touch-action:manipulation;display:flex;flex-direction:column;overflow:hidden}
+.fcard .pic{aspect-ratio:1/1;display:grid;place-items:center;background:#fbfaf7}
+.fcard .pic img,.fcard .pic svg{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.fcard .nm{font-size:13px;font-weight:600;padding:4px 6px 6px;text-align:center;line-height:1.15;min-height:2.4em;display:flex;align-items:center;justify-content:center;word-break:break-word;hyphens:auto}
+.fcard .info{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.92);font-weight:700;font-size:14px;color:var(--muted);display:grid;place-items:center;font-family:Georgia,serif;font-style:italic}
+.fcard.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.fcard.newbadge::after{content:"neu";position:absolute;top:4px;left:4px;background:var(--warn);color:#fff;font-size:11px;font-weight:700;padding:2px 6px;border-radius:8px}
+.fcard.dragging{opacity:.3}
+.ghost{position:fixed;z-index:1000;pointer-events:none;width:96px;transform:translate(-50%,-60%) rotate(-3deg);box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:.95}
+.locked .fcard{cursor:not-allowed}
+
+/* ---------- Allgemeine Seiten ---------- */
+.page{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+.page h1{font-size:24px;margin:4px 0 4px}
+.page .sub{color:var(--muted);margin:0 0 18px}
+.panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.panel h2{font-size:18px;margin:0 0 10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label.field{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted);font-weight:600}
+label.field input,label.field select,label.field textarea{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink);font-weight:400;min-height:44px}
+label.check{display:flex;gap:10px;align-items:center;min-height:44px;font-weight:600}
+label.check input{width:22px;height:22px;accent-color:var(--accent)}
+textarea{width:100%}
+.q{margin-bottom:16px}
+.q label{font-weight:700;display:block;margin-bottom:6px}
+.q textarea{border:1px solid var(--line);border-radius:10px;padding:10px;min-height:80px;background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#f3f1ea;border-radius:20px;padding:4px 10px 4px 4px;font-size:14px}
+.chip .mini{width:28px;height:28px;border-radius:50%;overflow:hidden;background:#fff;display:grid;place-items:center}
+.chip .mini img,.chip .mini svg{width:100%;height:100%;object-fit:contain}
+.sumcat{border-left:6px solid var(--c);padding:8px 12px;margin-bottom:10px;background:#fcfbf8;border-radius:8px}
+.sumcat h3{margin:0 0 6px;font-size:16px}
+.sumcat .why{color:var(--muted);font-size:14px;margin:4px 0 8px;font-style:italic}
+.warnbox{background:#fff6ec;border:1px solid #f0d6bb;color:#7a4a22;padding:10px 12px;border-radius:10px;font-size:14px}
+.infobox{background:var(--accent-soft);border:1px solid #cfe0d1;color:#2f5138;padding:10px 12px;border-radius:10px;font-size:14px}
+
+/* Vergleich */
+.cmpgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.t th{color:var(--muted);font-weight:600}
+.tag{display:inline-block;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700}
+.tag.diff{background:#fde9dc;color:#8b4a1e}
+.tag.same{background:#e6efe7;color:#2f5138}
+.tag.c{color:#fff}
+
+/* Lehrkraft */
+.subtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.subtabs button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;font-weight:600;min-height:44px}
+.subtabs button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.pitem{display:grid;grid-template-columns:70px 1fr;gap:10px;background:#fff;border-radius:12px;padding:8px;border:1px solid var(--line);align-items:center}
+.pitem.out{opacity:.55}
+.pitem .th{width:70px;height:70px;border-radius:8px;background:#fbfaf7;overflow:hidden;display:grid;place-items:center}
+.pitem .th img,.pitem .th svg{width:100%;height:100%;object-fit:contain}
+.pitem .nm{font-weight:700;margin-bottom:2px}
+.pitem .meta{font-size:12px;color:var(--muted);margin-bottom:4px}
+.pitem .acts{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.pitem label.mini{display:flex;align-items:center;gap:4px;font-size:13px;min-height:36px;padding:0 4px}
+.pitem label.mini input{width:20px;height:20px;accent-color:var(--accent)}
+.upload-zone{border:2px dashed #cfc7b5;border-radius:12px;padding:16px;text-align:center;color:var(--muted);background:#fcfbf8}
+.upload-zone.drag{border-color:var(--accent);background:var(--accent-soft)}
+
+/* Modal */
+.modal-back{position:fixed;inset:0;background:rgba(30,28,22,.45);z-index:500;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:18px;max-width:720px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+.modal header h2{margin:0;font-size:19px;flex:1}
+.modal .mbody{padding:16px}
+.modal footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--line);position:sticky;bottom:0;background:#fff;flex-wrap:wrap}
+.detail{display:grid;grid-template-columns:220px 1fr;gap:18px}
+.detail .big{width:220px;height:220px;background:#fbfaf7;border-radius:14px;display:grid;place-items:center;overflow:hidden}
+.detail .big img,.detail .big svg{width:100%;height:100%;object-fit:contain}
+.nutr td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.na{color:#a19a8b;font-style:italic}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:40px;height:40px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.swatch.on{box-shadow:0 0 0 3px var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;z-index:900;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:90vw}
+.banner{background:#fff6ec;border-bottom:1px solid #f0d6bb;color:#7a4a22;padding:8px 16px;font-size:14px}
+
+/* Responsiv: Tablet hochkant & schmal */
+@media (max-width: 900px){
+  .sortwrap{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto}
+  .pool{border-right:0;border-bottom:1px solid var(--line);max-height:none}
+  .pool-grid{display:flex;overflow-x:auto;gap:10px;padding-bottom:8px;min-height:150px}
+  .pool-grid .fcard{width:100px;flex:none}
+  .board{overflow:visible}
+  .detail{grid-template-columns:1fr}
+  .detail .big{width:100%;height:220px}
+  .cmpgrid,.grid2{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+}
+@media print{
+  header.top,.toolbar,.noprint{display:none!important}
+}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" aria-label="Zurück"><style>.lernangebot-leiste{all:initial!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;width:100%!important;min-height:44px!important;padding:0 8px!important;background:#eef2f7!important;border-bottom:1px solid rgba(10,45,83,.1)!important;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI Variable Text","Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:-.01em!important}.lernangebot-leiste a{all:initial!important;display:inline-flex!important;align-items:center!important;gap:2px!important;box-sizing:border-box!important;min-height:36px!important;padding:0 12px 0 6px!important;border-radius:999px!important;color:#0f6f8f!important;font:inherit!important;cursor:pointer!important}.lernangebot-leiste a:hover{background:rgba(10,45,83,.07)!important}.lernangebot-leiste a:focus-visible{outline:3px solid #0f7f6c!important;outline-offset:2px!important}.lernangebot-leiste svg{display:block!important;width:20px!important;height:20px!important;flex:none!important}@media (prefers-color-scheme:dark){.lernangebot-leiste{background:#061a33!important;border-bottom-color:rgba(255,255,255,.1)!important}.lernangebot-leiste a{color:#6fd3bf!important}.lernangebot-leiste a:hover{background:rgba(255,255,255,.08)!important}.lernangebot-leiste a:focus-visible{outline-color:#6fd3bf!important}}@media print{.lernangebot-leiste{display:none!important}}</style><a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>Lernangebote</a></nav>
+<div id="banner" class="banner hidden"></div>
+<header class="top">
+  <div class="brand"><span class="dot">●</span><span id="appTitle">Lebensmittel sortieren</span></div>
+  <nav class="tabs" id="tabs">
+    <a href="#sortieren" data-view="sortieren">Sortieren</a>
+    <a href="#vergleich" data-view="vergleich" id="tabCompare">Vergleichen</a>
+    <a href="#reflexion" data-view="reflexion">Reflexion</a>
+    <a href="#lehrkraft" data-view="lehrkraft">Lehrkraft</a>
+  </nav>
+  <div class="spacer"></div>
+  <label class="group-name">Gruppe <input id="groupInput" placeholder="Name der Gruppe" maxlength="40"></label>
+</header>
+<main id="view"></main>
+<div id="modalRoot"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   1) PRODUKTDATEN (Standardbestand)
+   - Keine Markennamen, keine erfundenen Nährwerte.
+   - Nährwerte: alle leer (null) -> "keine verifizierte Angabe".
+     Die Lehrkraft überträgt sie von der echten Verpackung (Quelle angeben).
+   - Zutaten nur bei Monoprodukten (eine Zutat), sonst leer.
+   - NOVA = typische Einordnung, produktabhängig; null = nicht eingeordnet.
+   ===================================================================== */
+const DEFAULT_PRODUCTS = [
+  {id:"milch",        name:"Milch",               unit:"ml", nova:1, ingredients:"Milch (Monoprodukt)",          art:{t:"carton", c:"#3f7cc4", l:"MILCH"}},
+  {id:"fruchtjoghurt",name:"Fruchtjoghurt",       unit:"g",  nova:4, ingredients:"", art:{t:"cup",    c:"#d9667a", l:"Erdbeer"}},
+  {id:"naturjoghurt", name:"Naturjoghurt",        unit:"g",  nova:1, ingredients:"", art:{t:"cup",    c:"#7aa3c9", l:"Natur"}},
+  {id:"gouda",        name:"Gouda",               unit:"g",  nova:3, ingredients:"", art:{t:"cheese", c:"#e8bf3c", l:"Gouda"}},
+  {id:"butter",       name:"Butter",              unit:"g",  nova:2, ingredients:"", art:{t:"block",  c:"#e9c94f", l:"Butter"}},
+  {id:"olivenoel",    name:"Olivenöl",            unit:"ml", nova:2, ingredients:"Olivenöl (Monoprodukt)", art:{t:"bottle", c:"#6d8a2e", l:"Olivenöl", liq:"#a8b23a"}},
+  {id:"cornflakes",   name:"Cornflakes",          unit:"g",  nova:4, ingredients:"", art:{t:"box",    c:"#d9532b", l:"Corn Flakes"}},
+  {id:"haferflocken", name:"Haferflocken",        unit:"g",  nova:1, ingredients:"Haferflocken (Monoprodukt)", art:{t:"bag", c:"#c9a46a", l:"Hafer-flocken"}},
+  {id:"vollkornbrot", name:"Vollkornbrot",        unit:"g",  nova:null, ingredients:"", art:{t:"bread", c:"#7a5233", l:"Vollkorn"}},
+  {id:"toastbrot",    name:"Weißbrot (Toast)",    unit:"g",  nova:4, ingredients:"", art:{t:"toast",  c:"#e7c38b", l:"Toast"}},
+  {id:"nudeln",       name:"Nudeln",              unit:"g",  nova:1, ingredients:"", art:{t:"bag",    c:"#2f6db0", l:"Nudeln", win:"pasta"}},
+  {id:"reis",         name:"Reis",                unit:"g",  nova:1, ingredients:"Reis (Monoprodukt)", art:{t:"bag", c:"#d8d2c2", l:"Reis", win:"rice", dark:true}},
+  {id:"kidneybohnen", name:"Kidneybohnen (Dose)", unit:"g",  nova:3, ingredients:"", art:{t:"can",    c:"#9b2f2f", l:"Kidney-bohnen"}},
+  {id:"kichererbsen", name:"Kichererbsen (Dose)", unit:"g",  nova:3, ingredients:"", art:{t:"can",    c:"#c79a42", l:"Kicher-erbsen"}},
+  {id:"apfelsaft",    name:"Apfelsaft",           unit:"ml", nova:1, ingredients:"", art:{t:"carton", c:"#e2a127", l:"Apfelsaft"}},
+  {id:"cola",         name:"Cola",                unit:"ml", nova:4, ingredients:"", art:{t:"bottle", c:"#b3262b", l:"Cola", liq:"#3b2116"}},
+  {id:"wasser",       name:"Mineralwasser",       unit:"ml", nova:1, ingredients:"", art:{t:"bottle", c:"#4aa3c9", l:"Wasser", liq:"#d5ecf6"}},
+  {id:"apfelmus",     name:"Apfelmus",            unit:"g",  nova:3, ingredients:"", art:{t:"jar",    c:"#e6cf86", l:"Apfelmus", lid:"#c0392b"}},
+  {id:"schokolade",   name:"Vollmilchschokolade", unit:"g",  nova:4, ingredients:"", art:{t:"bar",    c:"#6b3b8f", l:"Schokolade"}},
+  {id:"chips",        name:"Kartoffelchips",      unit:"g",  nova:null, ingredients:"", art:{t:"chips", c:"#e8b520", l:"Chips"}},
+  {id:"tkpizza",      name:"Tiefkühlpizza",       unit:"g",  nova:4, ingredients:"", art:{t:"pizza",  c:"#2c5e8f", l:"Pizza"}},
+  {id:"fischstaebchen",name:"Fischstäbchen",      unit:"g",  nova:4, ingredients:"", art:{t:"fishbox",c:"#1f6fa8", l:"Fisch-stäbchen"}},
+  {id:"salami",       name:"Salami",              unit:"g",  nova:null, ingredients:"", art:{t:"salami", c:"#9c3b37", l:"Salami"}},
+  {id:"apfel",        name:"Apfel",               unit:"g",  nova:1, ingredients:"Apfel (Monoprodukt)", art:{t:"apple", c:"#c8382c"}},
+  {id:"banane",       name:"Banane",              unit:"g",  nova:1, ingredients:"Banane (Monoprodukt)", art:{t:"banana", c:"#f1cc33"}},
+  {id:"karotten",     name:"Karotten",            unit:"g",  nova:1, ingredients:"Karotten (Monoprodukt)", art:{t:"carrot", c:"#e7782a"}},
+  {id:"erbsen",       name:"Erbsen (tiefgekühlt)",unit:"g",  nova:1, ingredients:"Erbsen (Monoprodukt)", art:{t:"frozenbag", c:"#3f9a4a", l:"Erbsen"}},
+  {id:"tomaten",      name:"Tomaten (Konserve)",  unit:"g",  nova:null, ingredients:"", art:{t:"can",  c:"#c8352b", l:"Tomaten", tomato:true}},
+  {id:"muesliriegel", name:"Müsliriegel",         unit:"g",  nova:4, ingredients:"", art:{t:"bar",    c:"#3f8a5c", l:"Müsliriegel"}},
+  {id:"fruchtgummi",  name:"Fruchtgummis",        unit:"g",  nova:4, ingredients:"", art:{t:"gummybag", c:"#e0447a", l:"Frucht-gummis"}},
+  {id:"quark",        name:"Magerquark",          unit:"g",  nova:1, ingredients:"", art:{t:"tub",    c:"#5d93b8", l:"Quark"}},
+  {id:"haehnchen",    name:"Hähnchenbrustfilet",  unit:"g",  nova:1, ingredients:"Hähnchenbrustfilet (Monoprodukt)", art:{t:"tray", c:"#e8b9a0", l:"Hähnchen"}},
+  /* Modus C: kommen später dazu */
+  {id:"eier",         name:"Eier",                unit:"g",  nova:1, ingredients:"Eier (Monoprodukt)", late:true, art:{t:"eggs", c:"#c9b79a"}},
+  {id:"erdnuesse",    name:"Erdnüsse (geröstet, gesalzen)", unit:"g", nova:3, ingredients:"", late:true, art:{t:"can", c:"#c2662d", l:"Erdnüsse", nuts:true}},
+  {id:"lachs",        name:"Lachsfilet",          unit:"g",  nova:1, ingredients:"Lachs (Monoprodukt)", late:true, art:{t:"tray", c:"#f08c62", l:"Lachs", fish:true}},
+  {id:"linsen",       name:"Rote Linsen (getrocknet)", unit:"g", nova:1, ingredients:"Rote Linsen (Monoprodukt)", late:true, art:{t:"bag", c:"#d0643a", l:"Linsen", win:"lentil"}},
+  {id:"kartoffeln",   name:"Kartoffeln",          unit:"g",  nova:1, ingredients:"Kartoffeln (Monoprodukt)", late:true, art:{t:"potato", c:"#c99a58"}}
+];
+const NUTR_FIELDS = [
+  ["kj","Energie","kJ"],["kcal","Energie","kcal"],["fat","Fett","g"],["satfat","davon gesättigte Fettsäuren","g"],
+  ["carbs","Kohlenhydrate","g"],["sugar","davon Zucker","g"],["fiber","Ballaststoffe","g"],["protein","Eiweiß","g"],["salt","Salz","g"]
+];
+const NOVA_TEXT = {
+  1:"Gruppe 1 – unverarbeitet oder minimal verarbeitet",
+  2:"Gruppe 2 – verarbeitete Küchenzutat (z. B. Öl, Butter, Zucker)",
+  3:"Gruppe 3 – verarbeitetes Lebensmittel",
+  4:"Gruppe 4 – stark verarbeitetes Lebensmittel"
+};
+const CAT_COLORS = ["#7a9e7e","#c97b5a","#d4a84b","#5b8db8","#9a7bb0","#5f8a8b","#b5838d","#8a8f5c","#6b7a8f","#c2a07a"];
+const ART_TYPES = [
+  ["carton","Getränkekarton"],["bottle","Flasche"],["cup","Becher"],["tub","Dose/Schale (Quark)"],["box","Schachtel hoch"],
+  ["pizza","Schachtel flach"],["fishbox","Tiefkühlschachtel"],["bag","Beutel mit Fenster"],["chips","Chipstüte"],["gummybag","Süßwarentüte"],
+  ["frozenbag","Tiefkühlbeutel"],["can","Konservendose"],["jar","Glas"],["bar","Riegel/Tafel"],["block","Block (Butter)"],
+  ["cheese","Käsestück"],["bread","Brotlaib"],["toast","Toastbrot"],["tray","Schale mit Folie"],["salami","Wurst"],
+  ["apple","Apfel"],["banana","Banane"],["carrot","Karotten"],["potato","Kartoffeln"],["eggs","Eierkarton"]
+];
+
+/* =====================================================================
+   2) ILLUSTRATIONEN (eigene SVG-Verpackungen, ohne Marken)
+   ===================================================================== */
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function shade(hex,amt){let c=hex.replace("#","");if(c.length===3)c=c.split("").map(x=>x+x).join("");let n=parseInt(c,16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+function lbl(text,x,y,w,size,color){
+  const parts=String(text||"").split("-");
+  const lines = parts.length>1 ? [parts[0]+"-",parts.slice(1).join("-")] : [text];
+  const fs = size || Math.min(13, Math.max(7, (w*1.55)/Math.max(...lines.map(l=>l.length))));
+  return lines.map((l,i)=>`<text x="${x}" y="${y+(i-(lines.length-1)/2)*fs*1.05}" text-anchor="middle" dominant-baseline="middle" font-family="system-ui,Arial,sans-serif" font-weight="800" font-size="${fs.toFixed(1)}" fill="${color||'#fff'}">${esc(l)}</text>`).join("");
+}
+function artSVG(a){
+  a=a||{t:"box",c:"#888",l:"?"};
+  const c=a.c||"#888", d=shade(c,-40), L=shade(c,40), l=a.l||"";
+  let s="";
+  const shadow=`<ellipse cx="60" cy="112" rx="34" ry="5" fill="#000" opacity=".10"/>`;
+  switch(a.t){
+  case "carton":
+    s=`${shadow}<polygon points="32,34 60,14 88,34" fill="${L}"/><rect x="56" y="8" width="8" height="8" rx="2" fill="${d}"/><polygon points="88,34 98,28 98,104 88,110" fill="${d}"/><rect x="32" y="34" width="56" height="76" fill="${c}"/><rect x="36" y="56" width="48" height="30" rx="4" fill="#fff"/>${lbl(l,60,71,46,null,c)}<rect x="32" y="96" width="56" height="14" fill="${d}" opacity=".35"/>`;break;
+  case "bottle":
+    s=`${shadow}<rect x="52" y="8" width="16" height="10" rx="3" fill="${d}"/><path d="M54 18h12v10c0 6 14 10 14 22v54c0 4-3 6-6 6H46c-3 0-6-2-6-6V50c0-12 14-16 14-22z" fill="${a.liq||L}" stroke="${shade(a.liq||L,-50)}" stroke-width="1.5" opacity=".95"/><path d="M46 46c3-6 6-8 8-9" stroke="#fff" stroke-width="3" opacity=".5" fill="none" stroke-linecap="round"/><rect x="40" y="60" width="40" height="28" fill="${c}"/>${lbl(l,60,74,38)}`;break;
+  case "cup":
+    s=`${shadow}<path d="M30 30h60l-8 78H38z" fill="#fff" stroke="#ddd"/><path d="M33 52h54l-3 34H36z" fill="${c}"/>${lbl(l,60,69,46)}<rect x="27" y="24" width="66" height="8" rx="3" fill="${L}"/><rect x="27" y="24" width="66" height="3" rx="1.5" fill="#fff" opacity=".6"/>`;break;
+  case "tub":
+    s=`${shadow}<path d="M24 44h72l-6 62H30z" fill="#fff" stroke="#ddd"/><path d="M26 58h68l-3 30H29z" fill="${c}"/>${lbl(l,60,73,50)}<rect x="20" y="36" width="80" height="10" rx="4" fill="${L}"/>`;break;
+  case "box":
+    s=`${shadow}<polygon points="30,14 84,14 94,8 40,8" fill="${L}"/><polygon points="84,14 94,8 94,104 84,110" fill="${d}"/><rect x="30" y="14" width="54" height="96" fill="${c}"/><circle cx="57" cy="76" r="17" fill="#fff" opacity=".9"/><circle cx="57" cy="76" r="13" fill="#f2d48b"/><path d="M48 74l5-4 4 5 6-3 4 4" stroke="#d7a64a" stroke-width="3" fill="none"/>${lbl(l,57,36,50)}`;break;
+  case "pizza":
+    s=`${shadow}<polygon points="14,46 98,46 108,38 24,38" fill="${L}"/><polygon points="98,46 108,38 108,92 98,100" fill="${d}"/><rect x="14" y="46" width="84" height="54" fill="${c}"/><circle cx="62" cy="73" r="22" fill="#e9b75d"/><circle cx="62" cy="73" r="18" fill="#cf4b32"/><circle cx="55" cy="68" r="4" fill="#8c2a1f"/><circle cx="69" cy="78" r="4" fill="#8c2a1f"/><circle cx="66" cy="65" r="3" fill="#f3e3b3"/><circle cx="56" cy="80" r="3" fill="#f3e3b3"/>${lbl(l,30,58,26,10)}`;break;
+  case "fishbox":
+    s=`${shadow}<polygon points="14,46 98,46 108,38 24,38" fill="${L}"/><polygon points="98,46 108,38 108,92 98,100" fill="${d}"/><rect x="14" y="46" width="84" height="54" fill="${c}"/><rect x="40" y="70" width="34" height="10" rx="4" fill="#e3a447"/><rect x="46" y="82" width="34" height="10" rx="4" fill="#d89335"/><rect x="62" y="68" width="30" height="10" rx="4" fill="#eab35a"/><path d="M80 52l-6 4 6 4zM50 56c6-6 18-6 24 0-6 6-18 6-24 0z" fill="#fff" opacity=".85"/>${lbl(l,34,58,34,9)}`;break;
+  case "bag": {
+    const win = a.win==="pasta" ? `<g stroke="#e7c46a" stroke-width="5" stroke-linecap="round"><path d="M48 66l8 14"/><path d="M60 64l-4 16"/><path d="M66 70l8 10"/><path d="M52 84l12 -2"/></g>`
+      : a.win==="rice" ? Array.from({length:18},(_,i)=>`<ellipse cx="${46+(i*7)%30}" cy="${66+Math.floor(i/5)*5}" rx="2.4" ry="1.3" fill="#fff" stroke="#ccc" stroke-width=".5"/>`).join("")
+      : a.win==="lentil" ? Array.from({length:20},(_,i)=>`<circle cx="${46+(i*7)%30}" cy="${66+Math.floor(i/5)*5}" r="2.2" fill="#e0703f"/>`).join("")
+      : Array.from({length:12},(_,i)=>`<ellipse cx="${47+(i*9)%28}" cy="${66+Math.floor(i/4)*6}" rx="4" ry="2.2" fill="#ead6aa"/>`).join("");
+    s=`${shadow}<path d="M32 22h56l4 84c0 3-2 5-5 5H33c-3 0-5-2-5-5z" fill="${c}"/><path d="M32 16h56v8H32z" fill="${d}"/><path d="M32 16l4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4" fill="${d}"/><rect x="42" y="60" width="36" height="30" rx="8" fill="#fbf7ee"/>${win}${lbl(l,60,42,52,null,a.dark?"#5a5244":"#fff")}`;break; }
+  case "chips":
+    s=`${shadow}<path d="M28 18h64c-4 30-4 60 0 92H28c4-32 4-62 0-92z" fill="${c}"/><path d="M28 14l4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6v6H28z" fill="${d}"/><path d="M28 104l4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6 4 6 4-6v4H28z" fill="${d}"/><ellipse cx="60" cy="76" rx="20" ry="13" fill="#f7d77a" stroke="#d6a93a" stroke-width="2"/><ellipse cx="52" cy="72" rx="3" ry="1.5" fill="#e3b347"/>${lbl(l,60,40,52,null,"#7a2a10")}`;break;
+  case "gummybag":
+    s=`${shadow}<path d="M30 20h60l4 86c0 3-2 5-5 5H31c-3 0-5-2-5-5z" fill="${c}"/><path d="M30 14h60v8H30z" fill="${d}"/>${["#f6d04d","#8fd16a","#ff8a3d","#fff","#c2e0ff"].map((f,i)=>`<circle cx="${44+i*8}" cy="${76+(i%2)*10}" r="6" fill="${f}" opacity=".95"/>`).join("")}${lbl(l,60,44,52)}`;break;
+  case "frozenbag":
+    s=`${shadow}<path d="M26 20h68v88H26z" fill="${c}" rx="6"/><path d="M26 14h68v8H26z" fill="${d}"/><path d="M30 26h60" stroke="#fff" stroke-width="2" opacity=".5"/>${Array.from({length:9},(_,i)=>`<circle cx="${46+(i%3)*14}" cy="${68+Math.floor(i/3)*11}" r="6" fill="#8fd16a" stroke="#4f8f3a" stroke-width="1.2"/>`).join("")}<text x="84" y="104" font-size="12" fill="#fff" text-anchor="middle">❄</text>${lbl(l,60,42,56)}`;break;
+  case "can": {
+    let icon = a.tomato ? `<circle cx="60" cy="80" r="11" fill="#e2483a"/><path d="M56 70l4 3 4-3" stroke="#3f8a3a" stroke-width="3" fill="none"/>`
+      : a.nuts ? `<ellipse cx="54" cy="80" rx="6" ry="9" fill="#e6b877"/><ellipse cx="66" cy="80" rx="6" ry="9" fill="#d9a35c"/>`
+      : `<ellipse cx="52" cy="82" rx="5" ry="7" fill="${shade(c,30)}" transform="rotate(30 52 82)"/><ellipse cx="62" cy="80" rx="5" ry="7" fill="${shade(c,20)}"/><ellipse cx="70" cy="84" rx="5" ry="7" fill="${shade(c,35)}" transform="rotate(-30 70 84)"/>`;
+    s=`${shadow}<rect x="30" y="24" width="60" height="84" rx="4" fill="#cfd3d6"/><ellipse cx="60" cy="24" rx="30" ry="6" fill="#e6e8ea" stroke="#b6bbc0"/><rect x="30" y="34" width="60" height="64" fill="${c}"/><rect x="30" y="34" width="60" height="3" fill="${d}"/><rect x="30" y="95" width="60" height="3" fill="${d}"/><ellipse cx="60" cy="80" rx="18" ry="13" fill="#fff" opacity=".9"/>${icon}${lbl(l,60,50,54)}<rect x="34" y="34" width="5" height="64" fill="#fff" opacity=".18"/>`;break; }
+  case "jar":
+    s=`${shadow}<rect x="36" y="16" width="48" height="14" rx="3" fill="${a.lid||d}"/><path d="M34 30h52c4 0 6 4 6 8v62c0 6-4 10-10 10H38c-6 0-10-4-10-10V38c0-4 2-8 6-8z" fill="${c}" opacity=".95"/><rect x="30" y="56" width="60" height="30" fill="#fff" opacity=".93"/>${lbl(l,60,71,54,null,"#7a5a20")}<path d="M36 38v14" stroke="#fff" stroke-width="4" opacity=".5" stroke-linecap="round"/>`;break;
+  case "bar":
+    s=`${shadow}<g transform="rotate(-12 60 66)"><rect x="12" y="44" width="96" height="40" rx="4" fill="${c}"/><path d="M12 44l-4 6 4 4-4 6 4 4-4 6 4 4-4 6 4 4M108 44l4 6-4 4 4 6-4 4 4 6-4 4 4 6-4 4" stroke="${d}" stroke-width="3" fill="none"/><rect x="24" y="52" width="72" height="24" rx="12" fill="#fff" opacity=".18"/>${lbl(l,60,64,84)}</g>`;break;
+  case "block":
+    s=`${shadow}<polygon points="20,56 88,56 104,46 36,46" fill="${L}"/><polygon points="88,56 104,46 104,84 88,96" fill="${d}"/><rect x="20" y="56" width="68" height="40" fill="${c}"/><rect x="24" y="66" width="60" height="20" rx="3" fill="#fff" opacity=".9"/>${lbl(l,54,76,56,null,"#8a6a10")}`;break;
+  case "cheese":
+    s=`${shadow}<polygon points="14,88 100,88 100,60 14,74" fill="${c}"/><polygon points="14,74 100,60 108,50 30,62" fill="${L}"/><polygon points="100,60 108,50 108,80 100,88" fill="${d}"/><polygon points="14,88 14,74 10,76 10,86" fill="#c8373b"/><circle cx="40" cy="80" r="4" fill="${d}"/><circle cx="66" cy="76" r="5" fill="${d}"/><circle cx="86" cy="80" r="3" fill="${d}"/><circle cx="70" cy="60" r="3" fill="${shade(c,-25)}"/>`;break;
+  case "bread":
+    s=`${shadow}<path d="M14 98c-4-22 4-46 24-54 14-6 30-6 46 0 20 8 26 32 22 54z" fill="${c}"/><path d="M20 98c-2-18 4-36 20-44 12-5 28-5 40 0 16 8 22 26 20 44z" fill="${shade(c,20)}"/>${Array.from({length:14},(_,i)=>`<ellipse cx="${30+(i*13)%62}" cy="${58+(i*7)%30}" rx="2" ry="1.2" fill="#f0dcae"/>`).join("")}<path d="M40 60l8 10M58 56l8 10M76 60l8 10" stroke="${shade(c,-30)}" stroke-width="3" stroke-linecap="round"/>`;break;
+  case "toast":
+    s=`${shadow}<path d="M26 104V52c-10-2-10-24 6-24h56c16 0 16 22 6 24v52z" fill="#fff" stroke="#e4ddcc" opacity=".95"/><path d="M32 100V54c-8-2-6-20 6-20h44c12 0 14 18 6 20v46z" fill="${c}"/><path d="M38 96V58c-5-2-4-16 4-16h36c8 0 9 14 4 16v38z" fill="#fbecc9"/><rect x="26" y="78" width="68" height="16" fill="#2f6db0" opacity=".85"/>${lbl(l,60,86,60,10)}`;break;
+  case "tray":
+    s=`${shadow}<path d="M12 62h96l-8 38H20z" fill="#f2f2f2" stroke="#d7d7d7"/>${a.fish?`<path d="M24 82c10-16 60-18 72-6-8 14-60 18-72 6z" fill="${c}"/><path d="M34 76l50 2M36 84l46 0" stroke="#fff" stroke-width="2" opacity=".6"/>`:`<path d="M24 80c4-14 30-18 46-14 16 4 28 10 26 18-4 8-30 10-46 8-16-2-28-4-26-12z" fill="${c}"/><path d="M30 80c10-6 30-6 50 0" stroke="#fff" stroke-width="2" opacity=".5"/>`}<path d="M10 60h100" stroke="#cde4f2" stroke-width="3"/><rect x="66" y="88" width="34" height="14" rx="2" fill="#fff" stroke="#ddd"/>${lbl(l,83,95,30,8,"#555")}`;break;
+  case "salami":
+    s=`${shadow}<g transform="rotate(-18 60 70)"><rect x="18" y="52" width="80" height="34" rx="17" fill="${c}"/>${Array.from({length:16},(_,i)=>`<circle cx="${30+(i*11)%60}" cy="${60+(i*5)%20}" r="2.2" fill="#f1d4cf"/>`).join("")}<path d="M98 69c6 0 8-4 12-2" stroke="#b39b7a" stroke-width="3" fill="none"/><ellipse cx="22" cy="69" rx="8" ry="17" fill="#d06a63"/>${Array.from({length:6},(_,i)=>`<circle cx="${19+(i%2)*6}" cy="${58+i*4}" r="1.8" fill="#f6e3df"/>`).join("")}</g>`;break;
+  case "apple":
+    s=`${shadow}<path d="M60 38c-10-8-36-8-38 22-2 30 18 50 30 50 4 0 6-2 8-2s4 2 8 2c12 0 32-20 30-50-2-30-28-30-38-22z" fill="${c}"/><path d="M60 38c0-10 2-18 8-24" stroke="#6b4a2a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M64 26c8-10 22-8 24-4-8 8-18 8-24 4z" fill="#5e9b3b"/><ellipse cx="40" cy="58" rx="6" ry="12" fill="#fff" opacity=".25"/>`;break;
+  case "banana":
+    s=`${shadow}<path d="M24 40c-4 34 18 64 64 62 10 0 14-6 8-10-30 4-52-20-56-52-2-8-14-10-16 0z" fill="${c}" stroke="${d}" stroke-width="2"/><path d="M30 44c2 26 20 48 50 52" stroke="${shade(c,-25)}" stroke-width="2" fill="none"/><rect x="26" y="30" width="8" height="12" rx="2" fill="#6b5a2a" transform="rotate(-10 30 36)"/><path d="M90 92l8 2" stroke="#4a3a1a" stroke-width="4" stroke-linecap="round"/>`;break;
+  case "carrot":
+    s=`${shadow}${[0,1,2].map(i=>`<g transform="rotate(${-20+i*20} 60 100) translate(${(i-1)*6} 0)"><path d="M52 40h16l-6 62c-1 4-3 4-4 0z" fill="${shade(c,i*8)}"/><path d="M54 52h6M56 66h7M56 80h5" stroke="${d}" stroke-width="2" stroke-linecap="round"/><path d="M60 40c-6-14-14-20-14-26M60 40c0-14 2-22 6-28M60 40c6-12 14-16 18-20" stroke="#4f8f3a" stroke-width="4" fill="none" stroke-linecap="round"/></g>`).join("")}`;break;
+  case "potato":
+    s=`${shadow}<ellipse cx="44" cy="80" rx="26" ry="20" fill="${c}"/><ellipse cx="76" cy="74" rx="24" ry="22" fill="${shade(c,12)}"/><ellipse cx="62" cy="92" rx="22" ry="15" fill="${shade(c,-8)}"/>${[[36,76],[50,86],[72,66],[84,80],[60,94]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.8" fill="${d}"/>`).join("")}`;break;
+  case "eggs":
+    s=`${shadow}<path d="M14 72h92l-6 32H20z" fill="${c}"/>${[22,40,58,76,94].map((x,i)=>`<ellipse cx="${x}" cy="66" rx="9" ry="12" fill="${i%2?'#f4e6cf':'#e9cfa7'}"/>`).join("")}<path d="M14 72h92" stroke="${d}" stroke-width="3"/>${[24,42,60,78,96].map(x=>`<path d="M${x-8} 80q8 10 16 0" stroke="${d}" stroke-width="2" fill="none"/>`).join("")}`;break;
+  default:
+    s=`${shadow}<rect x="30" y="20" width="60" height="88" rx="8" fill="${c}"/>${lbl(l,60,64,54)}`;
+  }
+  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">${s}</svg>`;
+}
+
+/* =====================================================================
+   3) SPEICHER: Bilder (IndexedDB) getrennt von Produktdaten/Sitzung (localStorage)
+   ===================================================================== */
+const LS = {
+  ok:true,
+  get(k,def){try{const v=localStorage.getItem(k);return v==null?def:JSON.parse(v);}catch(e){this.ok=false;return def;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){this.ok=false;warnStorage("Speichern im Browser nicht möglich (Speicher voll oder gesperrt). Bitte Daten exportieren.");return false;}}
+};
+const ImageStore = {
+  db:null, mem:new Map(), ok:false,
+  async init(){
+    try{
+      this.db = await new Promise((res,rej)=>{const r=indexedDB.open("lms-bilder",1);r.onupgradeneeded=()=>r.result.createObjectStore("img");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});
+      this.ok=true;
+      const all = await this._tx("readonly",st=>new Promise((res,rej)=>{const out=[];const cur=st.openCursor();cur.onsuccess=()=>{const c=cur.result;if(c){out.push([c.key,c.value]);c.continue();}else res(out);};cur.onerror=()=>rej(cur.error);}));
+      all.forEach(([k,v])=>this.mem.set(k,v));
+    }catch(e){this.ok=false;}
+  },
+  _tx(mode,fn){return new Promise((res,rej)=>{const tx=this.db.transaction("img",mode);const st=tx.objectStore("img");let out;Promise.resolve(fn(st)).then(v=>out=v,rej);tx.oncomplete=()=>res(out);tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error);});},
+  get(id){return this.mem.get(id)||null;},
+  async put(id,dataUrl){this.mem.set(id,dataUrl);if(this.ok){try{await this._tx("readwrite",st=>{st.put(dataUrl,id);});}catch(e){warnStorage("Bild konnte nicht dauerhaft gespeichert werden (Speicher voll?). Bitte Daten exportieren.");}}},
+  async del(id){this.mem.delete(id);if(this.ok){try{await this._tx("readwrite",st=>{st.delete(id);});}catch(e){}}},
+  async clear(){this.mem.clear();if(this.ok){try{await this._tx("readwrite",st=>{st.clear();});}catch(e){}}}
+};
+function warnStorage(msg){const b=document.getElementById("banner");b.textContent=msg;b.classList.remove("hidden");}
+
+/* =====================================================================
+   4) ZUSTAND
+   ===================================================================== */
+const uid = (p="x") => p+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const DEFAULT_SETTINGS = {
+  title:"Lebensmittel sortieren",
+  modes:{timer:true, late:true, reasons:false, compare:true},
+  timerMin:5,
+  details:{ingredients:true, nutrition:true, nova:true},
+  pin:""
+};
+function normProduct(p){
+  return {
+    id:p.id||uid("p"), name:String(p.name||"Ohne Namen").slice(0,80), unit:p.unit==="ml"?"ml":"g",
+    ingredients:p.ingredients||"", nutrition:Object.assign(Object.fromEntries(NUTR_FIELDS.map(f=>[f[0],null])), p.nutrition||{}),
+    nova:[1,2,3,4].includes(p.nova)?p.nova:null, source:p.source||"",
+    art:p.art||{t:"box",c:"#8a8f5c",l:p.name||""}, imageId:p.imageId||null,
+    inPool:p.inPool!==false, late:!!p.late, custom:!!p.custom
+  };
+}
+let products = (LS.get("lms.products",null) || DEFAULT_PRODUCTS).map(normProduct);
+let settings = Object.assign({}, structuredClone(DEFAULT_SETTINGS), LS.get("lms.settings",{}));
+settings.modes = Object.assign({}, DEFAULT_SETTINGS.modes, settings.modes||{});
+settings.details = Object.assign({}, DEFAULT_SETTINGS.details, settings.details||{});
+function newSession(){return {group:"", cats:[], lateShown:false, lateIds:[], snapshots:[], reflection:{}, timerEnd:null, timerOver:false, created:new Date().toISOString()};}
+let session = Object.assign(newSession(), LS.get("lms.session",{}));
+let ui = {view:"sortieren", sel:null, teacherTab:"produkte", teacherUnlocked:false, cmpA:null, cmpB:null};
+
+const saveProducts = () => LS.set("lms.products", products);
+const saveSettings = () => LS.set("lms.settings", settings);
+const saveSession  = () => LS.set("lms.session", session);
+const P = id => products.find(p=>p.id===id);
+
+/* Welche Produkte sind in dieser Stunde sichtbar? */
+function activeIds(){
+  return products.filter(p=>p.inPool && (!p.late || !settings.modes.late || session.lateShown)).map(p=>p.id);
+}
+function placedMap(){const m={};session.cats.forEach(c=>c.items.forEach(id=>m[id]=c.id));return m;}
+function unsortedIds(){const m=placedMap();return activeIds().filter(id=>!m[id]);}
+function cleanSession(){
+  const act=new Set(activeIds());
+  session.cats.forEach(c=>c.items=c.items.filter((id,i,a)=>act.has(id)&&a.indexOf(id)===i));
+}
+function picHTML(p){
+  const img = p.imageId && ImageStore.get(p.imageId);
+  return img ? `<img src="${img}" alt="" draggable="false">` : artSVG(p.art);
+}
+
+/* =====================================================================
+   5) HILFEN: Modal, Toast, Datei speichern
+   ===================================================================== */
+function toast(msg,ms=2600){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),ms);}
+function modal({title,body,buttons=[],wide=false,onClose}){
+  const root=document.getElementById("modalRoot");
+  const back=document.createElement("div");back.className="modal-back";
+  back.innerHTML=`<div class="modal" role="dialog" aria-modal="true" style="${wide?'max-width:980px':''}"><header><h2>${esc(title)}</h2><button class="iconbtn" data-x aria-label="Schließen">✕</button></header><div class="mbody"></div>${buttons.length?'<footer></footer>':''}</div>`;
+  const mb=back.querySelector(".mbody"); if(typeof body==="string") mb.innerHTML=body; else mb.appendChild(body);
+  const close=()=>{back.remove();onClose&&onClose();};
+  back.querySelector("[data-x]").onclick=close;
+  back.addEventListener("pointerdown",e=>{if(e.target===back)back._down=true;});
+  back.addEventListener("click",e=>{if(e.target===back&&back._down)close();back._down=false;});
+  const ft=back.querySelector("footer");
+  buttons.forEach(b=>{const el=document.createElement("button");el.className="btn "+(b.cls||"");el.textContent=b.label;el.onclick=async()=>{const r=b.onClick?await b.onClick(back):true;if(r!==false)close();};ft.appendChild(el);});
+  root.appendChild(back);
+  const f=back.querySelector("input,textarea,select"); if(f) setTimeout(()=>f.focus(),30);
+  return {el:back,close};
+}
+function confirmBox(text,okLabel="OK",danger=false){
+  return new Promise(res=>{modal({title:"Bitte bestätigen",body:`<p>${esc(text)}</p>`,onClose:()=>res(false),buttons:[{label:"Abbrechen",onClick:()=>{res(false);}},{label:okLabel,cls:danger?"primary danger":"primary",onClick:()=>{res(true);}}]});});
+}
+let downloadsNS = null;
+async function saveFile(filename, text, mime){
+  if(downloadsNS){
+    try{ await downloadsNS.save({filename, data:text}); toast("Datei gespeichert."); return; }
+    catch(e){ if(e&&e.code==="declined") return; if(e&&e.code==="rate_limited"){toast("Bitte kurz warten und erneut versuchen.");return;} }
+  }
+  try{
+    const url=URL.createObjectURL(new Blob([text],{type:mime||"application/octet-stream"}));
+    const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+  }catch(e){}
+  // Rückfallebene, falls der Download blockiert ist: Inhalt kopieren
+  if(text.length < 3_000_000){
+    modal({title:"Datei speichern",body:`<p>Der Download wurde gestartet. Falls keine Datei erscheint (z. B. in einer geschützten Umgebung), kannst du den Inhalt kopieren und als <b>${esc(filename)}</b> speichern.</p>`,
+      buttons:[{label:"Schließen"},{label:"Inhalt kopieren",cls:"primary",onClick:async()=>{try{await navigator.clipboard.writeText(text);toast("Kopiert.");}catch(e){toast("Kopieren nicht möglich.");}return false;}}]});
+  }
+}
+function readFileAsText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsText(file);});}
+function fileSlug(s){return (s||"ergebnis").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"ergebnis";}
+function today(){const d=new Date();return d.toISOString().slice(0,10);}
+
+/* Bild verkleinern (spart Speicher) -> dataURL (WebP, sonst JPEG) */
+const OK_TYPES=["image/jpeg","image/png","image/webp"];
+async function processImage(file){
+  if(file.type && !OK_TYPES.includes(file.type)) throw new Error("Format nicht unterstützt: "+file.type);
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error("Bild nicht lesbar"));i.src=url;});
+    const max=640, sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+    const cv=document.createElement("canvas");cv.width=Math.round(img.naturalWidth*sc);cv.height=Math.round(img.naturalHeight*sc);
+    const cx=cv.getContext("2d");cx.fillStyle="#ffffff";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(img,0,0,cv.width,cv.height);
+    let out=cv.toDataURL("image/webp",0.82); if(!out.startsWith("data:image/webp")) out=cv.toDataURL("image/jpeg",0.85);
+    return out;
+  }finally{URL.revokeObjectURL(url);}
+}
+function nameFromFile(f){return f.name.replace(/\.[^.]+$/,"").replace(/[_\-]+/g," ").replace(/\s+/g," ").trim().replace(/^./,c=>c.toUpperCase()).slice(0,60)||"Neues Produkt";}
+
+/* =====================================================================
+   6) ROUTING & KOPF
+   ===================================================================== */
+const VIEWS=["sortieren","vergleich","reflexion","lehrkraft"];
+function route(){
+  const h=(location.hash||"").replace("#","");
+  ui.view = VIEWS.includes(h)?h:"sortieren";
+  if(ui.view==="vergleich" && !settings.modes.compare) ui.view="sortieren";
+  render();
+}
+function go(v){ if(location.hash==="#"+v) route(); else location.hash=v; }
+window.addEventListener("hashchange",route);
+function renderHeader(){
+  document.getElementById("appTitle").textContent=settings.title||"Lebensmittel sortieren";
+  document.title=settings.title||"Lebensmittel sortieren";
+  document.querySelectorAll("#tabs a").forEach(a=>a.classList.toggle("active",a.dataset.view===ui.view));
+  document.getElementById("tabCompare").classList.toggle("hidden",!settings.modes.compare);
+  const gi=document.getElementById("groupInput"); if(document.activeElement!==gi) gi.value=session.group||"";
+}
+document.getElementById("groupInput").addEventListener("input",e=>{session.group=e.target.value;saveSession();});
+
+function render(){
+  renderHeader();
+  const v=document.getElementById("view");
+  if(ui.view==="sortieren") renderSort(v);
+  else if(ui.view==="vergleich") renderCompare(v);
+  else if(ui.view==="reflexion") renderReflection(v);
+  else renderTeacher(v);
+}
+
+/* =====================================================================
+   7) SORTIERANSICHT
+   ===================================================================== */
+let timerHandle=null;
+function cardHTML(id){
+  const p=P(id); if(!p) return "";
+  const isNew = session.lateIds.includes(id);
+  return `<div class="fcard${ui.sel===id?" sel":""}${isNew?" newbadge":""}" data-id="${esc(id)}" tabindex="0" aria-label="${esc(p.name)}">
+    <div class="pic">${picHTML(p)}</div><div class="nm">${esc(p.name)}</div>
+    <button class="info" data-info="${esc(id)}" aria-label="Details zu ${esc(p.name)}">i</button></div>`;
+}
+function renderSort(v){
+  cleanSession();
+  const uns=unsortedIds(), total=activeIds().length;
+  const lateAvail = settings.modes.late && !session.lateShown && products.some(p=>p.inPool&&p.late);
+  const lateCount = products.filter(p=>p.inPool&&p.late).length;
+  const timerOn = !!session.timerEnd && !session.timerOver;
+  v.innerHTML = `
+  <div class="toolbar">
+    <button class="btn primary" id="addCat">＋ Neue Gruppe</button>
+    ${settings.modes.timer?(timerOn?`<span class="timer" id="timerDisp">--:--</span><button class="btn" id="stopTimer">Zeit stoppen</button>`:`<button class="btn" id="startTimer">⏱ Zeitdruck (${settings.timerMin} min)</button>`):""}
+    ${lateAvail?`<button class="btn" id="showLate">✚ ${lateCount} neue Lebensmittel</button>`:""}
+    ${settings.modes.compare?`<button class="btn" id="snap">📌 Sortierung festhalten</button>`:""}
+    <span class="hint">${uns.length?`${total-uns.length} von ${total} sortiert`:`Alle ${total} Lebensmittel sortiert`}</span>
+    <div class="spacer"></div>
+    <button class="btn" id="toRefl">Weiter zur Reflexion →</button>
+  </div>
+  <div class="sortwrap ${session.timerOver?"locked":""}">
+    <aside class="pool">
+      <h2><span>Noch nicht sortiert</span><span>${uns.length}</span></h2>
+      <p style="margin:-4px 4px 10px;font-size:13px;color:var(--muted)">Ziehen (auf Tablets kurz gedrückt halten) – oder antippen und Ziel antippen. ⓘ zeigt Details.</p>
+      <div class="pool-grid" data-drop="pool">${uns.map(cardHTML).join("")}</div>
+    </aside>
+    <section class="board">
+      <div class="cats">
+        ${session.cats.map(c=>`
+        <div class="cat" style="--c:${c.color}" data-cat="${c.id}">
+          <div class="cat-head">
+            <button class="cdot" data-color="${c.id}" aria-label="Farbe ändern"></button>
+            <input class="cat-name" data-name="${c.id}" value="${esc(c.name)}" placeholder="Name der Gruppe" maxlength="50" aria-label="Gruppenname">
+            <span class="count" title="Anzahl">${c.items.length}</span>
+            <button class="iconbtn" data-merge="${c.id}" title="Mit anderer Gruppe zusammenführen" aria-label="Zusammenführen">⇄</button>
+            <button class="iconbtn" data-del="${c.id}" title="Gruppe löschen" aria-label="Gruppe löschen">🗑</button>
+          </div>
+          ${settings.modes.reasons?`<textarea class="reason ${c.reason.trim()?"":"missing"}" data-reason="${c.id}" rows="2" placeholder="Begründung: Warum gehören diese Lebensmittel zusammen?">${esc(c.reason)}</textarea>`:""}
+          <div class="cat-body" data-drop="${c.id}">${c.items.map(cardHTML).join("")}</div>
+        </div>`).join("")}
+        <button class="newcat" id="addCat2" data-drop="new">＋ Neue Gruppe<br><span style="font-weight:400;font-size:13px">(auch hierher ziehen)</span></button>
+      </div>
+    </section>
+  </div>`;
+  // Ereignisse
+  v.querySelector("#addCat").onclick=()=>{addCat();};
+  v.querySelector("#addCat2").onclick=()=>{ if(ui.sel){ moveTo(ui.sel,"new"); } else addCat(); };
+  v.querySelector("#toRefl").onclick=()=>go("reflexion");
+  const st=v.querySelector("#startTimer"); if(st) st.onclick=startTimer;
+  const sp=v.querySelector("#stopTimer"); if(sp) sp.onclick=()=>{session.timerEnd=null;session.timerOver=false;saveSession();render();};
+  const sl=v.querySelector("#showLate"); if(sl) sl.onclick=showLate;
+  const sn=v.querySelector("#snap"); if(sn) sn.onclick=snapshotDialog;
+  v.querySelectorAll("[data-name]").forEach(inp=>{
+    inp.addEventListener("input",()=>{const c=session.cats.find(x=>x.id===inp.dataset.name);c.name=inp.value;saveSession();});
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")inp.blur();});
+  });
+  v.querySelectorAll("[data-reason]").forEach(t=>t.addEventListener("input",()=>{const c=session.cats.find(x=>x.id===t.dataset.reason);c.reason=t.value;t.classList.toggle("missing",!t.value.trim());saveSession();}));
+  v.querySelectorAll("[data-color]").forEach(b=>b.onclick=()=>colorDialog(b.dataset.color));
+  v.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>deleteCat(b.dataset.del));
+  v.querySelectorAll("[data-merge]").forEach(b=>b.onclick=()=>mergeDialog(b.dataset.merge));
+  v.querySelectorAll("[data-info]").forEach(b=>{b.addEventListener("pointerdown",e=>e.stopPropagation());b.onclick=e=>{e.stopPropagation();detailDialog(b.dataset.info);};});
+  // Tippen auf leere Zielfläche bei Auswahl
+  v.querySelectorAll("[data-drop]").forEach(z=>z.addEventListener("click",e=>{
+    if(!ui.sel || session.timerOver) return;
+    if(e.target.closest(".fcard")) return;
+    if(z.dataset.drop==="new") return; // eigener Handler
+    moveTo(ui.sel,z.dataset.drop);
+  }));
+  if(timerOn) tickTimer();
+}
+function addCat(withItem){
+  const c={id:uid("c"),name:"",color:CAT_COLORS[session.cats.length%CAT_COLORS.length],reason:"",items:[]};
+  if(withItem) c.items.push(withItem);
+  session.cats.push(c);saveSession();render();
+  const inp=document.querySelector(`[data-name="${c.id}"]`); if(inp){inp.focus();inp.scrollIntoView({block:"nearest",behavior:"auto"});}
+  return c;
+}
+function moveTo(id,target,beforeId){
+  if(session.timerOver) return;
+  if(target==="new"){ session.cats.forEach(c=>c.items=c.items.filter(x=>x!==id)); ui.sel=null; addCat(id); return; }
+  session.cats.forEach(c=>c.items=c.items.filter(x=>x!==id));
+  if(target!=="pool"){
+    const c=session.cats.find(x=>x.id===target); if(!c) return;
+    const i = beforeId ? c.items.indexOf(beforeId) : -1;
+    if(i>=0) c.items.splice(i,0,id); else c.items.push(id);
+  }
+  ui.sel=null; saveSession(); render();
+}
+function colorDialog(cid){
+  const c=session.cats.find(x=>x.id===cid);
+  const m=modal({title:"Farbe wählen",body:`<div class="swatches">${CAT_COLORS.map(col=>`<button class="swatch ${col===c.color?"on":""}" style="background:${col}" data-col="${col}" aria-label="Farbe ${col}"></button>`).join("")}</div>`});
+  m.el.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{c.color=b.dataset.col;saveSession();m.close();render();});
+}
+async function deleteCat(cid){
+  const c=session.cats.find(x=>x.id===cid);
+  if(c.items.length && !(await confirmBox(`Gruppe „${c.name||"ohne Namen"}“ löschen? Die ${c.items.length} Lebensmittel kommen zurück zu „Noch nicht sortiert“.`,"Löschen",true))) return;
+  session.cats=session.cats.filter(x=>x.id!==cid);saveSession();render();
+}
+function mergeDialog(cid){
+  const src=session.cats.find(x=>x.id===cid);
+  const others=session.cats.filter(x=>x.id!==cid);
+  if(!others.length){toast("Es gibt keine zweite Gruppe zum Zusammenführen.");return;}
+  const body=`<p>„${esc(src.name||"ohne Namen")}“ zusammenführen mit:</p>
+   <div class="row" style="flex-direction:column;align-items:stretch">${others.map(o=>`<label class="check"><input type="radio" name="mt" value="${o.id}"> <span class="cdot" style="--c:${o.color};width:22px;height:22px"></span> ${esc(o.name||"ohne Namen")} (${o.items.length})</label>`).join("")}</div>
+   <label class="field" style="margin-top:10px">Name der neuen Gruppe<input id="mname" maxlength="50"></label>`;
+  const m=modal({title:"Gruppen zusammenführen",body,buttons:[{label:"Abbrechen"},{label:"Zusammenführen",cls:"primary",onClick:(el)=>{
+    const t=el.querySelector('input[name="mt"]:checked'); if(!t){toast("Bitte eine Gruppe auswählen.");return false;}
+    const dst=session.cats.find(x=>x.id===t.value);
+    dst.items=[...dst.items,...src.items.filter(i=>!dst.items.includes(i))];
+    dst.name=el.querySelector("#mname").value.trim()||dst.name;
+    dst.reason=[dst.reason,src.reason].filter(s=>s.trim()).join(" / ");
+    session.cats=session.cats.filter(x=>x.id!==cid);saveSession();render();
+  }}]});
+  m.el.querySelectorAll('input[name="mt"]').forEach(r=>r.onchange=()=>{const o=session.cats.find(x=>x.id===r.value);m.el.querySelector("#mname").value=[o.name,src.name].filter(Boolean).join(" + ");});
+}
+function showLate(){
+  const ids=products.filter(p=>p.inPool&&p.late).map(p=>p.id);
+  session.lateShown=true; session.lateIds=ids; saveSession(); render();
+  toast(`${ids.length} neue Lebensmittel sind da. Passen sie in eure Gruppen – oder braucht ihr neue?`,4500);
+}
+function startTimer(){
+  session.timerEnd=Date.now()+settings.timerMin*60000; session.timerOver=false; saveSession(); render();
+}
+function tickTimer(){
+  clearInterval(timerHandle);
+  const upd=()=>{
+    const el=document.getElementById("timerDisp");
+    if(!session.timerEnd){clearInterval(timerHandle);return;}
+    const left=Math.max(0,session.timerEnd-Date.now());
+    if(el){const s=Math.ceil(left/1000);el.textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+    if(left<=0){clearInterval(timerHandle);timeUp();}
+  };
+  upd(); timerHandle=setInterval(upd,250);
+}
+function timeUp(){
+  session.timerOver=true; saveSession(); endDrag(true); if(ui.view==="sortieren") render();
+  const total=activeIds().length, done=total-unsortedIds().length;
+  modal({title:"Zeit abgelaufen!",body:`<p style="font-size:20px"><b>${done}</b> von <b>${total}</b> Lebensmitteln sortiert, in <b>${session.cats.length}</b> Gruppen.</p><p class="sub">Schaut euch eure Gruppen an: Was war schnell zu entscheiden, wo habt ihr gezögert?</p>`,
+    onClose:()=>{session.timerEnd=null;session.timerOver=false;saveSession();render();},
+    buttons:[{label:"Weiter sortieren (ohne Zeit)",cls:"primary"}]});
+}
+function snapshotDialog(){
+  const n=session.snapshots.length+1;
+  modal({title:"Sortierung festhalten",body:`<p>Die aktuelle Sortierung wird gespeichert und kann später im Bereich „Vergleichen“ einer anderen gegenübergestellt werden.</p>
+    <label class="field">Bezeichnung<input id="sname" value="Sortierung ${n}" maxlength="50"></label>
+    <label class="check"><input type="checkbox" id="sclear"> Danach Arbeitsfläche leeren (neu sortieren nach einem anderen Kriterium)</label>`,
+    buttons:[{label:"Abbrechen"},{label:"Festhalten",cls:"primary",onClick:(el)=>{
+      session.snapshots.push(makeSnapshot(el.querySelector("#sname").value.trim()||`Sortierung ${n}`));
+      if(el.querySelector("#sclear").checked){session.cats=[];}
+      saveSession();render();toast("Sortierung festgehalten.");
+    }}]});
+}
+function makeSnapshot(name){
+  return {id:uid("s"),name,group:session.group||"",time:new Date().toISOString(),
+    cats:session.cats.map(c=>({name:c.name||"(ohne Namen)",color:c.color,reason:c.reason,items:c.items.map(id=>({id,name:P(id)?.name||id}))})),
+    unsorted:unsortedIds().map(id=>({id,name:P(id)?.name||id}))};
+}
+
+/* ---------- Drag & Drop (Maus, Stift, Touch) ----------
+   Maus/Stift: sofort ziehen (ab 6 px Bewegung).
+   Touch: kurz gedrückt halten (180 ms), dann ziehen – so bleibt Wischen zum Scrollen möglich. */
+let drag=null;
+document.addEventListener("pointerdown",e=>{
+  if(ui.view!=="sortieren") return;
+  const card=e.target.closest(".fcard"); if(!card || e.target.closest(".info")) return;
+  if(e.button!==undefined && e.button>0) return;
+  if(drag) endDrag(true);
+  drag={id:card.dataset.id,card,x:e.clientX,y:e.clientY,pid:e.pointerId,type:e.pointerType,active:false,armed:e.pointerType!=="touch",ghost:null,over:null,cancelled:false};
+  if(e.pointerType==="touch"){ drag.timer=setTimeout(()=>{ if(drag&&!drag.cancelled){drag.armed=true; beginDrag(drag.x,drag.y);} },180); }
+});
+document.addEventListener("pointermove",e=>{
+  if(!drag || e.pointerId!==drag.pid) return;
+  const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+  if(!drag.active){
+    if(drag.type==="touch"){ if(!drag.armed && Math.hypot(dx,dy)>8){drag.cancelled=true;clearTimeout(drag.timer);drag=null;} return; }
+    if(Math.hypot(dx,dy)>6) beginDrag(e.clientX,e.clientY); else return;
+  }
+  moveGhost(e.clientX,e.clientY);
+});
+function beginDrag(x,y){
+  if(session.timerOver){drag=null;return;}
+  drag.active=true;
+  const g=drag.card.cloneNode(true); g.classList.add("ghost"); g.classList.remove("sel"); document.body.appendChild(g); drag.ghost=g;
+  drag.card.classList.add("dragging");
+  try{ if(navigator.vibrate) navigator.vibrate(15); }catch(e){}
+  moveGhost(x,y);
+}
+function moveGhost(x,y){
+  drag.ghost.style.left=x+"px"; drag.ghost.style.top=y+"px"; drag.lx=x; drag.ly=y;
+  const el=document.elementFromPoint(x,y); const z=el&&el.closest("[data-drop]");
+  if(drag.over&&drag.over!==z) drag.over.classList.remove("drop-hover");
+  if(z) z.classList.add("drop-hover"); drag.over=z;
+  // automatisch scrollen am Rand
+  const edge=60;
+  if(y<edge) window.scrollBy(0,-12); else if(y>innerHeight-edge) window.scrollBy(0,12);
+  const board=document.querySelector(".board"); if(board){const r=board.getBoundingClientRect(); if(x>r.left&&x<r.right){ if(y<r.top+edge&&y>r.top) board.scrollBy(0,-12); else if(y>r.bottom-edge&&y<r.bottom) board.scrollBy(0,12);} }
+}
+document.addEventListener("touchmove",e=>{ if(drag && (drag.active||drag.armed)) e.preventDefault(); },{passive:false});
+window.addEventListener("blur",()=>{ if(drag) endDrag(true); });
+document.addEventListener("pointerleave",()=>{ if(drag&&drag.active) endDrag(true); });
+document.addEventListener("contextmenu",e=>{ if(e.target.closest&&e.target.closest(".fcard")) e.preventDefault(); });
+document.addEventListener("pointerup",e=>{
+  if(!drag || e.pointerId!==drag.pid) return;
+  clearTimeout(drag.timer);
+  if(drag.active){
+    const z=drag.over; const id=drag.id;
+    let before=null;
+    const el=document.elementFromPoint(drag.lx,drag.ly); const oc=el&&el.closest(".fcard");
+    if(oc && oc.dataset.id!==id && z && z.contains(oc)) before=oc.dataset.id;
+    endDrag();
+    if(z) moveTo(id,z.dataset.drop,before);
+  } else {
+    const id=drag.id; drag=null; onTapCard(id);
+  }
+});
+document.addEventListener("pointercancel",e=>{ if(drag && e.pointerId===drag.pid){ if(!drag.active) {clearTimeout(drag.timer);drag=null;} } });
+function endDrag(abort){
+  if(!drag) return;
+  clearTimeout(drag.timer);
+  if(drag.ghost) drag.ghost.remove();
+  if(drag.over) drag.over.classList.remove("drop-hover");
+  if(drag.card) drag.card.classList.remove("dragging");
+  drag=null;
+}
+function onTapCard(id){
+  if(session.timerOver) return;
+  if(ui.sel && ui.sel!==id){
+    const m=placedMap(); const zSel=m[ui.sel]||"pool", zTap=m[id]||"pool";
+    if(zSel!==zTap){ moveTo(ui.sel,zTap,id); return; }
+  }
+  ui.sel = ui.sel===id?null:id;
+  document.querySelectorAll(".fcard").forEach(c=>c.classList.toggle("sel",c.dataset.id===ui.sel));
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){ if(drag) endDrag(); if(ui.sel){ui.sel=null;document.querySelectorAll(".fcard.sel").forEach(c=>c.classList.remove("sel"));} }
+  if((e.key==="Enter"||e.key===" ") && document.activeElement && document.activeElement.classList.contains("fcard")){e.preventDefault();onTapCard(document.activeElement.dataset.id);}
+});
+
+/* ---------- Detailansicht ---------- */
+function fmt(n){return n==null||n===""?null:String(n).replace(".",",");}
+function detailDialog(id){
+  const p=P(id); const D=settings.details;
+  let parts=[];
+  if(D.ingredients) parts.push(`<h3 style="margin:0 0 4px;font-size:16px">Zutaten</h3><p style="margin:0 0 14px">${p.ingredients.trim()?esc(p.ingredients):'<span class="na">Keine verifizierte Zutatenliste hinterlegt. Schaut auf die Verpackung.</span>'}</p>`);
+  if(D.nutrition){
+    const any=NUTR_FIELDS.some(f=>p.nutrition[f[0]]!=null&&p.nutrition[f[0]]!=="");
+    parts.push(`<h3 style="margin:0 0 4px;font-size:16px">Nährwerte pro 100 ${p.unit}</h3>`+(any?`<table class="t nutr">${NUTR_FIELDS.map(f=>`<tr><td>${f[1]}${f[0]==="kcal"||f[0]==="kj"?"":""}</td><td>${fmt(p.nutrition[f[0]])!=null?esc(fmt(p.nutrition[f[0]]))+" "+f[2]:'<span class="na">keine Angabe</span>'}</td></tr>`).join("")}</table><p style="font-size:13px;color:var(--muted)">Quelle: ${p.source.trim()?esc(p.source):'<span class="na">nicht angegeben</span>'}</p>`
+      :`<p class="na" style="margin:0 0 14px">Keine verifizierten Nährwerte hinterlegt. Die Werte unterscheiden sich je nach Produkt – schaut auf die Verpackung.</p>`));
+  }
+  if(D.nova) parts.push(`<h3 style="margin:8px 0 4px;font-size:16px">Verarbeitungsgrad</h3><p style="margin:0">${p.nova?esc(NOVA_TEXT[p.nova])+'<br><span style="font-size:13px;color:var(--muted)">Einordnung nach dem NOVA-System; typischer Wert, kann je nach Produkt abweichen.</span>':'<span class="na">Nicht eingeordnet (hängt stark vom konkreten Produkt ab).</span>'}</p>`);
+  if(!parts.length) parts.push(`<p class="na">Für diese Stunde sind keine Zusatzinformationen freigegeben.</p>`);
+  modal({title:p.name,wide:false,body:`<div class="detail"><div class="big">${picHTML(p)}</div><div>${parts.join("")}</div></div>`});
+}
+
+/* =====================================================================
+   8) VERGLEICH
+   ===================================================================== */
+function compareSources(){
+  const list=[{key:"current",label:"Aktuelle Sortierung",snap:makeSnapshot("Aktuelle Sortierung")}];
+  session.snapshots.forEach(s=>list.push({key:s.id,label:(s.group?s.group+" – ":"")+s.name,snap:s}));
+  return list;
+}
+function renderCompare(v){
+  const src=compareSources();
+  if(!ui.cmpA||!src.find(s=>s.key===ui.cmpA)) ui.cmpA = src[1]?src[1].key:"current";
+  if(!ui.cmpB||!src.find(s=>s.key===ui.cmpB)) ui.cmpB = src.length>2?src[2].key:"current";
+  const A=src.find(s=>s.key===ui.cmpA).snap, B=src.find(s=>s.key===ui.cmpB).snap;
+  const opts=sel=>src.map(s=>`<option value="${s.key}" ${s.key===sel?"selected":""}>${esc(s.label)}</option>`).join("");
+  const colOf=(snap)=>{const m={};snap.cats.forEach(c=>c.items.forEach(it=>m[it.id]={cat:c.name,color:c.color,mates:new Set(c.items.map(x=>x.id).filter(x=>x!==it.id))}));return m;};
+  const mA=colOf(A), mB=colOf(B);
+  const allIds=[...new Set([...Object.keys(mA),...Object.keys(mB)])];
+  const nameOf=id=>(P(id)?.name)||([...A.cats,...B.cats].flatMap(c=>c.items).find(i=>i.id===id)||{}).name||id;
+  let same=0;
+  const rows=allIds.map(id=>{
+    const a=mA[id], b=mB[id]; let status="";
+    if(a&&b){const inter=[...a.mates].filter(x=>b.mates.has(x)).length;const uni=new Set([...a.mates,...b.mates]).size;const j=uni?inter/uni:1;
+      if(j>=0.999){status=`<span class="tag same">gleiche Partner</span>`;same++;} else if(j<0.5) status=`<span class="tag diff">anders zusammengestellt</span>`; else status=`<span class="tag" style="background:#f3f1ea">teilweise gleich</span>`;}
+    else status=`<span class="tag" style="background:#f3f1ea">nur in einer Sortierung</span>`;
+    const cell=x=>x?`<span class="tag c" style="background:${x.color}">${esc(x.cat)}</span>`:'<span class="na">–</span>';
+    return `<tr><td>${esc(nameOf(id))}</td><td>${cell(a)}</td><td>${cell(b)}</td><td>${status}</td></tr>`;
+  }).join("");
+  const side=(snap)=>`${snap.cats.length?snap.cats.map(c=>`<div class="sumcat" style="--c:${c.color}"><h3>${esc(c.name)} <span class="count" style="--c:${c.color}">${c.items.length}</span></h3>${c.reason?.trim()?`<div class="why">„${esc(c.reason)}“</div>`:""}<div class="chips">${c.items.map(it=>chip(it.id,it.name)).join("")}</div></div>`).join(""):'<p class="na">Noch keine Gruppen.</p>'}`;
+  v.innerHTML=`<div class="page">
+    <h1>Sortierungen vergleichen</h1>
+    <p class="sub">Haltet beim Sortieren eine Sortierung fest (📌) oder ladet die Ergebnisdatei einer anderen Gruppe. Es gibt kein Richtig oder Falsch – es geht um die Kriterien.</p>
+    <div class="panel row noprint">
+      <label class="field" style="flex:1;min-width:220px">Sortierung A<select id="selA">${opts(ui.cmpA)}</select></label>
+      <label class="field" style="flex:1;min-width:220px">Sortierung B<select id="selB">${opts(ui.cmpB)}</select></label>
+      <div class="row" style="align-self:flex-end">
+        <button class="btn" id="impRes">Ergebnis einer anderen Gruppe laden</button>
+        <input type="file" id="impResFile" accept=".json,application/json" class="hidden" multiple>
+        ${session.snapshots.length?`<button class="btn danger" id="delSnaps">Festgehaltene löschen</button>`:""}
+      </div>
+    </div>
+    ${src.length<2?`<div class="infobox" style="margin-bottom:16px">Es gibt noch keine festgehaltene Sortierung. Geht zu „Sortieren“ und tippt auf „📌 Sortierung festhalten“, sortiert dann nach einem anderen Kriterium neu – oder ladet das Ergebnis einer anderen Gruppe.</div>`:""}
+    <div class="cmpgrid">
+      <div class="panel"><h2>A: ${esc(A.group?A.group+" – ":"")}${esc(A.name)}</h2>${side(A)}</div>
+      <div class="panel"><h2>B: ${esc(B.group?B.group+" – ":"")}${esc(B.name)}</h2>${side(B)}</div>
+    </div>
+    <div class="panel">
+      <h2>Lebensmittel im Vergleich</h2>
+      <p class="sub" style="margin-bottom:8px">${same} von ${allIds.length} Lebensmitteln stehen in beiden Sortierungen mit genau denselben Partnern zusammen.</p>
+      <div style="overflow:auto"><table class="t"><thead><tr><th>Lebensmittel</th><th>Gruppe in A</th><th>Gruppe in B</th><th>Zusammenstellung</th></tr></thead><tbody>${rows||'<tr><td colspan="4" class="na">Noch nichts sortiert.</td></tr>'}</tbody></table></div>
+    </div>
+    <div class="panel"><h2>Zum Besprechen</h2><ul style="margin:0;padding-left:20px"><li>Welches Kriterium steckt jeweils hinter A und B?</li><li>Welche Lebensmittel wechseln die Gruppe – und warum?</li><li>Für welchen Zweck ist welche Sortierung besonders nützlich (Einkaufen, Ernährung, Lagerung …)?</li></ul></div>
+  </div>`;
+  v.querySelector("#selA").onchange=e=>{ui.cmpA=e.target.value;render();};
+  v.querySelector("#selB").onchange=e=>{ui.cmpB=e.target.value;render();};
+  const f=v.querySelector("#impResFile"); v.querySelector("#impRes").onclick=()=>f.click();
+  f.onchange=async()=>{let n=0;for(const file of f.files){try{const j=JSON.parse(await readFileAsText(file));n+=importResult(j);}catch(e){toast("Datei konnte nicht gelesen werden: "+file.name);}}f.value="";if(n){saveSession();toast(`${n} Sortierung(en) geladen.`);render();}};
+  const ds=v.querySelector("#delSnaps"); if(ds) ds.onclick=async()=>{if(await confirmBox("Alle festgehaltenen und geladenen Sortierungen löschen?","Löschen",true)){session.snapshots=[];saveSession();render();}};
+}
+function chip(id,name){const p=P(id);return `<span class="chip"><span class="mini">${p?picHTML(p):""}</span>${esc(p?p.name:name)}</span>`;}
+function importResult(j){
+  if(!j||j.typ!=="lebensmittel-sortieren-ergebnis") { toast("Das ist keine Ergebnisdatei dieser Anwendung."); return 0; }
+  let n=0;
+  const add=(s)=>{session.snapshots.push(Object.assign({},s,{id:uid("s"),group:s.group||j.gruppe||"Andere Gruppe"}));n++;};
+  if(j.aktuell) add(Object.assign({name:"Endstand"},j.aktuell));
+  (j.festgehalten||[]).forEach(add);
+  return n;
+}
+
+/* =====================================================================
+   9) REFLEXION & EXPORT
+   ===================================================================== */
+const QUESTIONS=[
+  ["q1","Nach welchen Kriterien habt ihr sortiert?"],
+  ["q2","Welche Lebensmittel waren schwierig einzuordnen? Warum?"],
+  ["q3","Welche anderen Sortierungen wären möglich?"],
+  ["q4","Welche Informationen auf Verpackungen helfen bei der Einordnung?"],
+  ["q5","Warum ist die Einteilung in „gesunde“ und „ungesunde“ Lebensmittel möglicherweise zu einfach?"]
+];
+function renderReflection(v){
+  cleanSession();
+  const missing = settings.modes.reasons ? session.cats.filter(c=>!c.reason.trim()) : [];
+  const uns=unsortedIds();
+  v.innerHTML=`<div class="page">
+    <h1>Reflexion</h1>
+    <p class="sub">${session.group?`Gruppe: <b>${esc(session.group)}</b> · `:""}${session.cats.length} Gruppen · ${activeIds().length-uns.length} von ${activeIds().length} Lebensmitteln sortiert</p>
+    ${missing.length?`<div class="warnbox" style="margin-bottom:14px">Für ${missing.length} Gruppe(n) fehlt noch eine Begründung: ${missing.map(c=>esc(c.name||"ohne Namen")).join(", ")}. <a href="#sortieren">Zurück zum Sortieren</a></div>`:""}
+    <div class="panel"><h2>Eure Sortierung</h2>
+      ${session.cats.length?session.cats.map(c=>`<div class="sumcat" style="--c:${c.color}"><h3>${esc(c.name||"(ohne Namen)")} <span class="count" style="--c:${c.color}">${c.items.length}</span></h3>${c.reason.trim()?`<div class="why">Begründung: ${esc(c.reason)}</div>`:""}<div class="chips">${c.items.map(id=>chip(id)).join("")}</div></div>`).join(""):'<p class="na">Noch keine Gruppen angelegt.</p>'}
+      ${uns.length?`<p style="margin:8px 0 4px;font-weight:600">Nicht einsortiert:</p><div class="chips">${uns.map(id=>chip(id)).join("")}</div>`:""}
+    </div>
+    <div class="panel">
+      <h2>Fragen</h2>
+      ${QUESTIONS.map(([k,q])=>`<div class="q"><label for="${k}">${esc(q)}</label><textarea id="${k}" data-q="${k}" rows="3">${esc(session.reflection[k]||"")}</textarea></div>`).join("")}
+    </div>
+    <div class="panel noprint">
+      <h2>Ergebnis sichern</h2>
+      <div class="row">
+        <button class="btn primary" id="expHtml">Ergebnis als Seite speichern (.html)</button>
+        <button class="btn" id="expJson">Ergebnisdatei für Vergleich (.json)</button>
+        <button class="btn" id="copyTxt">Als Text kopieren</button>
+      </div>
+      <p class="sub" style="margin-top:10px">Die .html-Datei lässt sich in jedem Browser öffnen und drucken. Die .json-Datei kann eine andere Gruppe unter „Vergleichen“ laden.</p>
+    </div>
+  </div>`;
+  v.querySelectorAll("[data-q]").forEach(t=>t.addEventListener("input",()=>{session.reflection[t.dataset.q]=t.value;saveSession();}));
+  v.querySelector("#expHtml").onclick=()=>saveFile(`sortierung-${fileSlug(session.group)}-${today()}.html`,resultHTML(),"text/html");
+  v.querySelector("#expJson").onclick=()=>saveFile(`sortierung-${fileSlug(session.group)}-${today()}.json`,JSON.stringify(resultJSON(),null,1),"application/json");
+  v.querySelector("#copyTxt").onclick=async()=>{try{await navigator.clipboard.writeText(resultText());toast("Text kopiert.");}catch(e){modal({title:"Text",body:`<textarea rows="16" readonly>${esc(resultText())}</textarea>`});}};
+}
+function resultJSON(){
+  return {typ:"lebensmittel-sortieren-ergebnis",version:1,gruppe:session.group||"",datum:new Date().toISOString(),titel:settings.title,
+    aktuell:makeSnapshot("Endstand"),festgehalten:session.snapshots,
+    reflexion:QUESTIONS.map(([k,q])=>({frage:q,antwort:session.reflection[k]||""}))};
+}
+function resultText(){
+  let t=`${settings.title}\nGruppe: ${session.group||"-"}\nDatum: ${new Date().toLocaleString("de-DE")}\n\nSORTIERUNG\n`;
+  session.cats.forEach(c=>{t+=`\n■ ${c.name||"(ohne Namen)"} (${c.items.length})\n`;if(c.reason.trim())t+=`  Begründung: ${c.reason}\n`;t+=`  ${c.items.map(id=>P(id)?.name).join(", ")}\n`;});
+  const u=unsortedIds(); if(u.length) t+=`\nNicht einsortiert: ${u.map(id=>P(id)?.name).join(", ")}\n`;
+  if(session.snapshots.length){t+=`\nFESTGEHALTENE SORTIERUNGEN\n`;session.snapshots.forEach(s=>{t+=`\n${s.group?s.group+" – ":""}${s.name}\n`;s.cats.forEach(c=>t+=`  ■ ${c.name}: ${c.items.map(i=>i.name).join(", ")}\n`);});}
+  t+=`\nREFLEXION\n`; QUESTIONS.forEach(([k,q])=>t+=`\n${q}\n${session.reflection[k]||"-"}\n`);
+  return t;
+}
+function resultHTML(){
+  const thumb=id=>{const p=P(id);return `<span class="c"><span class="m">${p?picHTML(p):""}</span>${esc(p?p.name:id)}</span>`;};
+  return `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(settings.title)} – ${esc(session.group||"Ergebnis")}</title>
+<style>body{font-family:system-ui,Arial,sans-serif;max-width:900px;margin:24px auto;padding:0 16px;color:#2b2a26}h1{margin-bottom:0}.s{color:#6f6b62}.g{border-left:6px solid;padding:6px 12px;margin:12px 0;background:#faf8f3;border-radius:6px}.g h3{margin:0 0 6px}.c{display:inline-flex;align-items:center;gap:6px;background:#efece4;border-radius:16px;padding:3px 10px 3px 3px;margin:3px;font-size:14px}.m{width:30px;height:30px;border-radius:50%;overflow:hidden;background:#fff;display:inline-block}.m img,.m svg{width:100%;height:100%;object-fit:contain}.q{margin:14px 0}.q b{display:block}.a{white-space:pre-wrap;border:1px solid #ddd;border-radius:8px;padding:8px;min-height:40px}</style></head><body>
+<h1>${esc(settings.title)}</h1><p class="s">Gruppe: <b>${esc(session.group||"–")}</b> · ${new Date().toLocaleString("de-DE")}</p>
+<h2>Sortierung</h2>${session.cats.map(c=>`<div class="g" style="border-color:${c.color}"><h3>${esc(c.name||"(ohne Namen)")} (${c.items.length})</h3>${c.reason.trim()?`<p class="s"><i>Begründung: ${esc(c.reason)}</i></p>`:""}${c.items.map(thumb).join("")}</div>`).join("")}
+${unsortedIds().length?`<p><b>Nicht einsortiert:</b> ${unsortedIds().map(thumb).join("")}</p>`:""}
+${session.snapshots.length?`<h2>Festgehaltene Sortierungen</h2>${session.snapshots.map(s=>`<h3>${esc((s.group?s.group+" – ":"")+s.name)}</h3>${s.cats.map(c=>`<div class="g" style="border-color:${c.color}"><b>${esc(c.name)}</b>: ${c.items.map(i=>esc(i.name)).join(", ")}</div>`).join("")}`).join("")}`:""}
+<h2>Reflexion</h2>${QUESTIONS.map(([k,q])=>`<div class="q"><b>${esc(q)}</b><div class="a">${esc(session.reflection[k]||"")}</div></div>`).join("")}
+</body></html>`;
+}
+
+/* =====================================================================
+   10) LEHRKRAFTMODUS
+   ===================================================================== */
+function renderTeacher(v){
+  if(settings.pin && !ui.teacherUnlocked){
+    v.innerHTML=`<div class="page" style="max-width:420px"><div class="panel"><h2>Lehrkraftbereich</h2><p class="sub">Bitte PIN eingeben.</p>
+    <form id="pinForm" class="row"><input id="pinIn" type="password" inputmode="numeric" autocomplete="off" style="flex:1;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:10px"><button class="btn primary">Öffnen</button></form></div></div>`;
+    v.querySelector("#pinForm").onsubmit=e=>{e.preventDefault();if(v.querySelector("#pinIn").value===settings.pin){ui.teacherUnlocked=true;render();}else toast("PIN falsch.");};
+    setTimeout(()=>v.querySelector("#pinIn").focus(),30);
+    return;
+  }
+  const tabs=[["produkte","Produkte & Bilder"],["stunde","Stunde vorbereiten"],["daten","Sichern & Laden"]];
+  v.innerHTML=`<div class="page"><h1>Lehrkraftbereich</h1><p class="sub">Lebensmittelpool zusammenstellen, eigene Fotos hochladen, Lernmodi wählen, Daten sichern.</p>
+   <div class="subtabs">${tabs.map(([k,l])=>`<button data-tt="${k}" class="${ui.teacherTab===k?"active":""}">${l}</button>`).join("")}</div><div id="tbody"></div></div>`;
+  v.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{ui.teacherTab=b.dataset.tt;render();});
+  const tb=v.querySelector("#tbody");
+  if(ui.teacherTab==="produkte") teacherProducts(tb); else if(ui.teacherTab==="stunde") teacherLesson(tb); else teacherData(tb);
+}
+function teacherProducts(tb){
+  const inPool=products.filter(p=>p.inPool).length, late=products.filter(p=>p.inPool&&p.late).length;
+  tb.innerHTML=`
+  <div class="panel">
+    <h2>Eigene Produktfotos</h2>
+    <div class="upload-zone" id="uz">
+      <p style="margin:0 0 10px">Fotos hierher ziehen oder auswählen. Aus jedem Foto wird ein neues Produkt (Name = Dateiname, danach anpassbar). JPG, PNG, WebP.</p>
+      <div class="row" style="justify-content:center">
+        <button class="btn primary" id="multi">Mehrere Fotos hochladen</button>
+        <button class="btn" id="cam">📷 Foto aufnehmen</button>
+        <button class="btn" id="newP">＋ Produkt ohne Foto</button>
+      </div>
+      <input type="file" id="multiIn" accept="image/jpeg,image/png,image/webp" multiple class="hidden">
+      <input type="file" id="camIn" accept="image/jpeg,image/png,image/webp" capture="environment" class="hidden">
+    </div>
+    <p class="sub" style="margin:10px 0 0">Tipp: Fotos von echten Verpackungen aus dem Supermarkt oder von zu Hause wirken am besten – Vorderseite gerade fotografieren, ruhiger Hintergrund. Die Nährwerttabelle der Rückseite könnt ihr im Produkt eintragen.</p>
+  </div>
+  <div class="panel">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 style="margin:0">Produkte (${products.length}) · im Pool: ${inPool}${settings.modes.late?` · davon „kommen später“: ${late}`:""}</h2>
+      <div class="row"><input id="pf" placeholder="Suchen …" style="min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+      <button class="btn small" id="allIn">Alle in den Pool</button><button class="btn small" id="noneIn">Keine</button></div>
+    </div>
+    <div class="plist" id="plist"></div>
+  </div>`;
+  const list=tb.querySelector("#plist");
+  const draw=(q="")=>{
+    list.innerHTML=products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).map(p=>{
+      const hasN=NUTR_FIELDS.some(f=>p.nutrition[f[0]]!=null&&p.nutrition[f[0]]!=="");
+      return `<div class="pitem ${p.inPool?"":"out"}"><div class="th">${picHTML(p)}</div><div>
+      <div class="nm">${esc(p.name)}</div>
+      <div class="meta">${p.imageId?"Foto":"Illustration"} · ${hasN?"Nährwerte ✓":"keine Nährwerte"}${p.custom?" · eigenes":""}</div>
+      <div class="acts">
+        <label class="mini"><input type="checkbox" data-pool="${p.id}" ${p.inPool?"checked":""}> Pool</label>
+        ${settings.modes.late?`<label class="mini" title="Erscheint erst im Modus „Neue Lebensmittel“"><input type="checkbox" data-late="${p.id}" ${p.late?"checked":""}> später</label>`:""}
+        <button class="btn small" data-edit="${p.id}">Bearbeiten</button>
+        <button class="iconbtn" data-rm="${p.id}" aria-label="Löschen" title="Löschen">🗑</button>
+      </div></div></div>`;}).join("");
+    list.querySelectorAll("[data-pool]").forEach(c=>c.onchange=()=>{P(c.dataset.pool).inPool=c.checked;saveProducts();teacherProducts(tb);});
+    list.querySelectorAll("[data-late]").forEach(c=>c.onchange=()=>{P(c.dataset.late).late=c.checked;saveProducts();teacherProducts(tb);});
+    list.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editProduct(b.dataset.edit,()=>teacherProducts(tb)));
+    list.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const p=P(b.dataset.rm);if(await confirmBox(`„${p.name}“ endgültig löschen?`,"Löschen",true)){await removeProduct(p.id);teacherProducts(tb);}});
+  };
+  draw();
+  const pf=tb.querySelector("#pf"); pf.oninput=()=>draw(pf.value);
+  tb.querySelector("#allIn").onclick=()=>{products.forEach(p=>p.inPool=true);saveProducts();teacherProducts(tb);};
+  tb.querySelector("#noneIn").onclick=()=>{products.forEach(p=>p.inPool=false);saveProducts();teacherProducts(tb);};
+  const mi=tb.querySelector("#multiIn"), ci=tb.querySelector("#camIn");
+  tb.querySelector("#multi").onclick=()=>mi.click(); tb.querySelector("#cam").onclick=()=>ci.click();
+  mi.onchange=async()=>{await bulkUpload([...mi.files]);mi.value="";};
+  ci.onchange=async()=>{await bulkUpload([...ci.files]);ci.value="";};
+  tb.querySelector("#newP").onclick=()=>editProduct(null,()=>teacherProducts(tb));
+  const uz=tb.querySelector("#uz");
+  uz.addEventListener("dragover",e=>{e.preventDefault();uz.classList.add("drag");});
+  uz.addEventListener("dragleave",()=>uz.classList.remove("drag"));
+  uz.addEventListener("drop",async e=>{e.preventDefault();uz.classList.remove("drag");await bulkUpload([...e.dataTransfer.files]);});
+}
+async function bulkUpload(files){
+  files=files.filter(f=>f&&f.size);
+  if(!files.length) return;
+  const created=[], failed=[];
+  toast(`${files.length} Bild(er) werden verarbeitet …`,1500);
+  for(const f of files){
+    try{
+      const data=await processImage(f); const imgId=uid("img"); await ImageStore.put(imgId,data);
+      const p=normProduct({id:uid("p"),name:nameFromFile(f),custom:true,imageId:imgId,art:{t:"box",c:"#8a8f5c",l:nameFromFile(f)}});
+      products.push(p); created.push(p);
+    }catch(e){failed.push(f.name+" ("+e.message+")");}
+  }
+  saveProducts();
+  if(failed.length) toast("Nicht übernommen: "+failed.join(", "),5000);
+  if(created.length) nameReviewDialog(created);
+  render();
+}
+function nameReviewDialog(list){
+  const body=`<p>Bitte die Namen prüfen. Weitere Angaben (Zutaten, Nährwerte) über „Bearbeiten“.</p>
+   ${list.map(p=>`<div class="row" style="margin-bottom:8px;flex-wrap:nowrap"><div style="width:56px;height:56px;flex:none;border-radius:8px;overflow:hidden;background:#fbfaf7">${picHTML(p).replace("<img","<img style='width:100%;height:100%;object-fit:contain'")}</div>
+   <input data-nm="${p.id}" value="${esc(p.name)}" maxlength="80" style="flex:1;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+   <select data-un="${p.id}" style="min-height:44px;border:1px solid var(--line);border-radius:10px"><option value="g">g</option><option value="ml">ml</option></select></div>`).join("")}`;
+  modal({title:`${list.length} neue Produkte`,body,buttons:[{label:"Übernehmen",cls:"primary",onClick:(el)=>{
+    el.querySelectorAll("[data-nm]").forEach(i=>{const p=P(i.dataset.nm);if(p)p.name=i.value.trim()||p.name;});
+    el.querySelectorAll("[data-un]").forEach(s=>{const p=P(s.dataset.un);if(p)p.unit=s.value;});
+    saveProducts();render();
+  }}]});
+}
+async function removeProduct(id){
+  const p=P(id); if(p.imageId && !products.some(x=>x!==p&&x.imageId===p.imageId)) await ImageStore.del(p.imageId);
+  products=products.filter(x=>x.id!==id);
+  session.cats.forEach(c=>c.items=c.items.filter(x=>x!==id));
+  saveProducts();saveSession();
+}
+function editProduct(id,after){
+  const isNew=!id;
+  const p = isNew ? normProduct({id:uid("p"),name:"",custom:true,art:{t:"box",c:"#5f8a8b",l:""}}) : structuredClone(P(id));
+  let newImg=undefined; // undefined = unverändert, null = entfernen, string = neues Bild
+  const body=document.createElement("div");
+  const artOpts=ART_TYPES.map(([k,l])=>`<option value="${k}" ${p.art.t===k?"selected":""}>${l}</option>`).join("");
+  body.innerHTML=`
+   <div class="detail" style="grid-template-columns:200px 1fr">
+     <div>
+       <div class="big" id="ePic" style="width:200px;height:200px"></div>
+       <div class="row" style="margin-top:8px">
+         <button class="btn small" id="eUp">Bild hochladen</button>
+         <button class="btn small" id="eCam">📷 Foto</button>
+         <button class="btn small danger" id="eRm">Bild entfernen</button>
+       </div>
+       <input type="file" id="eUpIn" accept="image/jpeg,image/png,image/webp" class="hidden">
+       <input type="file" id="eCamIn" accept="image/jpeg,image/png,image/webp" capture="environment" class="hidden">
+       <div id="artBox" style="margin-top:10px">
+         <label class="field">Illustration (ohne Foto)<select id="eArt">${artOpts}</select></label>
+         <label class="field" style="margin-top:6px">Farbe<input type="color" id="eCol" value="${p.art.c||"#5f8a8b"}"></label>
+         <label class="field" style="margin-top:6px">Aufschrift<input id="eLbl" value="${esc(p.art.l||"")}" maxlength="20"></label>
+       </div>
+     </div>
+     <div>
+       <label class="field">Produktname<input id="eName" value="${esc(p.name)}" maxlength="80" required></label>
+       <label class="field" style="margin-top:10px">Zutatenliste (von der Verpackung übertragen)<textarea id="eIng" rows="3" placeholder="leer = keine Angabe">${esc(p.ingredients)}</textarea></label>
+       <div class="row" style="margin-top:10px">
+         <label class="field">Bezugsgröße<select id="eUnit"><option value="g" ${p.unit==="g"?"selected":""}>pro 100 g</option><option value="ml" ${p.unit==="ml"?"selected":""}>pro 100 ml</option></select></label>
+         <label class="field" style="flex:1">Verarbeitungsgrad (NOVA)<select id="eNova"><option value="">nicht eingeordnet</option>${[1,2,3,4].map(n=>`<option value="${n}" ${p.nova===n?"selected":""}>${NOVA_TEXT[n]}</option>`).join("")}</select></label>
+       </div>
+       <p style="margin:12px 0 4px;font-weight:700">Nährwerte – nur verifizierte Werte von der Verpackung, leer lassen wenn unbekannt</p>
+       <div class="grid3">${NUTR_FIELDS.map(f=>`<label class="field">${f[1]} (${f[2]})<input data-n="${f[0]}" inputmode="decimal" value="${p.nutrition[f[0]]??""}"></label>`).join("")}</div>
+       <label class="field" style="margin-top:10px">Quelle der Angaben<input id="eSrc" value="${esc(p.source)}" placeholder="z. B. Verpackung, Foto vom 16.11.2026"></label>
+     </div>
+   </div>`;
+  const pic=body.querySelector("#ePic");
+  const curImg=()=> newImg===undefined ? (p.imageId&&ImageStore.get(p.imageId)) : newImg;
+  const drawPic=()=>{
+    const im=curImg();
+    p.art={t:body.querySelector("#eArt").value,c:body.querySelector("#eCol").value,l:body.querySelector("#eLbl").value,
+      ...(P(p.id)&&P(p.id).art.t===body.querySelector("#eArt").value?Object.fromEntries(Object.entries(P(p.id).art).filter(([k])=>!["t","c","l"].includes(k))):{})};
+    pic.innerHTML= im?`<img src="${im}" alt="">`:artSVG(p.art);
+    body.querySelector("#eRm").disabled=!im;
+  };
+  ["#eArt","#eCol","#eLbl"].forEach(s=>body.querySelector(s).addEventListener("input",drawPic));
+  const pick=async(input)=>{const f=input.files[0];input.value="";if(!f)return;try{newImg=await processImage(f);drawPic();}catch(e){toast(e.message);}};
+  body.querySelector("#eUp").onclick=()=>body.querySelector("#eUpIn").click();
+  body.querySelector("#eCam").onclick=()=>body.querySelector("#eCamIn").click();
+  body.querySelector("#eUpIn").onchange=e=>pick(e.target);
+  body.querySelector("#eCamIn").onchange=e=>pick(e.target);
+  body.querySelector("#eRm").onclick=()=>{newImg=null;drawPic();};
+  drawPic();
+  modal({title:isNew?"Neues Produkt":"Produkt bearbeiten",body,wide:true,buttons:[{label:"Abbrechen"},{label:"Speichern",cls:"primary",onClick:async()=>{
+    const name=body.querySelector("#eName").value.trim(); if(!name){toast("Bitte einen Namen eingeben.");return false;}
+    const nut={}; let bad=false;
+    body.querySelectorAll("[data-n]").forEach(i=>{const raw=i.value.trim().replace(",",".");if(raw===""){nut[i.dataset.n]=null;return;}const n=Number(raw);if(!isFinite(n)||n<0){bad=true;i.style.borderColor="var(--danger)";}else nut[i.dataset.n]=n;});
+    if(bad){toast("Bitte nur Zahlen bei den Nährwerten.");return false;}
+    p.name=name;p.ingredients=body.querySelector("#eIng").value.trim();p.unit=body.querySelector("#eUnit").value;
+    const nv=body.querySelector("#eNova").value;p.nova=nv?Number(nv):null;p.nutrition=nut;p.source=body.querySelector("#eSrc").value.trim();
+    if(newImg!==undefined){
+      const oldId=p.imageId;
+      if(newImg){const nid=uid("img");await ImageStore.put(nid,newImg);p.imageId=nid;} else p.imageId=null;
+      if(oldId && !products.some(x=>x.id!==p.id&&x.imageId===oldId)) await ImageStore.del(oldId);
+    }
+    const i=products.findIndex(x=>x.id===p.id); if(i>=0) products[i]=normProduct(p); else products.push(normProduct(p));
+    saveProducts(); after&&after(); renderHeader();
+  }}]});
+}
+function teacherLesson(tb){
+  const m=settings.modes, d=settings.details;
+  tb.innerHTML=`
+  <div class="panel"><h2>Titel</h2><input id="lt" value="${esc(settings.title)}" maxlength="60" style="width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:10px"></div>
+  <div class="panel"><h2>Lernmodi</h2>
+    <p class="sub">Freies Sortieren ist immer aktiv. Die gewählten Zusatzmodi erscheinen bei den Schülerinnen und Schülern als Schaltflächen.</p>
+    <label class="check"><input type="checkbox" data-m="timer" ${m.timer?"checked":""}> B · Sortieren unter Zeitdruck – Dauer <input id="tm" type="number" min="1" max="60" value="${settings.timerMin}" style="width:80px;min-height:40px;border:1px solid var(--line);border-radius:8px;padding:6px"> Minuten</label>
+    <label class="check"><input type="checkbox" data-m="late" ${m.late?"checked":""}> C · Neue Lebensmittel nachreichen (Produkte mit „später“ erscheinen erst auf Knopfdruck)</label>
+    <label class="check"><input type="checkbox" data-m="reasons" ${m.reasons?"checked":""}> D · Begründungsmodus (jede Gruppe braucht eine Begründung)</label>
+    <label class="check"><input type="checkbox" data-m="compare" ${m.compare?"checked":""}> E · Vergleichsmodus (Sortierungen festhalten und vergleichen)</label>
+  </div>
+  <div class="panel"><h2>Detailansicht für Schülerinnen und Schüler</h2>
+    <label class="check"><input type="checkbox" data-d="ingredients" ${d.ingredients?"checked":""}> Zutatenliste</label>
+    <label class="check"><input type="checkbox" data-d="nutrition" ${d.nutrition?"checked":""}> Nährwerttabelle</label>
+    <label class="check"><input type="checkbox" data-d="nova" ${d.nova?"checked":""}> Verarbeitungsgrad (NOVA)</label>
+    <p class="sub" style="margin:6px 0 0">Tipp: Für den ersten Durchgang ausschalten, damit die Gruppen eigene Kriterien finden – später einschalten.</p>
+  </div>
+  <div class="panel"><h2>Arbeitsfläche</h2>
+    <p class="sub">Leert Gruppen, festgehaltene Sortierungen und Reflexion auf diesem Gerät – z. B. für die nächste Gruppe. Produkte und Bilder bleiben.</p>
+    <button class="btn danger" id="resetS">Arbeitsfläche zurücksetzen</button>
+  </div>
+  <div class="panel"><h2>PIN für den Lehrkraftbereich</h2>
+    <p class="sub">Einfacher Schutz gegen versehentliche Änderungen (kein Sicherheitsschutz). Leer = kein PIN.</p>
+    <div class="row"><input id="pinSet" type="password" inputmode="numeric" value="${esc(settings.pin)}" maxlength="12" style="min-height:44px;border:1px solid var(--line);border-radius:10px;padding:10px"><button class="btn" id="pinSave">PIN speichern</button></div>
+  </div>`;
+  tb.querySelector("#lt").oninput=e=>{settings.title=e.target.value||"Lebensmittel sortieren";saveSettings();renderHeader();};
+  tb.querySelectorAll("[data-m]").forEach(c=>c.onchange=()=>{settings.modes[c.dataset.m]=c.checked;saveSettings();renderHeader();});
+  tb.querySelector("#tm").onchange=e=>{settings.timerMin=Math.max(1,Math.min(60,Number(e.target.value)||5));e.target.value=settings.timerMin;saveSettings();};
+  tb.querySelectorAll("[data-d]").forEach(c=>c.onchange=()=>{settings.details[c.dataset.d]=c.checked;saveSettings();});
+  tb.querySelector("#resetS").onclick=async()=>{if(await confirmBox("Arbeitsfläche auf diesem Gerät zurücksetzen? Nicht exportierte Ergebnisse gehen verloren.","Zurücksetzen",true)){session=newSession();saveSession();toast("Arbeitsfläche ist leer.");}};
+  tb.querySelector("#pinSave").onclick=()=>{settings.pin=tb.querySelector("#pinSet").value.trim();saveSettings();ui.teacherUnlocked=true;toast(settings.pin?"PIN gespeichert.":"PIN entfernt.");};
+}
+function teacherData(tb){
+  tb.innerHTML=`
+  <div class="panel"><h2>Stundenpaket exportieren</h2>
+    <p class="sub">Enthält alle Produkte, eigene Fotos und die Einstellungen der Stunde. Auf den Schüler-Tablets über „Stundenpaket laden“ einspielen – so haben alle Gruppen denselben Lebensmittelpool.</p>
+    <div class="row"><button class="btn primary" id="expPkg">Stundenpaket speichern (.json)</button>
+    <button class="btn" id="expPkgNoImg">Nur Produktdaten, ohne Fotos</button></div>
+  </div>
+  <div class="panel"><h2>Stundenpaket laden</h2>
+    <p class="sub">„Ersetzen“ übernimmt Produkte und Einstellungen vollständig. „Ergänzen“ fügt nur Produkte hinzu, die noch fehlen.</p>
+    <div class="row"><button class="btn primary" id="impRep">Laden &amp; ersetzen</button><button class="btn" id="impAdd">Laden &amp; ergänzen</button></div>
+    <input type="file" id="impIn" accept=".json,application/json" class="hidden">
+  </div>
+  <div class="panel"><h2>Speicher auf diesem Gerät</h2><p id="stInfo" class="sub">wird ermittelt …</p>
+    <div class="infobox">Alle Daten liegen nur in diesem Browser auf diesem Gerät. Beim Löschen der Browserdaten sind sie weg – exportiert das Stundenpaket als Sicherung.</div>
+  </div>
+  <div class="panel"><h2>Auf Ausgangszustand zurücksetzen</h2>
+    <p class="sub">Löscht eigene Produkte, Fotos, Einstellungen und die Arbeitsfläche auf diesem Gerät und stellt den Standardbestand (${DEFAULT_PRODUCTS.length} Lebensmittel) wieder her.</p>
+    <button class="btn danger" id="factory">Alles zurücksetzen</button>
+  </div>`;
+  let mode="replace"; const fi=tb.querySelector("#impIn");
+  tb.querySelector("#expPkg").onclick=()=>exportPackage(true);
+  tb.querySelector("#expPkgNoImg").onclick=()=>exportPackage(false);
+  tb.querySelector("#impRep").onclick=()=>{mode="replace";fi.click();};
+  tb.querySelector("#impAdd").onclick=()=>{mode="merge";fi.click();};
+  fi.onchange=async()=>{const f=fi.files[0];fi.value="";if(!f)return;try{const j=JSON.parse(await readFileAsText(f));await importPackage(j,mode);}catch(e){toast("Datei konnte nicht gelesen werden.");}};
+  tb.querySelector("#factory").onclick=async()=>{if(await confirmBox("Wirklich alles zurücksetzen? Eigene Produkte und Fotos werden gelöscht.","Alles zurücksetzen",true)){
+    await ImageStore.clear();products=DEFAULT_PRODUCTS.map(normProduct);settings=structuredClone(DEFAULT_SETTINGS);session=newSession();saveProducts();saveSettings();saveSession();ui.teacherUnlocked=false;toast("Zurückgesetzt.");render();}};
+  (async()=>{
+    const imgs=products.filter(p=>p.imageId).length; let s=`${products.length} Produkte, ${imgs} mit Foto. Bildspeicher: ${ImageStore.ok?"verfügbar":"<b>nicht verfügbar</b> – Fotos gehen beim Schließen verloren"}.`;
+    try{if(navigator.storage&&navigator.storage.estimate){const e=await navigator.storage.estimate();s+=` Belegt: ca. ${(e.usage/1048576).toFixed(1)} MB.`;}}catch(e){}
+    const el=tb.querySelector("#stInfo"); if(el) el.innerHTML=s;
+  })();
+}
+function exportPackage(withImages){
+  const images={}; if(withImages) products.forEach(p=>{if(p.imageId){const d=ImageStore.get(p.imageId);if(d)images[p.imageId]=d;}});
+  const pkg={typ:"lebensmittel-sortieren-paket",version:1,exportiert:new Date().toISOString(),
+    einstellungen:Object.assign({},settings,{pin:""}),produkte:products.map(p=>withImages?p:Object.assign({},p,{imageId:null})),bilder:images};
+  saveFile(`stundenpaket-${fileSlug(settings.title)}-${today()}.json`,JSON.stringify(pkg),"application/json");
+}
+async function importPackage(j,mode){
+  if(!j||j.typ!=="lebensmittel-sortieren-paket"||!Array.isArray(j.produkte)){toast("Das ist kein Stundenpaket dieser Anwendung.");return;}
+  const imgs=j.bilder||{};
+  for(const [k,v] of Object.entries(imgs)){ if(typeof v==="string"&&v.startsWith("data:image/")) await ImageStore.put(k,v); }
+  const incoming=j.produkte.map(normProduct).map(p=>(p.imageId&&!ImageStore.get(p.imageId))?Object.assign(p,{imageId:null}):p);
+  if(mode==="replace"){
+    products=incoming;
+    if(j.einstellungen){const pin=settings.pin;settings=Object.assign(structuredClone(DEFAULT_SETTINGS),j.einstellungen);settings.modes=Object.assign({},DEFAULT_SETTINGS.modes,j.einstellungen.modes||{});settings.details=Object.assign({},DEFAULT_SETTINGS.details,j.einstellungen.details||{});settings.pin=pin;}
+    session=newSession();
+  } else {
+    let n=0; incoming.forEach(p=>{if(!P(p.id)){products.push(p);n++;}}); toast(`${n} Produkte ergänzt.`);
+  }
+  saveProducts();saveSettings();saveSession();
+  if(mode==="replace") toast(`Stundenpaket geladen: ${products.length} Produkte.`);
+  render();
+}
+
+/* =====================================================================
+   11) START
+   ===================================================================== */
+(async function init(){
+  await ImageStore.init();
+  if(!ImageStore.ok) warnStorage("Hinweis: Dieser Browser erlaubt keinen dauerhaften Bildspeicher. Eigene Fotos bitte über „Sichern & Laden“ exportieren.");
+  try{localStorage.setItem("lms.test","1");localStorage.removeItem("lms.test");}catch(e){warnStorage("Hinweis: Speichern im Browser ist hier nicht möglich. Ergebnisse bitte vor dem Schließen exportieren.");}
+  route();
+  if(session.timerEnd && !session.timerOver && Date.now()>session.timerEnd){ session.timerEnd=null; saveSession(); render(); }
+})();
+</script>
+</body>
+</html>

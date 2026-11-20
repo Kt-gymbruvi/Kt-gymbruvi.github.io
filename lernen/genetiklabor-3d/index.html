@@ -1,0 +1,2673 @@
+<!doctype html><html lang="de"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="stylesheet" href="../schriften/schriften.css">
+</head><body>
+<nav class="lernangebot-leiste" aria-label="Zurück"><style>.lernangebot-leiste{all:initial!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;width:100%!important;min-height:44px!important;padding:0 8px!important;background:#eef2f7!important;border-bottom:1px solid rgba(10,45,83,.1)!important;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI Variable Text","Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:-.01em!important}.lernangebot-leiste a{all:initial!important;display:inline-flex!important;align-items:center!important;gap:2px!important;box-sizing:border-box!important;min-height:36px!important;padding:0 12px 0 6px!important;border-radius:999px!important;color:#0f6f8f!important;font:inherit!important;cursor:pointer!important}.lernangebot-leiste a:hover{background:rgba(10,45,83,.07)!important}.lernangebot-leiste a:focus-visible{outline:3px solid #0f7f6c!important;outline-offset:2px!important}.lernangebot-leiste svg{display:block!important;width:20px!important;height:20px!important;flex:none!important}@media (prefers-color-scheme:dark){.lernangebot-leiste{background:#061a33!important;border-bottom-color:rgba(255,255,255,.1)!important}.lernangebot-leiste a{color:#6fd3bf!important}.lernangebot-leiste a:hover{background:rgba(255,255,255,.08)!important}.lernangebot-leiste a:focus-visible{outline-color:#6fd3bf!important}}@media print{.lernangebot-leiste{display:none!important}}</style><a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>Lernangebote</a></nav>
+<title>Genetiklabor 3D</title>
+<style>
+:root{
+  --stage-a:#0c1a2b; --stage-b:#17304b; --stage-ink:#e8eef5; --stage-muted:#9db0c4; --stage-line:#2b4460;
+  --bg:#eef1f0; --panel:#fbfcfb; --ink:#16202c; --muted:#556272; --line:#cfd6d4;
+  --accent:#12436d; --accent-ink:#ffffff; --hl:#ffd43b; --hl-ink:#2b2200;
+  --note-bg:#fff6d8; --note-line:#d9ac2b; --note-ink:#3d3000;
+  --sun-a:#ffffff; --sun-b:#e9eef2; --sun-ink:#16202c; --sun-line:#8a99a8;
+  --start:#2f9e44; --stop:#e03131;
+  --bA:#2f9e44; --bT:#e03131; --bU:#f76707; --bG:#1c7ed6; --bC:#7048e8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0b131d; --panel:#111c29; --ink:#e6edf4; --muted:#9aa9b9; --line:#2a3a4c;
+    --accent:#ffd43b; --accent-ink:#231c00;
+    --note-bg:#2c2610; --note-line:#8a6d14; --note-ink:#f3e3a6;
+    --sun-a:#1a2838; --sun-b:#223346; --sun-ink:#e6edf4; --sun-line:#5d7187;
+  }
+}
+:root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg:#0b131d; --panel:#111c29; --ink:#e6edf4; --muted:#9aa9b9; --line:#2a3a4c;
+    --accent:#ffd43b; --accent-ink:#231c00;
+    --note-bg:#2c2610; --note-line:#8a6d14; --note-ink:#f3e3a6;
+    --sun-a:#1a2838; --sun-b:#223346; --sun-ink:#e6edf4; --sun-line:#5d7187;
+  }
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  display:flex;flex-direction:column;background:var(--bg);color:var(--ink);
+  font-family:"Avenir Next","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%;
+}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+
+/* Kopfzeile */
+.top{
+  display:flex;align-items:center;flex-wrap:wrap;
+  padding:8px 14px;padding-top:calc(8px + env(safe-area-inset-top,0px));
+  background:var(--stage-a);color:var(--stage-ink);
+}
+.top h1{font-size:19px;line-height:1.2;margin:0 14px 0 0;font-weight:700;letter-spacing:.01em}
+.top .sub{font-size:15px;color:var(--stage-muted);margin-right:auto}
+.top .status{display:flex;align-items:center;font-size:15px}
+.phase{background:var(--hl);color:var(--hl-ink);font-weight:700;border-radius:4px;padding:2px 9px;margin-right:10px}
+.count{color:var(--stage-muted);white-space:nowrap}
+
+[hidden]{display:none !important}
+/* Modulauswahl */
+.mods{display:flex;background:var(--stage-a);padding:0 8px;border-top:1px solid var(--stage-line);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mods button{min-height:46px;padding:0 16px;background:none;border:0;border-bottom:3px solid transparent;
+  color:var(--stage-muted);font-size:16px;font-weight:600;white-space:nowrap;cursor:pointer}
+.mods button[aria-selected="true"]{color:var(--stage-ink);border-bottom-color:var(--hl)}
+/* Modulleisten unter der 3D-Ansicht (PCR, Gel) */
+.modbar{border-top:1px solid var(--stage-line);padding:6px 10px 8px;display:flex;flex-wrap:wrap;align-items:center}
+.modbar .ro{margin:2px 20px 2px 0}
+.modbar .ro span{display:block;font-size:12.5px;color:var(--stage-muted);white-space:nowrap}
+.modbar .ro strong{font-size:20px;line-height:1.2;white-space:nowrap}
+.modbar .ro small{font-size:13px;font-weight:600;color:var(--stage-muted)}
+.modbar .slide{display:flex;align-items:center;flex:1 1 250px;margin:2px 0;font-size:15px}
+.modbar .slide label{margin-right:10px;white-space:nowrap}
+.modbar .slide input{flex:1;min-width:90px;height:44px;margin:0;accent-color:var(--hl)}
+.modbar .slide output{min-width:4.2em;text-align:right;font-weight:700}
+.modbar button{min-height:44px;padding:0 14px;margin:2px 0 2px 12px;border-radius:8px;border:1px solid var(--stage-line);
+  background:none;color:var(--stage-ink);font-size:15px;font-weight:600;cursor:pointer}
+.modbar button[aria-pressed="true"]{background:var(--hl);border-color:var(--hl);color:var(--hl-ink)}
+.legend b{display:inline-block;width:18px;height:10px;border-radius:2px;margin:0 5px 0 10px}
+.legend b:first-child{margin-left:0}
+
+/* Hauptbereich */
+.app{flex:1;min-height:0;display:flex}
+.stage{flex:1;min-width:0;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,var(--stage-a),var(--stage-b));color:var(--stage-ink)}
+.view{flex:1;min-height:0;position:relative;overflow:hidden}
+.view canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;cursor:grab}
+.view canvas.drag{cursor:grabbing}
+.legend{position:absolute;left:10px;top:10px;display:flex;align-items:center;font-size:13px;color:var(--stage-muted);pointer-events:none}
+.legend i{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:4px;margin-right:4px;
+  text-align:center;font-style:normal;font-weight:700;color:#fff;font-size:14px}
+.legend span{margin-left:4px}
+.viewbtn{position:absolute;right:10px;top:10px;min-height:44px;min-width:44px;padding:0 12px;
+  background:rgba(12,26,43,.72);border:1px solid var(--stage-line);border-radius:8px;color:var(--stage-ink);font-size:14px}
+.gesture{position:absolute;left:10px;bottom:8px;font-size:13px;color:var(--stage-muted);pointer-events:none}
+.fail{position:absolute;left:0;top:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;
+  padding:24px;text-align:center;font-size:17px}
+
+/* Sequenzleiste */
+.strip{border-top:1px solid var(--stage-line);padding:6px 8px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.strip .row{display:grid;grid-template-columns:7.6em repeat(38,minmax(12px,1fr));align-items:center;min-width:560px}
+.strip .lab{font-size:12.5px;color:var(--stage-muted);white-space:nowrap;padding-right:6px}
+.strip .end{font-size:11.5px;color:var(--stage-muted);text-align:center}
+.strip .c{font-family:ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;font-weight:700;font-size:13px;
+  line-height:19px;height:19px;text-align:center;color:#fff;border-radius:3px;margin:1px .5px}
+.strip .c.gap{margin-left:3.5px}
+.strip .c.todo{background:transparent !important;color:transparent;box-shadow:inset 0 0 0 1px var(--stage-line)}
+.strip .c.cur{box-shadow:0 0 0 2px var(--hl)}
+.strip .c.stopcur{box-shadow:0 0 0 2px #ff6b6b}
+.strip .row.faded .c{opacity:.32}
+.strip .aa{font-size:12.5px;font-weight:700;line-height:19px;height:19px;text-align:center;border-radius:10px;
+  margin:1px 1.5px 1px 4px;background:var(--hl);color:var(--hl-ink)}
+.strip .aa.wait{background:transparent;color:transparent;box-shadow:inset 0 0 0 1px var(--stage-line)}
+.bA{background:var(--bA)}.bT{background:var(--bT)}.bU{background:var(--bU)}.bG{background:var(--bG)}.bC{background:var(--bC)}
+
+/* Seitenfeld */
+.panel{width:40%;max-width:520px;min-width:330px;display:flex;flex-direction:column;background:var(--panel);
+  border-left:1px solid var(--line)}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;min-height:48px;background:none;border:0;border-bottom:3px solid transparent;
+  font-size:16px;font-weight:600;color:var(--muted);padding:4px 6px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.pane{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 18px 20px;display:none}
+.pane.on{display:block}
+.pane h2{font-size:21px;line-height:1.25;margin:0 0 10px;font-weight:700}
+.pane p{margin:0 0 12px;max-width:34em}
+.pane .steptext{font-size:18px;line-height:1.5}
+.note{background:var(--note-bg);border-left:4px solid var(--note-line);color:var(--note-ink);
+  padding:10px 12px;font-size:15px;line-height:1.4;margin-top:16px;max-width:36em}
+.note strong{display:block;margin-bottom:2px}
+.limits{margin:0;padding-left:1.15em;max-width:36em}
+.limits li{margin-bottom:9px;font-size:16px}
+
+/* Codon-Sonne */
+#sun{display:block;width:100%;max-width:470px;height:auto;margin:0 auto;touch-action:manipulation}
+#sun .sec{fill:var(--sun-a);stroke:var(--sun-line);stroke-width:.7;cursor:pointer}
+#sun .sec.alt{fill:var(--sun-b)}
+#sun .sec.start{fill:var(--start)}
+#sun .sec.stop{fill:var(--stop)}
+#sun .sec.on{fill:var(--hl)}
+#sun .sec.dim{opacity:.5}
+#sun text{fill:var(--sun-ink);pointer-events:none;font-family:inherit;font-weight:700;text-anchor:middle;dominant-baseline:central}
+#sun text.inv{fill:#fff}
+#sun text.onink{fill:var(--hl-ink)}
+#sun text.dim{opacity:.6}
+.sunres{font-size:18px;font-weight:600;min-height:2.9em;margin:10px 0 8px}
+.keys{display:flex;flex-wrap:wrap;margin:0 -4px 10px}
+.keys button{min-width:48px;min-height:48px;margin:4px;border-radius:8px;border:0;color:#fff;font-weight:700;font-size:19px;cursor:pointer}
+.keys button.plain{background:none;border:1px solid var(--line);color:var(--ink);font-size:16px;font-weight:600;padding:0 14px}
+.modelcodon{border-top:1px solid var(--line);padding-top:10px;font-size:16px;display:flex;align-items:center;flex-wrap:wrap}
+.modelcodon span{margin-right:10px}
+.modelcodon button{min-height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:none;font-size:16px;font-weight:600;cursor:pointer}
+.modelcodon button:disabled{opacity:.4}
+.sunhelp{font-size:15px;color:var(--muted);margin:0 0 8px}
+
+/* Steuerleiste */
+.controls{display:flex;align-items:center;flex-wrap:wrap;padding:8px 10px;
+  padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));background:var(--panel);border-top:1px solid var(--line)}
+.controls button{min-height:48px;min-width:112px;margin:4px;padding:0 16px;border-radius:8px;border:1px solid var(--line);
+  background:none;font-size:17px;font-weight:600;cursor:pointer}
+.controls button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.controls button:disabled{opacity:.38;cursor:default}
+.speed{display:flex;align-items:center;margin:4px 4px 4px auto;font-size:16px}
+.speed label{margin-right:10px;white-space:nowrap}
+.speed input{width:170px;height:44px;margin:0;accent-color:var(--accent)}
+.speed output{display:inline-block;min-width:3.2em;text-align:right;font-weight:700}
+
+/* Epigenetik: Unterkapitel-Auswahl und Zustandsanzeigen */
+.modbar .subsel{display:flex;flex-wrap:wrap;margin:0 14px 2px 0}
+.modbar .subsel button{margin:2px 8px 2px 0}
+.modbar .ro strong.small{font-size:17px}
+.cpgs{display:flex;flex-wrap:wrap;margin:2px 14px 2px 0}
+.cpg{min-width:80px;margin:2px 6px 2px 0;padding:2px 8px 3px;border-radius:6px;border:1px solid var(--stage-line)}
+.cpg span{display:block;font-size:12.5px;color:var(--stage-muted);white-space:nowrap}
+.cpg strong{display:block;font-size:16px;line-height:1.25;white-space:nowrap}
+.cpg.on{background:var(--hl);border-color:var(--hl);color:var(--hl-ink)}
+.cpg.on span{color:var(--hl-ink)}
+/* Genregulation nach der Transkription: eigene Unterkapitel-Auswahl (nicht .subsel, damit die Epigenetik-Auswahl unberührt bleibt) */
+.modbar .psel{display:flex;flex-wrap:wrap;margin:0 14px 2px 0}
+.modbar .psel button{margin:2px 8px 2px 0}
+.cpg.wide{min-width:96px}
+
+@media (max-width:820px),(orientation:portrait){
+  .app{flex-direction:column}
+  .stage{flex:none;height:48%}
+  .panel{width:auto;max-width:none;min-width:0;flex:1;min-height:0;border-left:0;border-top:1px solid var(--line)}
+  .top .sub{display:none}
+  .top h1{margin-right:auto}
+  .controls button{flex:1;min-width:96px}
+  .speed{margin-left:4px;flex:1 1 100%}
+  .speed input{flex:1;width:auto}
+  .gesture{display:none}
+}
+@media (max-width:520px){
+  .controls button{min-width:0;padding:0 6px;font-size:15px}
+  .legend span{display:none}
+  .viewbtn{font-size:13px;padding:0 8px}
+}
+</style>
+
+<header class="top">
+  <h1>Genetiklabor 3D</h1>
+  <div class="status"><span class="phase" id="phase">Überblick</span><span class="count" id="count">Schritt 0 von 18</span></div>
+</header>
+<nav class="mods" role="tablist" aria-label="Modulauswahl">
+  <button type="button" role="tab" data-mod="tt" aria-selected="true">Transkription und Translation</button>
+  <button type="button" role="tab" data-mod="pcr" aria-selected="false">PCR</button>
+  <button type="button" role="tab" data-mod="gel" aria-selected="false">Gelelektrophorese</button>
+  <button type="button" role="tab" data-mod="epi" aria-selected="false">Epigenetik</button>
+  <button type="button" role="tab" data-mod="post" aria-selected="false">Genregulation nach der Transkription</button>
+</nav>
+
+<main class="app">
+  <section class="stage" aria-label="3D-Modell">
+    <div class="view" id="view">
+      <canvas id="gl" aria-label="3D-Szene: mit dem Finger oder der Maus drehen, mit zwei Fingern oder dem Mausrad zoomen"></canvas>
+      <div class="legend" id="legend" aria-hidden="true"></div>
+      <button class="viewbtn" id="viewreset" type="button">Ansicht zentrieren</button>
+      <div class="gesture">Ziehen: drehen. Zwei Finger oder Mausrad: zoomen.</div>
+      <div class="fail" id="fail"></div>
+    </div>
+    <div class="strip" id="strip" aria-label="Sequenzleiste"></div>
+    <div class="modbar" id="pcrbar" hidden>
+      <div class="ro"><span>Temperatur (Richtwert)</span><strong id="pcrTemp">–</strong></div>
+      <div class="ro"><span>Zyklus</span><strong id="pcrCyc">0</strong></div>
+      <div class="ro"><span>DNA-Doppelstränge</span><strong id="pcrN">1</strong></div>
+      <div class="ro"><span>davon genau Ziellänge</span><strong id="pcrExact">0</strong></div>
+      <div class="slide" id="pcrCountBox" hidden>
+        <label for="pcrCount">Zyklen</label>
+        <input type="range" id="pcrCount" min="0" max="30" step="1" value="4">
+        <output id="pcrCountOut" for="pcrCount">4</output>
+      </div>
+    </div>
+    <div class="modbar" id="gelbar" hidden>
+      <div class="slide">
+        <label for="gelTime">Laufzeit</label>
+        <input type="range" id="gelTime" min="0" max="60" step="1" value="0" disabled>
+        <output id="gelTimeOut" for="gelTime">0 min</output>
+      </div>
+      <button type="button" id="gelReveal" aria-pressed="false">Fragmentlängen einblenden</button>
+    </div>
+    <div class="modbar" id="methbar" hidden>
+      <div class="subsel" role="group" aria-label="Unterkapitel Epigenetik">
+        <button type="button" data-sub="meth" aria-pressed="true">DNA-Methylierung</button>
+        <button type="button" data-sub="hist" aria-pressed="false">Histonmodifikation</button>
+      </div>
+      <div class="ro"><span>Gen</span><strong class="small" id="methGene">aktiv</strong></div>
+      <div class="cpgs" aria-label="Zustand der CpG-Stellen">
+        <div class="cpg" id="cpg0"><span>CpG 1</span><strong>offen</strong></div>
+        <div class="cpg" id="cpg1"><span>CpG 2</span><strong>offen</strong></div>
+        <div class="cpg" id="cpg2"><span>CpG 3</span><strong>offen</strong></div>
+        <div class="cpg" id="cpg3"><span>CpG 4</span><strong>offen</strong></div>
+      </div>
+      <button type="button" id="methCtl" aria-pressed="false">Kontrollansicht einblenden</button>
+    </div>
+    <div class="modbar" id="histbar" hidden>
+      <div class="subsel" role="group" aria-label="Unterkapitel Epigenetik">
+        <button type="button" data-sub="meth" aria-pressed="false">DNA-Methylierung</button>
+        <button type="button" data-sub="hist" aria-pressed="true">Histonmodifikation</button>
+      </div>
+      <div class="ro"><span>Chromatin</span><strong class="small" id="histState">Euchromatin</strong></div>
+      <div class="ro"><span>Gen zugänglich</span><strong class="small" id="histAcc">ja</strong></div>
+      <div class="ro"><span>Markierungen am Histonschwanz</span><strong class="small" id="histMarks">keine</strong></div>
+    </div>
+    <div class="modbar" id="rnaibar" hidden>
+      <div class="psel" role="group" aria-label="Unterkapitel Genregulation nach der Transkription">
+        <button type="button" data-psub="rnai" aria-pressed="true">RNA-Interferenz</button>
+        <button type="button" data-psub="splice" aria-pressed="false">Alternatives Spleißen</button>
+      </div>
+      <div class="ro"><span>Ziel-mRNA</span><strong class="small" id="riMrna">intakt</strong></div>
+      <div class="ro"><span>Genexpression</span><strong class="small" id="riExpr">normal</strong></div>
+      <div class="ro"><span>siRNA-Länge (Richtwert)</span><strong class="small">ca. 21–23 Nukleotide</strong></div>
+      <button type="button" id="riCtl" aria-pressed="false">Vergleich ohne RNAi einblenden</button>
+    </div>
+    <div class="modbar" id="splicebar" hidden>
+      <div class="psel" role="group" aria-label="Unterkapitel Genregulation nach der Transkription">
+        <button type="button" data-psub="rnai" aria-pressed="false">RNA-Interferenz</button>
+        <button type="button" data-psub="splice" aria-pressed="true">Alternatives Spleißen</button>
+      </div>
+      <div class="ro"><span>Variante</span><strong class="small" id="spVar">noch keine</strong></div>
+      <div class="cpgs" aria-label="Schalter: welche Abschnitte in der mRNA enthalten sind (hervorgehoben = enthalten)">
+        <div class="cpg" id="spx0"><span>Exon 1</span><strong>–</strong></div>
+        <div class="cpg wide" id="spx1"><span>Intron 1</span><strong>–</strong></div>
+        <div class="cpg" id="spx2"><span>Exon 2</span><strong>–</strong></div>
+        <div class="cpg wide" id="spx3"><span>Intron 2</span><strong>–</strong></div>
+        <div class="cpg" id="spx4"><span>Exon 3</span><strong>–</strong></div>
+        <div class="cpg wide" id="spx5"><span>Intron 3</span><strong>–</strong></div>
+        <div class="cpg" id="spx6"><span>Exon 4</span><strong>–</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" aria-selected="true" data-tab="p-text">Erklärung</button>
+      <button type="button" role="tab" aria-selected="false" data-tab="p-sun" id="tabSun">Codon-Sonne</button>
+      <button type="button" role="tab" aria-selected="false" data-tab="p-lim">Modellgrenzen</button>
+    </div>
+
+    <div class="pane on" id="p-text" role="tabpanel">
+      <h2 id="title"></h2>
+      <p class="steptext" id="text" aria-live="polite"></p>
+      <div class="note">
+        <strong>Hinweis: vereinfachtes Modell</strong>
+        <span id="note"></span>
+      </div>
+    </div>
+
+    <div class="pane" id="p-sun" role="tabpanel">
+      <p class="sunhelp">Lies von innen (5′) nach außen (3′): erste, zweite, dritte Base des Codons der mRNA. Ganz außen steht die Aminosäure.</p>
+      <svg id="sun" viewBox="0 0 440 440" role="img" aria-label="Codon-Sonne der Standard-Codontabelle"></svg>
+      <p class="sunres" id="sunres" aria-live="polite"></p>
+      <div class="keys" id="keys">
+        <button type="button" class="bU" data-b="U">U</button>
+        <button type="button" class="bC" data-b="C">C</button>
+        <button type="button" class="bA" data-b="A">A</button>
+        <button type="button" class="bG" data-b="G">G</button>
+        <button type="button" class="plain" data-b="">Auswahl löschen</button>
+      </div>
+      <div class="modelcodon">
+        <span id="mcodon">Im Modell wird noch kein Codon gelesen.</span>
+        <button type="button" id="mshow" disabled>In der Sonne zeigen</button>
+      </div>
+    </div>
+
+    <div class="pane" id="p-lim" role="tabpanel">
+      <h2>Was dieses Modell vereinfacht</h2>
+      <ul class="limits" id="lim-tt">
+        <li><strong>Öffnen der DNA:</strong> Im Modell öffnet allein die RNA-Polymerase die Doppelhelix. Helikase-Aktivität und weitere Hilfsproteine (bei Eukaryoten die allgemeinen Transkriptionsfaktoren) sind nicht dargestellt.</li>
+        <li><strong>Promotor und Ende des Gens:</strong> Der Promotor ist nur als kurze Sequenz direkt vor dem Gen angedeutet. Eine Terminatorsequenz und die nicht übersetzten Bereiche der mRNA fehlen weitgehend.</li>
+        <li><strong>Länge:</strong> Die mRNA hat hier nur 26 Basen und 7 Codons. Echte Gene sind Hunderte bis viele Tausend Basenpaare lang.</li>
+        <li><strong>Zelltyp:</strong> Bei Eukaryoten wird die mRNA im Zellkern noch bearbeitet (unter anderem Spleißen) und durch Kernporen transportiert. Bei Prokaryoten beginnt die Translation schon während der Transkription. Beides ist nicht dargestellt.</li>
+        <li><strong>Translation:</strong> Initiationsfaktoren, Elongationsfaktoren, Freisetzungsfaktoren am Stoppcodon und der Energiebedarf (GTP, ATP) fehlen. Auch das Beladen der tRNAs mit ihrer Aminosäure durch eigene Enzyme wird nicht gezeigt.</li>
+        <li><strong>Formen:</strong> DNA, RNA-Polymerase, Ribosom und tRNA sind stark vereinfachte Körper. Die DNA ist in Längsrichtung gestreckt, Größenverhältnisse stimmen nicht. Die Farben sind frei gewählt.</li>
+        <li><strong>Ablauf:</strong> Es arbeitet nur ein Ribosom; in der Zelle lesen meist mehrere Ribosomen dieselbe mRNA. Die Faltung des Polypeptids zum Protein ist nicht dargestellt.</li>
+      </ul>
+      <ul class="limits" id="lim-pcr" hidden>
+        <li><strong>Richtwerte:</strong> Etwa 95 °C, 50 bis 65 °C und 72 °C sind übliche Richtwerte. Die tatsächlichen Temperaturen und Zeiten hängen von den Primern, der verwendeten DNA-Polymerase und der Länge des Zielabschnitts ab.</li>
+        <li><strong>Verdopplung:</strong> 2ⁿ Doppelstränge nach n Zyklen sind ein theoretischer Höchstwert. In Wirklichkeit verdoppelt sich die DNA nicht in jedem Zyklus vollständig, und in späten Zyklen flacht die Vermehrung ab, weil Primer und Nukleotide knapp werden.</li>
+        <li><strong>Ausgangsmenge:</strong> Das Modell beginnt mit einem einzigen Doppelstrang. Ein echter Ansatz enthält meist sehr viele Vorlagen-Moleküle, die nicht alle gleichzeitig reagieren.</li>
+        <li><strong>Darstellung der DNA:</strong> Die DNA ist als gerade Leiter gezeichnet, nicht als Doppelhelix, und ohne Basenfolge. Die Längen sind nicht maßstabsgetreu: Primer sind meist etwa 18 bis 25 Nukleotide lang, Zielabschnitte oft einige Hundert bis einige Tausend Basenpaare.</li>
+        <li><strong>Reaktionsansatz:</strong> Nukleotide, Pufferlösung und weitere Zusätze sind nicht dargestellt. Die hitzestabile DNA-Polymerase erscheint nur als einfache Kugel.</li>
+        <li><strong>Länge der Produkte:</strong> Im Modell läuft die Polymerase immer bis zum Ende der Vorlage. Wie weit sie tatsächlich kommt, hängt von der Dauer der Elongation ab.</li>
+        <li><strong>Anzahl der gezeichneten Moleküle:</strong> Es werden höchstens 16 Doppelstränge gezeichnet. Größere Mengen erscheinen nur als Zahl.</li>
+      </ul>
+      <ul class="limits" id="lim-gel" hidden>
+        <li><strong>Laufstrecke:</strong> Die Laufstrecke ist vereinfacht logarithmisch dargestellt: Sie nimmt gleichmäßig mit dem Logarithmus der Fragmentlänge ab. Das gilt in echten Gelen nur näherungsweise und nur in einem mittleren Längenbereich.</li>
+        <li><strong>Einflussgrößen:</strong> Die Laufstrecke hängt auch von der Gelkonzentration, der angelegten Spannung, der Pufferlösung und der Laufzeit ab. Alle Zahlen (Basenpaare, Minuten) sind Beispielwerte.</li>
+        <li><strong>Sichtbarkeit:</strong> DNA ist im Gel zunächst unsichtbar und wird erst durch einen DNA-Farbstoff erkennbar, meist nach dem Lauf. Im Modell sind die Banden ständig zu sehen.</li>
+        <li><strong>Banden:</strong> Eine Bande besteht aus sehr vielen gleich langen Fragmenten. Hier ist sie ein einzelner Balken mit einheitlicher Helligkeit; das Verbreitern der Banden durch Diffusion fehlt.</li>
+        <li><strong>Aufbau:</strong> Pufferlösung, Stromquelle, Kabel und der Ladepuffer, der die Proben in die Taschen sinken lässt, sind nicht dargestellt.</li>
+        <li><strong>Proben:</strong> A und B sind erfundene Beispiele. Wie die Fragmente entstanden sind (etwa durch PCR oder durch Schneiden mit Restriktionsenzymen), zeigt das Modell nicht.</li>
+      </ul>
+      <ul class="limits" id="lim-meth" hidden>
+        <li><strong>Darstellung der DNA:</strong> Gezeigt ist ein sehr kurzer Abschnitt (33 Basenpaare) als gerade Leiter, nicht als Doppelhelix. Der Promotor enthält nur vier CpG-Stellen; echte Promotoren können sehr viel mehr enthalten.</li>
+        <li><strong>Methylgruppe:</strong> Die Methylgruppe (CH₃) ist als gelbe Kugel am Cytosin gezeichnet, nicht an ihrer genauen Position im Molekül. Methyliert sind im Modell immer die Cytosine beider Stränge einer CpG-Stelle.</li>
+        <li><strong>Zeitlicher Ablauf:</strong> Im Modell methyliert eine einzelne DNMT die Stellen nacheinander, kurz nachdem das Gen abgelesen wurde. In der Zelle werden Methylierungsmuster vor allem während der Entwicklung und Zelldifferenzierung festgelegt und nach jeder DNA-Replikation erhalten. Dieser Unterschied ist nicht dargestellt.</li>
+        <li><strong>Wirkung:</strong> Die Genaktivität erscheint als „aktiv“ oder „stummgeschaltet“. In Wirklichkeit ist die Wirkung oft abgestuft. Wie die bindenden Proteine weitere Proteine heranholen und das Chromatin verdichten, ist nur im Text angedeutet; Chromatin-Remodeling-Komplexe sind nicht dargestellt.</li>
+        <li><strong>Umkehrbarkeit:</strong> Das Entfernen von Methylgruppen (Demethylierung) wird nicht gezeigt.</li>
+        <li><strong>Formen:</strong> Transkriptionsfaktoren, RNA-Polymerase, DNMT und bindende Proteine sind einfache Körper. Größenverhältnisse sind nicht maßstabsgetreu, die Farben sind frei gewählt. Die mRNA ist nur als Reihe von Bausteinen angedeutet.</li>
+        <li><strong>Hinweis, kein Lerninhalt des Modells:</strong> Ob und in welchem Umfang epigenetische Markierungen über Generationen weitergegeben werden, wird in der Forschung diskutiert. Das Modell trifft dazu keine Aussage.</li>
+      </ul>
+      <ul class="limits" id="lim-hist" hidden>
+        <li><strong>Anzahl:</strong> Gezeigt sind nur fünf Nucleosomen. Im Zellkern liegen sehr viele Nucleosomen hintereinander. Die DNA windet sich knapp zweimal um jeden Histonkern; sie ist als einfacher Schlauch ohne Basen gezeichnet.</li>
+        <li><strong>Histone:</strong> Die acht Histone sind als Kugeln dargestellt, ihre Anordnung im Histonkern ist vereinfacht. Das Linker-Histon H1 fehlt.</li>
+        <li><strong>Histonschwanz:</strong> Nur ein einziger Histonschwanz (von Histon H3) mit 14 Aminosäuren ist gezeigt. In Wirklichkeit hat jedes der acht Histone einen Schwanz, und die Schwänze sind länger.</li>
+        <li><strong>Modifikationsmuster vereinfacht:</strong> Gezeigt sind nur Acetylierung und Methylierung an drei Lysinen (K4, K9, K14). Dass Lysine ein-, zwei- oder dreifach methyliert sein können, ist nicht unterschieden. Weitere Modifikationen wie die Phosphorylierung fehlen. In der Zelle wirkt meist die Kombination vieler Markierungen zusammen.</li>
+        <li><strong>Verdichtung:</strong> Der Übergang zwischen Euchromatin und Heterochromatin ist als gleichmäßige Bewegung gezeichnet, die räumliche Anordnung der Nucleosomen ist frei gewählt. Chromatin-Remodeling-Komplexe, die Nucleosomen verschieben oder lösen, sind nicht dargestellt.</li>
+        <li><strong>Formen:</strong> Enzyme, Transkriptionsfaktor, RNA-Polymerase und bindende Proteine sind einfache Körper. Größenverhältnisse sind nicht maßstabsgetreu, die Farben sind frei gewählt.</li>
+        <li><strong>Hinweis, kein Lerninhalt des Modells:</strong> Ob und in welchem Umfang epigenetische Markierungen über Generationen weitergegeben werden, wird in der Forschung diskutiert. Das Modell trifft dazu keine Aussage.</li>
+      </ul>
+      <ul class="limits" id="lim-rnai" hidden>
+        <li><strong>Fehlende Proteine:</strong> Dicer, RISC und Argonaute sind einfache Körper. Weitere beteiligte Proteine fehlen, zum Beispiel Helikasen und Hilfsproteine, die die siRNA an den RISC übergeben. Der RISC besteht in der Zelle aus Argonaute und weiteren Proteinen.</li>
+        <li><strong>Längen sind Richtwerte:</strong> Eine siRNA ist etwa 21 bis 23 Nukleotide je Strang lang (Richtwert), im Modell 21. Dass die beiden Stränge an ihren 3′-Enden meist um zwei Nukleotide überstehen, ist nicht dargestellt. Die dsRNA ist im Modell 63 Basenpaare lang; in der Zelle ist sie oft deutlich länger, etwa mehrere Hundert Basenpaare (Richtwert). Größenverhältnisse sind nicht maßstabsgetreu, die Farben sind frei gewählt.</li>
+        <li><strong>Nur eine Zielsequenz:</strong> Die mRNA hat im Modell genau eine Zielsequenz, und nur eine siRNA wird verfolgt. Weil eine lange dsRNA meist einem längeren Abschnitt der mRNA entspricht, können die übrigen siRNAs an anderen Stellen derselben mRNA binden. Die mRNA ist mit 27 Basen sehr kurz; Cap und Poly-A-Schwanz fehlen.</li>
+        <li><strong>Passagier-Strang:</strong> Im Modell wird er einfach entfernt. In der Zelle wird er häufig vom Argonaute-Protein zerschnitten und dann abgebaut. Welcher Strang zum Guide-Strang wird, hängt unter anderem davon ab, wie fest die Enden der siRNA gepaart sind.</li>
+        <li><strong>Spaltung:</strong> Nicht alle Argonaute-Proteine können schneiden. Ist die Paarung zwischen Guide-Strang und mRNA nicht vollständig, wird die mRNA oft nicht gespalten, sondern ihre Translation gehemmt. Das ist typisch für miRNAs (Mikro-RNAs), die die Zelle selbst bildet; sie sind nicht dargestellt.</li>
+        <li><strong>Abbau und Wirkung:</strong> Nukleasen sind nicht als Körper gezeigt; der Abbau erscheint als Verschwinden der Bausteine. Wie viele mRNA-Moleküle abgebaut werden und wie stark die Genexpression sinkt, zeigt das Modell nicht. Meist sinkt sie deutlich, aber nicht immer vollständig.</li>
+        <li><strong>Vergleich:</strong> Die Kontrollansicht zeigt ein Ribosom und ein kurzes Protein nur als Symbol. Ablauf und Größe der Translation sind im Modul „Transkription und Translation“ genauer dargestellt.</li>
+        <li><strong>Hinweis, kein Lerninhalt des Modells:</strong> RNA-Interferenz wird in Forschung und Medizin genutzt, um gezielt einzelne Gene stummzuschalten.</li>
+      </ul>
+      <ul class="limits" id="lim-splice" hidden>
+        <li><strong>Spleißosom stark vereinfacht:</strong> Das Spleißosom besteht aus mehreren kleinen Komplexen aus RNA und Proteinen (snRNPs) und vielen weiteren Proteinen, die sich an jedem Intron schrittweise zusammenlagern. Im Modell ist es ein einfacher Körper je herausgeschnittenem Stück. Die chemischen Schritte des Spleißens und weitere beteiligte Komplexe fehlen.</li>
+        <li><strong>Regulation:</strong> Proteine, die an die prä-mRNA binden und die Auswahl der Exons steuern (Spleißfaktoren), sind nur im Text erwähnt und nicht dargestellt. Die Schalter zeigen nur das Ergebnis der Auswahl, nicht ihre Ursache.</li>
+        <li><strong>Größen nicht maßstabsgetreu:</strong> Exons und Introns sind im Modell fast gleich lang. In Wirklichkeit sind Introns oft viel länger als Exons, und die Längen schwanken stark.</li>
+        <li><strong>Exons und Protein:</strong> Im Modell entspricht jedes Exon genau einem Abschnitt des Proteins. Exons enthalten aber auch nicht codierende Bereiche (am Anfang und am Ende der mRNA), und Exongrenzen müssen nicht mit Grenzen von Proteinabschnitten übereinstimmen. Beim Exon-Skipping bleibt im Modell das Leseraster erhalten; ist die Basenzahl des übersprungenen Exons nicht durch drei teilbar, verschiebt es sich.</li>
+        <li><strong>Intron-Retention:</strong> Gezeigt ist der Fall, dass das Intron ein Stoppcodon im Leseraster enthält und ein verkürztes Protein entsteht. Häufig wird eine solche mRNA auch im Zellkern zurückgehalten oder abgebaut, bevor viel Protein entsteht.</li>
+        <li><strong>Drei Moleküle:</strong> Die oberste Zeile zeigt die prä-mRNA nur als Vorlage. Jede Zeile darunter steht für ein eigenes Molekül derselben prä-mRNA. In der Zelle wird jedes Molekül einmal gespleißt, oft schon während der Transkription.</li>
+        <li><strong>Weitere Bearbeitung:</strong> 5′-Cap, Poly-A-Schwanz und der Transport durch die Kernporen sind nicht dargestellt. Weitere Formen des alternativen Spleißens, etwa alternative Spleißstellen, fehlen.</li>
+      </ul>
+    </div>
+  </aside>
+</main>
+
+<footer class="controls">
+  <button type="button" class="primary" id="bStart">Start</button>
+  <button type="button" id="bNext">Weiter</button>
+  <button type="button" id="bBack">Zurück</button>
+  <button type="button" id="bReset">Zurücksetzen</button>
+  <div class="speed">
+    <label for="speed">Geschwindigkeit</label>
+    <input type="range" id="speed" min="0.5" max="3" step="0.25" value="1">
+    <output id="speedOut" for="speed">1×</output>
+  </div>
+</footer>
+
+<script src="three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* =====================================================================
+     1. Fachliche Daten
+     ===================================================================== */
+  // mRNA 5'->3': Vorlauf ACC, dann AUG GCU CAC GAA CUC AAA UAA, Nachlauf GG
+  var MRNA = "ACCAUGGCUCACGAACUCAAAUAAGG";
+  var FLANK_L = "TATAAT";            // angedeuteter Promotor (nicht transkribiert)
+  var FLANK_R = "GCTA";              // DNA hinter dem Gen (nicht transkribiert)
+  var DNA_COMP = { A: "T", T: "A", G: "C", C: "G" };
+  var RNA_COMP = { A: "U", U: "A", G: "C", C: "G" };
+  var CODING = FLANK_L + MRNA.replace(/U/g, "T") + FLANK_R;   // nicht-codogener Strang 5'->3'
+  var TEMPLATE = CODING.split("").map(function (b) { return DNA_COMP[b]; }).join(""); // codogener Strang 3'->5'
+  var NBP = CODING.length, NM = MRNA.length, OFF = FLANK_L.length;
+  var FIRST = MRNA.indexOf("AUG");   // Position des Startcodons in der mRNA
+
+  // Standard-Codontabelle, Reihenfolge U, C, A, G für alle drei Positionen
+  var ORDER = "UCAG";
+  var TABLE = "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG";
+  var AA = {
+    F: ["Phe", "Phenylalanin"], L: ["Leu", "Leucin"], S: ["Ser", "Serin"], Y: ["Tyr", "Tyrosin"],
+    C: ["Cys", "Cystein"], W: ["Trp", "Tryptophan"], P: ["Pro", "Prolin"], H: ["His", "Histidin"],
+    Q: ["Gln", "Glutamin"], R: ["Arg", "Arginin"], I: ["Ile", "Isoleucin"], M: ["Met", "Methionin"],
+    T: ["Thr", "Threonin"], N: ["Asn", "Asparagin"], K: ["Lys", "Lysin"], V: ["Val", "Valin"],
+    A: ["Ala", "Alanin"], D: ["Asp", "Asparaginsäure"], E: ["Glu", "Glutaminsäure"], G: ["Gly", "Glycin"],
+    "*": ["Stopp", "Stoppcodon"]
+  };
+  function codonAt(i) {
+    return ORDER[i >> 4] + ORDER[(i >> 2) & 3] + ORDER[i & 3];
+  }
+  function aaOf(codon) {
+    var i = ORDER.indexOf(codon[0]) * 16 + ORDER.indexOf(codon[1]) * 4 + ORDER.indexOf(codon[2]);
+    return TABLE[i];
+  }
+  function anticodon(codon) {       // 3'->5' geschrieben, steht also direkt unter dem Codon
+    return codon.split("").map(function (b) { return RNA_COMP[b]; }).join("");
+  }
+
+  // Leseraster ab AUG bis einschließlich Stoppcodon
+  var CODONS = [];
+  for (var ci = FIRST; ci + 3 <= NM; ci += 3) {
+    var cd = MRNA.substr(ci, 3);
+    CODONS.push(cd);
+    if (aaOf(cd) === "*") break;
+  }
+  var NAA = CODONS.length - 1;       // Anzahl Aminosäuren (ohne Stoppcodon)
+  var STOPCODON = CODONS[NAA];
+  var PEPTIDE = CODONS.slice(0, NAA).map(function (c) { return AA[aaOf(c)][0]; });
+
+  /* =====================================================================
+     2. Schritte: Texte und Zielzustände
+     ===================================================================== */
+  var BY = -19;                      // Höhe der mRNA während der Translation
+  function codonX(c) { return 3 * c + FIRST + 1 + OFF - 17.5; }   // x-Mitte von Codon c
+
+  var base = { pol: OFF - 0.5, polOn: 0, rel: 0, tr: 0, small: 0, large: 0, rib: 0, h: 0, free: 0,
+               stop: 0, hc: 0, hcOn: 0, cx: -3.5, cy: -0.3, cw: 42, ch: 9 };
+  for (var k0 = 0; k0 < NAA; k0++) { base["a" + k0] = 0; base["d" + k0] = 0; }
+
+  var STEPS = [];
+  var curP = base;
+  function addStep(def) {
+    var P = {}, key;
+    for (key in curP) P[key] = curP[key];
+    for (key in def.set) P[key] = def.set[key];
+    curP = P;
+    STEPS.push({ title: def.title, text: def.text, phase: def.phase, P: P, seg: def.seg || {},
+                 dur: def.dur || 2.4, codon: def.codon === undefined ? -1 : def.codon });
+  }
+
+  addStep({
+    phase: "Überblick", title: "Ausgangslage: ein Abschnitt der DNA", set: {},
+    text: "Die DNA ist eine Doppelhelix aus zwei Einzelsträngen, die über komplementäre (zueinander passende) Basen verbunden sind: A mit T und G mit C. Die Stränge verlaufen gegenläufig; ihre beiden unterschiedlichen Enden heißen 5′-Ende und 3′-Ende. In der Abfolge der Basen ist festgelegt, in welcher Reihenfolge Aminosäuren zu einem Polypeptid (einer Aminosäurekette) verknüpft werden."
+  });
+  addStep({
+    phase: "Transkription", title: "Die RNA-Polymerase bindet an die DNA", dur: 2.6,
+    set: { polOn: 1, cx: -12, cy: 0, cw: 26 },
+    text: "Die RNA-Polymerase ist das Enzym, das von einem DNA-Abschnitt eine Kopie aus RNA herstellt. Sie bindet am Promotor, einer Erkennungssequenz vor dem Gen, und öffnet dort die Doppelhelix. Nur einer der beiden Stränge dient als Vorlage: der codogene Strang."
+  });
+  addStep({
+    phase: "Transkription", title: "Die mRNA entsteht", dur: 6,
+    set: { pol: OFF + 13, cx: 0, cy: -1.2, cw: 26, ch: 10 },
+    text: "Die RNA-Polymerase liest den codogenen Strang in 3′→5′-Richtung ab und verknüpft passende RNA-Bausteine (Nukleotide) zur mRNA, der Boten-RNA. Die mRNA wächst dadurch in 5′→3′-Richtung. Statt Thymin (T) enthält RNA die Base Uracil (U): Gegenüber von A im codogenen Strang wird U eingebaut."
+  });
+  addStep({
+    phase: "Transkription", title: "Die Doppelhelix schließt sich wieder", dur: 6,
+    set: { pol: OFF + NM + 0.5, cx: 10, cy: -1.2 },
+    text: "Hinter der RNA-Polymerase löst sich die mRNA vom codogenen Strang, und die beiden DNA-Stränge lagern sich wieder zusammen. Vergleiche in der Sequenzleiste: Die mRNA ist komplementär zum codogenen Strang und stimmt mit dem nicht-codogenen Strang überein, nur mit U statt T."
+  });
+  addStep({
+    phase: "Transkription", title: "Ende der Transkription", dur: 3,
+    set: { polOn: 0, rel: 1, cx: -2, cy: -1.8, cw: 40 }, seg: { rel: [0, 0.7], polOn: [0.3, 1] },
+    text: "Am Ende des Gens löst sich die RNA-Polymerase von der DNA und gibt die fertige mRNA frei. Die DNA bleibt unverändert erhalten und kann erneut abgelesen werden."
+  });
+  addStep({
+    phase: "Translation", title: "Die mRNA gelangt zum Ribosom", dur: 3.2,
+    set: { tr: 1, cx: -0.5, cy: BY + 1, cw: 30, ch: 10 },
+    text: "Die mRNA bringt die Information zu einem Ribosom im Cytoplasma. Ribosomen sind die Orte, an denen Aminosäuren zu einem Polypeptid verknüpft werden. Dabei wird die mRNA in Dreiergruppen gelesen: Je drei aufeinanderfolgende Basen bilden ein Codon, das für eine Aminosäure steht."
+  });
+  addStep({
+    phase: "Translation", title: "Start am Startcodon " + CODONS[0], dur: 4.2, codon: 0,
+    set: { small: 1, a0: 1, large: 1, hc: 0, hcOn: 1, cx: codonX(0), cy: BY + 2.6, cw: 21, ch: 14 },
+    seg: { small: [0, 0.35], hcOn: [0.2, 0.45], a0: [0.3, 0.72], large: [0.66, 1] },
+    text: "Die kleine Untereinheit des Ribosoms lagert sich an die mRNA an; die Translation beginnt am Startcodon " + CODONS[0] + ". Dort bindet eine tRNA (Transfer-RNA) mit dem Anticodon 3′-" + anticodon(CODONS[0]) + "-5′, also dem Basentriplett, das komplementär zum Codon ist. Sie trägt die Aminosäure Methionin (Met); danach lagert sich die große Untereinheit an."
+  });
+
+  function chain(n) { return PEPTIDE.slice(0, n).join("–"); }
+  for (var k = 1; k < NAA; k++) {
+    var cdn = CODONS[k], a = AA[aaOf(cdn)], anti = anticodon(cdn), tA;
+    if (k === 1) {
+      tA = "Das Ribosom hat drei Plätze für tRNAs: A (Ankunft), P (hier hängt das Polypeptid) und E (Ausgang, englisch exit). An der A-Stelle liegt jetzt das Codon " + cdn + ". Dazu passt nur eine tRNA mit dem Anticodon 3′-" + anti + "-5′; sie bringt die Aminosäure " + a[1] + " (" + a[0] + ") mit.";
+    } else if (k === 2) {
+      tA = "An der A-Stelle liegt das Codon " + cdn + ". Prüfe mit der Codon-Sonne, für welche Aminosäure es steht: Lies von innen (5′) nach außen (3′). Die passende tRNA mit dem Anticodon 3′-" + anti + "-5′ bringt " + a[1] + " (" + a[0] + ").";
+    } else if (k === 3) {
+      tA = "Das Codon " + cdn + " wird von einer tRNA mit dem Anticodon 3′-" + anti + "-5′ erkannt; sie trägt " + a[1] + " (" + a[0] + "). Jede tRNA-Sorte ist mit genau einer Aminosäure beladen. So wird die Basenfolge der mRNA eindeutig in eine Aminosäurefolge übersetzt.";
+    } else if (k === 4) {
+      tA = "Codon " + cdn + ": Die tRNA mit dem Anticodon 3′-" + anti + "-5′ bringt " + a[1] + " (" + a[0] + "). Die Codon-Sonne zeigt, dass mehrere Codons für " + a[1] + " stehen. Der genetische Code ist also redundant (mehrere Codons für dieselbe Aminosäure), aber eindeutig.";
+    } else {
+      tA = "Codon " + cdn + ": Die tRNA mit dem Anticodon 3′-" + anti + "-5′ bringt " + a[1] + " (" + a[0] + ")." + (k === NAA - 1 ? " Es ist die letzte Aminosäure dieses kurzen Polypeptids, denn das folgende Codon ist " + STOPCODON + "." : "");
+    }
+    var setA = { cx: codonX(k) - 1.5, cy: BY + 3 + 0.25 * k, hc: k };
+    setA["a" + k] = 1;
+    addStep({ phase: "Translation", title: "Codon " + (k + 1) + " (" + cdn + ") wird gelesen", dur: 2.6, codon: k, set: setA, text: tA });
+
+    var tB;
+    if (k === 1) {
+      tB = "Methionin wird von seiner tRNA gelöst und über eine Peptidbindung mit " + a[1] + " verknüpft. Danach rückt das Ribosom um ein Codon in 5′→3′-Richtung weiter. Die entladene tRNA verlässt das Ribosom über die E-Stelle, und an der A-Stelle liegt das nächste Codon.";
+    } else {
+      tB = "Die bisherige Kette " + chain(k) + " wird auf " + a[1] + " übertragen und durch eine Peptidbindung verknüpft; das Polypeptid ist nun " + (k + 1) + " Aminosäuren lang. Das Ribosom rückt ein Codon weiter, die entladene tRNA verlässt es über die E-Stelle.";
+    }
+    var setB = { h: k, rib: k, cx: codonX(k), hc: k + 1 }, segB = { h: [0, 0.4], rib: [0.4, 0.8], hc: [0.4, 0.8] };
+    setB["d" + (k - 1)] = 1; segB["d" + (k - 1)] = [0.62, 1];
+    addStep({ phase: "Translation", title: "Peptidbindung und Weiterrücken", dur: 3.8, codon: k + 1, set: setB, seg: segB, text: tB });
+  }
+  addStep({
+    phase: "Translation", title: "Stoppcodon " + STOPCODON, dur: 1.6, codon: NAA, set: { stop: 1 },
+    text: "An der A-Stelle liegt jetzt das Stoppcodon " + STOPCODON + ". Für die Stoppcodons UAA, UAG und UGA gibt es keine passende tRNA, deshalb wird keine weitere Aminosäure angefügt."
+  });
+  (function () {
+    var set = { free: 1, large: 0, small: 0, stop: 0, hcOn: 0, cx: codonX(NAA - 1) - 3, cy: BY + 5.5, cw: 26, ch: 19 };
+    var seg = { free: [0, 0.6], large: [0.45, 1], small: [0.45, 1], stop: [0, 0.2], hcOn: [0, 0.3] };
+    set["d" + (NAA - 1)] = 1; seg["d" + (NAA - 1)] = [0.3, 0.85];
+    addStep({
+      phase: "Translation", title: "Das Polypeptid wird freigesetzt", dur: 4, set: set, seg: seg,
+      text: "Das Polypeptid " + chain(NAA) + " löst sich von der letzten tRNA, und das Ribosom zerfällt in seine beiden Untereinheiten. Erst durch die Faltung zu einer bestimmten Raumstruktur wird aus einem Polypeptid ein funktionsfähiges Protein."
+    });
+  })();
+
+  /* =====================================================================
+     3. Oberfläche außerhalb der 3D-Szene
+     ===================================================================== */
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt !== undefined) e.textContent = txt;
+    return e;
+  }
+
+  // ---- Sequenzleiste ----
+  var stripCells = { coding: [], template: [], mrna: [], aa: [] }, stripRows = {};
+  (function buildStrip() {
+    var strip = $("strip");
+    function row(name, label, e1, e2, seq, from) {
+      var r = el("div", "row");
+      r.appendChild(el("span", "lab", label));
+      var s1 = el("span", "end", e1); s1.style.gridColumn = "2"; r.appendChild(s1);
+      for (var i = 0; i < seq.length; i++) {
+        var b = i + from, c = el("span", "c b" + seq[i], seq[i]);
+        c.style.gridColumn = String(b + 3);
+        var j = b - OFF - FIRST;
+        if (j >= 0 && j % 3 === 0 && j < CODONS.length * 3 + 1) c.className += " gap";
+        r.appendChild(c);
+        stripCells[name].push(c);
+      }
+      var s2 = el("span", "end", e2); s2.style.gridColumn = String(NBP + 3); r.appendChild(s2);
+      strip.appendChild(r);
+      stripRows[name] = r;
+    }
+    row("coding", "nicht-codogen", "5′", "3′", CODING, 0);
+    row("template", "codogen", "3′", "5′", TEMPLATE, 0);
+    row("mrna", "mRNA", "5′", "3′", MRNA, OFF);
+    var r = el("div", "row");
+    r.appendChild(el("span", "lab", "Polypeptid"));
+    for (var c = 0; c < NAA; c++) {
+      var a = el("span", "aa wait", PEPTIDE[c]);
+      var col = OFF + FIRST + 3 * c + 3;
+      a.style.gridColumn = col + " / span 3";
+      r.appendChild(a);
+      stripCells.aa.push(a);
+    }
+    strip.appendChild(r);
+    stripRows.aa = r;
+  })();
+
+  var stripKey = "";
+  function syncStrip(P) {
+    var n = Math.max(0, Math.min(NM, Math.floor(P.pol - OFF + 1e-6) + 1));
+    var trans = P.tr > 0.5;
+    var cur = P.hcOn > 0.5 ? Math.round(P.hc) : -1;
+    var arrived = 0, i;
+    for (i = 0; i < NAA; i++) if (P["a" + i] > 0.999) arrived = i + 1;
+    var key = n + "|" + trans + "|" + cur + "|" + arrived + "|" + (P.stop > 0.5);
+    if (key === stripKey) return;
+    stripKey = key;
+    for (i = 0; i < NM; i++) {
+      var c = stripCells.mrna[i], cls = "c b" + MRNA[i];
+      var j = i - FIRST;
+      if (j >= 0 && j % 3 === 0 && j < CODONS.length * 3 + 1) cls += " gap";
+      if (i >= n) cls += " todo";
+      if (cur >= 0 && j >= cur * 3 && j < cur * 3 + 3) cls += (cur === NAA ? " stopcur" : " cur");
+      c.className = cls;
+    }
+    stripRows.coding.className = stripRows.template.className = trans ? "row faded" : "row";
+    for (i = 0; i < NAA; i++) stripCells.aa[i].className = i < arrived ? "aa" : "aa wait";
+  }
+
+  // ---- Reiter ----
+  var tabs = document.querySelectorAll(".tabs button");
+  function showTab(id) {
+    for (var i = 0; i < tabs.length; i++) {
+      var on = tabs[i].getAttribute("data-tab") === id;
+      tabs[i].setAttribute("aria-selected", on ? "true" : "false");
+      $(tabs[i].getAttribute("data-tab")).className = on ? "pane on" : "pane";
+    }
+  }
+  for (var ti = 0; ti < tabs.length; ti++) {
+    tabs[ti].addEventListener("click", function () { showTab(this.getAttribute("data-tab")); });
+  }
+
+  // ---- Codon-Sonne ----
+  var sunSecs = [], sunTexts = [], sunSel = { p: "", aa: "" }, modelCodon = "";
+  (function buildSun() {
+    var NS = "http://www.w3.org/2000/svg", svg = $("sun"), C = 220;
+    var RR = [0, 50, 98, 150, 214];
+    function pt(r, deg) {
+      var a = (deg - 90) * Math.PI / 180;
+      return (C + r * Math.cos(a)).toFixed(2) + " " + (C + r * Math.sin(a)).toFixed(2);
+    }
+    function sector(r0, r1, a0, a1) {
+      var d = "M" + pt(r1, a0) + " A" + r1 + " " + r1 + " 0 0 1 " + pt(r1, a1);
+      if (r0 > 0) d += " L" + pt(r0, a1) + " A" + r0 + " " + r0 + " 0 0 0 " + pt(r0, a0) + " Z";
+      else d += " L" + C + " " + C + " Z";
+      return d;
+    }
+    function addSec(r0, r1, a0, a1, cls, data) {
+      var p = document.createElementNS(NS, "path");
+      p.setAttribute("d", sector(r0, r1, a0, a1));
+      p.setAttribute("class", cls);
+      svg.appendChild(p);
+      data.el = p; data.base = cls;
+      sunSecs.push(data);
+      p.addEventListener("click", function () {
+        if (data.aa) setSun("", data.aa); else setSun(data.p, "");
+      });
+      return data;
+    }
+    function addText(r, deg, str, size, rot, data) {
+      var t = document.createElementNS(NS, "text"), a = (deg - 90) * Math.PI / 180;
+      var x = C + r * Math.cos(a), y = C + r * Math.sin(a);
+      t.setAttribute("x", x.toFixed(2)); t.setAttribute("y", y.toFixed(2));
+      t.setAttribute("font-size", size);
+      if (rot !== null) t.setAttribute("transform", "rotate(" + rot.toFixed(2) + " " + x.toFixed(2) + " " + y.toFixed(2) + ")");
+      t.textContent = str;
+      svg.appendChild(t);
+      data.txt = t;
+    }
+    var i, d;
+    for (i = 0; i < 4; i++) {
+      d = addSec(RR[0], RR[1], i * 90, i * 90 + 90, "sec" + (i % 2 ? " alt" : ""), { p: ORDER[i] });
+      addText(27, i * 90 + 45, ORDER[i], 25, null, d);
+    }
+    for (i = 0; i < 16; i++) {
+      d = addSec(RR[1], RR[2], i * 22.5, i * 22.5 + 22.5, "sec" + ((i + (i >> 2)) % 2 ? " alt" : ""), { p: ORDER[i >> 2] + ORDER[i & 3] });
+      addText(75, i * 22.5 + 11.25, ORDER[i & 3], 15, null, d);
+    }
+    var w = 360 / 64;
+    for (i = 0; i < 64; i++) {
+      d = addSec(RR[2], RR[3], i * w, i * w + w, "sec" + ((i + (i >> 2)) % 2 ? " alt" : ""), { p: codonAt(i) });
+      addText(125, i * w + w / 2, ORDER[i & 3], 10.5, null, d);
+    }
+    var g0 = 0, gi = 0;
+    for (i = 1; i <= 64; i++) {
+      if (i === 64 || TABLE[i] !== TABLE[g0]) {
+        var letter = TABLE[g0], mid = (g0 + i) / 2 * w;
+        var cls = "sec" + (gi % 2 ? " alt" : "");
+        if (letter === "*") cls = "sec stop";
+        if (letter === "M") cls = "sec start";
+        d = addSec(RR[3], RR[4], g0 * w, i * w, cls, { aa: letter, from: g0, to: i });
+        d.inv = letter === "*" || letter === "M";
+        addText(182, mid, letter === "M" ? "Met Start" : AA[letter][0], 11, mid > 180 ? mid + 90 : mid - 90, d);
+        g0 = i; gi++;
+      }
+    }
+  })();
+
+  function setSun(prefix, aa) {
+    sunSel.p = prefix; sunSel.aa = aa;
+    var any = prefix !== "" || aa !== "", i;
+    for (i = 0; i < sunSecs.length; i++) {
+      var s = sunSecs[i], on = false;
+      if (prefix) {
+        if (s.p) on = s.p.length <= prefix.length ? prefix.indexOf(s.p) === 0 : s.p.indexOf(prefix) === 0;
+        else if (prefix.length === 3) {
+          var idx = ORDER.indexOf(prefix[0]) * 16 + ORDER.indexOf(prefix[1]) * 4 + ORDER.indexOf(prefix[2]);
+          on = idx >= s.from && idx < s.to;
+        }
+      } else if (aa) {
+        on = s.aa ? s.aa === aa : (s.p.length === 3 && aaOf(s.p) === aa);
+      }
+      s.el.setAttribute("class", s.base + (on ? " on" : (any ? " dim" : "")));
+      s.txt.setAttribute("class", on ? "onink" : ((s.inv ? "inv" : "") + (any ? " dim" : "")));
+    }
+    var out = $("sunres");
+    if (prefix.length === 3) {
+      var l = aaOf(prefix);
+      if (l === "*") out.textContent = "5′-" + prefix + "-3′ ist ein Stoppcodon: Hier endet die Translation, es wird keine Aminosäure eingebaut.";
+      else if (prefix === "AUG") out.textContent = "5′-AUG-3′ steht für Methionin (Met) und ist zugleich das Startcodon.";
+      else out.textContent = "5′-" + prefix + "-3′ steht für " + AA[l][1] + " (" + AA[l][0] + ").";
+    } else if (prefix.length > 0) {
+      out.textContent = "5′-" + prefix + "···".substr(0, 3 - prefix.length) + "-3′: Wähle die " + (prefix.length === 1 ? "zweite" : "dritte") + " Base.";
+    } else if (aa) {
+      var list = [];
+      for (i = 0; i < 64; i++) if (TABLE[i] === aa) list.push(codonAt(i));
+      out.textContent = (aa === "*" ? "Stoppcodons" : AA[aa][1] + " (" + AA[aa][0] + ")") + ": " + list.join(", ");
+    } else {
+      out.textContent = "Tippe die erste Base im inneren Kreis an oder nutze die Tasten.";
+    }
+  }
+  $("keys").addEventListener("click", function (ev) {
+    var t = ev.target;
+    if (!t || !t.hasAttribute || !t.hasAttribute("data-b")) return;
+    var b = t.getAttribute("data-b");
+    if (b === "") setSun("", "");
+    else setSun(sunSel.p.length >= 3 ? b : sunSel.p + b, "");
+  });
+  $("mshow").addEventListener("click", function () { if (modelCodon) setSun(modelCodon, ""); });
+  function setModelCodon(c) {
+    modelCodon = c >= 0 ? CODONS[c] : "";
+    $("mcodon").textContent = modelCodon ? "Im Modell wird gerade gelesen: " + modelCodon : "Im Modell wird noch kein Codon gelesen.";
+    $("mshow").disabled = !modelCodon;
+  }
+  setSun("", "");
+
+  /* =====================================================================
+     3b. Module: PCR und Gelelektrophorese (Schritte, Leisten) und Modulauswahl
+     ===================================================================== */
+  function stepList(base0) {            // wie addStep, aber für eine eigene Schrittliste
+    var list = [], prev = base0;
+    return {
+      steps: list,
+      add: function (def) {
+        var P = {}, key;
+        for (key in prev) P[key] = prev[key];
+        for (key in def.set) P[key] = def.set[key];
+        prev = P;
+        list.push({ title: def.title, text: def.text, phase: def.phase, P: P, seg: def.seg || {},
+                    dur: def.dur || 2.4, temp: def.temp || "", cyc: def.cyc || 0 });
+      }
+    };
+  }
+  function fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+
+  // ---------------- PCR ----------------
+  var PCR_MAX = 4;                       // animierte Zyklen
+  var PCR_SP = [0, 3, 2.6, 2.4, 1.9];    // Zeilenabstand je Stufe
+  function pcrCam(n) {                   // Bildausschnitt für 2^n Doppelstränge
+    var cols = n >= 3 ? 2 : 1, rows = Math.pow(2, n) / cols;
+    return { cw: cols * 17 + 4, ch: (rows - 1) * PCR_SP[n] + 6 };
+  }
+  var pcrBase = { cnt: 0, cx: 0, cy: 0, cw: 21, ch: 6 };
+  for (var pc = 1; pc <= PCR_MAX; pc++) { pcrBase["d" + pc] = 0; pcrBase["a" + pc] = 0; pcrBase["e" + pc] = 0; }
+  var PCR = stepList(pcrBase);
+  PCR.add({
+    phase: "Überblick", title: "Ausgangslage: DNA mit Zielabschnitt", set: {},
+    text: "Die PCR (Polymerase-Kettenreaktion) vervielfältigt einen bestimmten DNA-Abschnitt, den Zielabschnitt (blau), im Reaktionsgefäß. Der Ansatz enthält die DNA-Vorlage, zwei Primer, DNA-Bausteine (Nukleotide) und eine hitzestabile DNA-Polymerase. Ein Thermocycler, ein programmierbares Heizgerät, wiederholt dann immer wieder drei Temperaturschritte."
+  });
+  var T_DEN = "ca. 95 °C", T_ANN = "ca. 50–65 °C", T_EXT = "ca. 72 °C";
+  var PCR_TXT = [null,
+    ["Bei etwa 95 °C (Richtwert) lösen sich die Wasserstoffbrücken zwischen den komplementären Basen. Der DNA-Doppelstrang trennt sich in zwei Einzelstränge; diesen Vorgang nennt man Denaturierung.",
+     "Die Temperatur wird auf etwa 50 bis 65 °C gesenkt (Richtwert, abhängig von den Primern). Primer sind kurze DNA-Einzelstränge, die komplementär zu den Rändern des Zielabschnitts sind. An jeden Einzelstrang lagert sich ein Primer an und legt so den Startpunkt für die DNA-Polymerase fest.",
+     "Bei etwa 72 °C (Richtwert) verlängert die DNA-Polymerase jeden Primer an seinem 3′-Ende um passende Nukleotide. Der neue Strang wächst in 5′→3′-Richtung und ist komplementär zur Vorlage; diesen Schritt nennt man Elongation. Aus einem Doppelstrang sind zwei geworden."],
+    ["Wieder etwa 95 °C (Richtwert): Alle Doppelstränge trennen sich, auch die neu gebildeten. Jeder Einzelstrang dient im nächsten Schritt als Vorlage, deshalb spricht man von einer Kettenreaktion.",
+     "Bei etwa 50 bis 65 °C (Richtwert) lagern sich erneut Primer an. Beachte die Stränge aus Zyklus 1: Sie beginnen mit einem Primer, ragen am anderen Ende aber noch über den Zielabschnitt hinaus (grau).",
+     "Bei etwa 72 °C (Richtwert) werden alle Primer verlängert; aus 2 Doppelsträngen werden 4. An den Strängen aus Zyklus 1 endet die Synthese dort, wo deren Primer liegt. So entstehen erstmals Einzelstränge, die genau so lang sind wie der Zielabschnitt."],
+    ["Etwa 95 °C (Richtwert): Die 4 Doppelstränge trennen sich in 8 Einzelstränge. Die drei Temperaturschritte laufen in jedem Zyklus gleich ab.",
+     "Etwa 50 bis 65 °C (Richtwert): An alle 8 Einzelstränge lagern sich Primer an. Das gelingt, weil die Primer in großem Überschuss im Ansatz vorliegen.",
+     "Etwa 72 °C (Richtwert): Aus 4 Doppelsträngen werden 8. Zwei davon bestehen erstmals aus zwei Strängen, die genau dem Zielabschnitt entsprechen; sie haben keinen grauen Überhang mehr."],
+    ["Etwa 95 °C (Richtwert): Aus 8 Doppelsträngen werden 16 Einzelstränge. Die Zahl der Vorlagen verdoppelt sich mit jedem Zyklus.",
+     "Etwa 50 bis 65 °C (Richtwert): An alle 16 Einzelstränge lagern sich Primer an.",
+     "Etwa 72 °C (Richtwert): Aus 8 Doppelsträngen werden 16, davon haben 8 genau die Länge des Zielabschnitts. Ihr Anteil nimmt von Zyklus zu Zyklus zu, während die Zahl der längeren Stränge nur langsam wächst."]
+  ];
+  for (pc = 1; pc <= PCR_MAX; pc++) {
+    var cam = pcrCam(pc), sD = { cw: cam.cw, ch: cam.ch }, sA = {}, sE = {};
+    sD["d" + pc] = 1; sA["a" + pc] = 1; sE["e" + pc] = 1;
+    PCR.add({ phase: "Zyklus " + pc, title: "Zyklus " + pc + ": Denaturierung", dur: 2.6, set: sD, temp: T_DEN, cyc: pc, text: PCR_TXT[pc][0] });
+    PCR.add({ phase: "Zyklus " + pc, title: "Zyklus " + pc + ": Primer-Anlagerung", dur: 2.6, set: sA, temp: T_ANN, cyc: pc, text: PCR_TXT[pc][1] });
+    PCR.add({ phase: "Zyklus " + pc, title: "Zyklus " + pc + ": Elongation", dur: 3.8, set: sE, temp: T_EXT, cyc: pc, text: PCR_TXT[pc][2] });
+  }
+  PCR.add({
+    phase: "Zählmodus", title: "Zählmodus: bis zu 30 Zyklen", dur: 0.6, set: { cnt: 1 }, cyc: PCR_MAX,
+    text: "Nach n Zyklen sind aus einem Doppelstrang theoretisch 2ⁿ Doppelstränge geworden. Stelle mit dem Regler „Zyklen“ unter der 3D-Ansicht die Zyklenzahl ein: Nach 30 Zyklen wären es über eine Milliarde. Gezeichnet werden höchstens 16 Doppelstränge, alles Weitere zeigt die Zahl."
+  });
+
+  var pcrN = PCR_MAX, pcrKey = "";
+  function pcrSync(P, S) {
+    var lvl = 0, i;
+    for (i = 1; i <= PCR_MAX; i++) if (P["e" + i] > 0.999) lvl = i;
+    var cnt = P.cnt > 0.5, n = cnt ? pcrN : lvl;
+    var key = n + "|" + cnt + "|" + S.temp + "|" + S.cyc;
+    if (key === pcrKey) return;
+    pcrKey = key;
+    $("pcrTemp").textContent = S.temp || "–";
+    $("pcrCyc").textContent = cnt ? String(n) : (S.cyc ? S.cyc + " von " + PCR_MAX : "0");
+    $("pcrN").innerHTML = fmt(Math.pow(2, n)) + " <small>= 2<sup>" + n + "</sup></small>";
+    $("pcrExact").textContent = fmt(n < 1 ? 0 : Math.max(0, Math.pow(2, n) - 2 * n));
+    $("pcrCountBox").hidden = !cnt;
+    $("pcrCountOut").textContent = String(pcrN);
+  }
+  $("pcrCount").addEventListener("input", function () {
+    pcrN = parseInt(this.value, 10) || 0;
+    dirty = true;
+  });
+
+  // ---------------- Gelelektrophorese ----------------
+  var GEL_TMAX = 60;                      // Minuten (Beispielwert)
+  var GEL_LANES = [
+    { name: "M", x: -2.8, bp: [2000, 1000, 500, 200, 100] },
+    { name: "A", x: 0, bp: [1200, 600, 300] },
+    { name: "B", x: 2.8, bp: [1500, 600, 150] }
+  ];
+  // Vereinfachung: relative Laufstrecke nimmt linear mit log10(Länge) ab (100 bp = 1)
+  function gelMob(bp) { return 1 - 0.62 * (Math.log(bp / 100) / Math.LN10); }
+  var GEL = stepList({ load: 0, volt: 0, time: 0, cx: 0.2, cy: 0, cw: 20, ch: 18.5 });
+  GEL.add({
+    phase: "Aufbau", title: "Aufbau der Gelelektrophorese", set: {},
+    text: "Mit der Gelelektrophorese werden DNA-Fragmente nach ihrer Länge aufgetrennt. Das Gel besteht aus Agarose, einem Vielfachzucker, der ein Netz mit feinen Poren bildet; es liegt in einer leitfähigen Pufferlösung zwischen zwei Elektroden. An einem Ende des Gels befinden sich Vertiefungen, die Taschen."
+  });
+  GEL.add({
+    phase: "Vorbereitung", title: "Proben auftragen", dur: 3, set: { load: 1 },
+    text: "In die Taschen werden die DNA-Proben A und B pipettiert. In eine weitere Tasche (M) kommt ein Längenmarker: ein Gemisch aus DNA-Fragmenten bekannter Länge, angegeben in Basenpaaren (bp)."
+  });
+  GEL.add({
+    phase: "Lauf", title: "Spannung anlegen", dur: 3.4, set: { volt: 1, time: 12 }, seg: { volt: [0, 0.25], time: [0.25, 1] },
+    text: "Nun wird eine elektrische Spannung angelegt. DNA ist wegen ihrer Phosphatgruppen negativ geladen und wandert deshalb im elektrischen Feld zur Anode, dem Pluspol. Die Taschen liegen daher auf der Seite der Kathode, des Minuspols."
+  });
+  GEL.add({
+    phase: "Lauf", title: "Auftrennung nach Länge", dur: 5, set: { time: 36 },
+    text: "Die Poren des Gels bremsen lange Fragmente stärker als kurze. Kurze Fragmente wandern deshalb in derselben Zeit weiter als lange. Gleich lange Fragmente bleiben zusammen und bilden eine Bande."
+  });
+  GEL.add({
+    phase: "Auswertung", title: "Auswertung mit dem Längenmarker", dur: 4.5, set: { time: GEL_TMAX },
+    text: "Nach dem Lauf werden die Banden mit einem DNA-Farbstoff sichtbar gemacht. Durch den Vergleich mit dem Längenmarker lässt sich die Länge der Fragmente in A und B abschätzen. Verändere die Laufzeit mit dem Regler und prüfe deine Schätzung mit „Fragmentlängen einblenden“."
+  });
+
+  var gelUser = null, gelReveal = false, gelKey = "";
+  function gelTime(P) { return gelUser !== null ? gelUser : P.time; }
+  function gelSync(P, S) {
+    var t = Math.round(gelTime(P)), off = S.P.volt < 0.5;
+    var key = t + "|" + off + "|" + gelReveal;
+    if (key === gelKey) return;
+    gelKey = key;
+    var sl = $("gelTime");
+    if (gelUser === null) sl.value = String(t);
+    sl.disabled = off;
+    $("gelTimeOut").textContent = t + " min";
+    $("gelReveal").setAttribute("aria-pressed", gelReveal ? "true" : "false");
+    $("gelReveal").textContent = gelReveal ? "Fragmentlängen ausblenden" : "Fragmentlängen einblenden";
+  }
+  $("gelTime").addEventListener("input", function () {
+    gelUser = parseFloat(this.value) || 0;
+    dirty = true;
+  });
+  $("gelReveal").addEventListener("click", function () { gelReveal = !gelReveal; dirty = true; });
+
+  // ---------------- Modulauswahl ----------------
+  var MODS = {
+    tt: {
+      steps: STEPS, last: STEPS.length - 1, sync: syncStrip, az0: 0.3, el0: 0.2, bar: "strip", lim: "lim-tt", sun: true,
+      reset: function () { stripKey = ""; },
+      legend: '<i class="bA">A</i><i class="bT">T</i><i class="bU">U</i><i class="bG">G</i><i class="bC">C</i><span>Basen</span>',
+      note: "Nicht dargestellt sind unter anderem Helikase-Aktivität und weitere Hilfsproteine beim Öffnen der DNA, Initiationsfaktoren und Elongationsfaktoren. Formen und Größen sind nicht maßstabsgetreu. Die vollständige Liste steht unter „Modellgrenzen“."
+    },
+    pcr: {
+      steps: PCR.steps, last: PCR.steps.length - 1, sync: pcrSync, az0: 0.1, el0: 0.1, bar: "pcrbar", lim: "lim-pcr", sun: false,
+      reset: function () { pcrN = PCR_MAX; $("pcrCount").value = String(PCR_MAX); pcrKey = ""; },
+      legend: '<b style="background:#4dabf7"></b>Zielabschnitt<b style="background:#8695a6"></b>übrige DNA<b style="background:#ffd43b"></b>Primer 1<b style="background:#f783ac"></b>Primer 2',
+      note: "Die Temperaturen sind Richtwerte, die Verdopplung in jedem Zyklus (2ⁿ) ist ein theoretischer Höchstwert. Nicht dargestellt sind unter anderem Nukleotide und Pufferlösung; die DNA ist als gerade Leiter statt als Doppelhelix gezeichnet. Die vollständige Liste steht unter „Modellgrenzen“."
+    },
+    gel: {
+      steps: GEL.steps, last: GEL.steps.length - 1, sync: gelSync, az0: 0.12, el0: 1.0, bar: "gelbar", lim: "lim-gel", sun: false,
+      reset: function () { gelUser = null; gelReveal = false; gelKey = ""; },
+      onStep: function () { gelUser = null; gelKey = ""; },
+      legend: "",
+      note: "Die Laufstrecke ist vereinfacht logarithmisch dargestellt. In Wirklichkeit hängt sie auch von der Gelkonzentration und der angelegten Spannung ab; Fragmentlängen und Laufzeiten sind Beispielwerte. Die Banden sind im Modell ständig sichtbar. Die vollständige Liste steht unter „Modellgrenzen“."
+    }
+  };
+  /* =====================================================================
+     3c. Modul Epigenetik: Daten, Schritte und Leisten
+         (zwei Unterkapitel; MODS.epi zeigt immer auf das gewählte)
+     ===================================================================== */
+  // Oberer Strang 5'->3': Promotor mit vier CpG-Stellen, danach der Anfang des Gens
+  var METH_PROM = "ATCGTTACGAGTCCGTTCGAT", METH_GENE = "ATGGCTAAAGTT";
+  var METH_SEQ = METH_PROM + METH_GENE, METH_N = METH_SEQ.length, METH_G0 = METH_PROM.length;
+  var CPG = [];
+  for (var mq = 0; mq + 1 < METH_N; mq++) if (METH_SEQ.substr(mq, 2) === "CG") CPG.push(mq);
+
+  // ---------------- DNA-Methylierung ----------------
+  var methBase = { tf: 0, tfb: 0, pol: 0, px: 0, dn: 0, dx: 0, mb: 0, sil: 0, ctl: 0, cx: 0, cy: 0.9, cw: 36, ch: 9.5 };
+  for (mq = 0; mq < CPG.length; mq++) methBase["m" + mq] = 0;
+  var METH = stepList(methBase);
+  METH.add({
+    phase: "Überblick", title: "Epigenetik: Gene an- und abschalten, ohne die DNA-Sequenz zu ändern", set: {},
+    text: "Fast alle Körperzellen eines Organismus enthalten dieselbe DNA, nutzen aber unterschiedliche Gene. Die Epigenetik untersucht Veränderungen der Genaktivität, die nicht auf einer Änderung der Basenfolge beruhen, sondern auf chemischen Markierungen an der DNA oder an den Proteinen, um die sie gewickelt ist. Gezeigt ist ein Gen (grün) mit seinem Promotor (blau), dem Abschnitt vor dem Gen, an dem die Transkription beginnt. Gelb umrandet sind vier CpG-Stellen: Dort folgt in 5′→3′-Richtung auf ein Cytosin (C) ein Guanin (G); das p steht für die Phosphatgruppe dazwischen."
+  });
+  METH.add({
+    phase: "Unmethyliert", title: "Unmethylierter Promotor: Transkriptionsfaktoren binden", dur: 2.6, set: { tf: 1 },
+    text: "Alle CpG-Stellen sind offen, also nicht methyliert. Transkriptionsfaktoren, das sind Proteine, die an bestimmte Abschnitte des Promotors binden, können sich anlagern. Sie ermöglichen, dass die RNA-Polymerase an den Promotor gelangt und die Transkription beginnt."
+  });
+  METH.add({
+    phase: "Unmethyliert", title: "Das Gen ist aktiv", dur: 4.5, set: { pol: 1, px: 1 }, seg: { pol: [0, 0.25], px: [0.25, 1] },
+    text: "Die RNA-Polymerase liest das Gen ab und stellt eine mRNA her. Das Gen ist aktiv. Welche mRNA entsteht, bestimmt die Basenfolge der DNA."
+  });
+  METH.add({
+    phase: "Methylierung", title: "DNMT überträgt eine Methylgruppe auf Cytosin", dur: 4.2,
+    set: { tf: 0, pol: 0, px: 0, dn: 1, dx: 0, m0: 1 },
+    seg: { tf: [0, 0.3], pol: [0, 0.3], px: [0, 0.3], dn: [0.25, 0.55], m0: [0.6, 0.95] },
+    text: "Eine Methylierung ist das Anhängen einer Methylgruppe (CH₃). Das Enzym DNA-Methyltransferase, kurz DNMT, überträgt sie auf das Cytosin einer CpG-Stelle. Weil die Folge CG auch auf dem Gegenstrang vorkommt, ist hier das Cytosin beider Stränge methyliert. Wichtig: Die DNA-Sequenz ändert sich dabei nicht. Aus C wird kein anderer Buchstabe; das Cytosin trägt nur zusätzlich eine Methylgruppe."
+  });
+  METH.add({
+    phase: "Methylierung", title: "Weitere CpG-Stellen werden methyliert", dur: 5.5,
+    set: { dx: 3, m1: 1, m2: 1, m3: 1 },
+    seg: { dx: [0, 0.9], m1: [0.3, 0.42], m2: [0.52, 0.64], m3: [0.84, 0.96] },
+    text: "Die DNMT methyliert nach und nach auch die übrigen CpG-Stellen im Promotor. Die Zustandsanzeige unter der 3D-Ansicht zeigt für jede CpG-Stelle, ob sie offen oder methyliert ist. Vergleiche die Buchstaben: Die Basenfolge ist dieselbe geblieben."
+  });
+  METH.add({
+    phase: "Stummschaltung", title: "Proteine binden an die methylierten Stellen", dur: 3.2,
+    set: { dn: 0, mb: 1 }, seg: { dn: [0, 0.4], mb: [0.3, 1] },
+    text: "Bestimmte Proteine erkennen methylierte CpG-Stellen und binden dort (Methyl-CpG-bindende Proteine). Sie besetzen den Promotor und holen weitere Proteine heran, die die DNA dichter verpacken (siehe Unterkapitel „Histonmodifikation“). Methylgruppen können außerdem die Bindung mancher Transkriptionsfaktoren direkt behindern."
+  });
+  METH.add({
+    phase: "Stummschaltung", title: "Das Gen ist stummgeschaltet", dur: 3,
+    set: { tfb: 1, sil: 1 }, seg: { tfb: [0, 0.6], sil: [0.5, 1] },
+    text: "Transkriptionsfaktoren finden am Promotor keinen Platz mehr, die RNA-Polymerase kann nicht starten: Es entsteht keine mRNA. Das Gen ist stummgeschaltet, obwohl seine Basenfolge unverändert ist. Epigenetische Markierungen verändern die DNA-Sequenz nicht; sie beeinflussen, ob ein Gen abgelesen wird."
+  });
+  METH.add({
+    phase: "Vergleich", title: "Vergleich mit der Kontrollansicht", dur: 2.6, set: { ctl: 1 },
+    text: "Unten siehst du denselben DNA-Abschnitt ohne Methylierung. Dort binden Transkriptionsfaktoren, und das Gen wird abgelesen. Beide Abschnitte haben genau dieselbe Basenfolge; der Unterschied liegt allein in den Methylgruppen an den CpG-Stellen des Promotors. Methylierungsmuster können bei Zellteilungen an die Tochterzellen weitergegeben werden."
+  });
+
+  var methUserCtl = null, methKey = "";
+  function methCtlK(P) { return methUserCtl !== null ? (methUserCtl ? 1 : 0) : P.ctl; }   // 0..1
+  function methSync(P) {
+    var st = [], nm = 0, i;
+    for (i = 0; i < CPG.length; i++) { st.push(P["m" + i] > 0.5 ? 1 : 0); nm += st[i]; }
+    var ctl = methCtlK(P) > 0.5;
+    var gene = P.sil > 0.5 ? "stummgeschaltet" :
+      nm === CPG.length ? "Promotor methyliert" : nm > 0 ? "Promotor wird methyliert" :
+      P.pol > 0.5 ? "aktiv, wird abgelesen" : "aktiv";
+    var key = st.join("") + "|" + gene + "|" + ctl;
+    if (key === methKey) return;
+    methKey = key;
+    $("methGene").textContent = gene;
+    for (i = 0; i < CPG.length; i++) {
+      var c = $("cpg" + i);
+      c.className = st[i] ? "cpg on" : "cpg";
+      c.lastElementChild.textContent = st[i] ? "methyliert" : "offen";
+    }
+    $("methCtl").setAttribute("aria-pressed", ctl ? "true" : "false");
+    $("methCtl").textContent = ctl ? "Kontrollansicht ausblenden" : "Kontrollansicht einblenden";
+  }
+  $("methCtl").addEventListener("click", function () {
+    methUserCtl = !(methCtlK(paramsAt(step, tt)) > 0.5);
+    dirty = true;
+  });
+
+  // ---------------- Histonmodifikation ----------------
+  var histBase = { dense: 0, tf: 0, pol: 0, px: 0, hat: 0, hmt: 0, hmtAt: 4, hdac: 0, kdm: 0,
+                   ac9: 0, ac14: 0, me4: 0, me9: 0, rd: 0, lab: 1, cx: 0.6, cy: 2.4, cw: 11, ch: 11.5 };
+  var HIST = stepList(histBase);
+  var HCAM = [0, 0.35];
+  HIST.add({
+    phase: "Überblick", title: "Das Nucleosom: DNA um Histone gewickelt", set: {},
+    text: "Im Zellkern von Eukaryoten liegt die DNA nicht frei vor. Sie ist um Histone gewickelt; das sind kleine, positiv geladene Proteine. Acht Histone, je zwei der Sorten H2A, H2B, H3 und H4, bilden einen Histonkern. Ein Nucleosom ist dieser Histonkern zusammen mit der DNA, die sich knapp zweimal um ihn windet. Die DNA ist wegen ihrer Phosphatgruppen negativ geladen; die entgegengesetzten Ladungen ziehen sich an."
+  });
+  HIST.add({
+    phase: "Überblick", title: "Der Histonschwanz", dur: 2.4, set: { cx: 1.2, cy: 4.2, cw: 9, ch: 9.5 },
+    text: "Aus jedem Histon ragt ein Ende seiner Aminosäurekette heraus: der Histonschwanz. Es ist das N-terminale Ende, also das Ende mit der freien Aminogruppe. Gezeigt ist nur der Schwanz eines H3-Histons. Er enthält mehrere Lysine (Abkürzung K), deren Seitenkette positiv geladen ist (+). Die Zahl gibt an, die wievielte Aminosäure vom N-terminalen Ende aus das Lysin ist. An solchen Lysinen können Enzyme chemische Gruppen anhängen oder wieder entfernen."
+  });
+  HIST.add({
+    phase: "Chromatin", title: "Euchromatin: locker gepackt", dur: 5,
+    set: { lab: 0, tf: 1, pol: 1, px: 1, cx: 0, cy: 1.4, cw: 38, ch: 13 },
+    seg: { lab: [0, 0.1], cx: HCAM, cy: HCAM, cw: HCAM, ch: HCAM, tf: [0.35, 0.6], pol: [0.55, 0.7], px: [0.65, 1] },
+    text: "Chromatin ist die DNA zusammen mit den Proteinen, um die sie gewickelt ist. Im Euchromatin liegen die Nucleosomen locker hintereinander. Die DNA zwischen ihnen ist zugänglich: Ein Transkriptionsfaktor kann binden, und die RNA-Polymerase kann das Gen (grün) ablesen."
+  });
+  HIST.add({
+    phase: "Chromatin", title: "Heterochromatin: dicht gepackt", dur: 4,
+    set: { dense: 1, tf: 0, pol: 0, px: 0, cw: 26 },
+    seg: { tf: [0, 0.25], pol: [0, 0.25], px: [0, 0.25], dense: [0.2, 1], cw: [0.2, 1] },
+    text: "Im Heterochromatin liegen die Nucleosomen dicht beieinander. Die DNA ist für Transkriptionsfaktoren und die RNA-Polymerase weitgehend unzugänglich; Gene in diesem Bereich werden kaum abgelesen. Wie dicht das Chromatin gepackt ist, hängt unter anderem von Markierungen an den Histonschwänzen ab."
+  });
+  HIST.add({
+    phase: "Acetylierung", title: "Acetylierung lockert das Chromatin", dur: 5.5,
+    set: { hat: 1, ac9: 1, ac14: 1, dense: 0, lab: 1, cx: 0.5, cy: 2.6, cw: 30, ch: 14 },
+    seg: { lab: [0, 0.1], hat: [0, 0.2], ac9: [0.2, 0.35], ac14: [0.32, 0.47], dense: [0.5, 1], cw: [0.5, 1] },
+    text: "Eine Acetylierung ist das Anhängen einer Acetylgruppe (Ac). Das Enzym Histon-Acetyltransferase (HAT) überträgt sie auf Lysine im Histonschwanz, hier auf K9 und K14. Dadurch verliert das Lysin seine positive Ladung und wird ungeladen. Der Histonschwanz bindet schwächer an die negativ geladene DNA, und das Chromatin lockert sich auf. Die Basenfolge der DNA bleibt dabei unverändert."
+  });
+  HIST.add({
+    phase: "Acetylierung", title: "Das Gen wird zugänglich", dur: 4.5,
+    set: { hat: 0, tf: 1, pol: 1, px: 1, lab: 0, cx: 0, cy: 1.6, cw: 36, ch: 13 },
+    seg: { hat: [0, 0.3], lab: [0, 0.1], tf: [0.2, 0.5], pol: [0.45, 0.6], px: [0.55, 1] },
+    text: "Im aufgelockerten Chromatin ist das Gen zugänglich: Der Transkriptionsfaktor bindet, und die RNA-Polymerase stellt eine mRNA her. Acetylierte Histone findet man deshalb häufig im Bereich aktiver Gene."
+  });
+  HIST.add({
+    phase: "Histon-Methylierung", title: "Histon-Methylierung: Die Position entscheidet", dur: 4,
+    set: { hmt: 1, hmtAt: 4, me4: 1, lab: 1, cx: 1.4, cy: 4.0, cw: 13, ch: 11.5 },
+    seg: { lab: [0, 0.1], hmt: [0.2, 0.5], me4: [0.55, 0.85] },
+    text: "Auch Histone können methyliert werden: Eine Histon-Methyltransferase hängt Methylgruppen (Me) an bestimmte Lysine. Anders als die Acetylierung verändert das die Ladung des Lysins nicht. Die Wirkung entsteht dadurch, dass andere Proteine die Markierung erkennen. Ob eine Methylierung aktivierend oder reprimierend (hemmend) wirkt, hängt von ihrer Position ab. Die Methylierung von K4 im Histon H3 ist ein Beispiel für eine eher aktivierende Markierung: Das Gen bleibt zugänglich."
+  });
+  HIST.add({
+    phase: "Gegenreaktionen", title: "Gegenreaktionen: Deacetylasen und Demethylasen", dur: 5.5,
+    set: { hmt: 0, hdac: 1, kdm: 1, ac9: 0, ac14: 0, me4: 0, tf: 0, pol: 0, px: 0, dense: 0.6, cx: 0.5, cy: 2.6, cw: 28, ch: 14 },
+    seg: { hmt: [0, 0.2], hdac: [0, 0.25], kdm: [0, 0.25], ac9: [0.3, 0.45], ac14: [0.4, 0.55], me4: [0.45, 0.6],
+           tf: [0.5, 0.7], pol: [0.5, 0.7], px: [0.5, 0.7], dense: [0.6, 1], cx: [0.6, 1], cy: [0.6, 1], cw: [0.6, 1], ch: [0.6, 1] },
+    text: "Die Markierungen sind umkehrbar. Histon-Deacetylasen (HDAC) entfernen Acetylgruppen, Histon-Demethylasen entfernen Methylgruppen. Die Lysine K9 und K14 sind wieder positiv geladen, der Histonschwanz bindet wieder stärker an die DNA, und das Chromatin wird dichter. Ob ein Gen zugänglich ist, hängt vom Wechselspiel der Enzyme ab, die Markierungen anhängen, und der Enzyme, die sie entfernen."
+  });
+  HIST.add({
+    phase: "Histon-Methylierung", title: "Methylierung an K9: Heterochromatin entsteht", dur: 5,
+    set: { hdac: 0, kdm: 0, hmt: 1, hmtAt: 9, me9: 1, rd: 1, dense: 1 },
+    seg: { hdac: [0, 0.2], kdm: [0, 0.2], hmtAt: [0, 0.02], hmt: [0.1, 0.35], me9: [0.35, 0.55], rd: [0.55, 0.75], dense: [0.65, 1] },
+    text: "Nun methyliert eine Histon-Methyltransferase das Lysin K9 im Histon H3. An dieser Position wirkt die Methylierung reprimierend: Proteine erkennen die Markierung, binden an den Histonschwanz und tragen dazu bei, dass die Nucleosomen dicht gepackt werden. Es entsteht Heterochromatin, und das Gen ist weitgehend unzugänglich."
+  });
+  HIST.add({
+    phase: "Zusammenfassung", title: "Zusammenfassung", dur: 2.6,
+    set: { hmt: 0, lab: 0, cx: 0, cy: 1.8, cw: 30, ch: 14 }, seg: { hmt: [0, 0.4], lab: [0, 0.2] },
+    text: "Acetylierung lockert das Chromatin und erleichtert die Transkription. Histon-Methylierung kann je nach Position aktivierend oder reprimierend wirken. Deacetylasen und Demethylasen machen die Markierungen rückgängig. Keine dieser Histonmodifikationen verändert die DNA-Sequenz. Neben Acetyl- und Methylgruppen können auch Phosphatgruppen an Histone angehängt werden (Phosphorylierung); sie ist hier nicht dargestellt."
+  });
+
+  var histKey = "";
+  function histSync(P) {
+    var d = P.dense, marks = [];
+    var state = d < 0.3 ? "Euchromatin (locker)" : d > 0.7 ? "Heterochromatin (dicht)" : "Übergang";
+    var acc = d < 0.3 ? "ja" : d > 0.7 ? "weitgehend nein" : "eingeschränkt";
+    if (P.me4 > 0.5) marks.push("K4 Me");
+    if (P.ac9 > 0.5) marks.push("K9 Ac");
+    if (P.me9 > 0.5) marks.push("K9 Me");
+    if (P.ac14 > 0.5) marks.push("K14 Ac");
+    var mk = marks.length ? marks.join(", ") : "keine";
+    var key = state + "|" + acc + "|" + mk;
+    if (key === histKey) return;
+    histKey = key;
+    $("histState").textContent = state;
+    $("histAcc").textContent = acc;
+    $("histMarks").textContent = mk;
+  }
+
+  MODS.meth = {
+    steps: METH.steps, last: METH.steps.length - 1, sync: methSync, az0: 0.15, el0: 0.15, bar: "methbar", lim: "lim-meth", sun: false,
+    reset: function () { methUserCtl = null; methKey = ""; },
+    onStep: function () { methUserCtl = null; methKey = ""; },
+    legend: '<i class="bA">A</i><i class="bT">T</i><i class="bG">G</i><i class="bC">C</i><span>Basen</span><b style="background:#ffd43b"></b>Methylgruppe (CH₃)',
+    note: "Gezeigt sind nur ein kurzer DNA-Abschnitt mit vier CpG-Stellen und wenige Proteine als einfache Körper; die DNA ist als gerade Leiter statt als Doppelhelix gezeichnet. Wie Methylierungsmuster in der Zelle entstehen und erhalten werden, ist stark vereinfacht. Größenverhältnisse sind nicht maßstabsgetreu. Die vollständige Liste steht unter „Modellgrenzen“."
+  };
+  MODS.hist = {
+    steps: HIST.steps, last: HIST.steps.length - 1, sync: histSync, az0: 0.25, el0: 0.22, bar: "histbar", lim: "lim-hist", sun: false,
+    reset: function () { histKey = ""; },
+    legend: '<b style="background:#ff922b"></b>H2A<b style="background:#fcc419"></b>H2B<b style="background:#4dabf7"></b>H3<b style="background:#63e6be"></b>H4<b style="background:#f06595"></b>Ac<b style="background:#b197fc"></b>Me',
+    note: "Nur wenige Histone und Modifikationen sind dargestellt: fünf Nucleosomen und ein einziger Histonschwanz mit drei Lysinen. Das Modifikationsmuster ist vereinfacht, Chromatin-Remodeling-Komplexe sind nicht im Detail dargestellt, Größenverhältnisse sind nicht maßstabsgetreu. Die vollständige Liste steht unter „Modellgrenzen“."
+  };
+  MODS.epi = MODS.meth;                  // Reiter „Epigenetik“ öffnet das zuletzt gewählte Unterkapitel
+  (function () {
+    var sb = document.querySelectorAll(".subsel button");
+    for (var i = 0; i < sb.length; i++) {
+      sb[i].addEventListener("click", function () {   // Wechsel setzt Szene und Schritt zurück
+        MODS.epi = MODS[this.getAttribute("data-sub")];
+        setModule("epi");
+      });
+    }
+  })();
+
+
+  /* =====================================================================
+     3d. Modul Genregulation nach der Transkription: Daten, Schritte, Leisten
+         (zwei Unterkapitel; MODS.post zeigt immer auf das gewählte)
+     ===================================================================== */
+  // ---------------- RNA-Interferenz ----------------
+  // Alle Sequenzen sind frei erfunden. siRNA im Modell: 21 Nukleotide (Richtwert 21–23).
+  var RI_SEG = 21;
+  var RI_TGT = "GAUCCGUACGAUUGCAAGCUU";                      // Zielsequenz der mRNA, 5'->3'
+  var RI_SL = "CUAGGACUUCGAAGCUCAGUA", RI_SR = "AGCUUCGGAUCAGCAUGCCGA";
+  var RI_S = RI_SL + RI_TGT + RI_SR;                          // oberer dsRNA-Strang 5'->3'
+  var RI_A = RI_S.split("").map(function (b) { return RNA_COMP[b]; }).join("");   // unterer Strang 3'->5'
+  var RI_N = RI_S.length;                                     // 63 Basenpaare
+  var RI_M = "CAA" + RI_TGT + "GGA", RI_MN = RI_M.length, RI_T0 = 3;   // mRNA 5'->3', Zielsequenz ab RI_T0
+  var RI_CUT = RI_T0 + 11;                                    // erste Base des 3'-Bruchstücks
+
+  var RI = stepList({ ds: 0, dc: 0, dx: 0, c1: 0, c2: 0, out: 0, risc: 0, pas: 0, mv: 0, cl: 0, rel: 0, deg: 0, ctl: 0,
+                      cx: 0, cy: -2.6, cw: 36, ch: 8 });
+  var RCAM = [0, 0.4];
+  RI.add({
+    phase: "Überblick", title: "Genregulation nach der Transkription", set: {},
+    text: "Ob aus einem Gen ein Protein entsteht, entscheidet sich nicht nur bei der Transkription. Auch die fertige mRNA kann noch reguliert werden, zum Beispiel durch RNA-Interferenz (RNAi). Dabei schalten kurze RNA-Stücke eine bestimmte mRNA gezielt ab. Gezeigt ist eine mRNA im Cytoplasma. Gelb hinterlegt ist ihre Zielsequenz: der Abschnitt, an den später ein passendes RNA-Stück bindet."
+  });
+  RI.add({
+    phase: "dsRNA", title: "Doppelsträngige RNA (dsRNA)", dur: 3,
+    set: { ds: 1, cy: 1.3, cw: 75, ch: 15 }, seg: { cx: RCAM, cy: RCAM, cw: RCAM, ch: RCAM, ds: [0.35, 1] },
+    text: "Oben erscheint eine dsRNA, eine doppelsträngige RNA: zwei RNA-Stränge, deren Basen komplementär gepaart sind (A mit U, G mit C). Solche RNA kann zum Beispiel von Viren stammen, in der Zelle selbst entstehen oder im Labor eingebracht werden. Der obere Strang des mittleren Abschnitts hat dieselbe Basenfolge wie die Zielsequenz der mRNA, der untere ist dazu komplementär. Im Modell ist die dsRNA 63 Basenpaare lang; in der Zelle ist sie oft deutlich länger (Richtwert: mehrere Hundert Basenpaare)."
+  });
+  RI.add({
+    phase: "Dicer", title: "Dicer erkennt die dsRNA", dur: 2.4, set: { dc: 1 },
+    text: "Dicer ist ein Enzym, das doppelsträngige RNA erkennt und zerschneidet. Es gehört zu den Ribonukleasen, also zu den Enzymen, die RNA spalten. Dicer bindet an ein Ende der dsRNA."
+  });
+  RI.add({
+    phase: "Dicer", title: "Dicer zerschneidet die dsRNA in siRNAs", dur: 5,
+    set: { dx: 1, c1: 1, c2: 1 }, seg: { dx: [0, 0.85], c1: [0.42, 0.55], c2: [0.83, 0.96] },
+    text: "Dicer schneidet die dsRNA in kurze Doppelstücke von ungefähr gleicher Länge. Diese Stücke heißen siRNAs (small interfering RNAs, kleine störende RNAs). Jeder Strang einer siRNA ist etwa 21 bis 23 Nukleotide lang (Richtwert); im Modell sind es 21. Aus einer langen dsRNA entstehen so viele siRNAs."
+  });
+  RI.add({
+    phase: "RISC", title: "Der RISC nimmt eine siRNA auf", dur: 4.5,
+    set: { dc: 0, out: 1, risc: 1, cy: 2.2, cw: 36, ch: 12 },
+    seg: { dc: [0, 0.2], out: [0, 0.5], cx: [0.1, 0.5], cy: [0.1, 0.5], cw: [0.1, 0.5], ch: [0.1, 0.5], risc: [0.5, 0.9] },
+    text: "Eine siRNA wird in einen Proteinkomplex geladen, den RISC (RNA-induced silencing complex, RNA-induzierter Stummschaltkomplex). Sein zentrales Protein heißt Argonaute. Die beiden anderen siRNAs können ebenfalls in RISC-Komplexe gelangen; das Modell verfolgt nur die mittlere."
+  });
+  RI.add({
+    phase: "RISC", title: "Der Guide-Strang bleibt im RISC", dur: 3.4, set: { pas: 1 },
+    text: "Die beiden Stränge der siRNA werden getrennt. Einer bleibt fest im RISC gebunden: der Guide-Strang (Leitstrang, gelbes Rückgrat). Er ist komplementär zur Zielsequenz und führt den Komplex zur passenden mRNA. Der andere Strang, der Passagier-Strang, wird entfernt und abgebaut."
+  });
+  RI.add({
+    phase: "Paarung", title: "Der RISC paart mit der Ziel-mRNA", dur: 4.2,
+    set: { mv: 1, cy: -2.8, cw: 36, ch: 9.5 }, seg: { mv: [0, 0.85], cy: [0, 0.6], cw: [0, 0.6], ch: [0, 0.6] },
+    text: "Der RISC trifft auf mRNAs. Nur wo die Basen des Guide-Strangs komplementär zu einem Abschnitt der mRNA sind, bilden sich Basenpaare. Hier passt der Guide-Strang über seine ganze Länge zur Zielsequenz. Guide-Strang und mRNA liegen antiparallel: Das 5′-Ende des Guide-Strangs liegt am 3′-Ende der Zielsequenz."
+  });
+  RI.add({
+    phase: "Spaltung", title: "Argonaute spaltet die mRNA", dur: 2.6, set: { cl: 1 },
+    text: "Das Argonaute-Protein schneidet die mRNA ungefähr in der Mitte des gepaarten Bereichs. Gespalten wird dabei das Zucker-Phosphat-Rückgrat der mRNA. Aus einer mRNA werden zwei Bruchstücke."
+  });
+  RI.add({
+    phase: "Abbau", title: "Abbau der mRNA: Die Genexpression sinkt", dur: 5.5,
+    set: { rel: 1, deg: 1, cy: -0.6, ch: 13 }, seg: { rel: [0, 0.45], cy: [0, 0.45], ch: [0, 0.45], deg: [0.3, 1] },
+    text: "Die Bruchstücke haben ungeschützte Enden und werden von Nukleasen abgebaut, Enzymen, die Nukleinsäuren in ihre Bausteine zerlegen. Der RISC mit dem Guide-Strang wird wieder frei und kann weitere mRNAs mit derselben Zielsequenz spalten. Weil weniger mRNA übrig bleibt, entsteht weniger Protein: Die Genexpression sinkt, obwohl das Gen weiter transkribiert wird. Man spricht von Gen-Stummschaltung nach der Transkription."
+  });
+  RI.add({
+    phase: "Vergleich", title: "Vergleich: dieselbe Zielsequenz ohne RNA-Interferenz", dur: 2.6, set: { ctl: 1 },
+    text: "Unten siehst du dieselbe mRNA mit derselben Zielsequenz, aber ohne RISC mit passendem Guide-Strang. Sie bleibt erhalten, ein Ribosom bindet und bildet das Protein. Gen und mRNA sind in beiden Fällen gleich; der Unterschied liegt allein darin, ob ein passender RISC vorhanden ist."
+  });
+
+  var riUserCtl = null, riKey = "";
+  function riCtlK(P) { return riUserCtl !== null ? (riUserCtl ? 1 : 0) : P.ctl; }
+  function riSync(P) {
+    var m = P.deg > 0.5 ? "abgebaut" : P.cl > 0.5 ? "gespalten" : P.mv > 0.5 ? "mit RISC gepaart" : "intakt";
+    var e = P.deg > 0.5 ? "verringert" : P.cl > 0.5 ? "sinkt" : "normal";
+    var ctl = riCtlK(P) > 0.5;
+    var key = m + "|" + e + "|" + ctl;
+    if (key === riKey) return;
+    riKey = key;
+    $("riMrna").textContent = m;
+    $("riExpr").textContent = e;
+    $("riCtl").setAttribute("aria-pressed", ctl ? "true" : "false");
+    $("riCtl").textContent = ctl ? "Vergleich ohne RNAi ausblenden" : "Vergleich ohne RNAi einblenden";
+  }
+  $("riCtl").addEventListener("click", function () {
+    riUserCtl = !(riCtlK(paramsAt(step, tt)) > 0.5);
+    dirty = true;
+  });
+
+  // ---------------- Alternatives Spleißen ----------------
+  // prä-mRNA: Exon 1, Intron 1, Exon 2, Intron 2, Exon 3, Intron 3, Exon 4
+  var SP_SEG = [
+    { ex: true, n: 1, len: 4, col: 0x4dabf7 }, { ex: false, n: 1, len: 5 },
+    { ex: true, n: 2, len: 4, col: 0x69db7c }, { ex: false, n: 2, len: 5 },
+    { ex: true, n: 3, len: 4, col: 0xff922b }, { ex: false, n: 3, len: 5 },
+    { ex: true, n: 4, len: 4, col: 0xf783ac }
+  ];
+  var SP_NAME = SP_SEG.map(function (s) { return (s.ex ? "Exon " : "Intron ") + s.n; });
+  // Varianten: 1 bedeutet „in der reifen mRNA enthalten“
+  var SP_VAR = [null,
+    { id: "A", name: "A: alle Exons", keep: [1, 0, 1, 0, 1, 0, 1] },
+    { id: "B", name: "B: Exon-Skipping", keep: [1, 0, 1, 0, 0, 0, 1] },
+    { id: "C", name: "C: Intron-Retention", keep: [1, 0, 1, 1, 1, 0, 1] }
+  ];
+  var SP = stepList({ v: 0, rA: 0, bA: 0, sA: 0, pA: 0, rB: 0, bB: 0, sB: 0, pB: 0, rC: 0, bC: 0, sC: 0, pC: 0,
+                      cx: -1.5, cy: 6, cw: 43, ch: 8.5 });
+  var SPV = { cy: [0, 0.25], ch: [0, 0.25] };
+  SP.add({
+    phase: "Überblick", title: "prä-mRNA: Exons und Introns", set: {},
+    text: "Bei Eukaryoten entsteht bei der Transkription im Zellkern zunächst eine prä-mRNA (Vorläufer-mRNA). Sie besteht abwechselnd aus Exons (farbig) und Introns (grau). Exons sind die Abschnitte, die in der fertigen mRNA erhalten bleiben und die Information für das Protein tragen. Introns liegen dazwischen, werden normalerweise herausgeschnitten und nicht in Protein übersetzt."
+  });
+  SP.add({
+    phase: "Spleißosom", title: "Das Spleißosom bindet an die Introns", dur: 3.6,
+    set: { rA: 1, bA: 1, cy: 3.9, ch: 12.5 }, seg: { cy: [0, 0.5], ch: [0, 0.5], rA: [0, 0.5], bA: [0.5, 1] },
+    text: "Das Spleißosom ist ein großer Komplex aus RNA und Proteinen. Es erkennt die Grenzen zwischen Exon und Intron an kurzen Erkennungssequenzen. Die Zeilen darunter zeigen einzelne Moleküle derselben prä-mRNA. Am ersten Molekül (A) binden Spleißosomen an alle drei Introns."
+  });
+  SP.add({
+    phase: "Spleißen", title: "Spleißen: Introns heraus, Exons verknüpft", dur: 4.8, set: { v: 1, sA: 1 },
+    text: "Das Spleißosom schneidet jedes Intron an beiden Enden heraus. Das Intron bildet dabei eine Schleife (Lasso-Struktur) und wird anschließend abgebaut. Die benachbarten Exons werden direkt miteinander verknüpft. Es entsteht die reife mRNA A mit allen vier Exons. Die Schalter unter der 3D-Ansicht zeigen, welche Abschnitte in dieser mRNA enthalten sind (gelb hervorgehoben)."
+  });
+  SP.add({
+    phase: "Spleißen", title: "Aus mRNA A entsteht Protein A", dur: 3, set: { pA: 1 },
+    text: "Die reife mRNA gelangt aus dem Zellkern ins Cytoplasma und wird an den Ribosomen translatiert. Im Modell trägt jedes Exon die Information für einen Abschnitt des Proteins (gleiche Farbe). Protein A enthält alle vier Abschnitte."
+  });
+  SP.add({
+    phase: "Alternatives Spleißen", title: "Exon-Skipping: Ein Exon wird übersprungen", dur: 8,
+    set: { v: 2, rB: 1, bB: 1, sB: 1, pB: 1, cy: 1.5, ch: 17 },
+    seg: { cy: SPV.cy, ch: SPV.ch, rB: [0, 0.25], bB: [0.25, 0.4], sB: [0.4, 0.8], pB: [0.8, 1] },
+    text: "Am zweiten Molekül derselben prä-mRNA wird Exon 3 nicht als Exon genutzt. Das Spleißosom schneidet Intron 2, Exon 3 und Intron 3 als ein einziges Stück heraus. In mRNA B folgt auf Exon 2 direkt Exon 4, und Protein B fehlt der Abschnitt von Exon 3. Ob ein Exon eingebaut oder übersprungen wird, steuern Proteine, die an die prä-mRNA binden (Spleißfaktoren). Welche davon vorhanden sind, kann sich je nach Zelltyp unterscheiden."
+  });
+  SP.add({
+    phase: "Alternatives Spleißen", title: "Intron-Retention: Ein Intron bleibt erhalten", dur: 8,
+    set: { v: 3, rC: 1, bC: 1, sC: 1, pC: 1, cy: -1, ch: 21.5 },
+    seg: { cy: SPV.cy, ch: SPV.ch, rC: [0, 0.25], bC: [0.25, 0.4], sC: [0.4, 0.8], pC: [0.8, 1] },
+    text: "Am dritten Molekül wird Intron 2 nicht herausgeschnitten. Die mRNA C enthält alle vier Exons und zusätzlich Intron 2. Bei der Translation werden dann auch die Basen des Introns als Codons gelesen. Häufig liegt dabei im Intron ein Stoppcodon: Das Protein endet vorzeitig. Diesen Fall zeigt das Modell. Protein C ist verkürzt und endet mit einem Abschnitt, der aus dem Intron stammt (grau)."
+  });
+  SP.add({
+    phase: "Zusammenfassung", title: "Ein Gen, mehrere Proteine", dur: 1.6, set: { v: 0 },
+    text: "Aus derselben prä-mRNA sind drei verschiedene mRNAs und damit drei verschiedene Proteine entstanden. Diese Auswahl nennt man alternatives Spleißen. So kann ein einziges Gen die Information für mehrere Proteine liefern. Welche Variante gebildet wird, kann sich zwischen Zelltypen und Entwicklungsstadien unterscheiden. Die Regulation findet nach der Transkription statt; die Basenfolge des Gens bleibt gleich."
+  });
+
+  var spKey = "";
+  function spSync(P, S) {
+    var v = S.P.v, i, all = v === 0 && S.P.rC > 0.5;
+    var key = v + "|" + all;
+    if (key === spKey) return;
+    spKey = key;
+    $("spVar").textContent = v ? SP_VAR[v].name : all ? "A, B und C im Vergleich" : "noch keine";
+    for (i = 0; i < SP_SEG.length; i++) {
+      var c = $("spx" + i), k = v ? SP_VAR[v].keep[i] : -1;
+      c.className = (SP_SEG[i].ex ? "cpg" : "cpg wide") + (k === 1 ? " on" : "");
+      c.lastElementChild.textContent = k < 0 ? "–" : SP_SEG[i].ex ? (k ? "eingebaut" : "übersprungen") : (k ? "bleibt" : "entfernt");
+    }
+  }
+
+  MODS.rnai = {
+    steps: RI.steps, last: RI.steps.length - 1, sync: riSync, az0: 0.12, el0: 0.12, bar: "rnaibar", lim: "lim-rnai", sun: false,
+    reset: function () { riUserCtl = null; riKey = ""; },
+    onStep: function () { riUserCtl = null; riKey = ""; },
+    legend: '<i class="bA">A</i><i class="bU">U</i><i class="bG">G</i><i class="bC">C</i><span>Basen</span><b style="background:#ff8fab"></b>Strang wie mRNA<b style="background:#cc5de8"></b>Gegenstrang<b style="background:#ffd43b"></b>Guide-Strang',
+    note: "Nicht dargestellt sind weitere beteiligte Proteine, zum Beispiel Helikasen und weitere Bestandteile des RISC; Dicer, RISC und Argonaute sind einfache Körper. Die mRNA hat nur eine Zielsequenz. Größen sind nicht maßstabsgetreu. Die Länge der dsRNA und die siRNA-Länge von etwa 21 bis 23 Nukleotiden sind Richtwerte. Die vollständige Liste steht unter „Modellgrenzen“."
+  };
+  MODS.splice = {
+    steps: SP.steps, last: SP.steps.length - 1, sync: spSync, az0: 0.12, el0: 0.12, bar: "splicebar", lim: "lim-splice", sun: false,
+    reset: function () { spKey = ""; },
+    legend: '<b style="background:linear-gradient(90deg,#4dabf7,#69db7c,#ff922b,#f783ac)"></b>Exons<b style="background:#8695a6"></b>Introns<b style="background:#9775fa"></b>Spleißosom',
+    note: "Die Bestandteile des Spleißosoms sind stark vereinfacht; weitere Komplexe und Spleißfaktoren fehlen. Jede Zeile steht für ein eigenes Molekül derselben prä-mRNA. Größen sind nicht maßstabsgetreu, Introns sind in Wirklichkeit oft viel länger als Exons. Die vollständige Liste steht unter „Modellgrenzen“."
+  };
+  MODS.post = MODS.rnai;                 // Reiter öffnet das zuletzt gewählte Unterkapitel
+  (function () {
+    var pb = document.querySelectorAll(".psel button");
+    for (var i = 0; i < pb.length; i++) {
+      pb[i].addEventListener("click", function () {   // Wechsel setzt Szene und Schritt zurück
+        MODS.post = MODS[this.getAttribute("data-psub")];
+        setModule("post");
+      });
+    }
+  })();
+
+  var cur = MODS.tt;
+  var modTabs = document.querySelectorAll(".mods button");
+  function applyModuleUI() {
+    var key, i;
+    for (key in MODS) {
+      $(MODS[key].bar).hidden = MODS[key] !== cur;
+      $(MODS[key].lim).hidden = MODS[key] !== cur;
+      if (MODS[key].group) MODS[key].group.visible = MODS[key] === cur;
+    }
+    for (i = 0; i < modTabs.length; i++) {
+      modTabs[i].setAttribute("aria-selected", MODS[modTabs[i].getAttribute("data-mod")] === cur ? "true" : "false");
+    }
+    $("legend").innerHTML = cur.legend;
+    $("note").textContent = cur.note;
+    $("tabSun").hidden = !cur.sun;
+    if (!cur.sun && $("p-sun").className === "pane on") showTab("p-text");
+  }
+  function setModule(id) {              // Modulwechsel setzt Szene, Schritt und Ansicht zurück
+    cur = MODS[id];
+    playing = false; animating = false; wait = 0; step = 0; tt = 1;
+    az = cur.az0; elv = cur.el0; zoom = 1;
+    cur.reset();
+    applyModuleUI();
+    showStep();
+  }
+  for (var mi = 0; mi < modTabs.length; mi++) {
+    modTabs[mi].addEventListener("click", function () { setModule(this.getAttribute("data-mod")); });
+  }
+  applyModuleUI();
+
+  /* =====================================================================
+     4. Ablaufsteuerung
+     ===================================================================== */
+  var step = 0, tt = 1, animating = false, playing = false, wait = 0, speed = 1, dirty = true;
+
+  function ease(u) { return u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u); }
+  function paramsAt(s, t) {
+    var L = cur.steps;
+    if (s === 0 || t >= 1) return L[s].P;
+    var A = L[s - 1].P, B = L[s].P, seg = L[s].seg, out = {}, key;
+    for (key in B) {
+      if (A[key] === B[key]) { out[key] = B[key]; continue; }
+      var w = seg[key], u = w ? (t - w[0]) / (w[1] - w[0]) : t;
+      out[key] = A[key] + (B[key] - A[key]) * ease(u);
+    }
+    return out;
+  }
+  function readTime(s) { return 2.5 + cur.steps[s].text.length / 30; }   // Sekunden bei Geschwindigkeit 1
+
+  function showStep() {
+    var S = cur.steps[step], LAST = cur.last;
+    $("title").textContent = S.title;
+    $("text").textContent = S.text;
+    $("phase").textContent = S.phase;
+    $("count").textContent = "Schritt " + step + " von " + LAST;
+    $("bBack").disabled = step === 0;
+    $("bNext").disabled = step === LAST;
+    $("bStart").textContent = playing ? "Pause" : (step === LAST ? "Neu starten" : "Start");
+    setModelCodon(S.codon === undefined ? -1 : S.codon);
+    if (cur.onStep) cur.onStep(S);
+    dirty = true;
+  }
+  function goNext() {
+    if (step >= cur.last) { playing = false; showStep(); return; }
+    step++; tt = 0; animating = true; wait = 0;
+    showStep();
+  }
+  function goBack() {
+    playing = false; animating = false; wait = 0;
+    if (step > 0) step--;
+    tt = 1;
+    showStep();
+  }
+  function reset() {
+    playing = false; animating = false; wait = 0; step = 0; tt = 1;
+    showStep();
+  }
+  function togglePlay() {
+    if (playing) { playing = false; wait = 0; showStep(); return; }
+    if (step === cur.last) { step = 0; tt = 1; }
+    playing = true;
+    if (!animating) goNext(); else showStep();
+  }
+  $("bStart").addEventListener("click", togglePlay);
+  $("bNext").addEventListener("click", function () { playing = false; goNext(); });
+  $("bBack").addEventListener("click", goBack);
+  $("bReset").addEventListener("click", reset);
+  $("speed").addEventListener("input", function () {
+    speed = parseFloat(this.value) || 1;
+    $("speedOut").textContent = String(speed).replace(".", ",") + "×";
+  });
+  document.addEventListener("keydown", function (ev) {
+    var tag = ev.target && ev.target.tagName;
+    if (tag === "INPUT" || tag === "BUTTON") return;
+    if (ev.key === "ArrowRight") { playing = false; goNext(); }
+    else if (ev.key === "ArrowLeft") goBack();
+    else if (ev.key === " ") { ev.preventDefault(); togglePlay(); }
+  });
+
+  /* =====================================================================
+     5. 3D-Szene
+     ===================================================================== */
+  var view = $("view"), canvas = $("gl");
+  function fail(msg) {
+    var f = $("fail"); f.textContent = msg; f.style.display = "flex";
+    showStep(); cur.sync(cur.steps[0].P, cur.steps[0]);
+  }
+  if (!window.THREE) {
+    fail("Die 3D-Bibliothek Three.js konnte nicht geladen werden. Bitte die Internetverbindung prüfen und die Seite neu laden. Texte, Sequenzleiste und Codon-Sonne funktionieren trotzdem.");
+    startLoop(null);
+    return;
+  }
+  var T = window.THREE, renderer;
+  try {
+    renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  } catch (e) {
+    fail("Dieser Browser kann die 3D-Ansicht nicht darstellen (WebGL ist nicht verfügbar). Texte, Sequenzleiste und Codon-Sonne funktionieren trotzdem.");
+    startLoop(null);
+    return;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  var scene = new T.Scene();
+  var FOV = 40, TANH = Math.tan(FOV * Math.PI / 360);
+  var camera = new T.PerspectiveCamera(FOV, 1, 0.5, 500);
+  scene.add(new T.HemisphereLight(0xffffff, 0x6f8196, 0.95));
+  var sun3 = new T.DirectionalLight(0xffffff, 0.55); sun3.position.set(6, 10, 14); scene.add(sun3);
+
+  // Jedes Modul hat eine eigene Gruppe; PARENT ist die Gruppe, in die gerade gebaut wird.
+  var G_TT = new T.Group(); scene.add(G_TT);
+  var PARENT = G_TT;
+
+  var COL = { A: 0x2f9e44, T: 0xe03131, U: 0xf76707, G: 0x1c7ed6, C: 0x7048e8 };
+  var AACOL = [0xffd43b, 0xff922b, 0xf06595, 0xcc5de8, 0x5c7cfa, 0x20c997, 0x94d82d, 0x66d9e8];
+
+  var gSphere = new T.SphereGeometry(1, 14, 10);
+  var gBlob = new T.SphereGeometry(1, 24, 16);
+  var gBox = new T.BoxGeometry(1, 1, 1);
+  var gCyl = new T.CylinderGeometry(1, 1, 1, 7, 1, true);
+  function lam(color, opacity) {
+    var o = { color: color };
+    if (opacity !== undefined) { o.transparent = true; o.opacity = opacity; o.depthWrite = false; }
+    return new T.MeshLambertMaterial(o);
+  }
+  function inst(geo, mat, n) {
+    var m = new T.InstancedMesh(geo, mat, n);
+    m.frustumCulled = false;
+    PARENT.add(m);
+    return m;
+  }
+
+  // Hilfsgrößen
+  var UP = new T.Vector3(0, 1, 0), QI = new T.Quaternion();
+  var _m = new T.Matrix4(), _q = new T.Quaternion(), _s = new T.Vector3();
+  var v1 = new T.Vector3(), v2 = new T.Vector3(), v3 = new T.Vector3(), v4 = new T.Vector3();
+  function setInst(mesh, i, pos, quat, sx, sy, sz) {
+    _s.set(Math.max(sx, 1e-4), Math.max(sy, 1e-4), Math.max(sz, 1e-4));
+    _m.compose(pos, quat, _s);
+    mesh.setMatrixAt(i, _m);
+  }
+  function link(mesh, i, a, b, r) {
+    v3.subVectors(b, a);
+    var len = v3.length();
+    if (len < 1e-5) { setInst(mesh, i, a, QI, 0, 0, 0); return; }
+    v3.multiplyScalar(1 / len);
+    _q.setFromUnitVectors(UP, v3);
+    v4.addVectors(a, b).multiplyScalar(0.5);
+    setInst(mesh, i, v4, _q, r, len, r);
+  }
+  function smooth(a, b, x) { return ease((x - a) / (b - a)); }
+  function lerp(a, b, u) { return a + (b - a) * u; }
+
+  // ---- Beschriftungen als Sprites (Texturen werden lokal auf einem Canvas gezeichnet) ----
+  var FONT = '"Avenir Next","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+  function makeTex(cv) {
+    var tex = new T.CanvasTexture(cv);
+    tex.minFilter = T.LinearFilter; tex.generateMipmaps = false;
+    return tex;
+  }
+  function glyphTex(str) {              // weiße Schrift mit dunkler Kontur, ohne Hintergrund
+    var cv = document.createElement("canvas"), g = cv.getContext("2d"), px = 46;
+    g.font = "700 " + px + "px " + FONT;
+    cv.width = Math.max(64, Math.ceil(g.measureText(str).width) + 16); cv.height = 64;
+    g = cv.getContext("2d");
+    g.font = "700 " + px + "px " + FONT; g.textAlign = "center"; g.textBaseline = "middle";
+    g.lineJoin = "round"; g.lineWidth = 7; g.strokeStyle = "rgba(8,16,28,0.75)";
+    g.strokeText(str, cv.width / 2, 34); g.fillStyle = "#ffffff"; g.fillText(str, cv.width / 2, 34);
+    return { tex: makeTex(cv), ratio: cv.width / cv.height };
+  }
+  function pillTex(str) {               // Schild mit Hintergrund
+    var cv = document.createElement("canvas"), g = cv.getContext("2d"), px = 34;
+    g.font = "600 " + px + "px " + FONT;
+    var w = Math.ceil(g.measureText(str).width) + 34, h = 60, r = 12;
+    cv.width = w; cv.height = h;
+    g = cv.getContext("2d");
+    g.beginPath(); g.moveTo(r, 1); g.lineTo(w - r, 1); g.quadraticCurveTo(w - 1, 1, w - 1, r);
+    g.lineTo(w - 1, h - r); g.quadraticCurveTo(w - 1, h - 1, w - r, h - 1); g.lineTo(r, h - 1);
+    g.quadraticCurveTo(1, h - 1, 1, h - r); g.lineTo(1, r); g.quadraticCurveTo(1, 1, r, 1); g.closePath();
+    g.fillStyle = "rgba(9,20,34,0.86)"; g.fill();
+    g.lineWidth = 2; g.strokeStyle = "rgba(157,176,196,0.7)"; g.stroke();
+    g.font = "600 " + px + "px " + FONT; g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillStyle = "#f2f6fa"; g.fillText(str, w / 2, h / 2 + 2);
+    return { tex: makeTex(cv), ratio: w / h };
+  }
+
+  // Buchstaben auf den Basen: werden bei jedem Bild leicht zur Kamera hin versetzt
+  var letterMat = {};
+  "ATGCU".split("").forEach(function (ch) {
+    letterMat[ch] = new T.SpriteMaterial({ map: glyphTex(ch).tex, transparent: true, depthWrite: false });
+  });
+  var letters = [];
+  function addLetter(ch) {
+    var sp = new T.Sprite(letterMat[ch]);
+    sp.scale.set(0.66, 0.66, 1);
+    PARENT.add(sp);
+    var L = { sp: sp, anchor: new T.Vector3(), on: false };
+    letters.push(L);
+    return L;
+  }
+  // Schilder: immer sichtbar (kein Tiefentest)
+  function addLabel(str, h, ax, pill) {
+    var t = pill === false ? glyphTex(str) : pillTex(str);
+    var sp = new T.Sprite(new T.SpriteMaterial({ map: t.tex, transparent: true, depthTest: false, depthWrite: false }));
+    sp.scale.set(h * t.ratio, h, 1);
+    sp.center.set(ax === undefined ? 0.5 : ax, 0.5);
+    sp.renderOrder = 10;
+    sp.visible = false;
+    PARENT.add(sp);
+    return sp;
+  }
+  function put(sp, on, x, y, z) { sp.visible = on; if (on) sp.position.set(x, y, z); }
+
+  // ---- DNA ----
+  var R = 1.3, LB = R - 0.06, TW = Math.PI / 5;      // 10 Basenpaare pro Windung
+  var dnaBack = inst(gSphere, lam(0xa9bccf), NBP * 2);
+  var dnaBase = inst(gBox, lam(0xffffff), NBP * 2);
+  var dnaLink = inst(gCyl, lam(0xa9bccf), (NBP - 1) * 2);
+  var tPos = [], cPos = [], tLet = [], cLet = [], color = new T.Color(), b0;
+  for (b0 = 0; b0 < NBP; b0++) {
+    tPos.push(new T.Vector3()); cPos.push(new T.Vector3());
+    dnaBase.setColorAt(b0, color.setHex(COL[TEMPLATE[b0]]));
+    dnaBase.setColorAt(NBP + b0, color.setHex(COL[CODING[b0]]));
+    tLet.push(addLetter(TEMPLATE[b0])); cLet.push(addLetter(CODING[b0]));
+  }
+  dnaBase.instanceColor.needsUpdate = true;
+
+  // ---- mRNA ----
+  var mBack = inst(gSphere, lam(0xff8fab), NM);
+  var mBase = inst(gBox, lam(0xffffff), NM);
+  var mLink = inst(gCyl, lam(0xff8fab), NM - 1);
+  var mPos = [], mLet = [], mE = [];
+  for (b0 = 0; b0 < NM; b0++) {
+    mPos.push(new T.Vector3()); mE.push(0);
+    mBase.setColorAt(b0, color.setHex(COL[MRNA[b0]]));
+    mLet.push(addLetter(MRNA[b0]));
+  }
+  mBase.instanceColor.needsUpdate = true;
+  var PAIR_Y = (R + 0.2) - LB - 0.1 - 0.9;           // mRNA-Rückgrat, solange die Base mit der DNA gepaart ist
+
+  // ---- RNA-Polymerase ----
+  var pol = new T.Mesh(gBlob, lam(0xffa94d, 0.3)); PARENT.add(pol);
+
+  // ---- Ribosom ----
+  var ribL = new T.Mesh(gBlob, lam(0x74c0fc, 0.2)); PARENT.add(ribL);
+  var ribS = new T.Mesh(gBlob, lam(0xa5d8ff, 0.34)); PARENT.add(ribS);
+  var glow = new T.Mesh(gBox, new T.MeshBasicMaterial({ color: 0xffd43b, transparent: true, opacity: 0.32, depthWrite: false }));
+  PARENT.add(glow);
+
+  // ---- tRNAs und Aminosäuren ----
+  var trnaMat = lam(0x63e6be), baseMats = {};
+  "AUGC".split("").forEach(function (ch) { baseMats[ch] = lam(COL[ch]); });
+  var trnas = [], aas = [], aaPos = [];
+  for (b0 = 0; b0 < NAA; b0++) {
+    var g = new T.Group(), anti0 = anticodon(CODONS[b0]), lets = [], part;
+    for (var q = 0; q < 3; q++) {
+      part = new T.Mesh(gBox, baseMats[anti0[q]]); part.scale.set(0.62, 0.8, 0.4); part.position.set(q - 1, 0.95, 0); g.add(part);
+      lets.push(addLetter(anti0[q]));
+    }
+    part = new T.Mesh(gBox, trnaMat); part.scale.set(2.9, 0.3, 0.5); part.position.set(0, 1.5, 0); g.add(part);
+    part = new T.Mesh(gBox, trnaMat); part.scale.set(1.9, 0.34, 0.44); part.position.set(0, 2.5, 0); g.add(part);
+    part = new T.Mesh(gCyl, trnaMat); part.scale.set(0.3, 1.9, 0.3); part.position.set(0, 2.6, 0); g.add(part);
+    g.visible = false; PARENT.add(g);
+    trnas.push({ g: g, lets: lets });
+    var am = new T.Mesh(gSphere, lam(AACOL[b0 % AACOL.length])); am.visible = false; PARENT.add(am);
+    aas.push({ mesh: am, label: addLabel(PEPTIDE[b0], 0.62, 0.5, false) });
+    aaPos.push(new T.Vector3());
+  }
+  var bonds = inst(gCyl, lam(0xe9ecef), Math.max(1, NAA - 1));
+  var AA_TOP = 4.15;
+
+  // ---- Schilder ----
+  var LBL = {
+    t3: addLabel("codogener Strang 3′", 0.78, 1), c5: addLabel("nicht-codogener Strang 5′", 0.78, 1),
+    t5: addLabel("5′", 0.78, 0), c3: addLabel("3′", 0.78, 0),
+    prom: addLabel("Promotor", 0.78), pol: addLabel("RNA-Polymerase", 0.9),
+    m5: addLabel("mRNA 5′", 0.78, 1), m3: addLabel("3′", 0.78, 0),
+    big: addLabel("große Untereinheit", 0.8, 0), small: addLabel("kleine Untereinheit", 0.8),
+    E: addLabel("E", 0.8), P: addLabel("P", 0.8), A: addLabel("A", 0.8),
+    trna: addLabel("tRNA", 0.78, 0), pep: addLabel("Polypeptid", 0.8, 1),
+    stop: addLabel("Stoppcodon", 0.85, 0)
+  };
+
+  // ---- Zustand auf die Szene anwenden ----
+  var target = new T.Vector3(), camW = 40, camH = 10;
+  function wrapAng(a) { a = (a + Math.PI) % (2 * Math.PI); if (a < 0) a += 2 * Math.PI; return a - Math.PI; }
+
+  function apply(P) {
+    var b, j, i, x;
+    var sOn = ease(P.polOn);
+
+    // DNA: in der Nähe der RNA-Polymerase geöffnet
+    for (b = 0; b < NBP; b++) {
+      x = b - 17.5;
+      var d = b - P.pol;
+      var o = sOn * smooth(-7.5, -4.5, d) * (1 - smooth(1.5, 4, d));
+      var te = wrapAng(b * TW) * (1 - o), c = Math.cos(te), s = Math.sin(te), rT = R + 0.2 * o;
+      tPos[b].set(x, rT * c, rT * s);
+      v1.set(0, -c, -s);
+      _q.setFromUnitVectors(UP, v1);
+      v2.copy(tPos[b]).addScaledVector(v1, LB / 2);
+      setInst(dnaBase, b, v2, _q, 0.62, LB, 0.4);
+      tLet[b].anchor.copy(v2); tLet[b].on = true;
+      setInst(dnaBack, b, tPos[b], QI, 0.34, 0.34, 0.34);
+
+      cPos[b].set(x, -R * c + o * R * 0.9, -R * s - o * 2.6);
+      v1.set(0, c * (1 - o) + 0.25 * o, s * (1 - o) + o).normalize();
+      _q.setFromUnitVectors(UP, v1);
+      v2.copy(cPos[b]).addScaledVector(v1, LB / 2);
+      setInst(dnaBase, NBP + b, v2, _q, 0.62, LB, 0.4);
+      cLet[b].anchor.copy(v2); cLet[b].on = true;
+      setInst(dnaBack, NBP + b, cPos[b], QI, 0.34, 0.34, 0.34);
+    }
+    for (b = 0; b < NBP - 1; b++) {
+      link(dnaLink, b, tPos[b], tPos[b + 1], 0.13);
+      link(dnaLink, NBP - 1 + b, cPos[b], cPos[b + 1], 0.13);
+    }
+    dnaBase.instanceMatrix.needsUpdate = dnaBack.instanceMatrix.needsUpdate = dnaLink.instanceMatrix.needsUpdate = true;
+
+    // mRNA
+    var relE = ease(P.rel), freeY = lerp(-3.8, BY - 0.45, ease(P.tr)), count = 0;
+    for (j = 0; j < NM; j++) {
+      var dd = P.pol - (j + OFF);
+      var e = Math.max(0, Math.min(1, dd + 0.5));
+      var w = Math.max(relE, smooth(3, 8, dd));
+      mE[j] = e;
+      if (e > 0.5) count = j + 1;
+      mPos[j].set(j + OFF - 17.5, lerp(PAIR_Y, freeY, w), 0);
+      setInst(mBack, j, mPos[j], QI, 0.3 * e, 0.3 * e, 0.3 * e);
+      v2.copy(mPos[j]); v2.y += 0.45;
+      setInst(mBase, j, v2, QI, 0.62 * e, 0.9 * e, 0.4 * e);
+      mLet[j].anchor.copy(v2); mLet[j].on = e > 0.5;
+    }
+    for (j = 0; j < NM - 1; j++) {
+      if (mE[j + 1] > 0.01) link(mLink, j, mPos[j], mPos[j + 1], 0.12 * mE[j + 1]);
+      else setInst(mLink, j, mPos[j], QI, 0, 0, 0);
+    }
+    mBack.instanceMatrix.needsUpdate = mBase.instanceMatrix.needsUpdate = mLink.instanceMatrix.needsUpdate = true;
+
+    // RNA-Polymerase
+    var px = P.pol - 1.5 - 17.5;
+    pol.visible = sOn > 0.01;
+    pol.position.set(px, (1 - sOn) * 5, -0.6 + (1 - sOn) * 3);
+    pol.scale.set(4.9 * sOn + 0.001, 3.0 * sOn + 0.001, 3.3 * sOn + 0.001);
+
+    // Ribosom
+    var rx = codonX(P.rib), sL = ease(P.large), sS = ease(P.small);
+    ribL.visible = sL > 0.01;
+    ribL.position.set(rx, BY + 3.1 + (1 - sL) * 6, 0);
+    ribL.scale.set(5.3 * sL + 0.001, 3.4 * sL + 0.001, 2.7 * sL + 0.001);
+    ribS.visible = sS > 0.01;
+    ribS.position.set(rx, BY - 1.55 - (1 - sS) * 4, 0);
+    ribS.scale.set(5.0 * sS + 0.001, 1.15 * sS + 0.001, 2.3 * sS + 0.001);
+    glow.visible = P.hcOn > 0.01;
+    glow.position.set(codonX(P.hc), BY, 0);
+    glow.scale.set(3.05, 1.2, 0.8);
+    glow.material.opacity = 0.34 * P.hcOn;
+    glow.material.color.setHex(P.stop > 0.5 ? 0xff6b6b : 0xffd43b);
+
+    // tRNAs
+    var newest = -1;
+    for (i = 0; i < NAA; i++) {
+      var a = P["a" + i], dp = P["d" + i], sa = ease(a), sd = ease(dp), tr = trnas[i];
+      var vis = a > 0.001 && dp < 0.999;
+      var sc = Math.min(1, sa * 2.5) * (1 - sd);
+      var tx = codonX(i) + (1 - sa) * 4.5 - sd * 5, ty = BY + (1 - sa) * 6.5 + sd * 5.5, tz = (1 - sa) * 2.5 + sd * 2;
+      tr.g.visible = vis;
+      if (vis) { tr.g.position.set(tx, ty, tz); tr.g.scale.set(sc, sc, sc); newest = i; }
+      for (j = 0; j < 3; j++) {
+        tr.lets[j].on = vis && sc > 0.6;
+        tr.lets[j].anchor.set(tx + (j - 1) * sc, ty + 0.95 * sc, tz);
+      }
+      // Aminosäure: auf der eigenen tRNA oder in der Kette
+      var p = aaPos[i], kk = P.h - i;
+      if (kk <= 0) {
+        p.set(codonX(i) + (1 - sa) * 4.5, BY + AA_TOP + (1 - sa) * 6.5, (1 - sa) * 2.5);
+      } else {
+        p.set(codonX(P.h) - 0.25 * kk + 0.55 * Math.sin(1.4 * kk), BY + AA_TOP + 1.12 * kk, 0.5 * (Math.cos(1.7 * kk) - 1));
+      }
+      var fr = ease(P.free);
+      p.x -= 2.5 * fr; p.y += 2.2 * fr; p.z += 1.0 * fr;
+      var av = a > 0.001, as = 0.66 * Math.min(1, sa * 2.5);
+      aas[i].mesh.visible = av;
+      aas[i].mesh.position.copy(p);
+      aas[i].mesh.scale.set(as + 0.001, as + 0.001, as + 0.001);
+      put(aas[i].label, av && sa > 0.4, p.x, p.y, p.z);
+    }
+    for (i = 1; i < NAA; i++) {
+      var bs = Math.max(0, Math.min(1, P.h - (i - 1)));
+      if (bs > 0.01) link(bonds, i - 1, aaPos[i - 1], aaPos[i], 0.2 * bs);
+      else setInst(bonds, i - 1, aaPos[i], QI, 0, 0, 0);
+    }
+    bonds.instanceMatrix.needsUpdate = true;
+
+    // Schilder
+    var tr0 = P.tr < 0.5;
+    put(LBL.t3, true, tPos[0].x - 0.8, tPos[0].y, tPos[0].z);
+    put(LBL.c5, true, cPos[0].x - 0.8, cPos[0].y, cPos[0].z);
+    put(LBL.t5, true, tPos[NBP - 1].x + 0.8, tPos[NBP - 1].y, tPos[NBP - 1].z);
+    put(LBL.c3, true, cPos[NBP - 1].x + 0.8, cPos[NBP - 1].y, cPos[NBP - 1].z);
+    put(LBL.prom, tr0, (OFF - 1) / 2 - 17.5, -2.5, 0);
+    put(LBL.pol, sOn > 0.5, px, 3.7 + (1 - sOn) * 5, 0);
+    put(LBL.m5, count > 0, mPos[0].x - 0.8, mPos[0].y, 0);
+    put(LBL.m3, count > 0, mPos[Math.max(0, count - 1)].x + 0.8, mPos[Math.max(0, count - 1)].y, 0);
+    var both = sL > 0.6 && sS > 0.6;
+    put(LBL.big, sL > 0.6, rx + 4.4, BY + 5.4, 0);
+    put(LBL.small, sS > 0.6, rx, BY - 3.5, 0);
+    put(LBL.E, both, rx - 3, BY - 1.55, 0);
+    put(LBL.P, both, rx, BY - 1.55, 0);
+    put(LBL.A, both, rx + 3, BY - 1.55, 0);
+    if (newest >= 0 && P.free < 0.05 && P.stop < 0.5) {
+      var ng = trnas[newest].g;
+      put(LBL.trna, ng.scale.x > 0.7, ng.position.x + 0.7, ng.position.y + 3.25, ng.position.z);
+    } else LBL.trna.visible = false;
+    put(LBL.pep, P.h > 0.99, aaPos[0].x - 1.0, aaPos[0].y + 0.2, aaPos[0].z);
+    put(LBL.stop, P.stop > 0.5, rx + 1.7, BY + 2.3, 0);
+
+    target.set(P.cx, P.cy, 0); camW = P.cw; camH = P.ch;
+  }
+
+  MODS.tt.apply = apply;
+  MODS.tt.group = G_TT;
+
+  /* =====================================================================
+     5b. 3D-Szene PCR
+     ===================================================================== */
+  var G_PCR = new T.Group(); scene.add(G_PCR);
+  PARENT = G_PCR;
+  var PL = 7, PT = 3.5, PP = 1.6, PH = 0.3;   // halbe Vorlagenlänge, halber Zielabschnitt, Primerlänge, halber Strangabstand
+  // Strang: type +1 = 5′-Ende links, -1 = 5′-Ende rechts; a..b = Ausdehnung; born = Zyklus der Entstehung
+  function strand(type, a, b, born) { return { type: type, a: a, b: b, born: born }; }
+  var LV = [[{ top: strand(1, -PL, PL, 0), bot: strand(-1, -PL, PL, 0) }]];
+  (function () {
+    for (var n = 1; n <= PCR_MAX; n++) {
+      var prev = LV[n - 1], next = [];
+      for (var i = 0; i < prev.length; i++) {
+        next.push({ top: prev[i].top, bot: strand(-1, prev[i].top.a, PT, n) });   // neuer Strang endet am Ende der Vorlage
+        next.push({ top: strand(1, -PT, prev[i].bot.b, n), bot: prev[i].bot });
+      }
+      LV.push(next);
+    }
+  })();
+  var PN = Math.pow(2, PCR_MAX + 1);          // höchstens 32 Einzelstränge = 16 Doppelstränge
+  var pcTarget = inst(gBox, lam(0x4dabf7), PN);
+  var pcFlank = inst(gBox, lam(0x8695a6), PN * 2);
+  var pcTeeth = inst(gBox, lam(0xdbe4ee), PN * 15);
+  var pcShaft = inst(gBox, lam(0xffffff), PN);
+  var pcHead = inst(new T.ConeGeometry(1, 1, 10), lam(0xffffff), PN);
+  var pcPol = inst(gSphere, lam(0xffa94d, 0.55), PN / 2);
+  var PCOL = [new T.Color(0xffd43b), new T.Color(0xf783ac)];
+  for (b0 = 0; b0 < PN; b0++) { pcShaft.setColorAt(b0, PCOL[0]); pcHead.setColorAt(b0, PCOL[0]); }
+  var QXP = new T.Quaternion().setFromUnitVectors(UP, new T.Vector3(1, 0, 0));
+  var QXN = new T.Quaternion().setFromUnitVectors(UP, new T.Vector3(-1, 0, 0));
+  var PLBL = {
+    t5: addLabel("5′", 0.7, 1), t3: addLabel("3′", 0.7, 0), b3: addLabel("3′", 0.7, 1), b5: addLabel("5′", 0.7, 0),
+    target: addLabel("Zielabschnitt", 0.8), p1: addLabel("Primer 1", 0.7), p2: addLabel("Primer 2", 0.7),
+    pol: addLabel("DNA-Polymerase", 0.7)
+  };
+  var pcN = { t: 0, f: 0, th: 0, pr: 0, po: 0 };
+  var sv0 = new T.Vector3(), svA = new T.Vector3(), svB = new T.Vector3();
+  function pcrSlot(n, i, out) {
+    var cols = n >= 3 ? 2 : 1, rows = Math.pow(2, n) / cols;
+    var col = Math.floor(i / rows), row = i % rows;
+    out.set((col - (cols - 1) / 2) * 17, ((rows - 1) / 2 - row) * PCR_SP[n], 0);
+  }
+  function pcSeg(mesh, key, xa, xb, x0, y) {
+    if (xb - xa < 0.02) return;
+    v2.set(x0 + (xa + xb) / 2, y, 0);
+    setInst(mesh, pcN[key]++, v2, QI, xb - xa, 0.26, 0.26);
+  }
+  // Zeichnet einen Einzelstrang; lo..hi = bereits vorhandener Bereich; pa/py/pz = Primer-Animation
+  function pcStrand(st, x0, y, lo, hi, pa, py, pz) {
+    var a = Math.max(st.a, lo), b = Math.min(st.b, hi), ta = -PT, tb = PT, x;
+    var pLo = st.type > 0 ? -PT : PT - PP, pHi = pLo + PP;
+    if (st.born > 0) { if (st.type > 0) ta = pHi; else tb = pLo; }
+    pcSeg(pcFlank, "f", a, Math.min(b, -PT), x0, y);
+    pcSeg(pcTarget, "t", Math.max(a, ta), Math.min(b, tb), x0, y);
+    pcSeg(pcFlank, "f", Math.max(a, PT), b, x0, y);
+    for (x = st.a + 0.5; x < st.b; x += 1) {           // angedeutete Basen
+      var inPrimer = st.born > 0 && x > pLo && x < pHi;
+      if (inPrimer) {
+        if (pa <= 0) continue;
+        v2.set(x0 + x, y - st.type * 0.24 + py, pz);
+        setInst(pcTeeth, pcN.th++, v2, QI, 0.13 * pa, 0.26 * pa, 0.13 * pa);
+      } else if (x > a && x < b) {
+        v2.set(x0 + x, y - st.type * 0.24, 0);
+        setInst(pcTeeth, pcN.th++, v2, QI, 0.13, 0.26, 0.13);
+      }
+    }
+    if (st.born > 0 && pa > 0) {                        // Primer als Pfeil in 5′→3′-Richtung
+      var dir = st.type, xs = dir > 0 ? -PT : PT, sl = PP - 0.55, k = pcN.pr++;
+      v2.set(x0 + xs + dir * sl / 2, y + py, pz);
+      setInst(pcShaft, k, v2, QI, sl * pa, 0.36 * pa, 0.36 * pa);
+      v2.set(x0 + xs + dir * (sl + 0.275), y + py, pz);
+      setInst(pcHead, k, v2, dir > 0 ? QXP : QXN, 0.38 * pa, 0.55 * pa, 0.38 * pa);
+      pcShaft.setColorAt(k, PCOL[dir > 0 ? 0 : 1]);
+      pcHead.setColorAt(k, PCOL[dir > 0 ? 0 : 1]);
+    }
+  }
+  function pcPolAt(x, y) {
+    v2.set(x, y, 0.05);
+    setInst(pcPol, pcN.po++, v2, QI, 0.8, 0.62, 0.62);
+  }
+  function pcrApply(P) {
+    var c = 0, i, k;
+    for (k = 1; k <= PCR_MAX; k++) if (P["d" + k] > 0) c = k;
+    var cnt = P.cnt > 0.5;
+    if (cnt) c = 0;
+    pcN.t = pcN.f = pcN.th = pcN.pr = pcN.po = 0;
+    var otx = 0, oty = 0, obx = 0, oby = 0, showEnds = false, e = 0, a = 0, polX = 0, polY = 0;
+    if (c === 0) {                                      // ruhender Zustand einer Stufe
+      var n = cnt ? Math.min(pcrN, PCR_MAX) : 0, D = LV[n];
+      for (i = 0; i < D.length; i++) {
+        pcrSlot(n, i, sv0);
+        pcStrand(D[i].top, sv0.x, sv0.y + PH, -99, 99, 1, 0, 0);
+        pcStrand(D[i].bot, sv0.x, sv0.y - PH, -99, 99, 1, 0, 0);
+      }
+      showEnds = !cnt; oty = PH; oby = -PH;
+      if (cnt) { var cm = pcrCam(n); target.set(0, 0, 0); camW = cm.cw; camH = cm.ch; }
+    } else {                                            // Zyklus c: trennen, Primer, verlängern
+      var par = LV[c - 1], kid = LV[c], d = P["d" + c];
+      a = P["a" + c]; e = P["e" + c];
+      for (i = 0; i < par.length; i++) {
+        pcrSlot(c - 1, i, sv0); pcrSlot(c, 2 * i, svA); pcrSlot(c, 2 * i + 1, svB);
+        var tx = lerp(sv0.x, svA.x, d), ty = lerp(sv0.y, svA.y, d) + PH;
+        var bx = lerp(sv0.x, svB.x, d), by = lerp(sv0.y, svB.y, d) - PH;
+        pcStrand(par[i].top, tx, ty, -99, 99, 1, 0, 0);
+        pcStrand(par[i].bot, bx, by, -99, 99, 1, 0, 0);
+        if (a > 0) {
+          var nb = kid[2 * i].bot, lo = lerp(PT - PP, nb.a, e);
+          pcStrand(nb, tx, ty - 2 * PH, lo, PT, a, -(1 - a) * 1.5, (1 - a) * 2.5);
+          var nt = kid[2 * i + 1].top, hi = lerp(-PT + PP, nt.b, e);
+          pcStrand(nt, bx, by + 2 * PH, -PT, hi, a, (1 - a) * 1.5, (1 - a) * 2.5);
+          if (e > 0 && e < 1) { pcPolAt(tx + lo, ty - 2 * PH); pcPolAt(bx + hi, by + 2 * PH); }
+          if (i === par.length - 1) { polX = bx + hi; polY = by + 2 * PH; }
+        }
+        if (i === 0) { otx = tx; oty = ty; }
+        if (i === par.length - 1) { obx = bx; oby = by; }
+      }
+      showEnds = c === 1;
+    }
+    pcTarget.count = pcN.t; pcFlank.count = pcN.f; pcTeeth.count = pcN.th;
+    pcShaft.count = pcHead.count = pcN.pr; pcPol.count = pcN.po;
+    pcTarget.instanceMatrix.needsUpdate = pcFlank.instanceMatrix.needsUpdate = pcTeeth.instanceMatrix.needsUpdate = true;
+    pcShaft.instanceMatrix.needsUpdate = pcHead.instanceMatrix.needsUpdate = pcPol.instanceMatrix.needsUpdate = true;
+    pcShaft.instanceColor.needsUpdate = pcHead.instanceColor.needsUpdate = true;
+
+    put(PLBL.t5, showEnds, otx - PL - 0.4, oty, 0);
+    put(PLBL.t3, showEnds, otx + PL + 0.4, oty, 0);
+    put(PLBL.b3, showEnds, obx - PL - 0.4, oby, 0);
+    put(PLBL.b5, showEnds, obx + PL + 0.4, oby, 0);
+    put(PLBL.target, c === 0 && !cnt, 0, PH + 1.2, 0);
+    var prim = c === 1 && a > 0.6 && e < 0.25;
+    put(PLBL.p1, prim, obx - PT + PP / 2, oby + 2 * PH + 0.85, 0);
+    put(PLBL.p2, prim, otx + PT - PP / 2, oty - 2 * PH - 0.85, 0);
+    put(PLBL.pol, c === 1 && e > 0.02 && e < 0.98, polX, polY + 1.0, 0);
+    if (!cnt) { target.set(P.cx, P.cy, 0); camW = P.cw; camH = P.ch; }
+  }
+  MODS.pcr.apply = pcrApply;
+  MODS.pcr.group = G_PCR;
+
+  /* =====================================================================
+     5c. 3D-Szene Gelelektrophorese
+     ===================================================================== */
+  var G_GEL = new T.Group(); scene.add(G_GEL);
+  PARENT = G_GEL;
+  var GW = 9, GLEN = 14, ZW = -GLEN / 2 + 1, GRUN = 11.5;       // Gelbreite, Gellänge, Lage der Taschen, maximale Laufstrecke
+  function gPart(geo, mat, sx, sy, sz, x, y, z) {
+    var m = new T.Mesh(geo, mat);
+    m.scale.set(sx, sy, sz); m.position.set(x, y, z);
+    PARENT.add(m);
+    return m;
+  }
+  gPart(gBox, lam(0x1b2e44), GW + 2.4, 0.3, GLEN + 3.4, 0, -0.5, 0);               // Wanne
+  gPart(gBox, lam(0x8ecae6, 0.5), GW, 0.6, GLEN, 0, 0, 0);                         // Gel
+  var gCath = gPart(gCyl, lam(0x5c6773), 0.14, GW + 1.6, 0.14, 0, 0.1, -GLEN / 2 - 1.0);   // Kathode (−)
+  var gAno = gPart(gCyl, lam(0xe03131), 0.14, GW + 1.6, 0.14, 0, 0.1, GLEN / 2 + 1.0);     // Anode (+)
+  gCath.rotation.z = gAno.rotation.z = Math.PI / 2;
+  var gArrowA = gPart(gBox, lam(0xffd43b), 0.16, 0.1, 3.2, GW / 2 + 0.7, 0.2, -0.3);
+  var gArrowB = gPart(new T.ConeGeometry(1, 1, 10), lam(0xffd43b), 0.36, 0.8, 0.36, GW / 2 + 0.7, 0.2, 1.6);
+  gArrowB.rotation.x = Math.PI / 2;
+  var gWells = [], gFill = [], gDrop = [], gLane = [], gBands = [];
+  var wellMat = lam(0x0d1a29), fillMat = lam(0x4c6ef5), dropMat = lam(0x4c6ef5);
+  var bandMat = new T.MeshBasicMaterial({ color: 0xfff3bf });
+  GEL_LANES.forEach(function (ln, li) {
+    gWells.push(gPart(gBox, wellMat, 1.9, 0.12, 0.5, ln.x, 0.26, ZW));
+    gFill.push(gPart(gBox, fillMat, 1.7, 0.1, 0.36, ln.x, 0.3, ZW));
+    gDrop.push(gPart(gSphere, dropMat, 0.3, 0.3, 0.3, ln.x, 3, ZW));
+    gLane.push(addLabel(ln.name, 0.85));
+    ln.bp.forEach(function (bp) {
+      gBands.push({
+        bp: bp, lane: li, x: ln.x, z: ZW,
+        mesh: gPart(gBox, bandMat, 1.8, 0.07, 0.22, ln.x, 0.335, ZW),
+        label: li === 0 ? addLabel(String(bp) + " bp", 0.62, 1) : addLabel(String(bp) + " bp", 0.6, 0.5, false)
+      });
+    });
+  });
+  var GLBL = {
+    cath: addLabel("Kathode (−)", 0.8), ano: addLabel("Anode (+)", 0.8), run: addLabel("Laufrichtung", 0.66)
+  };
+  function gelApply(P) {
+    var load = ease(P.load), volt = P.volt, frac = gelTime(P) / GEL_TMAX, i, j;
+    for (i = 0; i < GEL_LANES.length; i++) {
+      gFill[i].visible = load > 0.85;
+      gDrop[i].visible = P.load > 0.001 && P.load < 0.999;
+      gDrop[i].position.y = lerp(3.4, 0.4, load);
+      var ds = 0.3 * (1 - smooth(0.8, 1, P.load)) + 0.001;
+      gDrop[i].scale.set(ds, ds, ds);
+      put(gLane[i], true, GEL_LANES[i].x, 0.5, ZW - 1.0);
+    }
+    for (i = 0; i < gBands.length; i++) {
+      var B = gBands[i];
+      B.z = ZW + 0.36 + GRUN * frac * gelMob(B.bp);
+      B.mesh.visible = P.load > 0.999 && frac > 0.001;
+      B.mesh.position.z = B.z;
+    }
+    for (i = 0; i < gBands.length; i++) {              // Beschriftung nur, wenn die Nachbarbanden weit genug entfernt sind
+      var B2 = gBands[i], free = B2.mesh.visible;
+      for (j = 0; j < gBands.length && free; j++) {
+        if (j !== i && gBands[j].lane === B2.lane && Math.abs(gBands[j].z - B2.z) < 0.62) free = false;
+      }
+      if (B2.lane === 0) put(B2.label, free, -GW / 2 - 0.35, 0.34, B2.z);
+      else put(B2.label, free && gelReveal, B2.x, 0.6, B2.z);
+    }
+    gArrowA.visible = gArrowB.visible = volt > 0.5;
+    put(GLBL.run, volt > 0.5, GW / 2 + 0.9, 0.3, 3.0);
+    put(GLBL.cath, true, 0, 0.5, -GLEN / 2 - 2.1);
+    put(GLBL.ano, true, 0, 0.5, GLEN / 2 + 2.1);
+    target.set(P.cx, P.cy, 0.6); camW = P.cw; camH = P.ch;
+  }
+  MODS.gel.apply = gelApply;
+  MODS.gel.group = G_GEL;
+  /* =====================================================================
+     5d. 3D-Szene Epigenetik: DNA-Methylierung
+     ===================================================================== */
+  function rrect(g, w, h, r) {
+    g.beginPath(); g.moveTo(r, 2); g.lineTo(w - r, 2); g.quadraticCurveTo(w - 2, 2, w - 2, r);
+    g.lineTo(w - 2, h - r); g.quadraticCurveTo(w - 2, h - 2, w - r, h - 2); g.lineTo(r, h - 2);
+    g.quadraticCurveTo(2, h - 2, 2, h - r); g.lineTo(2, r); g.quadraticCurveTo(2, 2, r, 2); g.closePath();
+  }
+  function statePill(str, h, bg, line, ink) {   // Zustandsschild mit eigenen Farben
+    var cv = document.createElement("canvas"), g = cv.getContext("2d"), px = 34;
+    g.font = "700 " + px + "px " + FONT;
+    var w = Math.ceil(g.measureText(str).width) + 34, hh = 60;
+    cv.width = w; cv.height = hh;
+    g = cv.getContext("2d");
+    rrect(g, w, hh, 12); g.fillStyle = bg; g.fill(); g.lineWidth = 3; g.strokeStyle = line; g.stroke();
+    g.font = "700 " + px + "px " + FONT; g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillStyle = ink; g.fillText(str, w / 2, hh / 2 + 2);
+    var sp = new T.Sprite(new T.SpriteMaterial({ map: makeTex(cv), transparent: true, depthTest: false, depthWrite: false }));
+    sp.scale.set(h * w / hh, h, 1); sp.renderOrder = 10; sp.visible = false;
+    PARENT.add(sp);
+    return sp;
+  }
+  function blob(col, op) { var m = new T.Mesh(gBlob, lam(col, op)); m.visible = false; PARENT.add(m); return m; }
+
+  var G_METH = new T.Group(); scene.add(G_METH);
+  PARENT = G_METH;
+  var MX0 = -(METH_N - 1) / 2, CTL_Y = -7.6;
+  function mxp(i) { return MX0 + i; }
+  function cpgX(k) { return mxp(CPG[k]) + 0.5; }
+  function cpgXf(f) {
+    var a = Math.max(0, Math.min(CPG.length - 1, Math.floor(f))), b = Math.min(CPG.length - 1, a + 1);
+    return lerp(cpgX(a), cpgX(b), Math.max(0, Math.min(1, f - a)));
+  }
+  var GENE_MID = (mxp(METH_G0) + mxp(METH_N - 1)) / 2, PROM_MID = (mxp(0) + mxp(METH_G0 - 1)) / 2;
+  var TFX = [(cpgX(0) + cpgX(1)) / 2, (cpgX(2) + cpgX(3)) / 2];
+  var NGENE = METH_N - METH_G0;
+
+  // Leiter-Darstellung eines DNA-Abschnitts (statisch)
+  function ladder(y0, withLetters) {
+    var back = inst(gBox, lam(0xa9bccf), 2), bases = inst(gBox, lam(0xffffff), METH_N * 2);
+    var bands = inst(gBox, lam(0xffffff, 0.6), 2);
+    var marks = inst(gBox, new T.MeshBasicMaterial({ color: 0xffd43b, transparent: true, opacity: 0.18, depthWrite: false }), CPG.length);
+    var i;
+    v2.set(0, y0 + 0.86, 0); setInst(back, 0, v2, QI, METH_N - 0.1, 0.2, 0.34);
+    v2.set(0, y0 - 0.86, 0); setInst(back, 1, v2, QI, METH_N - 0.1, 0.2, 0.34);
+    for (i = 0; i < METH_N; i++) {
+      var tb = METH_SEQ[i], bb = DNA_COMP[tb];
+      v2.set(mxp(i), y0 + 0.4, 0); setInst(bases, i, v2, QI, 0.66, 0.72, 0.42);
+      v2.set(mxp(i), y0 - 0.4, 0); setInst(bases, METH_N + i, v2, QI, 0.66, 0.72, 0.42);
+      bases.setColorAt(i, color.setHex(COL[tb])); bases.setColorAt(METH_N + i, color.setHex(COL[bb]));
+      if (withLetters) {
+        var L1 = addLetter(tb); L1.anchor.set(mxp(i), y0 + 0.4, 0); L1.on = true;
+        var L2 = addLetter(bb); L2.anchor.set(mxp(i), y0 - 0.4, 0); L2.on = true;
+      }
+    }
+    v2.set(PROM_MID, y0 - 1.35, 0); setInst(bands, 0, v2, QI, METH_G0 - 0.1, 0.22, 0.3);
+    v2.set(GENE_MID, y0 - 1.35, 0); setInst(bands, 1, v2, QI, NGENE - 0.1, 0.22, 0.3);
+    bands.setColorAt(0, color.setHex(0x748ffc)); bands.setColorAt(1, color.setHex(0x69db7c));
+    for (i = 0; i < CPG.length; i++) { v2.set(cpgX(i), y0, 0); setInst(marks, i, v2, QI, 1.9, 2.15, 0.95); }
+    back.instanceMatrix.needsUpdate = bases.instanceMatrix.needsUpdate = bands.instanceMatrix.needsUpdate = marks.instanceMatrix.needsUpdate = true;
+    bases.instanceColor.needsUpdate = bands.instanceColor.needsUpdate = true;
+  }
+  ladder(0, true);
+  var PILL_O = ["rgba(9,20,34,0.88)", "#69db7c", "#d3f9d8"], PILL_M = ["#ffd43b", "#ffd43b", "#2b2200"];
+  var mPillO = [], mPillM = [], mMbp = [], mq2;
+  for (mq2 = 0; mq2 < CPG.length; mq2++) {
+    mPillO.push(statePill((mq2 + 1) + ": offen", 0.62, PILL_O[0], PILL_O[1], PILL_O[2]));
+    mPillM.push(statePill((mq2 + 1) + ": CH₃", 0.62, PILL_M[0], PILL_M[1], PILL_M[2]));
+    mMbp.push(blob(0xff8787, 0.85));
+  }
+  var mMeth = inst(gSphere, lam(0xffd43b), CPG.length * 2);
+  var mTF = [blob(0x38d9a9, 0.8), blob(0x38d9a9, 0.8)];
+  var mPol = blob(0xffa94d, 0.4), mDnmt = blob(0xb197fc, 0.8);
+  var mRna = inst(gBox, lam(0xff8fab), NGENE);
+  var MLBL = {
+    t5: addLabel("5′", 0.7, 1), t3: addLabel("3′", 0.7, 0), b3: addLabel("3′", 0.7, 1), b5: addLabel("5′", 0.7, 0),
+    prom: addLabel("Promotor", 0.7), gene: addLabel("Gen", 0.7), cpg: addLabel("CpG-Stellen", 0.66, 1),
+    tf: addLabel("Transkriptionsfaktoren", 0.66, 1), pol: addLabel("RNA-Polymerase", 0.7), mrna: addLabel("mRNA", 0.66),
+    dnmt: addLabel("DNMT", 0.72, 0), mbp: addLabel("Methyl-CpG-bindende Proteine", 0.66, 1),
+    block: addLabel("Transkriptionsfaktoren finden keinen Platz", 0.62), sil: addLabel("keine Transkription", 0.72),
+    main: addLabel("Mit Methylierung: Gen stummgeschaltet", 0.7)
+  };
+
+  // Kontrollansicht: dieselbe Basenfolge ohne Methylierung, Gen aktiv (statisch)
+  var G_CTL = new T.Group(); G_METH.add(G_CTL); G_CTL.visible = false;
+  PARENT = G_CTL;
+  ladder(CTL_Y, false);
+  (function () {
+    var i, sp, m, rna = inst(gBox, lam(0xff8fab), NGENE), nr = Math.floor(0.55 * NGENE);
+    for (i = 0; i < CPG.length; i++) { sp = statePill((i + 1) + ": offen", 0.62, PILL_O[0], PILL_O[1], PILL_O[2]); put(sp, true, cpgX(i), CTL_Y + 2.95, 0); }
+    for (i = 0; i < 2; i++) { m = blob(0x38d9a9, 0.8); m.visible = true; m.position.set(TFX[i], CTL_Y + 1.55, 0); m.scale.set(1.25, 0.62, 0.7); }
+    m = blob(0xffa94d, 0.4); m.visible = true;
+    m.position.set(lerp(mxp(METH_G0) - 0.6, mxp(METH_N - 1) + 0.2, 0.55), CTL_Y, 0); m.scale.set(1.5, 1.35, 1.2);
+    for (i = 0; i < nr; i++) { v2.set(mxp(METH_G0 + i), CTL_Y + 1.75, 0.15); setInst(rna, i, v2, QI, 0.5, 0.36, 0.36); }
+    rna.count = nr; rna.instanceMatrix.needsUpdate = true;
+    put(addLabel("Kontrolle ohne Methylierung: Gen aktiv", 0.7), true, GENE_MID, CTL_Y + 3.0, 0);
+  })();
+  PARENT = G_METH;
+
+  function methApply(P) {
+    var i, s, k = ease(methCtlK(P));
+    for (i = 0; i < CPG.length; i++) {
+      var mv = P["m" + i], ms = 0.21 * ease(mv);
+      v2.set(mxp(CPG[i]) + 0.3, 0.7, 0.3); setInst(mMeth, 2 * i, v2, QI, ms, ms, ms);
+      v2.set(mxp(CPG[i] + 1) + 0.3, -0.7, 0.3); setInst(mMeth, 2 * i + 1, v2, QI, ms, ms, ms);
+      put(mPillO[i], mv <= 0.5, cpgX(i), 2.95, 0);
+      put(mPillM[i], mv > 0.5, cpgX(i), 2.95, 0);
+      var mb = ease(P.mb);
+      mMbp[i].visible = mb > 0.01;
+      mMbp[i].position.set(cpgX(i), lerp(4.5, 1.45, mb), 0.3);
+      mMbp[i].scale.set(0.7 * mb + 0.001, 0.48 * mb + 0.001, 0.6 * mb + 0.001);
+    }
+    mMeth.instanceMatrix.needsUpdate = true;
+
+    var tf = ease(P.tf), tb = ease(P.tfb);
+    for (i = 0; i < 2; i++) {
+      var m = mTF[i];
+      m.visible = tf > 0.01 || tb > 0.01;
+      if (tb > tf) { m.position.set(TFX[i], lerp(6, 4.0, tb), 0.4); s = tb; }
+      else { m.position.set(TFX[i], lerp(5.5, 1.55, tf), lerp(1.5, 0, tf)); s = tf; }
+      m.scale.set(1.25 * s + 0.001, 0.62 * s + 0.001, 0.7 * s + 0.001);
+    }
+
+    var pp = ease(P.pol), px = lerp(mxp(METH_G0) - 0.6, mxp(METH_N - 1) + 0.2, P.px);
+    mPol.visible = pp > 0.01;
+    mPol.position.set(px, 0, 0); mPol.scale.set(1.5 * pp + 0.001, 1.35 * pp + 0.001, 1.2 * pp + 0.001);
+    var nr = pp > 0.5 ? Math.max(0, Math.min(NGENE, Math.floor(P.px * NGENE + 1e-6))) : 0;
+    for (i = 0; i < nr; i++) { v2.set(mxp(METH_G0 + i), 1.75, 0.15); setInst(mRna, i, v2, QI, 0.5, 0.36, 0.36); }
+    mRna.count = nr; mRna.instanceMatrix.needsUpdate = true;
+
+    var dn = ease(P.dn), dxp = cpgXf(P.dx);
+    mDnmt.visible = dn > 0.01;
+    mDnmt.position.set(dxp, lerp(4.8, 1.6, dn), 0.45); mDnmt.scale.set(1.1 * dn + 0.001, 0.75 * dn + 0.001, 0.8 * dn + 0.001);
+
+    put(MLBL.t5, true, MX0 - 0.6, 0.86, 0); put(MLBL.t3, true, -MX0 + 0.6, 0.86, 0);
+    put(MLBL.b3, true, MX0 - 0.6, -0.86, 0); put(MLBL.b5, true, -MX0 + 0.6, -0.86, 0);
+    put(MLBL.prom, true, PROM_MID, -2.0, 0); put(MLBL.gene, true, GENE_MID, -2.0, 0);
+    put(MLBL.cpg, true, cpgX(0) - 1.3, 2.95, 0);
+    put(MLBL.tf, tf > 0.9 && tb < 0.1, TFX[0] - 1.5, 1.55, 0);
+    put(MLBL.pol, pp > 0.9, px, -2.9, 0);
+    put(MLBL.mrna, nr > 2, mxp(METH_G0) + nr / 2 - 0.5, 2.6, 0);
+    put(MLBL.dnmt, dn > 0.9, dxp + 1.2, 1.6, 0.45);
+    put(MLBL.mbp, P.mb > 0.9, cpgX(0) - 1.0, 1.45, 0);
+    put(MLBL.block, tb > 0.9, PROM_MID, 4.95, 0);
+    put(MLBL.sil, P.sil > 0.5, GENE_MID, 2.6, 0);
+    put(MLBL.main, k > 0.5, GENE_MID, 4.4, 0);
+
+    G_CTL.visible = k > 0.02;
+    target.set(P.cx, lerp(P.cy, -3.3, k), 0); camW = P.cw; camH = lerp(P.ch, 19, k);
+  }
+  MODS.meth.apply = methApply;
+  MODS.meth.group = G_METH;
+
+  /* =====================================================================
+     5e. 3D-Szene Epigenetik: Histonmodifikation
+     ===================================================================== */
+  var G_HIST = new T.Group(); scene.add(G_HIST);
+  PARENT = G_HIST;
+  var NUC = 5, NC = 2;                      // fünf Nucleosomen, das mittlere trägt den Histonschwanz
+  // DNA-Windung: knapp zwei Windungen (1,7) um den Histonkern, Ein- und Austritt unten
+  var wrapPts = [], WA0 = 216 * Math.PI / 180, wi;
+  for (wi = 0; wi <= 48; wi++) {
+    var wu = wi / 48, wa = WA0 - wu * 1.7 * 2 * Math.PI;
+    wrapPts.push(new T.Vector3(2.05 * Math.cos(wa), 2.05 * Math.sin(wa), lerp(-1.05, 1.05, wu)));
+  }
+  var wrapGeo = new T.TubeGeometry(new T.CatmullRomCurve3(wrapPts), 96, 0.3, 6, false);
+  var WIN = wrapPts[0], WOUT = wrapPts[wrapPts.length - 1];
+  var dnaMatH = lam(0xc5d3e0);
+  var hMats = [0xff922b, 0xfcc419, 0x4dabf7, 0x63e6be].map(function (c) { return lam(c); });   // H2A, H2B, H3, H4
+  var HLAY = [[2, 45], [3, 135], [0, 225], [1, 315]];   // [Histonsorte, Winkel] je Lage
+  var nucs = [], nIn = [], nOut = [];
+  for (wi = 0; wi < NUC; wi++) {
+    var ng = new T.Group();
+    ng.add(new T.Mesh(wrapGeo, dnaMatH));
+    for (var lz = 0; lz < 2; lz++) for (var hl = 0; hl < 4; hl++) {
+      var hm = new T.Mesh(gBlob, hMats[HLAY[hl][0]]), ha = HLAY[hl][1] * Math.PI / 180;
+      hm.scale.set(0.86, 0.86, 0.62);
+      hm.position.set(0.92 * Math.cos(ha), 0.92 * Math.sin(ha), lz ? 0.5 : -0.5);
+      ng.add(hm);
+    }
+    PARENT.add(ng); nucs.push(ng); nIn.push(new T.Vector3()); nOut.push(new T.Vector3());
+  }
+  // Lage der Nucleosomen [x, y, z, Drehung um y]: locker (Euchromatin) und dicht (Heterochromatin)
+  var NLOOSE = [[-13, -0.6, 0, 0.3], [-6.5, 0.6, 0, -0.3], [0, 0, 0, 0], [6.5, 0.6, 0, 0.3], [13, -0.6, 0, -0.3]];
+  var NDENSE = [[-5.0, 0.4, 0.9, 0.9], [-2.6, -1.6, -1.3, -0.8], [0, 0, 0, 0], [2.6, -1.6, -1.3, 0.8], [5.0, 0.4, 0.9, -0.9]];
+  var hLink = inst(gCyl, lam(0xffffff), NUC + 1);
+  for (wi = 0; wi <= NUC; wi++) hLink.setColorAt(wi, color.setHex(wi === NC + 1 ? 0x8ce99a : 0xc5d3e0));
+  hLink.instanceColor.needsUpdate = true;
+
+  // Histonschwanz (N-Terminus von H3) am mittleren Nucleosom; Lysine an Position 4, 9 und 14
+  PARENT = nucs[NC];
+  var TAILN = 14, TAIL_K = [4, 9, 14], TD = new T.Vector3(0.17, 0.94, 0.3).normalize();
+  function resPos(r, out) {
+    var k = TAILN - r;
+    return out.set(1.05 + 0.5 * k * TD.x + 0.22 * Math.sin(k * 1.1), 1.75 + 0.5 * k * TD.y, 1.3 + 0.5 * k * TD.z);
+  }
+  var tailLink = inst(gCyl, lam(0x8f9db0), TAILN - 1), rp = new T.Vector3(), rq = new T.Vector3(), r0;
+  var resMat = lam(0x8f9db0), lysMat = lam(0xf8f9fa);
+  for (r0 = 1; r0 <= TAILN; r0++) {
+    var isK = TAIL_K.indexOf(r0) >= 0, rm = new T.Mesh(gSphere, isK ? lysMat : resMat), rs = isK ? 0.3 : 0.22;
+    resPos(r0, rm.position); rm.scale.set(rs, rs, rs); PARENT.add(rm);
+    if (r0 < TAILN) { resPos(r0, rp); resPos(r0 + 1, rq); link(tailLink, r0 - 1, rp, rq, 0.08); }
+  }
+  tailLink.instanceMatrix.needsUpdate = true;
+  var TAGS = { ac9: [9, 0xf06595, "Ac"], ac14: [14, 0xf06595, "Ac"], me4: [4, 0xb197fc, "Me"], me9: [9, 0xb197fc, "Me"] };
+  var tagObj = {}, tk;
+  for (tk in TAGS) {
+    var tm = new T.Mesh(gSphere, lam(TAGS[tk][1])); tm.visible = false; PARENT.add(tm);
+    resPos(TAGS[tk][0], tm.position).add(new T.Vector3(0.5, 0.05, 0.12));
+    tagObj[tk] = { mesh: tm, label: addLabel(TAGS[tk][2], 0.5, 0, false), r: TAGS[tk][0] };
+  }
+  var kLbl = [], kPlus = [];
+  for (r0 = 0; r0 < TAIL_K.length; r0++) { kLbl.push(addLabel("K" + TAIL_K[r0], 0.48, 1, false)); kPlus.push(addLabel("+", 0.55, 0.5, false)); }
+  var eHat = blob(0x69db7c, 0.8), eHmt = blob(0x9775fa, 0.8), eHdac = blob(0xff6b6b, 0.8), eKdm = blob(0xffa94d, 0.8), eRd = blob(0xe599f7, 0.85);
+  var NLBL = {
+    tail: addLabel("Histonschwanz (N-Terminus)", 0.6), core: addLabel("Histonkern (8 Histone)", 0.6, 1),
+    dna: addLabel("DNA", 0.6, 0), nuc: addLabel("Nucleosom", 0.66),
+    hat: addLabel("HAT", 0.6, 0), hmt: addLabel("Methyltransferase", 0.6, 0), hdac: addLabel("HDAC", 0.6, 0),
+    kdm: addLabel("Demethylase", 0.6, 0), rd: addLabel("bindendes Protein", 0.6, 1)
+  };
+  PARENT = G_HIST;
+  var hTF = blob(0x38d9a9, 0.8), hPol = blob(0xffa94d, 0.4), hRna = inst(gSphere, lam(0xff8fab), 8);
+  var HLBL = {
+    gene: addLabel("Gen", 0.7), tf: addLabel("Transkriptionsfaktor", 0.66), pol: addLabel("RNA-Polymerase", 0.66, 0),
+    eu: addLabel("Euchromatin: locker gepackt", 0.8), het: addLabel("Heterochromatin: dicht gepackt", 0.8),
+    block: addLabel("Gen weitgehend unzugänglich", 0.66)
+  };
+  var hA = new T.Vector3(), hB = new T.Vector3(), hC = new T.Vector3();
+
+  function placeEnz(m, lb, pres, r, dx, dz) {     // Enzym nähert sich dem Rest r von der Seite
+    var p = ease(pres);
+    m.visible = p > 0.01;
+    resPos(r, m.position);
+    m.position.x += dx * (1 + 1.5 * (1 - p)); m.position.z += dz;
+    m.scale.set(0.72 * p + 0.001, 0.56 * p + 0.001, 0.56 * p + 0.001);
+    put(lb, p > 0.9, m.position.x + (dx > 0 ? 0.85 : -0.85), m.position.y, m.position.z);
+  }
+  function histApply(P) {
+    var i, d = ease(P.dense), lab = P.lab > 0.5, close = P.cw < 16, wide = P.cw > 18;
+    for (i = 0; i < NUC; i++) {
+      var a = NLOOSE[i], b = NDENSE[i], n = nucs[i];
+      n.position.set(lerp(a[0], b[0], d), lerp(a[1], b[1], d), lerp(a[2], b[2], d));
+      n.rotation.set(0, lerp(a[3], b[3], d), 0);
+      nIn[i].copy(WIN).applyQuaternion(n.quaternion).add(n.position);
+      nOut[i].copy(WOUT).applyQuaternion(n.quaternion).add(n.position);
+    }
+    hA.copy(nIn[0]); hA.x -= 4; link(hLink, 0, hA, nIn[0], 0.3);
+    for (i = 1; i < NUC; i++) link(hLink, i, nOut[i - 1], nIn[i], 0.3);
+    hA.copy(nOut[NUC - 1]); hA.x += 4; link(hLink, NUC, nOut[NUC - 1], hA, 0.3);
+    hLink.instanceMatrix.needsUpdate = true;
+
+    // Schwanz: Markierungen, Ladungen, Beschriftungen
+    for (tk in tagObj) {
+      var to = tagObj[tk], v = ease(P[tk]), ts = 0.22 * v + 0.001;
+      to.mesh.visible = v > 0.01; to.mesh.scale.set(ts, ts, ts);
+      put(to.label, v > 0.5, to.mesh.position.x + 0.3, to.mesh.position.y, to.mesh.position.z);
+    }
+    for (i = 0; i < TAIL_K.length; i++) {
+      var kr = TAIL_K[i], acd = (kr === 9 && P.ac9 > 0.5) || (kr === 14 && P.ac14 > 0.5);
+      resPos(kr, hC);
+      put(kLbl[i], lab, hC.x - 0.42, hC.y, hC.z + 0.1);
+      put(kPlus[i], lab && !acd, hC.x, hC.y + 0.42, hC.z + 0.22);
+    }
+    resPos(1, hC); put(NLBL.tail, lab, hC.x, hC.y + 0.75, hC.z);
+    put(NLBL.core, lab && close, -2.6, 1.9, 0.6);
+    put(NLBL.dna, lab && close, 2.4, -1.6, 1.1);
+    put(NLBL.nuc, lab && close, 0, -3.0, 0);
+
+    placeEnz(eHat, NLBL.hat, P.hat, 11.5, 1.7, 0.4);
+    placeEnz(eHmt, NLBL.hmt, P.hmt, P.hmtAt, 1.7, 0.4);
+    placeEnz(eHdac, NLBL.hdac, P.hdac, 11.5, 1.7, 0.4);
+    placeEnz(eKdm, NLBL.kdm, P.kdm, 4, 1.7, 0.4);
+    placeEnz(eRd, NLBL.rd, P.rd, 9, -1.85, 0.3);
+
+    // Gen auf der Linker-DNA zwischen mittlerem und rechtem Nachbarn
+    var A = nOut[NC], B = nIn[NC + 1], f = ease(P.tf), pp = ease(P.pol);
+    hC.lerpVectors(A, B, 0.3); hC.y += 0.75; hC.z += 0.35;
+    hTF.visible = f > 0.01;
+    hTF.position.set(hC.x, hC.y + 3.5 * (1 - f), hC.z + 2.5 * (1 - f));
+    hTF.scale.set(0.9 * f + 0.001, 0.55 * f + 0.001, 0.6 * f + 0.001);
+    hPol.visible = pp > 0.01;
+    hPol.position.lerpVectors(A, B, 0.35 + 0.5 * P.px);
+    hPol.scale.set(0.95 * pp + 0.001, 0.85 * pp + 0.001, 0.85 * pp + 0.001);
+    var nr = pp > 0.5 ? Math.max(0, Math.min(8, Math.round(P.px * 8))) : 0;
+    for (i = 0; i < nr; i++) {
+      v2.set(hPol.position.x - i * 0.3, hPol.position.y + 1.0 + i * 0.25, hPol.position.z + 0.3);
+      setInst(hRna, i, v2, QI, 0.2, 0.2, 0.2);
+    }
+    hRna.count = nr; hRna.instanceMatrix.needsUpdate = true;
+    hC.lerpVectors(A, B, 0.15);
+    put(HLBL.gene, wide, hC.x, hC.y - 1.1, hC.z);
+    put(HLBL.tf, wide && f > 0.9, hTF.position.x, hTF.position.y + 0.85, hTF.position.z);
+    put(HLBL.pol, wide && pp > 0.9, hPol.position.x + 0.9, hPol.position.y - 0.9, hPol.position.z);
+    put(HLBL.eu, wide && d < 0.3, 0, -4.3, 0);
+    put(HLBL.het, wide && d > 0.7, 0, -4.3, 0);
+    put(HLBL.block, wide && d > 0.7, 5.5, 3.6, 0);
+
+    target.set(P.cx, P.cy, 0); camW = P.cw; camH = P.ch;
+  }
+  MODS.hist.apply = histApply;
+  MODS.hist.group = G_HIST;
+
+  /* =====================================================================
+     5f. 3D-Szene Genregulation nach der Transkription: RNA-Interferenz
+     ===================================================================== */
+  var G_RI = new T.Group(); scene.add(G_RI);
+  PARENT = G_RI;
+  var RI_DY = 5.5, RI_MY = -3, RI_CY = -11, RI_GAP = 2.5;
+  var RI_CUTX = RI_CUT - RI_T0 - (RI_SEG - 1) / 2 - 0.5;      // x der Schnittstelle
+  function riX(i) { return i - (RI_N - 1) / 2; }               // dsRNA: Mitte des mittleren Abschnitts bei x = 0
+  function rmX(j) { return j - RI_T0 - (RI_SEG - 1) / 2; }     // mRNA: Zielsequenz genau unter dem mittleren Abschnitt
+  var gGuideCol = 0xffd43b;
+
+  // dsRNA: Basen (2 x 63) und Rückgrat je Abschnitt und Strang (6)
+  var riBase = inst(gBox, lam(0xffffff), RI_N * 2);
+  var riBack = inst(gBox, lam(0xffffff), 6);
+  var riq;
+  for (riq = 0; riq < RI_N; riq++) {
+    riBase.setColorAt(riq, color.setHex(COL[RI_S[riq]]));
+    riBase.setColorAt(RI_N + riq, color.setHex(COL[RI_A[riq]]));
+  }
+  for (riq = 0; riq < 3; riq++) {
+    riBack.setColorAt(riq, color.setHex(0xff8fab));
+    riBack.setColorAt(3 + riq, color.setHex(riq === 1 ? gGuideCol : 0xcc5de8));
+  }
+  riBase.instanceColor.needsUpdate = riBack.instanceColor.needsUpdate = true;
+  var riLetS = [], riLetA = [];
+  for (riq = 0; riq < RI_SEG; riq++) {
+    riLetS.push(addLetter(RI_S[RI_SEG + riq]));
+    riLetA.push(addLetter(RI_A[RI_SEG + riq]));
+  }
+
+  // mRNA: Basen (27), Rückgrat der beiden späteren Bruchstücke (2), Markierung der Zielsequenz
+  var rmBase = inst(gBox, lam(0xffffff), RI_MN);
+  var rmBack = inst(gBox, lam(0xff8fab), 2);
+  var rmLet = [];
+  for (riq = 0; riq < RI_MN; riq++) {
+    rmBase.setColorAt(riq, color.setHex(COL[RI_M[riq]]));
+    rmLet.push(riq >= RI_T0 && riq < RI_T0 + RI_SEG ? addLetter(RI_M[riq]) : null);
+  }
+  rmBase.instanceColor.needsUpdate = true;
+  function tgtBand(y0) {
+    var m = new T.Mesh(gBox, new T.MeshBasicMaterial({ color: 0xffd43b, transparent: true, opacity: 0.3, depthWrite: false }));
+    m.position.set(0, y0 + 0.55, -0.2); m.scale.set(RI_SEG + 0.3, 1.25, 0.9);
+    PARENT.add(m);
+    return m;
+  }
+  var rmBand = tgtBand(RI_MY);
+  var rDicer = blob(0xe599f7, 0.55), rRisc = blob(0x748ffc, 0.22), rAgo = blob(0x4dabf7, 0.85);
+  var rCut = new T.Mesh(gBox, new T.MeshBasicMaterial({ color: 0xff6b6b })); rCut.visible = false; PARENT.add(rCut);
+  var RLBL = {
+    ds: addLabel("dsRNA", 0.8, 1), s5: addLabel("5′", 0.7, 0.5), s3: addLabel("3′", 0.7, 0.5),
+    a3: addLabel("3′", 0.7, 0.5), a5: addLabel("5′", 0.7, 0.5),
+    dicer: addLabel("Dicer", 0.85), si0: addLabel("siRNA", 0.8), si1: addLabel("siRNA", 0.8), si2: addLabel("siRNA", 0.8),
+    risc: addLabel("RISC", 0.8, 0), ago: addLabel("Argonaute", 0.72, 0),
+    guide: addLabel("Guide-Strang", 0.72, 1), g3: addLabel("3′", 0.66, 1), g5: addLabel("5′", 0.66, 0),
+    pas: addLabel("Passagier-Strang wird abgebaut", 0.7),
+    m5: addLabel("mRNA 5′", 0.72, 1), m3: addLabel("3′", 0.72, 0), tgt: addLabel("Zielsequenz", 0.7),
+    cut: addLabel("Schnittstelle", 0.7), nuc: addLabel("Abbau durch Nukleasen", 0.72),
+    free: addLabel("RISC wieder frei", 0.72, 0), main: addLabel("Mit RNAi: mRNA abgebaut, weniger Protein", 0.75)
+  };
+  for (var rk in RLBL) RLBL[rk].userData.s0 = RLBL[rk].scale.clone();   // Grundgröße; bei weiter Ansicht vergrößert
+
+  // Kontrollansicht: dieselbe mRNA ohne RNAi, mit Ribosom und Protein (statisch)
+  var G_RIC = new T.Group(); G_RI.add(G_RIC); G_RIC.visible = false;
+  PARENT = G_RIC;
+  (function () {
+    var i, b = inst(gBox, lam(0xffffff), RI_MN), bb = inst(gBox, lam(0xff8fab), 1), pep = inst(gSphere, lam(0xffffff), 4), L;
+    for (i = 0; i < RI_MN; i++) {
+      v2.set(rmX(i), RI_CY + 0.4, 0); setInst(b, i, v2, QI, 0.66, 0.72, 0.42);
+      b.setColorAt(i, color.setHex(COL[RI_M[i]]));
+      if (i >= RI_T0 && i < RI_T0 + RI_SEG) { L = addLetter(RI_M[i]); L.anchor.set(rmX(i), RI_CY + 0.4, 0); L.on = true; }
+    }
+    v2.set((rmX(0) + rmX(RI_MN - 1)) / 2, RI_CY + 0.86, 0); setInst(bb, 0, v2, QI, RI_MN - 0.1, 0.2, 0.34);
+    tgtBand(RI_CY);
+    var rib = blob(0x74c0fc, 0.3); rib.visible = true; rib.position.set(8.5, RI_CY + 0.6, 0); rib.scale.set(2.6, 1.9, 1.7);
+    for (i = 0; i < 4; i++) {
+      v2.set(9.0 + 0.75 * i, RI_CY + 2.9 + 0.35 * i, 0); setInst(pep, i, v2, QI, 0.34, 0.34, 0.34);
+      pep.setColorAt(i, color.setHex(AACOL[i]));
+    }
+    b.instanceMatrix.needsUpdate = bb.instanceMatrix.needsUpdate = pep.instanceMatrix.needsUpdate = true;
+    b.instanceColor.needsUpdate = pep.instanceColor.needsUpdate = true;
+    put(addLabel("Ohne RNAi: mRNA bleibt erhalten und wird translatiert", 0.75), true, -3, RI_CY - 1.25, 0);
+    put(addLabel("Ribosom", 0.7), true, 8.5, RI_CY - 1.25, 0);
+    put(addLabel("Protein", 0.7, 0), true, 12.0, RI_CY + 4.3, 0);
+    put(addLabel("mRNA 5′", 0.72, 1), true, rmX(0) - 0.8, RI_CY + 0.86, 0);
+    put(addLabel("3′", 0.72, 0), true, rmX(RI_MN - 1) + 0.8, RI_CY + 0.86, 0);
+  })();
+  PARENT = G_RI;
+
+  function riStrand(first, y0, top, offx, s, idx) {   // 21 Basen eines Abschnitts setzen
+    var j, i, n = RI_SEG;
+    for (j = 0; j < n; j++) {
+      i = first + j;
+      v2.set(riX(i) + offx, top ? y0 + 0.4 : y0 - 0.4, 0);
+      setInst(riBase, top ? i : RI_N + i, v2, QI, 0.66 * s, 0.72 * s, 0.42 * s);
+    }
+    v2.set(riX(first + (n - 1) / 2) + offx, top ? y0 + 0.86 : y0 - 0.86, 0);
+    setInst(riBack, idx, v2, QI, (n - 0.1) * s, 0.2 * s, 0.34 * s);
+  }
+
+  function riApply(P) {
+    var i, j, k = ease(riCtlK(P));
+    var ds = ease(P.ds), out = ease(P.out), pas = ease(P.pas), mv = ease(P.mv), rel = ease(P.rel);
+    var c1 = ease(P.c1), c2 = ease(P.c2), rs = ease(P.risc), cl = ease(P.cl);
+    var offL = -RI_GAP * c1 - 10 * out, offR = RI_GAP * c2 + 10 * out, sOut = ds * (1 - out);
+    var yOut = RI_DY + 3 * out;
+    var py = RI_DY + 3.2 * pas, pS = ds * (1 - pas);
+    var gy = lerp(lerp(RI_DY, RI_MY, mv), RI_MY + 5.5, rel);
+
+    // dsRNA und siRNAs
+    riStrand(0, yOut, true, offL, sOut, 0); riStrand(0, yOut, false, offL, sOut, 3);
+    riStrand(2 * RI_SEG, yOut, true, offR, sOut, 2); riStrand(2 * RI_SEG, yOut, false, offR, sOut, 5);
+    riStrand(RI_SEG, py, true, 0, pS, 1);            // Passagier-Strang
+    riStrand(RI_SEG, gy, false, 0, ds, 4);           // Guide-Strang
+    riBase.instanceMatrix.needsUpdate = riBack.instanceMatrix.needsUpdate = true;
+    for (j = 0; j < RI_SEG; j++) {
+      riLetS[j].anchor.set(riX(RI_SEG + j), py + 0.4, 0); riLetS[j].on = pS > 0.6;
+      riLetA[j].anchor.set(riX(RI_SEG + j), gy - 0.4, 0); riLetA[j].on = ds > 0.6;
+    }
+
+    // mRNA: Spaltung und Abbau vom Schnitt aus nach außen
+    var deg = P.deg, lenL = 0, lenR = 0, dL = RI_CUT - 1, dR = RI_MN - 1 - RI_CUT;
+    var shL = -0.35 * cl - 1.6 * ease(deg), shR = -shL;
+    for (j = 0; j < RI_MN; j++) {
+      var left = j < RI_CUT, d = left ? RI_CUT - 1 - j : j - RI_CUT, t0 = 0.8 * d / (left ? dL : dR);
+      var s = 1 - smooth(t0, t0 + 0.2, deg);
+      if (left) lenL += s; else lenR += s;
+      v2.set(rmX(j) + (left ? shL : shR), RI_MY + 0.4, 0);
+      setInst(rmBase, j, v2, QI, 0.66 * s, 0.72 * s, 0.42 * s);
+      if (rmLet[j]) { rmLet[j].anchor.copy(v2); rmLet[j].on = s > 0.6; }
+    }
+    var xl = rmX(0) - 0.5 + shL, xr = rmX(RI_MN - 1) + 0.5 + shR;
+    v2.set(xl + lenL / 2, RI_MY + 0.86, 0); setInst(rmBack, 0, v2, QI, Math.max(0, lenL - 0.05), lenL > 0.05 ? 0.2 : 0, 0.34);
+    v2.set(xr - lenR / 2, RI_MY + 0.86, 0); setInst(rmBack, 1, v2, QI, Math.max(0, lenR - 0.05), lenR > 0.05 ? 0.2 : 0, 0.34);
+    rmBase.instanceMatrix.needsUpdate = rmBack.instanceMatrix.needsUpdate = true;
+    rmBand.visible = deg < 0.3;
+    rCut.visible = cl > 0.05 && deg < 0.5;
+    rCut.position.set(RI_CUTX, RI_MY + 0.6, 0.3); rCut.scale.set(0.12, 1.5 * cl, 0.5);
+
+    // Dicer
+    var dc = ease(P.dc), dxx = lerp(riX(0) - 0.5, riX(2 * RI_SEG) - 0.5, P.dx);
+    rDicer.visible = dc > 0.01;
+    rDicer.position.set(dxx, RI_DY + (1 - dc) * 4, 0.3);
+    rDicer.scale.set(1.9 * dc + 0.001, 1.6 * dc + 0.001, 1.4 * dc + 0.001);
+
+    // RISC mit Argonaute (umschließt den Guide-Strang)
+    rRisc.visible = rAgo.visible = rs > 0.01;
+    rRisc.position.set(0, gy - 0.55, -0.2); rRisc.scale.set(12 * rs + 0.001, 1.9 * rs + 0.001, 1.9 * rs + 0.001);
+    rAgo.position.set(RI_CUTX, gy - 1.55, 0.35); rAgo.scale.set(2.4 * rs + 0.001, 0.85 * rs + 0.001, 1.0 * rs + 0.001);
+
+    // Schilder
+    var whole = ds > 0.9 && c1 < 0.5;
+    put(RLBL.ds, whole, riX(0) - 1.0, RI_DY, 0);
+    put(RLBL.s5, whole, riX(0) - 0.2, RI_DY + 1.55, 0); put(RLBL.s3, whole, riX(RI_N - 1) + 0.2, RI_DY + 1.55, 0);
+    put(RLBL.a3, whole, riX(0) - 0.2, RI_DY - 1.55, 0); put(RLBL.a5, whole, riX(RI_N - 1) + 0.2, RI_DY - 1.55, 0);
+    put(RLBL.dicer, dc > 0.9, dxx, RI_DY - 2.5, 0);
+    put(RLBL.si0, c1 > 0.9 && out < 0.3, riX(10) + offL, RI_DY + 2.1, 0);
+    put(RLBL.si1, c2 > 0.9 && rs < 0.5, 0, RI_DY + 2.1, 0);
+    put(RLBL.si2, c2 > 0.9 && out < 0.3, riX(52) + offR, RI_DY + 2.1, 0);
+    put(RLBL.risc, rs > 0.9, -6.2, gy - 1.9, 0);
+    put(RLBL.ago, rs > 0.9, RI_CUTX + 1.5, gy - 2.25, 0.35);
+    put(RLBL.guide, rs > 0.9 && pas > 0.9, riX(RI_SEG) - 1.4, gy - 0.86, 0);
+    put(RLBL.g3, rs > 0.9 && pas > 0.9 && mv > 0.9, riX(RI_SEG) - 0.7, gy - 1.6, 0);
+    put(RLBL.g5, rs > 0.9 && pas > 0.9 && mv > 0.9, riX(2 * RI_SEG - 1) + 0.7, gy - 1.6, 0);
+    put(RLBL.pas, pas > 0.15 && pas < 0.92, 0, py + 1.8, 0);
+    put(RLBL.m5, lenL > 1, xl - 0.3, RI_MY + 0.86, 0);
+    put(RLBL.m3, lenR > 1, xr + 0.3, RI_MY + 0.86, 0);
+    put(RLBL.tgt, mv < 0.1 && rs < 0.5, 0, RI_MY - 0.9, 0);
+    put(RLBL.cut, cl > 0.9 && deg < 0.2, RI_CUTX, RI_MY + 2.1, 0);
+    put(RLBL.nuc, deg > 0.15 && deg < 0.85, 0, RI_MY - 1.3, 0);
+    put(RLBL.free, rel > 0.9, 6.3, gy - 1.9, 0);
+    put(RLBL.main, deg > 0.9, 0, RI_MY + 0.6, 0);
+
+    G_RIC.visible = k > 0.02;
+    target.set(P.cx, lerp(P.cy, -4.4, k), 0); camW = Math.max(P.cw, lerp(P.cw, 36, k)); camH = lerp(P.ch, 19, k);
+    var f = Math.max(1, Math.min(2.2, camW / 36));
+    for (var lk in RLBL) RLBL[lk].scale.copy(RLBL[lk].userData.s0).multiplyScalar(f);
+  }
+  MODS.rnai.apply = riApply;
+  MODS.rnai.group = G_RI;
+
+  /* =====================================================================
+     5g. 3D-Szene Genregulation nach der Transkription: alternatives Spleißen
+     ===================================================================== */
+  var G_SP = new T.Group(); scene.add(G_SP);
+  PARENT = G_SP;
+  var SP_PY = 6.2, SP_ROWY = [2.2, -2.8, -7.8], SP_PEP = 1.55, SP_LX = -17.6;
+  var gTorus = new T.TorusGeometry(1, 0.17, 6, 18);
+  var spIntronMat = lam(0x8695a6), spRingMat = lam(0x8695a6);
+  // Lage der Abschnitte in der prä-mRNA
+  var spPre = [], spX = -SP_SEG.reduce(function (a, s) { return a + s.len; }, 0) / 2;
+  SP_SEG.forEach(function (s) { spPre.push(spX + s.len / 2); spX += s.len; });
+  // Pro Variante: Endlage der erhaltenen Abschnitte und herausgeschnittene Stücke (zusammenhängend)
+  (function () {
+    for (var v = 1; v <= 3; v++) {
+      var V = SP_VAR[v], tot = 0, i, x, cutG = [], grp = null;
+      for (i = 0; i < SP_SEG.length; i++) if (V.keep[i]) tot += SP_SEG[i].len;
+      V.fin = []; V.grp = []; x = -tot / 2;
+      for (i = 0; i < SP_SEG.length; i++) {
+        if (V.keep[i]) { V.fin.push(x + SP_SEG[i].len / 2); x += SP_SEG[i].len; grp = null; V.grp.push(-1); }
+        else {
+          V.fin.push(0);
+          if (!grp) { grp = { a: i, b: i }; cutG.push(grp); } else grp.b = i;
+          V.grp.push(cutG.length - 1);
+        }
+      }
+      V.cuts = cutG.map(function (g) {
+        var x0 = spPre[g.a] - SP_SEG[g.a].len / 2, x1 = spPre[g.b] + SP_SEG[g.b].len / 2;
+        return { x: (x0 + x1) / 2, w: x1 - x0 };
+      });
+      V.start = -tot / 2;
+    }
+    // Protein: drei Kugeln je eingebautem Exon; Variante C endet mit zwei Kugeln aus dem Intron (Stoppcodon im Intron)
+    SP_VAR[1].pep = [0, 0, 0, 2, 2, 2, 4, 4, 4, 6, 6, 6];
+    SP_VAR[2].pep = [0, 0, 0, 2, 2, 2, 6, 6, 6];
+    SP_VAR[3].pep = [0, 0, 0, 2, 2, 2, 3, 3];
+  })();
+
+  function spSegMesh(i) {
+    var s = SP_SEG[i], m;
+    if (s.ex) { m = new T.Mesh(gBox, lam(s.col)); }
+    else { m = new T.Mesh(gCyl, spIntronMat); m.rotation.z = Math.PI / 2; }
+    PARENT.add(m);
+    return m;
+  }
+  function spSetSeg(m, i, x, y, f) {         // f: Längenfaktor (0 = verschwunden)
+    var s = SP_SEG[i];
+    m.visible = f > 0.02;
+    m.position.set(x, y, 0);
+    if (s.ex) m.scale.set((s.len - 0.12) * f, 0.9 * Math.min(1, f * 3), 0.7 * Math.min(1, f * 3));
+    else m.scale.set(0.2, s.len * f, 0.2);
+  }
+  // Vorlage (prä-mRNA) mit Schalter-Schildern
+  var spPreM = [], spPill = [], si, sj;
+  for (si = 0; si < SP_SEG.length; si++) {
+    spPreM.push(spSegMesh(si)); spSetSeg(spPreM[si], si, spPre[si], SP_PY, 1);
+    var spNm = SP_NAME[si], spEx = SP_SEG[si].ex;
+    spPill.push([
+      statePill(spNm, 0.8, "rgba(9,20,34,0.88)", "rgba(157,176,196,0.8)", "#f2f6fa"),
+      statePill(spNm + (spEx ? ": aus" : ": entfernt"), 0.8, "rgba(9,20,34,0.88)", "#5d7187", "#9db0c4"),
+      statePill(spNm + (spEx ? ": an" : ": bleibt"), 0.8, "#ffd43b", "#ffd43b", "#2b2200")
+    ]);
+  }
+  var SPL = {
+    pre: addLabel("prä-mRNA", 1.0, 1), p5: addLabel("5′", 0.9, 1), p3: addLabel("3′", 0.9, 0),
+    spl: addLabel("Spleißosom", 0.95), lasso: addLabel("Intron als Lasso, wird abgebaut", 0.9),
+    skip: addLabel("Exon 3 wird mit herausgeschnitten", 0.9), keepI: addLabel("Intron 2 bleibt", 0.9),
+    stop: addLabel("Stopp", 0.85, 0)
+  };
+  // Drei Moleküle derselben prä-mRNA (Zeilen A, B, C)
+  var spRows = [];
+  for (sj = 0; sj < 3; sj++) {
+    var spR = { segs: [], rings: [], spl: [], v: sj + 1 };
+    for (si = 0; si < SP_SEG.length; si++) spR.segs.push(spSegMesh(si));
+    for (si = 0; si < 3; si++) {
+      var spRg = new T.Mesh(gTorus, spRingMat); spRg.visible = false; PARENT.add(spRg); spR.rings.push(spRg);
+      spR.spl.push(blob(0x9775fa, 0.5));
+    }
+    spR.pep = inst(gSphere, lam(0xffffff), 12);
+    SP_VAR[sj + 1].pep.forEach(function (c, q) {
+      spR.pep.setColorAt(q, color.setHex(c === 3 ? 0x8695a6 : SP_SEG[c].col));
+    });
+    spR.pep.instanceColor.needsUpdate = true;
+    var spId = SP_VAR[sj + 1].id;
+    spR.lPre = addLabel("prä-mRNA", 0.9, 1);
+    spR.lM = addLabel("mRNA " + spId, 1.0, 1);
+    spR.lP = addLabel("Protein " + spId, 1.0, 1);
+    spRows.push(spR);
+  }
+
+  function spRow(spR, y, r, b, s, p) {
+    var V = SP_VAR[spR.v], i, vis = r > 0.001;
+    var yy = lerp(SP_PY, y, ease(r)), u1 = smooth(0, 0.5, s), u2 = smooth(0.5, 1, s), bb = ease(b);
+    for (i = 0; i < SP_SEG.length; i++) {
+      var m = spR.segs[i];
+      if (!vis) { m.visible = false; continue; }
+      if (V.keep[i]) spSetSeg(m, i, lerp(spPre[i], V.fin[i], u2), yy, 1);
+      else {
+        var c = V.cuts[V.grp[i]];
+        spSetSeg(m, i, lerp(spPre[i], c.x, u1), yy - 1.6 * u1, 1 - u1);
+      }
+    }
+    for (i = 0; i < 3; i++) {
+      var cg = V.cuts[i], spRg = spR.rings[i], sp = spR.spl[i];
+      if (!cg || !vis) { spRg.visible = sp.visible = false; continue; }
+      var rr = 0.95 * u1 * (1 - u2);
+      spRg.visible = rr > 0.02;
+      spRg.position.set(cg.x, yy - 1.6, 0); spRg.scale.set(rr + 0.001, rr + 0.001, rr + 0.001);
+      var ss = bb * (1 - u2);
+      sp.visible = ss > 0.01;
+      sp.position.set(cg.x, yy - 0.25 - 1.6 * u1 - (1 - bb) * 3, 0.5);
+      sp.scale.set((cg.w * 0.5 + 0.6) * ss * (1 - 0.45 * u1) + 0.001, 1.15 * ss + 0.001, 1.2 * ss + 0.001);
+    }
+    var n = V.pep.length;
+    for (i = 0; i < 12; i++) {
+      var ps = i < n ? Math.max(0, Math.min(1, p * n - i)) : 0;
+      v2.set((i - (n - 1) / 2) * 0.72, yy - SP_PEP, 0.25 * Math.sin(i * 1.3));
+      setInst(spR.pep, i, v2, QI, 0.33 * ps, 0.33 * ps, 0.33 * ps);
+    }
+    spR.pep.instanceMatrix.needsUpdate = true;
+    put(spR.lPre, vis && r > 0.6 && s < 0.9, SP_LX, yy, 0);
+    put(spR.lM, vis && s >= 0.9, SP_LX, yy, 0);
+    put(spR.lP, vis && p > 0.3, SP_LX, yy - SP_PEP, 0);
+    return { yy: yy, u1: u1, u2: u2, bb: bb, n: n };
+  }
+
+  function spApply(P) {
+    var v = cur.steps[step].P.v, i;
+    for (i = 0; i < SP_SEG.length; i++) {
+      var k = v ? SP_VAR[v].keep[i] : -1, pl = spPill[i], py = SP_SEG[i].ex ? SP_PY + 1.3 : SP_PY - 1.3;
+      put(pl[0], k < 0, spPre[i], py, 0); put(pl[1], k === 0, spPre[i], py, 0); put(pl[2], k === 1, spPre[i], py, 0);
+    }
+    var A = spRow(spRows[0], SP_ROWY[0], P.rA, P.bA, P.sA, P.pA);
+    var B = spRow(spRows[1], SP_ROWY[1], P.rB, P.bB, P.sB, P.pB);
+    var C = spRow(spRows[2], SP_ROWY[2], P.rC, P.bC, P.sC, P.pC);
+    put(SPL.pre, true, SP_LX, SP_PY, 0);
+    put(SPL.p5, true, spPre[0] - SP_SEG[0].len / 2 - 0.3, SP_PY, 0);
+    put(SPL.p3, true, spPre[6] + SP_SEG[6].len / 2 + 0.3, SP_PY, 0);
+    // Schilder an der Zeile, die gerade bearbeitet wird
+    var act = P.sC > 0 || P.bC > 0 ? [C, SP_VAR[3]] : P.sB > 0 || P.bB > 0 ? [B, SP_VAR[2]] : [A, SP_VAR[1]], R = act[0], V = act[1];
+    put(SPL.spl, R.bb > 0.9 && R.u1 < 0.4, V.cuts[0].x, R.yy - 1.75, 0);
+    put(SPL.lasso, R.u1 > 0.85 && R.u2 < 0.3 && V.id !== "B", V.cuts[V.cuts.length - 1].x, R.yy - 3.05, 0);
+    put(SPL.skip, R.u1 > 0.6 && R.u2 < 0.4 && V.id === "B", V.cuts[1].x, R.yy - 3.05, 0);
+    put(SPL.keepI, C.u2 > 0.95, SP_VAR[3].fin[3], C.yy + 1.15, 0);
+    put(SPL.stop, P.pC > 0.95, (C.n - 1) / 2 * 0.72 + 0.5, C.yy - SP_PEP, 0);
+    target.set(P.cx, P.cy, 0); camW = P.cw; camH = P.ch;
+  }
+  MODS.splice.apply = spApply;
+  MODS.splice.group = G_SP;
+  PARENT = G_TT;
+  applyModuleUI();
+
+  /* =====================================================================
+     6. Kamera: Drehen und Zoomen mit Finger und Maus (eigene Steuerung)
+     ===================================================================== */
+  var AZ0 = 0.3, EL0 = 0.2;
+  var az = AZ0, elv = EL0, zoom = 1, vw = 1, vh = 1;
+  function placeCamera() {
+    var aspect = vw / vh;
+    var dist = Math.max(camW / (2 * TANH * aspect), camH / (2 * TANH)) * zoom;
+    camera.position.set(
+      target.x + dist * Math.sin(az) * Math.cos(elv),
+      target.y + dist * Math.sin(elv),
+      target.z + dist * Math.cos(az) * Math.cos(elv));
+    camera.lookAt(target);
+  }
+  function faceLetters() {
+    for (var i = 0; i < letters.length; i++) {
+      var L = letters[i];
+      L.sp.visible = L.on;
+      if (!L.on) continue;
+      v1.subVectors(camera.position, L.anchor).normalize();
+      L.sp.position.copy(L.anchor).addScaledVector(v1, 0.42);
+    }
+  }
+  function rotate(dx, dy) {
+    az -= dx * 0.008;
+    elv = Math.max(-1.35, Math.min(1.35, elv + dy * 0.008));
+    dirty = true;
+  }
+  function setZoom(z) { zoom = Math.max(0.3, Math.min(2.6, z)); dirty = true; }
+
+  var mouseDown = false, lastX = 0, lastY = 0;
+  canvas.addEventListener("mousedown", function (ev) {
+    mouseDown = true; lastX = ev.clientX; lastY = ev.clientY; canvas.className = "drag"; ev.preventDefault();
+  });
+  window.addEventListener("mousemove", function (ev) {
+    if (!mouseDown) return;
+    rotate(ev.clientX - lastX, ev.clientY - lastY); lastX = ev.clientX; lastY = ev.clientY;
+  });
+  window.addEventListener("mouseup", function () { mouseDown = false; canvas.className = ""; });
+  canvas.addEventListener("wheel", function (ev) {
+    ev.preventDefault();
+    var dy = ev.deltaMode === 1 ? ev.deltaY * 30 : ev.deltaY;
+    setZoom(zoom * Math.exp(dy * 0.0012));
+  }, { passive: false });
+
+  var pinch0 = 0, zoom0 = 1;
+  function tdist(ts) { var dx = ts[0].clientX - ts[1].clientX, dy = ts[0].clientY - ts[1].clientY; return Math.sqrt(dx * dx + dy * dy); }
+  function tstart(ev) {
+    ev.preventDefault();
+    var ts = ev.touches;
+    if (ts.length === 1) { lastX = ts[0].clientX; lastY = ts[0].clientY; }
+    else if (ts.length >= 2) { pinch0 = tdist(ts); zoom0 = zoom; }
+  }
+  canvas.addEventListener("touchstart", tstart, { passive: false });
+  canvas.addEventListener("touchmove", function (ev) {
+    ev.preventDefault();
+    var ts = ev.touches;
+    if (ts.length === 1) { rotate(ts[0].clientX - lastX, ts[0].clientY - lastY); lastX = ts[0].clientX; lastY = ts[0].clientY; }
+    else if (ts.length >= 2 && pinch0 > 0) setZoom(zoom0 * pinch0 / Math.max(1, tdist(ts)));
+  }, { passive: false });
+  function tend(ev) {
+    var ts = ev.touches;
+    if (ts.length === 1) { lastX = ts[0].clientX; lastY = ts[0].clientY; }
+    pinch0 = 0;
+    if (ts.length >= 2) { pinch0 = tdist(ts); zoom0 = zoom; }
+  }
+  canvas.addEventListener("touchend", tend);
+  canvas.addEventListener("touchcancel", tend);
+  canvas.addEventListener("gesturestart", function (ev) { ev.preventDefault(); });
+  $("viewreset").addEventListener("click", function () { az = cur.az0; elv = cur.el0; zoom = 1; dirty = true; });
+
+  function resize() {
+    var w = view.clientWidth, h = view.clientHeight;
+    if (w < 2 || h < 2 || (w === vw && h === vh)) return;
+    vw = w; vh = h;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    dirty = true;
+  }
+
+  /* =====================================================================
+     7. Bildschleife (zeichnet nur, wenn sich etwas geändert hat)
+     ===================================================================== */
+  function startLoop(draw) {
+    var last = 0;
+    function frame(now) {
+      window.requestAnimationFrame(frame);
+      var dt = Math.min(0.1, (now - last) / 1000) || 0; last = now;
+      if (animating) {
+        tt += dt * speed / cur.steps[step].dur;
+        if (tt >= 1) {
+          tt = 1; animating = false;
+          if (playing) { if (step >= cur.last) { playing = false; showStep(); } else wait = readTime(step); }
+        }
+        dirty = true;
+      } else if (playing && wait > 0) {
+        wait -= dt * speed;
+        if (wait <= 0) goNext();
+      }
+      if (draw) draw();
+      else if (dirty) { cur.sync(paramsAt(step, tt), cur.steps[step]); dirty = false; }
+    }
+    window.requestAnimationFrame(frame);
+  }
+  showStep();
+  startLoop(function () {
+    resize();
+    if (!dirty) return;
+    dirty = false;
+    var P = paramsAt(step, tt);
+    cur.apply(P);
+    cur.sync(P, cur.steps[step]);
+    placeCamera();
+    faceLetters();
+    renderer.render(scene, camera);
+  });
+})();
+
+/* ---------------------------------------------------------------------------
+   Verwendete Bibliothek: Three.js r128 (npm-Version 0.128.0), UMD-Build
+   "three.min.js", eingebunden über cdnjs.cloudflare.com.
+   Kamerasteuerung: eigene Implementierung (Maus- und Touch-Ereignisse),
+   OrbitControls wird nicht geladen. Module: Transkription und Translation,
+   PCR, Gelelektrophorese, Epigenetik (DNA-Methylierung, Histonmodifikation),
+   Genregulation nach der Transkription (RNA-Interferenz, alternatives Spleißen).
+   Kein localStorage, keine Bilder aus dem
+   Netz, keine weiteren externen Quellen.
+   --------------------------------------------------------------------------- */
+</script>
+
+</body></html>

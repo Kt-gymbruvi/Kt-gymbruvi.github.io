@@ -8,8 +8,8 @@
 :root{
   --bg:#f5f7fb; --surface:#ffffff; --ink:#14213d; --muted:#53607a; --line:#d6dceb;
   --navy:#17305f; --navy-ink:#ffffff; --yellow:#f2c230; --yellow-ink:#1b1b1b;
-  --v:#c9d8f2; --h:#f2c230; --e:#d9dde5; --z:#b9e3dc;
-  --g1:#3c5d9e; --g2:#7f97c6; --g3:#b8c6e3; --gu:#9fd3a8; --gue:#d1b8ea; --gnone:#eceef3;
+  --v:#f6e59a; --h:#d9483b; --h-ink:#ffffff; --e:#b7cdee; --z:#f4b46a;
+  --g1:#e3a72b; --g2:#efc766; --g3:#f7e3a6; --gu:#bfe3c4; --gue:#d9c6ef; --gnone:#eceef3;
   --ok:#1f7a3a; --bad:#b3261e;
   color-scheme:light;
 }
@@ -17,8 +17,8 @@
   :root:not([data-theme="light"]){
     --bg:#0f1830; --surface:#17223f; --ink:#e8ecf6; --muted:#a6b0c8; --line:#2c3a5f;
     --navy:#0a1226; --navy-ink:#f2f4fa; --yellow:#f2c230; --yellow-ink:#1b1b1b;
-    --v:#34508a; --h:#c99e1c; --e:#3a4258; --z:#2c6b62;
-    --g1:#5a7cc2; --g2:#40598e; --g3:#2f4370; --gu:#2f6e3c; --gue:#5d4782; --gnone:#232d48;
+    --v:#6b5d22; --h:#b8352a; --h-ink:#ffffff; --e:#3b5378; --z:#8a5a22;
+    --g1:#9a6c16; --g2:#6f5418; --g3:#4d4220; --gu:#2f6e3c; --gue:#5d4782; --gnone:#232d48;
     --ok:#7fd69a; --bad:#ff8a80;
     color-scheme:dark;
   }
@@ -26,8 +26,8 @@
 :root[data-theme="dark"]{
   --bg:#0f1830; --surface:#17223f; --ink:#e8ecf6; --muted:#a6b0c8; --line:#2c3a5f;
   --navy:#0a1226; --navy-ink:#f2f4fa; --yellow:#f2c230; --yellow-ink:#1b1b1b;
-  --v:#34508a; --h:#c99e1c; --e:#3a4258; --z:#2c6b62;
-  --g1:#5a7cc2; --g2:#40598e; --g3:#2f4370; --gu:#2f6e3c; --gue:#5d4782; --gnone:#232d48;
+  --v:#6b5d22; --h:#b8352a; --h-ink:#ffffff; --e:#3b5378; --z:#8a5a22;
+  --g1:#9a6c16; --g2:#6f5418; --g3:#4d4220; --gu:#2f6e3c; --gue:#5d4782; --gnone:#232d48;
   --ok:#7fd69a; --bad:#ff8a80;
   color-scheme:dark;
 }
@@ -61,6 +61,11 @@ p{margin:.5rem 0;max-width:42rem}
 
 .cols{display:grid;grid-template-columns:1fr;gap:1.4rem;margin-top:1rem}
 @media (min-width:760px){.cols{grid-template-columns:1fr 1fr}}
+.gdiag{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin:.8rem 0 .4rem;font-size:.88rem;line-height:1.3}
+.gdiag .top{grid-column:1/-1;background:var(--h);color:var(--h-ink);padding:.5rem .7rem;border-radius:4px;text-align:center}
+.gdiag .box{padding:.5rem .6rem;border-radius:4px;position:relative;margin-top:1.1rem}
+.gdiag .box::before{content:"↑";position:absolute;top:-1.25rem;left:50%;transform:translateX(-50%);color:var(--muted);font-weight:700}
+.gdiag b{display:block}
 .model{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.2rem 1.2rem 1.4rem;border-top:6px solid var(--navy)}
 .model.goehner{border-top-color:var(--yellow)}
 .model h2{font-size:1.7rem}
@@ -69,8 +74,8 @@ dl{margin:.4rem 0}
 dt{font-weight:700;margin-top:.7rem}
 dd{margin:.15rem 0 0}
 .chip{display:inline-block;padding:.08rem .55rem;border-radius:3px;font-weight:600;font-size:.95rem;color:var(--ink)}
-.c-V{background:var(--v)}.c-H{background:var(--h);color:var(--yellow-ink)}.c-E{background:var(--e)}.c-Z{background:var(--z)}
-.c-gH{background:var(--h);color:var(--yellow-ink)}.c-v1{background:var(--g1);color:#fff}.c-v2{background:var(--g2)}.c-v3{background:var(--g3)}.c-u{background:var(--gu)}.c-ü{background:var(--gue)}.c-none{background:var(--gnone);color:var(--muted)}
+.c-V{background:var(--v)}.c-H{background:var(--h);color:var(--h-ink)}.c-E{background:var(--e)}.c-Z{background:var(--z)}
+.c-gH{background:var(--h);color:var(--h-ink)}.c-v1{background:var(--g1)}.c-v2{background:var(--g2)}.c-v3{background:var(--g3)}.c-u{background:var(--gu)}.c-ü{background:var(--gue)}.c-none{background:var(--gnone);color:var(--muted)}
 ol.steps{padding-left:1.3rem;margin:.4rem 0}
 ol.steps li{margin:.35rem 0}
 
@@ -169,65 +174,75 @@ nav.tabs button{min-height:48px;padding:.85rem 1.1rem;font-size:1.15rem}
 <section id="grundlagen">
   <div class="cols">
     <article class="model">
-      <h2>Meinel/Schnabel</h2>
-      <p class="q">Morphologische Betrachtungsweise: Wie sieht die Bewegung von außen aus?</p>
-      <p>Die Bewegung wird nach ihrer äußeren Gestalt in zeitlich aufeinanderfolgende Phasen gegliedert. Jede Phase hat eine allgemeine Funktion, die für alle Bewegungen gleich ist.</p>
-      <h3>Azyklische Bewegungen (Dreiphasenstruktur)</h3>
+      <h2>Phasenmodell nach Meinel/Schnabel</h2>
+      <p class="q">In welche Phasen gliedert sich der Ablauf, und welche allgemeine Aufgabe hat jede Phase?</p>
+      <p>Die Bewegung wird nach ihrem zeitlichen Ablauf in Phasen geteilt. Jede Phase erfüllt eine Funktion, die für alle Bewegungen dieses Typs gleich ist. (In der Literatur wird dieser Zugang auch als morphologische Betrachtung bezeichnet.)</p>
+      <h3>Azyklische Bewegungen: drei Phasen</h3>
+      <p class="note">Einmalige Ausführung, z. B. Wurf-, Stoß-, Schuss- und Sprungbewegungen.</p>
       <dl>
         <dt><span class="chip c-V">Vorbereitungsphase</span></dt>
-        <dd>Schafft optimale Voraussetzungen für die Hauptphase: Ausholen, Vordehnen der Muskulatur, Beschleunigungsweg verlängern, Anlauf.</dd>
+        <dd>Schafft optimale Voraussetzungen für die Hauptaktion. Häufig durch eine Ausholbewegung entgegen der Hauptrichtung (Speerwurf), manchmal durch einen Anlauf in dieselbe Richtung (Weitsprung).</dd>
         <dt><span class="chip c-H">Hauptphase</span></dt>
-        <dd>Löst die Bewegungsaufgabe unmittelbar, z. B. Abwurf, Absprung, Stoß.</dd>
+        <dd>Kernstück: Hier wird die Bewegungsaufgabe bewältigt – der eigene Körper wird fortbewegt oder ein Gerät bzw. Gegner erhält einen Impuls. Biomechanisch gilt vor allem das Prinzip der zeitlichen Koordination der Teilimpulse.</dd>
         <dt><span class="chip c-E">Endphase</span></dt>
-        <dd>Abbremsen, Gleichgewicht wiederherstellen, Übergang in Ruhe oder in eine Folgebewegung.</dd>
+        <dd>Führt zu einem stabilen Gleichgewichtszustand, z. B. Abfangen nach einem Wurf oder sicherer Stand nach einem Abgang.</dd>
       </dl>
-      <h3>Zyklische Bewegungen (Zweiphasenstruktur)</h3>
+      <h3>Zyklische Bewegungen: zwei Phasen</h3>
+      <p class="note">Der gleiche Ablauf wiederholt sich, z. B. Gehen, Laufen, Radfahren, Schwimmen, Rudern.</p>
       <dl>
         <dt><span class="chip c-H">Hauptphase</span> + <span class="chip c-Z">Zwischenphase</span></dt>
-        <dd>Bei Wiederholungen verschmelzen Endphase und folgende Vorbereitungsphase zur Zwischenphase (z. B. Rückholphase beim Kraularm). Nur der erste Zyklus hat eine eigene Vorbereitungsphase, nur der letzte eine eigene Endphase.</dd>
+        <dd>Endphase und folgende Vorbereitungsphase überlagern sich (<b>Phasenverschmelzung</b>) zur Zwischenphase.</dd>
+        <dt>Alternierender Verlauf</dt>
+        <dd>Häufig wechseln sich rechte und linke Körperseite ab (Gehen, Laufen, Kraul). Beim Sprint ist die Hauptphase zweiteilig: Vorschwung des einen Beins und Abstoß des anderen.</dd>
+        <dt>Teilbewegungen mit eigener Phasenstruktur</dt>
+        <dd>Arme und Beine können je eigene Haupt- und Zwischenphasen haben, die zeitlich verschoben ablaufen und sich überschneiden (Brustschwimmen).</dd>
       </dl>
-      <h3>Bewegungskombinationen</h3>
-      <p><b>Sukzessiv:</b> Endphase der ersten und Vorbereitungsphase der zweiten Bewegung verschmelzen (Ballannahme und Abspiel).<br><b>Simultan:</b> Bewegungen laufen gleichzeitig ab (Laufen und Dribbeln).</p>
+      <h3>Varianten der Bewegungsstruktur</h3>
+      <dl>
+        <dt>Unterdrückte Ausholbewegung</dt><dd>Aus taktischen Gründen, z. B. ansatzlose Würfe im Sportspiel oder Schläge im Kampfsport.</dd>
+        <dt>Mehrfache Ausholbewegung</dt><dd>Vor der eigentlichen Ausholbewegung wird Schwung geholt, z. B. am Reck aus dem ruhigen Hang.</dd>
+        <dt>Sukzessivkombination</dt><dd>Teilbewegungen folgen unmittelbar aufeinander; die Endphase der ersten verschmilzt mit der Vorbereitungsphase der nächsten (Fangen und Werfen, Handstützüberschlag mit Salto, Hindernislauf).</dd>
+        <dt>Simultankombination</dt><dd>Teilbewegungen laufen gleichzeitig ab, meist eine Fortbewegung mit einer Wurf-, Stoß- oder Schlagbewegung (Ball im Lauf fangen und passen).</dd>
+      </dl>
       <h3>Vorgehen</h3>
       <ol class="steps">
         <li>Bewegungsart bestimmen: azyklisch, zyklisch oder Kombination.</li>
-        <li>Hauptphase bestimmen: Wo wird die Aufgabe unmittelbar gelöst?</li>
-        <li>Vorbereitungs- und Endphase (bzw. Zwischenphase) abgrenzen.</li>
-        <li>Phasen beschreiben und ihre allgemeine Funktion angeben.</li>
+        <li>Hauptphase bestimmen: Wo wird die Aufgabe bewältigt?</li>
+        <li>Vorbereitungs- und Endphase bzw. Zwischenphase abgrenzen.</li>
+        <li>Phasen beschreiben und ihre Funktion begründen.</li>
       </ol>
     </article>
 
     <article class="model goehner">
-      <h2>Göhner</h2>
-      <p class="q">Funktionale Bewegungsanalyse: Wozu dient welcher Bewegungsteil?</p>
-      <p>Eine Bewegung ist die Lösung eines Bewegungsproblems. Welche Funktion ein Teil hat, ergibt sich erst aus dem Bewegungsziel und den Bedingungen, unter denen es erreicht werden muss.</p>
-      <h3>Bezugsgrundlagen</h3>
-      <dl>
-        <dt>Bewegungsziel</dt><dd>Was soll erreicht werden (Weite, Treffer, Zeit)?</dd>
-        <dt>Bewegermerkmale</dt><dd>Körperbau, Kraft, Beweglichkeit der Person.</dd>
-        <dt>Umgebungsbedingungen</dt><dd>Gerät, Untergrund, Medium (Wasser, Luft), Gegner.</dd>
-        <dt>Regelbedingungen</dt><dd>Wettkampfregeln, z. B. Schrittregel, Stoßkreis, Torraum.</dd>
-      </dl>
-      <h3>Funktionsphasen</h3>
+      <h2>Funktionsphasenmodell nach Göhner</h2>
+      <p class="q">Welche Funktion hat jede Aktion für das Bewegungsziel?</p>
+      <p>Mit einer Bewegung soll ein Ziel erreicht werden, z. B. eine Latte überspringen, ohne sie zu reißen. Göhner untersucht deshalb die sichtbaren Aktionen auf ihre zielbezogene Bedeutung. Die Zeiträume, in denen sie stattfinden, heißen Funktionsphasen.</p>
+      <div class="gdiag" aria-label="Schema der Funktionsphasen">
+        <div class="top"><b>Hauptfunktionsphase</b>unmittelbar auf das Bewegungsziel gerichtet</div>
+        <div class="box c-v1"><b>vorbereitend</b>Positionen und Bewegungszustände herstellen</div>
+        <div class="box c-u"><b>unterstützend</b>gleichzeitig ablaufende Aktionen verbessern</div>
+        <div class="box c-ü"><b>überleitend</b>abschließen oder an Folgendes anschließen</div>
+      </div>
       <dl>
         <dt><span class="chip c-gH">Hauptfunktionsphase</span></dt>
-        <dd>Erreicht das Bewegungsziel unmittelbar. Fehlt sie, ist das Ziel nicht erreichbar. Hat eine Bewegung mehrere Teilziele, kann es mehrere Hauptfunktionsphasen geben (z. B. Hochsprung: Höhe gewinnen und Latte überqueren).</dd>
-        <dt><span class="chip c-v1">vorbereitend</span></dt>
-        <dd>Geht der Hauptfunktion voraus und schafft ihre Voraussetzungen. Gestuft nach Ordnung: 1. Ordnung bereitet die Hauptfunktion direkt vor, 2. Ordnung bereitet die Phase 1. Ordnung vor usw.</dd>
-        <dt><span class="chip c-u">unterstützend</span></dt>
-        <dd>Läuft gleichzeitig mit einer anderen Phase ab und verbessert sie.</dd>
-        <dt><span class="chip c-ü">überleitend</span></dt>
-        <dd>Verbindet zwei Hauptfunktionsphasen, typisch bei zyklischen Bewegungen.</dd>
+        <dd>Ihre Aktionen sind direkt auf das Bewegungsziel ausgerichtet, nicht auf andere Phasen. Sie ist der zentrale Kern und funktional unabhängig.</dd>
+        <dt><span class="chip c-v1">vorbereitende Hilfsfunktionsphase</span></dt>
+        <dd>Stellt Körperhaltungen, Positionen im Raum oder Bewegungszustände her, aus denen spätere Aktionen erfolgen: z. B. den Absprungpunkt durch den Anlauf oder die Körperlage über der Latte durch den Absprung.</dd>
+        <dt>Ordnung</dt>
+        <dd>Wirkt eine vorbereitende Phase direkt auf die Hauptfunktionsphase, hat sie die 1. Ordnung. Wirkt sie auf eine Phase 1. Ordnung, hat sie die 2. Ordnung usw.</dd>
+        <dt><span class="chip c-u">unterstützende Hilfsfunktionsphase</span></dt>
+        <dd>Verbessert die Bedingungen gleichzeitig ablaufender Aktionen, z. B. der Schwungbeineinsatz beim Absprung im Hochsprung.</dd>
+        <dt><span class="chip c-ü">überleitende Hilfsfunktionsphase</span></dt>
+        <dd>Überführt den erreichten Bewegungszustand in ein stabiles Gleichgewicht oder in eine unmittelbar folgende Bewegung, z. B. von der Lattenüberquerung in die Landung.</dd>
       </dl>
       <h3>Vorgehen</h3>
       <ol class="steps">
-        <li>Bewegungsziel und Bezugsgrundlagen klären.</li>
-        <li>Bewegung in Teilaktionen gliedern.</li>
-        <li>Hauptfunktionsphase bestimmen.</li>
-        <li>Hilfsfunktionen mit der Weglass- bzw. Variationsprobe ermitteln: Was ändert sich, wenn dieser Teil fehlt oder anders ausgeführt wird?</li>
-        <li>Hilfsfunktionen ordnen (vorbereitend, unterstützend, überleitend; Ordnung).</li>
-        <li>Funktionen begründen, möglichst biomechanisch.</li>
+        <li>Die wichtigsten Aktionen in zeitlicher Reihenfolge benennen (Aktionsskizze).</li>
+        <li>Den Bewegungsverlauf beschreiben.</li>
+        <li>Jeder Aktion eine Funktion zuordnen: Wozu dient sie? Prüffrage: Was ginge verloren, wenn sie fehlt?</li>
+        <li>Die Aktionen den Funktionsphasen zuweisen und bei vorbereitenden Phasen die Ordnung bestimmen.</li>
       </ol>
+      <p class="note">Für Schritt 3 hilft es, das Bewegungsziel und die Bedingungen zu klären: Merkmale des Bewegers, Umgebung (Gerät, Medium, Gegner) und Regelwerk.</p>
     </article>
   </div>
 </section>
@@ -235,26 +250,30 @@ nav.tabs button{min-height:48px;padding:.85rem 1.1rem;font-size:1.15rem}
 <!-- VERGLEICH -->
 <section id="vergleich" hidden>
   <h2>Die Modelle im Vergleich</h2>
-  <p class="lead">Die Modelle schließen sich nicht aus: Meinel/Schnabel liefern die zeitliche Gliederung, Göhner die Begründung.</p>
+  <p class="lead">Beide Modelle analysieren Funktionen, aber auf verschiedenen Ebenen: Meinel/Schnabel ordnen den Ablauf in allgemeine Phasen, Göhner begründet jede einzelne Aktion über das Bewegungsziel.</p>
   <div class="tbl">
     <table>
       <thead><tr><th></th><th>Meinel/Schnabel</th><th>Göhner</th></tr></thead>
       <tbody>
-        <tr><th>Betrachtungsweise</th><td>morphologisch, Außensicht</td><td>funktional, Zweck-Mittel-Beziehung</td></tr>
-        <tr><th>Leitfrage</th><td>Wie läuft die Bewegung ab?</td><td>Wozu dient ein Bewegungsteil?</td></tr>
-        <tr><th>Bezugspunkt</th><td>der sichtbare Bewegungsablauf</td><td>Bewegungsziel und Bezugsgrundlagen (Beweger, Umgebung, Regeln)</td></tr>
-        <tr><th>Gliederung</th><td>zeitlich nacheinander: 3 Phasen (azyklisch) bzw. 2 Phasen (zyklisch)</td><td>hierarchisch: Hauptfunktionsphase und Hilfsfunktionsphasen verschiedener Ordnung</td></tr>
-        <tr><th>Gleichzeitige Teilbewegungen</th><td>nur über „simultane Kombination“ erfasst</td><td>als unterstützende Hilfsfunktionen direkt erfasst</td></tr>
-        <tr><th>Phasenanzahl</th><td>fest</td><td>abhängig von der Bewegung, beliebig viele Hilfsfunktionsphasen</td></tr>
-        <tr><th>Erkenntnis</th><td>beschreibend</td><td>erklärend und begründend</td></tr>
-        <tr><th>Stärken</th><td>einfach, schnell, auf fast alle Bewegungen anwendbar; gute Grundlage für Bewegungsbeobachtung</td><td>begründet, warum ein Teil nötig ist; hilft bei Fehlerkorrektur und methodischen Reihen; erfasst Regeln und Umgebung</td></tr>
-        <tr><th>Grenzen</th><td>erklärt nicht, warum eine Phase so aussieht; Phasengrenzen bei komplexen Bewegungen unscharf; Funktionen sehr allgemein</td><td>aufwendiger; Einordnung (z. B. Ordnung, Phasen nach der Hauptfunktion) teils interpretationsabhängig; Ergebnis ändert sich mit dem Ziel</td></tr>
-        <tr><th>Typischer Einsatz</th><td>Bewegungsbeschreibung, Beobachtungsbögen, Einstieg</td><td>Technikbegründung, Fehleranalyse, Vergleich von Techniken</td></tr>
+        <tr><th>Gliederung nach</th><td>zeitlichem Ablauf</td><td>Funktion jeder Aktion für das Ziel</td></tr>
+        <tr><th>Leitfrage</th><td>Welche Phasen folgen aufeinander, welche allgemeine Aufgabe haben sie?</td><td>Wozu dient eine Aktion – für das Ziel oder für eine andere Aktion?</td></tr>
+        <tr><th>Phasen</th><td>fest: 3 (azyklisch) bzw. 2 (zyklisch), dazu Strukturvarianten</td><td>eine Hauptfunktionsphase, beliebig viele Hilfsfunktionsphasen; vorbereitende mit Ordnung</td></tr>
+        <tr><th>Vor der Hauptaktion</th><td>eine Vorbereitungsphase</td><td>oft mehrere vorbereitende Hilfsfunktionsphasen verschiedener Ordnung</td></tr>
+        <tr><th>Gleichzeitige Aktionen</th><td>nur über Simultankombination oder getrennte Phasenstrukturen von Teilbewegungen</td><td>als unterstützende Hilfsfunktionsphasen</td></tr>
+        <tr><th>Nach der Hauptaktion</th><td>Endphase</td><td>überleitende Hilfsfunktionsphase</td></tr>
+        <tr><th>Vorgehen</th><td>Bewegungsart bestimmen, Phasen abgrenzen, Funktionen angeben</td><td>Aktionsskizze → Verlaufsbeschreibung → Funktionen → Funktionsphasen</td></tr>
+        <tr><th>Stärken</th><td>einfach und schnell; auf fast alle Bewegungen anwendbar; gute Grundlage für Beobachtung</td><td>begründet, warum eine Aktion nötig ist; hilft bei Fehlerkorrektur, Techniktraining und methodischen Reihen</td></tr>
+        <tr><th>Grenzen</th><td>Funktionen sehr allgemein; Phasengrenzen bei komplexen Bewegungen unscharf; erklärt nicht, warum eine Aktion so ausgeführt wird</td><td>aufwendiger; Zuordnung und Ordnung teils interpretationsabhängig; Ergebnis hängt vom gewählten Ziel ab</td></tr>
       </tbody>
     </table>
   </div>
-  <h3>Merksatz für die Klausur</h3>
-  <p>Eine Phase kann bei Meinel/Schnabel zur Vorbereitungsphase gehören und bei Göhner trotzdem in mehrere Funktionsphasen unterschiedlicher Ordnung zerfallen. Entscheidend bei Göhner ist immer die Begründung über das Ziel, nicht die Reihenfolge.</p>
+  <h3>Merksätze für die Klausur</h3>
+  <ol class="steps">
+    <li>Die Vorbereitungsphase zerfällt bei Göhner meist in mehrere vorbereitende Hilfsfunktionsphasen unterschiedlicher Ordnung.</li>
+    <li>Teile der Hauptphase können bei Göhner unterstützend sein: Beim Kugelstoß gehören Dreh-Strecken und Blockieren zur Beschleunigung, unterstützen aber den Ausstoß.</li>
+    <li>Die Endphase entspricht weitgehend der überleitenden Hilfsfunktionsphase.</li>
+    <li>Entscheidend ist bei Göhner immer die Begründung über das Ziel, nicht die Reihenfolge.</li>
+  </ol>
 </section>
 
 <!-- BEISPIELE -->
@@ -289,10 +308,11 @@ const FIG = (function(){
 
   const DATA={
    kugel:{H:130,f:[
-    {m:1,t:62,rl:[12,-6],ll:[-62,-58],ra:[5,150],la:[18,30],props:[{k:"ball",kind:"shot",at:"rh",dx:0,dy:-2}],hl:[]},
-    {m:1,t:72,rl:[38,-28],ll:[-78,-82],ra:[5,150],la:[40,60],props:[{k:"ball",kind:"shot",at:"rh",dx:0,dy:-2}],hl:["rl","ll"]},
-    {t:-22,rl:[28,-22],ll:[42,40],ra:[-140,40],la:[95,100],props:[{k:"ball",kind:"shot",at:"nk",dx:-6,dy:0}],hl:["tr"]},
-    {t:18,rl:[-28,-30],ll:[6,4],ra:[140,138],la:[-40,-15],props:[{k:"ball",kind:"shot",at:"rh",dx:2,dy:-3},{k:"stop",dx:20}],hl:["ra","rl"]},
+    {m:1,t:28,rl:[4,-2],ll:[14,-6],ra:[5,150],la:[78,88],props:[{k:"ball",kind:"shot",at:"rh",dx:0,dy:-2}],hl:[]},
+    {m:1,t:70,rl:[50,-35],ll:[34,-58],ra:[5,150],la:[30,40],props:[{k:"ball",kind:"shot",at:"rh",dx:0,dy:-2}],hl:["rl","ll"]},
+    {t:-22,rl:[28,-22],ll:[42,40],ra:[-140,40],la:[95,100],props:[{k:"ball",kind:"shot",at:"nk",dx:-6,dy:0}],hl:["rl"]},
+    {t:2,rl:[-16,-26],ll:[24,22],ra:[-140,40],la:[135,125],props:[{k:"ball",kind:"shot",at:"nk",dx:-6,dy:0}],hl:["la","tr"]},
+    {t:18,rl:[-28,-30],ll:[6,4],ra:[140,138],la:[-40,-15],props:[{k:"ball",kind:"shot",at:"rh",dx:2,dy:-3},{k:"stop",dx:20}],hl:["ra"]},
     {t:52,rl:[38,0],ll:[-82,-85],ra:[45,70],la:[-70,-40],props:[{k:"stop",dx:14},{k:"ball",kind:"shot",abs:[128,30]}],hl:[]}
    ]},
    weit:{H:130,f:[
@@ -405,14 +425,15 @@ const MS = {V:"Vorbereitungsphase",H:"Hauptphase",E:"Endphase",Z:"Zwischenphase"
 const GO = {gH:"Hauptfunktionsphase",v1:"vorbereitend, 1. Ordnung",v2:"vorbereitend, 2. Ordnung",v3:"vorbereitend, 3. Ordnung",u:"unterstützend","ü":"überleitend"};
 
 const EX = [
- {id:"kugel",name:"Kugelstoß (O’Brien)",typ:"azyklisch",
-  ziel:"Kugel möglichst weit stoßen – regelgerecht aus dem Kreis, Kugel am Hals, Verlassen nach hinten.",
+ {id:"kugel",name:"Kugelstoß (Rückenstoß-Technik)",typ:"azyklisch",
+  ziel:"Kugel möglichst weit stoßen – regelgerecht aus dem Kreis, Kugel am Hals, ohne Übertreten.",
   seg:[
-   {n:"Ausgangsstellung",d:"Rücken zur Stoßrichtung, Kugel am Hals, Oberkörper vorgebeugt, Gewicht auf dem Standbein.",ms:"V",g:"v3",w:"Schafft die Ausgangslage für ein flaches, schnelles Angleiten."},
-   {n:"Angleiten",d:"Flacher Schub über das Standbein rückwärts durch den Kreis.",ms:"V",g:"v2",w:"Vorbeschleunigung von Körper und Kugel."},
-   {n:"Stoßauslage",d:"Landung in der Stoßauslage, Rumpf verwrungen, Kugel hinter dem Stemmbein.",ms:"V",g:"v1",w:"Verlängert den Beschleunigungsweg und spannt die Muskulatur vor."},
-   {n:"Ausstoß",d:"Streckung von Bein, Hüfte, Rumpf und Stoßarm, Abdruck über die Finger.",ms:"H",g:"gH",w:"Bestimmt Abfluggeschwindigkeit, -winkel und -höhe und damit direkt die Weite."},
-   {n:"Umspringen",d:"Beinwechsel, Abfangen des Körpers vor dem Stoßbalken.",ms:"E",g:null,w:"Regelbedingt nötig (kein Übertreten), trägt aber nichts zur Flugweite bei. Göhners drei Hilfsfunktionsarten erfassen eine solche Phase nach der Hauptfunktion nicht eindeutig."}
+   {n:"Ausgangsstellung einnehmen",d:"Am hinteren Kreisrand, Rücken zur Stoßrichtung, Kugel am Hals, Schwungarm locker nach vorn.",ms:"V",g:"v3",w:"Stellt einen möglichst langen Beschleunigungsweg bereit; das Anlegen am Hals schreibt das Regelwerk vor. Für die Lösung der Aufgabe von geringer Bedeutung."},
+   {n:"Tiefgehen",d:"Oberkörper senkt sich, beide Beine beugen, das Schwungbein wird an das Standbein herangeführt (Kauerstellung).",ms:"V",g:"v2",w:"Verlängert den Beschleunigungsweg für die folgende Beinstreckung und Körperaufrichtung."},
+   {n:"Angleiten und Stoßauslage",d:"Schwungbein streckt explosiv nach hinten, Standbein drückt ab und wird flach unter den Körper gezogen; Landung in der Stoßauslage, Schulter- und Beckenachse sind verwrungen.",ms:"V",g:"v1",w:"Gibt Körper und Kugel eine Vorbeschleunigung und schafft mit der Verwringung die Ausgangslage für den Ausstoß."},
+   {n:"Dreh-Strecken und Blockieren",d:"Zweite Streckung des Stoßbeins, Aufrichten und Eindrehen des Rumpfes; das Stemmbein bleibt gestreckt, der Schwungarm wird weit aufgezogen und blockiert.",ms:"H",g:"u",w:"Beschleunigt die Kugel weiter und überträgt den Impuls des Schwungarms auf Rumpf und Kugel – unterstützt so den Ausstoß."},
+   {n:"Ausstoßen",d:"Explosives Strecken des Stoßarms, Ellbogen hinter der Kugel, abschließendes Abklappen im Handgelenk.",ms:"H",g:"gH",w:"Unmittelbar zielwirksam: bestimmt Abfluggeschwindigkeit, -höhe und -winkel (etwa 40°)."},
+   {n:"Abfangen",d:"Flacher Umsprung auf das rechte Bein.",ms:"E",g:"ü",w:"Überführt die Stoßbewegung in einen stabilen Gleichgewichtszustand und verhindert das Übertreten."}
   ]},
  {id:"weit",name:"Weitsprung",typ:"azyklisch",
   ziel:"Möglichst weit springen – Absprung vor der Brettkante; gemessen wird bis zum körpernächsten Abdruck in der Grube.",
@@ -421,18 +442,18 @@ const EX = [
    {n:"Absprungvorbereitung",d:"Langer vorletzter, kürzerer letzter Schritt; der Körperschwerpunkt wird leicht gesenkt.",ms:"V",g:"v1",w:"Schafft einen Beschleunigungsweg nach oben, ohne viel Anlaufgeschwindigkeit zu verlieren."},
    {n:"Absprung",d:"Aktiver, flacher Fußaufsatz auf dem Brett, Streckung von Sprungbein, Hüfte und Rumpf.",ms:"H",g:"gH",w:"Bestimmt Abfluggeschwindigkeit und -winkel und damit die Flugkurve des Körperschwerpunkts."},
    {n:"Schwungbein- und Armeinsatz",d:"Schwungbein und Arme schwingen beim Absprung energisch nach vorn-oben.",ms:"H",g:"u",w:"Läuft gleichzeitig mit dem Absprung ab und verstärkt den Abdruck vom Brett."},
-   {n:"Flugphase",d:"Schritt-, Hang- oder Laufsprung; die Beine werden zur Landung nach vorn gebracht.",ms:"H",g:"v1",w:"Kann die Flugkurve nicht mehr verändern. Sie gleicht die Vorwärtsrotation aus und bereitet eine Landung mit weit vorn liegenden Füßen vor."},
-   {n:"Landung",d:"Beine weit vorn, Hüfte nachschieben, nach vorn oder seitlich ausweichen.",ms:"E",g:"gH",w:"Wird häufig als zweite Hauptfunktionsphase eingeordnet: Wegen der Messregel entscheidet sie, wie viel der Flugweite gewertet wird. Manche Analysen sehen sie dagegen als Phase ohne Hauptfunktion."}
+   {n:"Flugphase",d:"Schritt-, Hang- oder Laufsprung; die Beine werden zur Landung nach vorn gebracht.",ms:"H",g:"ü",w:"Kann die Flugkurve nicht mehr verändern. Gleicht die Vorwärtsrotation aus und leitet in eine Landung mit weit vorn liegenden Füßen über."},
+   {n:"Landung",d:"Beine weit vorn, Hüfte nachschieben, nach vorn oder seitlich ausweichen.",ms:"E",g:"ü",w:"Überführt in einen stabilen Zustand. Wegen der Messregel entscheidet sie aber mit über die gewertete Weite – manche Analysen ordnen sie deshalb als zweite Hauptfunktionsphase ein."}
   ]},
  {id:"hoch",name:"Hochsprung (Flop)",typ:"azyklisch",
-  ziel:"Die Latte in möglichst großer Höhe überqueren, ohne sie abzuwerfen; der Absprung muss einbeinig erfolgen.",
+  ziel:"Über eine Latte springen, ohne sie zu reißen; der Absprung muss einbeinig erfolgen.",
   seg:[
-   {n:"Gerader Anlauf",d:"Die ersten Anlaufschritte geradlinig und zunehmend schneller.",ms:"V",g:"v2",w:"Baut die Anlaufgeschwindigkeit auf."},
-   {n:"Kurvenanlauf",d:"Die letzten 4–5 Schritte im Bogen mit Innenlage.",ms:"V",g:"v1",w:"Die Innenlage senkt den Körperschwerpunkt ab (längerer Beschleunigungsweg beim Absprung) und leitet die Drehung in die Rückenlage über der Latte ein."},
-   {n:"Absprung",d:"Fußaufsatz mit dem lattenfernen Bein, Aufrichten aus der Innenlage, Streckung nach oben.",ms:"H",g:"gH",w:"Bestimmt die Steighöhe des Körperschwerpunkts – erstes Teilziel: Höhe gewinnen."},
-   {n:"Schwungbein- und Armeinsatz",d:"Knie des lattennahen Schwungbeins und die Arme schwingen energisch hoch.",ms:"H",g:"u",w:"Läuft gleichzeitig mit dem Absprung ab, verstärkt den Abdruck und unterstützt die Drehung."},
-   {n:"Lattenüberquerung",d:"Rückenlage, Hüfte hoch (Brücke), dann Kinn zur Brust und Beine nachziehen.",ms:"H",g:"gH",w:"Zweite Hauptfunktionsphase: Hier wird das zweite Teilziel erreicht, die Latte ohne Abwurf zu überqueren. Durch die Brücke kann der Körperschwerpunkt knapp unter Lattenhöhe bleiben."},
-   {n:"Landung",d:"Landung auf Schultern und Rücken in der Matte.",ms:"E",g:null,w:"Für die Höhe ohne Funktion; dient der sicheren Landung."}
+   {n:"Gerader Anlauf",d:"Die ersten Anlaufschritte geradlinig und zunehmend schneller.",ms:"V",g:"v3",w:"Baut die Anlaufgeschwindigkeit auf."},
+   {n:"Kurvenanlauf",d:"Die letzten 4–5 Schritte im Bogen mit Innenlage.",ms:"V",g:"v2",w:"Die Innenlage senkt den Körperschwerpunkt ab (längerer Beschleunigungsweg beim Absprung) und leitet die Drehung in die Rückenlage ein."},
+   {n:"Absprung",d:"Fußaufsatz mit dem lattenfernen Bein, Aufrichten aus der Innenlage, Streckung nach oben.",ms:"H",g:"v1",w:"Bringt den Körper in die Höhe und Raumlage, aus der die Latte überquert werden kann."},
+   {n:"Schwungbein- und Armeinsatz",d:"Knie des lattennahen Schwungbeins und die Arme schwingen energisch hoch.",ms:"H",g:"u",w:"Unterstützt die gleichzeitig ablaufende Absprungbewegung und die Drehung."},
+   {n:"Lattenüberquerung",d:"Rückenlage, Hüfte hoch (Brücke), dann Kinn zur Brust und Beine nachziehen.",ms:"H",g:"gH",w:"Unmittelbar zielwirksam: Hier wird die Latte überquert, ohne sie zu reißen. Durch die Brücke kann der Körperschwerpunkt knapp unter Lattenhöhe bleiben."},
+   {n:"Landung",d:"Landung auf Schultern und Rücken in der Matte.",ms:"E",g:"ü",w:"Überführt den Bewegungszustand der Lattenüberquerung in die sichere Landung."}
   ]},
  {id:"korb",name:"Korbleger (Basketball)",typ:"azyklisch",
   ziel:"Ball aus der Bewegung sicher in den Korb bringen – unter Einhaltung der Schrittregel und gegen Verteidiger.",
@@ -440,9 +461,9 @@ const EX = [
    {n:"Dribbling zum Korb",d:"Annäherung im Tempodribbling.",ms:"V",g:"v3",w:"Bringt den Spieler mit Tempo in Korbnähe."},
    {n:"Zweier-Rhythmus",d:"Ball aufnehmen, zwei Schritte (lang – kurz).",ms:"V",g:"v2",w:"Regelgerechter Übergang vom Dribbling zum Sprung; horizontale Geschwindigkeit wird in Höhe umgesetzt."},
    {n:"Absprung",d:"Einbeiniger Absprung vom Gegenbein der Wurfhand.",ms:"H",g:"v1",w:"Bringt Ball und Hand möglichst hoch und nah an den Korb."},
-   {n:"Schwungbein und Ballschutz",d:"Knie des Schwungbeins hoch, Körper zwischen Ball und Gegner.",ms:"H",g:"u",w:"Läuft gleichzeitig mit Absprung und Ballabgabe ab: Höhengewinn und Schutz vor dem Block."},
+   {n:"Schwungbein und Ballschutz",d:"Knie des Schwungbeins hoch, Körper zwischen Ball und Gegner.",ms:"H",g:"u",w:"Unterstützt gleichzeitig Absprung und Ballabgabe: Höhengewinn und Schutz vor dem Block."},
    {n:"Ballabgabe",d:"Ball mit der Wurfhand ans Brett bzw. in den Korb legen.",ms:"H",g:"gH",w:"Löst die Bewegungsaufgabe unmittelbar: Treffer."},
-   {n:"Landung",d:"Beidbeinige, abgefederte Landung.",ms:"E",g:null,w:"Für den Treffer ohne Funktion; dient Gleichgewicht und Verletzungsschutz."}
+   {n:"Landung",d:"Beidbeinige, abgefederte Landung.",ms:"E",g:"ü",w:"Überführt in einen stabilen Stand, aus dem die nächste Spielhandlung möglich ist."}
   ]},
  {id:"hand",name:"Sprungwurf (Handball)",typ:"azyklisch",
   ziel:"Torwurf über die Abwehr hinweg; der Ball muss vor der Landung im Torraum die Hand verlassen.",
@@ -452,15 +473,15 @@ const EX = [
    {n:"Ausholbewegung",d:"Wurfarm hoch nach hinten, Bogenspannung im Rumpf.",ms:"V",g:"v1",w:"Verlängert den Beschleunigungsweg, Vordehnung der Wurfmuskulatur."},
    {n:"Abwurf",d:"Peitschenartiger Armzug, Ballabgabe über die Hand.",ms:"H",g:"gH",w:"Bestimmt Ballgeschwindigkeit und Richtung – unmittelbar zielwirksam."},
    {n:"Gegenarm und Rumpfeinsatz",d:"Gegenarm wird zum Körper gezogen, Rumpf dreht ein.",ms:"H",g:"u",w:"Läuft gleichzeitig mit dem Abwurf ab und erhöht die Abwurfgeschwindigkeit."},
-   {n:"Landung",d:"Landung auf dem Sprungbein, Abfangen.",ms:"E",g:null,w:"Für den Wurf ohne Funktion; Landung im Torraum ist nach der Ballabgabe erlaubt."}
+   {n:"Landung",d:"Landung auf dem Sprungbein, Abfangen.",ms:"E",g:"ü",w:"Überführt in einen stabilen Stand; die Landung im Torraum ist nach der Ballabgabe erlaubt."}
   ]},
  {id:"kraul",name:"Kraulschwimmen (Armzyklus)",typ:"zyklisch",
   ziel:"Möglichst schneller Vortrieb über die Strecke im Medium Wasser.",
   seg:[
    {n:"Eintauchen und Wasserfassen",d:"Hand taucht vor der Schulter ein, streckt sich, fasst Wasser.",ms:"Z",g:"v1",w:"Bringt die Hand in eine Position, aus der Vortrieb möglich ist."},
    {n:"Zug- und Druckphase",d:"Arm zieht und drückt unter dem Körper bis zum Oberschenkel.",ms:"H",g:"gH",w:"Erzeugt den Vortrieb und erreicht damit das Ziel unmittelbar."},
-   {n:"Überwasser-Rückführung",d:"Arm wird mit hohem Ellbogen locker nach vorn geführt.",ms:"Z",g:"ü",w:"Verbindet zwei Hauptfunktionsphasen desselben Arms; widerstandsarm über Wasser."},
-   {n:"Beinschlag",d:"Wechselbeinschlag aus der Hüfte.",ms:null,g:"u",w:"Läuft gleichzeitig ab: stabilisiert die Wasserlage, liefert wenig eigenen Vortrieb. Bei Meinel/Schnabel eine eigene zyklische Bewegung in simultaner Kombination."},
+   {n:"Überwasser-Rückführung",d:"Arm wird mit hohem Ellbogen locker nach vorn geführt.",ms:"Z",g:"ü",w:"Leitet unmittelbar in den nächsten Armzug über; widerstandsarm über Wasser. Die Arme arbeiten alternierend."},
+   {n:"Beinschlag",d:"Wechselbeinschlag aus der Hüfte.",ms:null,g:"u",w:"Läuft gleichzeitig ab: stabilisiert die Wasserlage, liefert wenig eigenen Vortrieb. Bei Meinel/Schnabel eine Teilbewegung mit eigener Haupt- und Zwischenphase, zeitlich verschoben zur Armbewegung."},
    {n:"Rumpfrotation mit Atmung",d:"Körper rollt um die Längsachse, seitliche Einatmung.",ms:null,g:"u",w:"Erleichtert Zug und Rückführung und ermöglicht die Atmung, ohne die Wasserlage zu stören."}
   ]}
 ];
@@ -494,13 +515,13 @@ function picker(el, onPick){
 /* Beispiele */
 function renderEx(e){
   const sh=t=>t.replace("Vorbereitungsphase","Vorbereitungs&shy;phase").replace("Hauptfunktionsphase","Haupt&shy;funktions&shy;phase").replace("Hauptphase","Haupt&shy;phase").replace("Zwischenphase","Zwischen&shy;phase").replace("unterstützend","unter&shy;stützend").replace("überleitend","über&shy;leitend").replace("vorbereitend","vor&shy;bereitend");
-  const msBar = e.seg.map(s=>`<div class="${s.ms?('c-'+s.ms):'c-none'}">${s.ms?sh(MS[s.ms]):'simultan'}</div>`).join("");
+  const msBar = e.seg.map(s=>`<div class="${s.ms?('c-'+s.ms):'c-none'}">${s.ms?sh(MS[s.ms]):'eigene Teil&shy;bewegung'}</div>`).join("");
   const gBar = e.seg.map(s=>`<div class="${cls(s.g)}">${s.g?sh(GO[s.g]):'ohne Hilfs&shy;funktion'}</div>`).join("");
   const names = e.seg.map(s=>`<div>${s.n}</div>`).join("");
   document.getElementById('ex-out').innerHTML = `
     <div class="goal"><b>Bewegungsziel (${e.typ})</b>${e.ziel}</div>
     <div class="strip" role="img" aria-label="Phasengliederung beider Modelle">
-      <div class="row"><div class="lab">Bildreihe</div><div class="figs">${e.seg.map((s,i)=>`<div>${FIG.render(e.id,i)}</div>`).join("")}</div></div>
+      <div class="row"><div class="lab">Aktions&shy;skizze</div><div class="figs">${e.seg.map((s,i)=>`<div>${FIG.render(e.id,i)}</div>`).join("")}</div></div>
       <div class="row"><div class="lab">Teilbewegung</div><div class="names">${names}</div></div>
       <div class="row"><div class="lab">Meinel/Schnabel</div><div class="bar">${msBar}</div></div>
       <div class="row"><div class="lab">Göhner</div><div class="bar">${gBar}</div></div>
@@ -512,7 +533,7 @@ function renderEx(e){
         <h3>${s.n}</h3>
         <p>${s.d}</p>
         <div class="tags">
-          <span class="chip ${s.ms?('c-'+s.ms):'c-none'}">M/S: ${s.ms?MS[s.ms]:'simultane Kombination'}</span>
+          <span class="chip ${s.ms?('c-'+s.ms):'c-none'}">M/S: ${s.ms?MS[s.ms]:'eigene Teilbewegung'}</span>
           <span class="chip ${cls(s.g)}">Göhner: ${s.g?GO[s.g]:'keine Hilfsfunktion i. e. S.'}</span>
         </div>
         <p class="why">${s.w}</p>
@@ -536,7 +557,7 @@ function renderQuiz(e){
         <div class="segfig">${FIG.render(e.id,i)}</div>
         <div class="txt"><h3>${s.n}</h3><p>${s.d}</p></div>
         <div class="pair">
-        ${s.ms?`<label>Meinel/Schnabel <span class="res" id="rm${i}"></span><select id="qm${i}">${opts(msMap)}</select></label>`:`<p class="note">Meinel/Schnabel: läuft simultan zur Armbewegung – nicht zuzuordnen.</p>`}
+        ${s.ms?`<label>Meinel/Schnabel <span class="res" id="rm${i}"></span><select id="qm${i}">${opts(msMap)}</select></label>`:`<p class="note">Meinel/Schnabel: eigene Teilbewegung mit eigener Phasenstruktur – hier nicht zuzuordnen.</p>`}
         ${s.g?`<label>Göhner <span class="res" id="rg${i}"></span><select id="qg${i}">${opts(GO)}</select></label>`:`<p class="note">Göhner: keine Hilfsfunktion im engeren Sinn – nicht zuzuordnen.</p>`}
         </div>
         <p class="why" id="w${i}" hidden>${s.w}</p>

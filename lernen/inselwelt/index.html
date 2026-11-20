@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inselwelt – Evolution live</title>
+<style>
+:root{
+  --bg:#EEF2F7; --surface:#FFFFFF; --ink:#14213D; --muted:#56637D; --line:#D3DBE8; --soft:#E4EAF3;
+  --yellow:#F2B705; --on-yellow:#14213D; --navy:#14284B; --on-navy:#F3F6FB;
+  --west:#2467D6; --east:#C77700; --sea:#143560; --sea2:#1C4A80; --sea3:#2A629F;
+  --ok:#1D7A4A;
+  --display:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0B1422; --surface:#121E33; --ink:#E9EEF7; --muted:#9AA8C1; --line:#26354F; --soft:#1A2942;
+    --navy:#0E1B33; --west:#74A8FF; --east:#FFBE4D; --sea:#0D2646; --sea2:#143861; --sea3:#1D4C7E; --ok:#5FD39A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0B1422; --surface:#121E33; --ink:#E9EEF7; --muted:#9AA8C1; --line:#26354F; --soft:#1A2942;
+  --navy:#0E1B33; --west:#74A8FF; --east:#FFBE4D; --sea:#0D2646; --sea2:#143861; --sea3:#1D4C7E; --ok:#5FD39A;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
+.app{max-width:1360px;margin:0 auto;padding:18px 16px 48px}
+
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 28px;margin-bottom:16px}
+.brand h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:700;letter-spacing:-0.02em}
+.brand p{margin:4px 0 0;color:var(--muted);max-width:46ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:700;font-size:.95rem}
+.tabs button[aria-selected="true"]{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.tabs button small{font-weight:400;opacity:.8;margin-left:4px}
+
+.layout{display:grid;gap:18px;grid-template-columns:minmax(0,1fr);grid-template-areas:"stage" "mission" "charts" "controls" "protocol" "model"}
+@media (min-width:1080px){.layout{grid-template-columns:minmax(0,1fr) 390px;grid-template-areas:"stage mission" "charts charts" "controls controls" "protocol protocol" "model model"}}
+.stage{grid-area:stage;min-width:0}
+.worldwrap{position:relative;border-radius:18px;overflow:hidden;background:var(--sea);aspect-ratio:1000/560}
+#world{display:block;width:100%;height:100%;touch-action:manipulation}
+.hud{position:absolute;left:0;right:0;bottom:0;display:flex;gap:4px 22px;flex-wrap:wrap;padding:8px 14px;color:#F3F6FB;background:linear-gradient(transparent,rgba(6,18,38,.72));font-size:.86rem;pointer-events:none}
+.hud b{font-family:var(--display);font-size:1.25rem;font-variant-numeric:tabular-nums;margin-right:5px}
+@media (max-width:620px){.hud{font-size:.7rem;gap:0 10px;padding:4px 8px}.hud b{font-size:.95rem;margin-right:3px}}
+.gate{position:absolute;inset:0;display:grid;place-items:center;background:rgba(8,22,46,.74);color:#F3F6FB;text-align:center;padding:18px}
+.gate[hidden]{display:none}
+.gate p{margin:0;font-family:var(--display);font-size:clamp(1.1rem,3vw,1.7rem);max-width:22ch}
+.transport{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:700}
+.btn.primary{background:var(--yellow);border-color:var(--yellow);color:var(--on-yellow);min-width:104px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.on{background:var(--navy);border-color:var(--navy);color:var(--on-navy)}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:9px 11px;font-variant-numeric:tabular-nums}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--on-navy)}
+.grow{flex:1}
+.legend{color:var(--muted);font-size:.86rem;margin:8px 0 0}
+.inspect{margin-top:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.92rem}
+.inspect h3{font-size:1.05rem;margin-bottom:4px}
+.geno{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0 8px}
+.geno span{display:grid;grid-template-rows:9px 9px;gap:2px}
+.geno i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--muted)}
+.geno i.a1{background:var(--ink);border-color:var(--ink)}
+
+.mission{grid-area:mission;background:var(--surface);border-radius:18px;padding:18px 18px 16px;border:1.5px solid var(--line);align-self:start}
+.mission h2{font-size:1.5rem}
+.mission .kind{color:var(--muted);margin:2px 0 10px}
+.mission .q{font-family:var(--display);font-size:1.12rem;font-weight:500;margin:0 0 8px}
+.mission p{margin:0 0 10px}
+.mission h3{font-size:1rem;margin:14px 0 6px}
+.predict label{display:flex;gap:9px;align-items:flex-start;padding:7px 9px;border:1.5px solid var(--line);border-radius:10px;margin-bottom:6px;cursor:pointer}
+.predict input{margin-top:4px;accent-color:var(--navy)}
+.predict label:has(input:checked){border-color:var(--yellow);background:color-mix(in srgb,var(--yellow) 16%,transparent)}
+ol.steps{margin:0;padding-left:1.25em}
+ol.steps li{margin-bottom:8px}
+ol.steps .btn{display:block;margin-top:5px;font-size:.92rem;text-align:left}
+ul.tasks{margin:0;padding-left:1.1em}
+ul.tasks li{margin-bottom:5px}
+details{margin-top:12px;border-top:1.5px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:700}
+details p,details li{color:var(--muted)}
+
+.charts{grid-area:charts;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.panel{background:var(--surface);border-radius:14px;border:1.5px solid var(--line);padding:14px 14px 10px;min-width:0}
+.panel header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.panel h2{font-size:1.1rem}
+.panel canvas{display:block;width:100%;height:220px}
+.panel .note{color:var(--muted);font-size:.84rem;margin:6px 0 2px}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chips button{border:1.5px solid var(--line);background:none;border-radius:999px;padding:3px 10px;font-size:.84rem}
+.chips button[aria-pressed="true"]{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.key{display:inline-flex;align-items:center;gap:5px;font-size:.84rem;color:var(--muted);margin-right:10px}
+.key::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--c)}
+
+.controls{grid-area:controls;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.isle h2::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--c);margin-right:8px}
+.row{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:baseline;margin-top:8px}
+.row label{font-size:.93rem}
+.row output{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem}
+.row input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--navy);margin:2px 0 0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) input[type=range],:root:not([data-theme="light"]) .predict input{accent-color:var(--yellow)}}
+:root[data-theme="dark"] input[type=range],:root[data-theme="dark"] .predict input{accent-color:var(--yellow)}
+.stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.stack .btn{font-size:.92rem;padding:8px 12px}
+
+.protocol{grid-area:protocol}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:700;color:var(--muted)}
+td:first-child,th:first-child{text-align:left}
+.empty{color:var(--muted);padding:10px 0}
+.model{grid-area:model;margin-top:0}
+.model ul{padding-left:1.1em;max-width:78ch}
+.model p{max-width:78ch}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" aria-label="Zurück"><style>.lernangebot-leiste{all:initial!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;width:100%!important;min-height:44px!important;padding:0 8px!important;background:#eef2f7!important;border-bottom:1px solid rgba(10,45,83,.1)!important;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI Variable Text","Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:-.01em!important}.lernangebot-leiste a{all:initial!important;display:inline-flex!important;align-items:center!important;gap:2px!important;box-sizing:border-box!important;min-height:36px!important;padding:0 12px 0 6px!important;border-radius:999px!important;color:#0f6f8f!important;font:inherit!important;cursor:pointer!important}.lernangebot-leiste a:hover{background:rgba(10,45,83,.07)!important}.lernangebot-leiste a:focus-visible{outline:3px solid #0f7f6c!important;outline-offset:2px!important}.lernangebot-leiste svg{display:block!important;width:20px!important;height:20px!important;flex:none!important}@media (prefers-color-scheme:dark){.lernangebot-leiste{background:#061a33!important;border-bottom-color:rgba(255,255,255,.1)!important}.lernangebot-leiste a{color:#6fd3bf!important}.lernangebot-leiste a:hover{background:rgba(255,255,255,.08)!important}.lernangebot-leiste a:focus-visible{outline-color:#6fd3bf!important}}@media print{.lernangebot-leiste{display:none!important}}</style><a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>Lernangebote</a></nav>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Inselwelt</h1>
+      <p>Selektion, Gendrift und Artbildung an einer Finkenpopulation, die sich vor deinen Augen entwickelt.</p>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Experimente"></nav>
+  </header>
+
+  <main class="layout">
+    <section class="stage" aria-label="Simulation">
+      <div class="worldwrap">
+        <canvas id="world" aria-label="Karte der beiden Inseln mit allen Finken"></canvas>
+        <div class="hud" id="hud" aria-live="off"></div>
+        <div class="gate" id="gate" hidden><p>Erst vermuten, dann starten: Wähle rechts deine Vermutung.</p></div>
+      </div>
+      <div class="transport">
+        <button class="btn primary" id="play">Starten</button>
+        <div class="seg" id="speed" role="group" aria-label="Geschwindigkeit"></div>
+        <button class="btn" id="bridge" aria-pressed="true">Landbrücke</button>
+        <span class="grow"></span>
+        <button class="btn" id="restart">Neu starten</button>
+      </div>
+      <p class="legend">Jeder Punkt ist ein Fink. Körperfarbe zeigt das Gefieder, die Spitze die Schnabelhöhe, der farbige Ring die Art. Tippe einen Finken an, um sein Erbgut zu sehen.</p>
+      <div class="inspect" id="inspect" hidden></div>
+    </section>
+
+    <aside class="mission" id="mission" aria-live="polite"></aside>
+
+    <section class="charts" aria-label="Auswertung">
+      <div class="panel">
+        <header><h2>Merkmalsverteilung</h2>
+          <div class="chips" id="histTrait"><button data-v="beak" aria-pressed="true">Schnabel</button><button data-v="col" aria-pressed="false">Gefieder</button></div>
+        </header>
+        <canvas id="hist"></canvas>
+        <p class="note"><span class="key" style="--c:var(--west)">West</span><span class="key" style="--c:var(--east)">Ost</span><span id="histNote"></span></p>
+      </div>
+      <div class="panel">
+        <header><h2>Zeitverlauf</h2>
+          <div class="chips" id="metric">
+            <button data-v="beak" aria-pressed="true">Schnabel</button><button data-v="col" aria-pressed="false">Gefieder</button><button data-v="n" aria-pressed="false">Tiere</button><button data-v="p" aria-pressed="false">Allel A</button><button data-v="cross" aria-pressed="false">Kreuzbarkeit</button>
+          </div>
+        </header>
+        <canvas id="series"></canvas>
+        <p class="note" id="seriesNote"></p>
+      </div>
+      <div class="panel">
+        <header><h2>Stammbaum der Arten</h2></header>
+        <canvas id="tree"></canvas>
+        <p class="note">Eine Art ist hier eine Fortpflanzungsgemeinschaft: alle Tiere, die über kreuzbare Paare miteinander verbunden sind.</p>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Umwelt und Eingriffe">
+      <div class="panel isle" id="env0" style="--c:var(--west)"></div>
+      <div class="panel isle" id="env1" style="--c:var(--east)"></div>
+      <div class="panel">
+        <header><h2>Eingriffe</h2></header>
+        <div class="row"><label for="mu">Mutationsrate je Allel</label><output id="muOut"></output>
+          <input type="range" id="mu" min="0" max="20" step="1" value="4"></div>
+        <div class="seg" id="target" role="group" aria-label="Insel für Eingriffe" style="margin-top:14px">
+          <button data-v="0" aria-pressed="true">West</button><button data-v="1" aria-pressed="false">Ost</button>
+        </div>
+        <div class="stack">
+          <button class="btn" id="evDrought">Dürre</button>
+          <button class="btn" id="evNormal">Normaljahr</button>
+          <button class="btn" id="evBottle">Flaschenhals: 12 überleben</button>
+          <button class="btn" id="evFound">8 Gründertiere herholen</button>
+        </div>
+        <p class="note" id="evNote">Eingriffe wirken auf die gewählte Insel und werden im Zeitverlauf markiert.</p>
+      </div>
+    </section>
+
+    <section class="panel protocol">
+      <header><h2>Messprotokoll</h2>
+        <div class="stack" style="margin:0"><button class="btn" id="logAdd">Messwert festhalten</button><button class="btn" id="logCopy">Tabelle kopieren</button><button class="btn" id="logClear">Leeren</button></div>
+      </header>
+      <div class="tablewrap" id="logWrap"></div>
+    </section>
+
+    <details class="model panel">
+      <summary>Was das Modell annimmt und wo es an Grenzen stößt</summary>
+      <ul>
+        <li>Jeder Fink ist ein eigenes Individuum mit diploidem Erbgut. Schnabelhöhe und Gefieder werden von je 12 Genorten additiv bestimmt, dazu kommt eine kleine, nicht erbliche Modifikation.</li>
+        <li>Nahrung: Kleine, mittlere und große Samen wachsen nach und werden geteilt. Je besser der Schnabel zum Samen passt, desto mehr Energie gewinnt ein Tier. Nachwuchs kostet Energie.</li>
+        <li>Räuber erbeuten bevorzugt Tiere, deren Gefieder vom Untergrund abweicht.</li>
+        <li>Partnerwahl: Weibchen bevorzugen Männchen mit ähnlichem Gesang. Der Gesang wird vererbt und hängt zusätzlich von der Schnabelhöhe ab. Diese Kopplung ist bei Darwinfinken beschrieben, hier aber stark vereinfacht und bewusst kräftig eingestellt, damit Artbildung in Unterrichtszeit sichtbar wird.</li>
+        <li>„Allel A“ ist ein neutraler Marker ohne Einfluss auf Überleben oder Fortpflanzung. Er zeigt reine Gendrift.</li>
+        <li>„Kreuzbarkeit“ ist der Anteil zufälliger West-Ost-Paare, die sich als Partner akzeptieren würden. Sobald zwei Arten bestehen, wird stattdessen zwischen den beiden größten Arten gemessen.</li>
+        <li>Grenzen: Die Zahlen (Millimeter, Generationen) sind Modellwerte, keine Messdaten. Selektion wirkt hier viel schneller als im Freiland. Postzygotische Barrieren, Dominanz, Kopplung von Genen und sympatrische Artbildung durch Polyploidie kommen nicht vor.</li>
+      </ul>
+      <p>Freilandbezug: Boag &amp; Grant (1981), Science 214, 82–85; Grant &amp; Grant (2002), Science 296, 707–711.</p>
+    </details>
+  </main>
+</div>
+
+<script>
+/* ===== Simulationskern: individuenbasiertes Modell, ohne DOM ===== */
+const WORLD_W = 1000, WORLD_H = 560;
+const ISL = [{ cx: 255, cy: 285, rx: 205, ry: 205 }, { cx: 745, cy: 285, rx: 205, ry: 205 }];
+const BR = { x0: 425, x1: 575, y0: 215, y1: 355 };
+const LOCI = 12;                 // Genorte je Merkmal (diploid, additiv)
+const SEED_OPT = [0.2, 0.5, 0.8]; // optimale Schnabelgröße für kleine / mittlere / große Samen
+const SEED_W = 0.2;             // Breite der Nutzungskurve
+const INTAKE = 3;                // maximale Aufnahme je Zeitschritt
+const INFLOW = 3;              // Nachwachsen je Zeitschritt und Angebotspunkt
+const E_BIRTH = 20, E_COST = 25, E_REPRO = 40, E_MAX = 70, E_LIVE = 0.5;
+const MATURE = 10;
+const GEN = 30;                  // Zeitschritte je Generation (gemessenes mittleres Elternalter)
+const SONG_K = 8;                // Kopplung Schnabel -> Gesang
+const SONG_SEG = 0.28;           // Streuung des Gesangs bei der Vererbung
+const EPS = 0.85, LINK2 = EPS * EPS, CORE = 4;         // Abstand, bis zu dem zwei Tiere als "kreuzbar" verbunden gelten
+const MU0 = 0.004;
+const MIN_SP = 6;
+const HUES = [205, 42, 330, 150, 275, 15, 95, 240, 180, 300, 60, 0];
+
+function wob(i, th) { return 1 + 0.05 * Math.sin(3 * th + i * 1.7) + 0.035 * Math.sin(5 * th + 1 + i); }
+function inIsl(i, x, y) {
+  const I = ISL[i], dx = (x - I.cx) / I.rx, dy = (y - I.cy) / I.ry;
+  return Math.hypot(dx, dy) < wob(i, Math.atan2(dy, dx));
+}
+
+function createSim(seed) {
+  let s = (seed >>> 0) || 1;
+  const rnd = () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  let spare = null;
+  const gauss = () => {
+    if (spare !== null) { const v = spare; spare = null; return v; }
+    let u = 0, v = 0; while (u === 0) u = rnd(); v = rnd();
+    const r = Math.sqrt(-2 * Math.log(u)), a = 2 * Math.PI * v;
+    spare = r * Math.sin(a); return r * Math.cos(a);
+  };
+
+  const S = {
+    tick: 0, inds: [], nextId: 1, bridge: true, mu: MU0, disp: 0.5, K: SONG_K, core: 4,
+    env: [{ seeds: [20, 100, 20], ground: 0.5, pred: 0.5 }, { seeds: [20, 100, 20], ground: 0.5, pred: 0.5 }],
+    pools: [[0, 0, 0], [0, 0, 0]],
+    species: [], splitStreak: {}, mergeStreak: {},
+    hist: { step: 10, t: [], n: [[], []], beak: [[], []], beakSd: [[], []], col: [[], []], colSd: [[], []], p: [[], []], cross: [], nsp: [] },
+    events: [], fx: [], stats: null, cross: null,
+    deaths: { starve: 0, pred: 0, age: 0 }, parentAgeSum: 0, births: 0
+  };
+
+  const onLand = (x, y) => inIsl(0, x, y) || inIsl(1, x, y) || (S.bridge && x > BR.x0 && x < BR.x1 && y > BR.y0 && y < BR.y1);
+
+  function phenotype(g) { let n = 0; for (let i = 0; i < g.length; i++) n += g[i]; return n / g.length; }
+  function finish(o) {
+    o.beak = Math.min(1, Math.max(0, phenotype(o.bg) + o.noiseB));
+    o.col = Math.min(1, Math.max(0, phenotype(o.cg) + o.noiseC));
+    o.eff = SEED_OPT.map(opt => Math.exp(-((o.beak - opt) ** 2) / (2 * SEED_W * SEED_W)));
+    o.S1 = o.s1 + S.K * o.beak; o.S2 = o.s2;
+    return o;
+  }
+  function randomSpot(i) {
+    for (let k = 0; k < 200; k++) {
+      const x = ISL[i].cx + (rnd() * 2 - 1) * ISL[i].rx, y = ISL[i].cy + (rnd() * 2 - 1) * ISL[i].ry;
+      if (inIsl(i, x, y)) return [x, y];
+    }
+    return [ISL[i].cx, ISL[i].cy];
+  }
+  function founder(i, sp) {
+    const [x, y] = randomSpot(i);
+    const bg = new Uint8Array(LOCI * 2), cg = new Uint8Array(LOCI * 2);
+    for (let k = 0; k < LOCI * 2; k++) { bg[k] = rnd() < 0.5 ? 1 : 0; cg[k] = rnd() < 0.5 ? 1 : 0; }
+    return finish({
+      id: S.nextId++, x, y, px: x, py: y, h: rnd() * 6.283, sex: rnd() < 0.5 ? 0 : 1,
+      age: Math.floor(rnd() * 30), maxAge: 40 + Math.floor(rnd() * 21), e: 30 + rnd() * 25, cool: 0,
+      bg, cg, noiseB: gauss() * 0.025, noiseC: gauss() * 0.025,
+      s1: gauss() * 0.4, s2: gauss() * 0.4, m: [rnd() < 0.5 ? 1 : 0, rnd() < 0.5 ? 1 : 0],
+      sp, isl: i, dead: false
+    });
+  }
+  function gamete(g, out, off) {
+    for (let l = 0; l < LOCI; l++) {
+      let a = g[2 * l + (rnd() < 0.5 ? 0 : 1)];
+      if (rnd() < S.mu) a = 1 - a;
+      out[2 * l + off] = a;
+    }
+  }
+  function child(mo, fa) {
+    const bg = new Uint8Array(LOCI * 2), cg = new Uint8Array(LOCI * 2);
+    gamete(mo.bg, bg, 0); gamete(fa.bg, bg, 1); gamete(mo.cg, cg, 0); gamete(fa.cg, cg, 1);
+    const seg = SONG_SEG * Math.sqrt(S.mu / MU0);
+    let x = mo.x + gauss() * 8, y = mo.y + gauss() * 8;
+    if (!onLand(x, y)) { x = mo.x; y = mo.y; }
+    if (rnd() < S.disp) { const j = S.bridge ? (rnd() < 0.5 ? 0 : 1) : mo.isl; [x, y] = randomSpot(j); }
+    return finish({
+      id: S.nextId++, x, y, px: x, py: y, h: rnd() * 6.283, sex: rnd() < 0.5 ? 0 : 1,
+      age: 0, maxAge: 40 + Math.floor(rnd() * 21), e: E_BIRTH, cool: 0,
+      bg, cg, noiseB: gauss() * 0.025, noiseC: gauss() * 0.025,
+      s1: (mo.s1 + fa.s1) / 2 + gauss() * seg, s2: (mo.s2 + fa.s2) / 2 + gauss() * seg,
+      m: [mo.m[rnd() < 0.5 ? 0 : 1], fa.m[rnd() < 0.5 ? 0 : 1]],
+      sp: mo.sp, isl: x < 500 ? 0 : 1, dead: false
+    });
+  }
+  const accept = (a, b) => Math.exp(-((a.S1 - b.S1) ** 2 + (a.S2 - b.S2) ** 2) / 2);
+
+  function newSpecies(parent) {
+    const id = S.species.length;
+    const name = id < 26 ? String.fromCharCode(65 + id) : String.fromCharCode(65 + id % 26) + Math.floor(id / 26 + 1);
+    S.species.push({ id, name, parent, born: S.tick, died: null, merged: null, hue: HUES[id % HUES.length], n: 0 });
+    return id;
+  }
+
+  function init(cfg) {
+    cfg = cfg || {};
+    S.tick = 0; S.inds = []; S.nextId = 1; S.species = []; S.splitStreak = {}; S.mergeStreak = {};
+    S.bridge = cfg.bridge !== undefined ? cfg.bridge : true;
+    S.mu = cfg.mu !== undefined ? cfg.mu : MU0;
+    if (cfg.env) S.env = JSON.parse(JSON.stringify(cfg.env));
+    const pop = cfg.pop || [150, 150];
+    const sp = newSpecies(null);
+    for (let i = 0; i < 2; i++) for (let k = 0; k < pop[i]; k++) S.inds.push(founder(i, sp));
+    for (let i = 0; i < 2; i++) for (let k = 0; k < 3; k++) S.pools[i][k] = S.env[i].seeds[k] * INFLOW * 3;
+    const h = S.hist; h.step = 10; h.t = []; h.cross = []; h.nsp = [];
+    for (const key of ['n', 'beak', 'beakSd', 'col', 'colSd', 'p']) h[key] = [[], []];
+    S.events = []; S.fx = []; S.deaths = { starve: 0, pred: 0, age: 0 }; S.parentAgeSum = 0; S.births = 0;
+    computeStats(); cluster(); record();
+  }
+
+  function kill(o, cause) {
+    o.dead = true; S.deaths[cause]++;
+    if (S.fx.length < 80) S.fx.push({ x: o.x, y: o.y, c: cause, t: S.tick });
+  }
+
+  function step() {
+    S.tick++;
+    const inds = S.inds, n = inds.length;
+    // 1 Nahrung: Samenvorräte wachsen nach, Tiere teilen sie sich
+    const dem = [[0, 0, 0], [0, 0, 0]], f = [[0, 0, 0], [0, 0, 0]];
+    for (let i = 0; i < n; i++) { const o = inds[i]; o.isl = o.x < 500 ? 0 : 1; const d = dem[o.isl]; d[0] += o.eff[0] * INTAKE; d[1] += o.eff[1] * INTAKE; d[2] += o.eff[2] * INTAKE; }
+    for (let i = 0; i < 2; i++) for (let k = 0; k < 3; k++) {
+      const inflow = S.env[i].seeds[k] * INFLOW;
+      S.pools[i][k] = Math.min(inflow * 6, S.pools[i][k] + inflow);
+      f[i][k] = dem[i][k] > 0 ? Math.min(1, S.pools[i][k] / dem[i][k]) : 0;
+      S.pools[i][k] -= dem[i][k] * f[i][k];
+    }
+    const males = [[], []], allM = [];
+    for (let i = 0; i < n; i++) {
+      const o = inds[i], ff = f[o.isl], env = S.env[o.isl];
+      let gain = (o.eff[0] * ff[0] + o.eff[1] * ff[1] + o.eff[2] * ff[2]) * INTAKE;
+      if (gain > INTAKE) gain = INTAKE;
+      o.e = Math.min(E_MAX, o.e + gain - E_LIVE);
+      o.age++; if (o.cool > 0) o.cool--;
+      // 2 Tod
+      if (o.e <= 0) { kill(o, 'starve'); continue; }
+      if (o.age > o.maxAge || rnd() < 0.002) { kill(o, 'age'); continue; }
+      const mis = Math.abs(o.col - env.ground);
+      if (rnd() < env.pred * 0.05 * mis * Math.sqrt(mis)) { kill(o, 'pred'); continue; }
+      // 3 Bewegung
+      o.px = o.x; o.py = o.y;
+      o.h += (rnd() - 0.5) * 0.7;
+      let nx = o.x + Math.cos(o.h) * 8, ny = o.y + Math.sin(o.h) * 8;
+      if (onLand(nx, ny)) { o.x = nx; o.y = ny; } else { o.h += 2 + rnd() * 2.3; }
+      if (o.sex === 1 && o.age >= MATURE) { males[o.isl].push(o); allM.push(o); }
+    }
+    // 4 Fortpflanzung: Weibchen wählen Partner mit ähnlichem Gesang
+    const born = [];
+    if (allM.length && n < 1100) {
+      for (let i = 0; i < n; i++) {
+        const o = inds[i];
+        if (o.dead || o.sex !== 0 || o.age < MATURE || o.e < E_REPRO || o.cool > 0) continue;
+        const pool = S.bridge ? allM : males[o.isl];
+        if (!pool.length) continue;
+        for (let tr = 0; tr < 8; tr++) {
+          const m = pool[Math.floor(rnd() * pool.length)];
+          if (m.dead) continue;
+          const dx = m.x - o.x, dy = m.y - o.y;
+          if (dx * dx + dy * dy > 150 * 150) continue;
+          if (rnd() < accept(o, m)) {
+            o.e -= E_COST; o.cool = 4; born.push(child(o, m));
+            S.parentAgeSum += (o.age + m.age) / 2; S.births++;
+            break;
+          }
+        }
+      }
+    }
+    let w = 0;
+    for (let i = 0; i < n; i++) if (!inds[i].dead) inds[w++] = inds[i];
+    inds.length = w;
+    for (const b of born) inds.push(b);
+    if (S.tick % 10 === 0) computeStats();
+    if (S.tick % 30 === 0) cluster();
+    if (S.tick % S.hist.step === 0) record();
+  }
+
+  function computeStats() {
+    const st = [0, 1].map(() => ({ n: 0, beak: 0, beakSd: 0, col: 0, colSd: 0, p: 0 }));
+    const lists = [[], []];
+    for (const o of S.inds) { const i = o.x < 500 ? 0 : 1; lists[i].push(o); const a = st[i]; a.n++; a.beak += o.beak; a.col += o.col; a.p += o.m[0] + o.m[1]; }
+    for (let i = 0; i < 2; i++) {
+      const a = st[i]; if (!a.n) { a.beak = a.col = a.p = NaN; continue; }
+      a.beak /= a.n; a.col /= a.n; a.p /= 2 * a.n;
+      let vb = 0, vc = 0; for (const o of lists[i]) { vb += (o.beak - a.beak) ** 2; vc += (o.col - a.col) ** 2; }
+      a.beakSd = Math.sqrt(vb / a.n); a.colSd = Math.sqrt(vc / a.n);
+    }
+    S.stats = st;
+    // Kreuzbarkeit: bei zwei oder mehr Arten zwischen den beiden größten Arten, sonst zwischen West und Ost
+    const bySp = {}; for (const o of S.inds) (bySp[o.sp] = bySp[o.sp] || []).push(o);
+    const big = Object.values(bySp).filter(a => a.length >= MIN_SP).sort((a, b) => b.length - a.length);
+    const A = big.length >= 2 ? big[0] : lists[0], B = big.length >= 2 ? big[1] : lists[1];
+    S.crossMode = big.length >= 2 ? 'art' : 'insel';
+    if (A.length && B.length) {
+      let sum = 0; const K = 160;
+      for (let k = 0; k < K; k++) sum += accept(A[Math.floor(rnd() * A.length)], B[Math.floor(rnd() * B.length)]);
+      S.cross = sum / K;
+    } else S.cross = null;
+  }
+
+  function record() {
+    const h = S.hist, st = S.stats;
+    h.t.push(S.tick); h.cross.push(S.cross === null ? NaN : S.cross);
+    h.nsp.push(S.species.filter(x => x.died === null).length);
+    for (let i = 0; i < 2; i++) { h.n[i].push(st[i].n); h.beak[i].push(st[i].beak); h.beakSd[i].push(st[i].beakSd); h.col[i].push(st[i].col); h.colSd[i].push(st[i].colSd); h.p[i].push(st[i].p); }
+    if (h.t.length > 1600) {
+      const half = a => { let w = 0; for (let i = 0; i < a.length; i += 2) a[w++] = a[i]; a.length = w; };
+      half(h.t); half(h.cross); half(h.nsp);
+      for (const key of ['n', 'beak', 'beakSd', 'col', 'colSd', 'p']) { half(h[key][0]); half(h[key][1]); }
+      h.step *= 2;
+    }
+  }
+
+  /* Arten = Fortpflanzungsgemeinschaften: Tiere, die über Ketten kreuzbarer Paare verbunden sind */
+  function cluster() {
+    const inds = S.inds, n = inds.length, par = new Int32Array(n);
+    for (let i = 0; i < n; i++) par[i] = i;
+    const find = a => { while (par[a] !== a) { par[a] = par[par[a]]; a = par[a]; } return a; };
+    const deg = new Uint16Array(n);
+    for (let pass = 0; pass < 2; pass++) for (let i = 0; i < n; i++) {
+      const a = inds[i];
+      if (pass === 1 && deg[i] < S.core) continue;
+      for (let j = i + 1; j < n; j++) {
+        if (pass === 1 && deg[j] < S.core) continue;
+        const b = inds[j], d1 = a.S1 - b.S1; if (d1 > EPS || d1 < -EPS) continue;
+        const d2 = a.S2 - b.S2;
+        if (d1 * d1 + d2 * d2 < LINK2) {
+          if (pass === 0) { deg[i]++; deg[j]++; }
+          else { const ra = find(i), rb = find(j); if (ra !== rb) par[ra] = rb; }
+        }
+      }
+    }
+    const comps = new Map();
+    for (let i = 0; i < n; i++) { if (deg[i] < S.core) continue; const r = find(i); let c = comps.get(r); if (!c) { c = { mem: [], cnt: {} }; comps.set(r, c); } c.mem.push(inds[i]); c.cnt[inds[i].sp] = (c.cnt[inds[i].sp] || 0) + 1; }
+    const big = [...comps.values()].filter(c => c.mem.length >= MIN_SP);
+    for (const c of big) { let best = -1, bn = 0; for (const k in c.cnt) if (c.cnt[k] > bn) { bn = c.cnt[k]; best = +k; } c.maj = best; c.majN = bn; }
+    // Aufspaltung
+    const byMaj = {};
+    for (const c of big) (byMaj[c.maj] = byMaj[c.maj] || []).push(c);
+    for (const sp of S.species) {
+      const list = byMaj[sp.id];
+      if (list && list.length >= 2) {
+        S.splitStreak[sp.id] = (S.splitStreak[sp.id] || 0) + 1;
+        if (S.splitStreak[sp.id] >= 3) {
+          list.sort((a, b) => b.majN - a.majN);
+          for (let k = 1; k < list.length; k++) { const id = newSpecies(sp.id); for (const o of list[k].mem) if (o.sp === sp.id) o.sp = id; list[k].cnt[id] = list[k].cnt[sp.id]; delete list[k].cnt[sp.id]; list[k].maj = id; }
+          S.splitStreak[sp.id] = 0;
+          S.events.push({ t: S.tick, label: 'Aufspaltung' });
+        }
+      } else S.splitStreak[sp.id] = 0;
+    }
+    // Verschmelzung
+    const seen = {};
+    for (const c of big) for (const k in c.cnt) {
+      const id = +k; if (id === c.maj || c.cnt[k] < MIN_SP) continue;
+      const key = c.maj + '>' + id; seen[key] = true;
+      S.mergeStreak[key] = (S.mergeStreak[key] || 0) + 1;
+      if (S.mergeStreak[key] >= 6) {
+        for (const o of c.mem) if (o.sp === id) o.sp = c.maj;
+        S.mergeStreak[key] = 0;
+        if (!inds.some(o => o.sp === id)) { S.species[id].died = S.tick; S.species[id].merged = c.maj; S.events.push({ t: S.tick, label: 'Verschmelzung' }); }
+      }
+    }
+    for (const key in S.mergeStreak) if (!seen[key]) delete S.mergeStreak[key];
+    for (const sp of S.species) sp.n = 0;
+    for (const o of inds) S.species[o.sp].n++;
+    for (const sp of S.species) if (sp.died === null && sp.n === 0) sp.died = S.tick;
+  }
+
+  /* Eingriffe */
+  function setBridge(open) {
+    if (S.bridge === open) return;
+    S.bridge = open;
+    if (!open) for (const o of S.inds) {
+      const i = o.x < 500 ? 0 : 1; let k = 0;
+      while (!inIsl(i, o.x, o.y) && k++ < 80) { o.x += (ISL[i].cx - o.x) * 0.06; o.y += (ISL[i].cy - o.y) * 0.06; }
+      o.px = o.x; o.py = o.y;
+    }
+    S.events.push({ t: S.tick, label: open ? 'Landbrücke offen' : 'Landbrücke überflutet' });
+  }
+  function bottleneck(i, keep) {
+    const list = S.inds.filter(o => (o.x < 500 ? 0 : 1) === i);
+    for (let k = list.length - 1; k > 0; k--) { const j = Math.floor(rnd() * (k + 1)); [list[k], list[j]] = [list[j], list[k]]; }
+    for (let k = keep; k < list.length; k++) list[k].dead = true;
+    S.inds = S.inds.filter(o => !o.dead);
+    S.events.push({ t: S.tick, label: 'Flaschenhals' }); computeStats();
+  }
+  function founders(from, to, count) {
+    const list = S.inds.filter(o => (o.x < 500 ? 0 : 1) === from);
+    let moved = 0;
+    for (let k = 0; k < count && list.length; k++) {
+      const o = list.splice(Math.floor(rnd() * list.length), 1)[0];
+      const [x, y] = randomSpot(to); o.x = o.px = x; o.y = o.py = y; o.isl = to; o.e = Math.max(o.e, 30); moved++;
+    }
+    if (moved) S.events.push({ t: S.tick, label: 'Gründertiere' }); computeStats();
+    return moved;
+  }
+  function mark(label) { S.events.push({ t: S.tick, label }); }
+
+  init({});
+  return { S, init, step, setBridge, bottleneck, founders, mark, accept, computeStats };
+}
+if (typeof module !== 'undefined') module.exports = { createSim, GEN, ISL, BR, wob, inIsl, SEED_OPT, WORLD_W, WORLD_H, LOCI };
+
+</script>
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const de = (x, d) => (x === null || x === undefined || isNaN(x)) ? '–' : x.toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
+const mm = v => 6 + 8 * v;
+const sim = createSim((Date.now() % 2147483647) || 7);
+const S = sim.S;
+S.disp = 0.5;
+
+const baseEnv = () => [{ seeds: [20, 100, 20], ground: 0.5, pred: 0.5 }, { seeds: [20, 100, 20], ground: 0.5, pred: 0.5 }];
+const SEEDNAME = ['Kleine, weiche Samen', 'Mittlere Samen', 'Große, harte Samen'];
+
+/* ---------- Experimente ---------- */
+function setSeeds(i, arr, label) { S.env[i].seeds = arr.slice(); if (label) sim.mark(label); syncControls(); }
+const MISSIONS = [
+  { id: 'duerre', tab: 'Dürre', kind: 'Gerichtete Selektion', chart: 'beak', hist: 'beak',
+    q: 'Wie verändert eine Dürre die Schnabelhöhe einer Finkenpopulation?',
+    intro: 'Auf der Westinsel lebt eine Finkenpopulation. Die Schnabelhöhe ist erblich und von Tier zu Tier verschieden. Kleine Schnäbel öffnen kleine, weiche Samen am besten, große Schnäbel knacken große, harte Samen.',
+    setup: () => ({ bridge: false, pop: [250, 0], env: baseEnv() }),
+    predict: ['Der Mittelwert der Schnabelhöhe steigt.', 'Der Mittelwert der Schnabelhöhe sinkt.', 'Der Mittelwert bleibt gleich, nur die Zahl der Tiere sinkt.'],
+    steps: [
+      { t: 'Starte und lass etwa 15 Generationen laufen. Halte dann einen Messwert im Protokoll fest.' },
+      { t: 'Löse die Dürre aus. Kleine Samen verschwinden, es bleiben fast nur große, harte Samen.', btn: 'Dürre auslösen', run: () => setSeeds(0, [0, 10, 60], 'Dürre') },
+      { t: 'Beobachte Verteilung und Zeitverlauf über etwa 30 Generationen. Halte erneut einen Messwert fest.' }
+    ],
+    tasks: ['Beschreibe, wie sich Tierzahl und Schnabelhöhe nach Beginn der Dürre verändern.', 'Erkläre die Veränderung mit den Begriffen Variation, Selektionsdruck und Fortpflanzungserfolg.', 'Tippe vor und nach der Dürre einzelne Finken an. Begründe, warum sich kein einzelnes Tier „angepasst“ hat.', 'Stelle eine Hypothese auf, was bei Mutationsrate 0 und lang anhaltender Dürre geschieht, und überprüfe sie.'],
+    expect: 'Die Population bricht ein, der Mittelwert der Schnabelhöhe steigt im Modell von rund 10 mm auf rund 12 mm. Entscheidend: Es überleben und vermehren sich bevorzugt Tiere, die schon vorher größere Schnäbel hatten. Im Freiland (Daphne Major, Dürre 1977) lag die Verschiebung bei etwa einem halben Millimeter; das Modell übertreibt die Stärke bewusst.' },
+  { id: 'tarnung', tab: 'Tarnung', kind: 'Selektion durch Räuber', chart: 'col', hist: 'col',
+    q: 'Was geschieht mit der Gefiederfarbe, wenn der Untergrund dunkel wird?',
+    intro: 'Ein Lavastrom bedeckt die Westinsel mit dunklem Gestein. Greifvögel entdecken Finken leichter, deren Gefieder sich vom Untergrund abhebt.',
+    setup: () => ({ bridge: false, pop: [250, 0], env: baseEnv() }),
+    predict: ['Das Gefieder der Population wird über Generationen dunkler.', 'Jeder Fink färbt sich im Lauf seines Lebens dunkler.', 'Die Gefiederfarbe ändert sich nicht.'],
+    steps: [
+      { t: 'Starte und lass etwa 10 Generationen laufen.' },
+      { t: 'Lass die Lava fließen: dunkler Untergrund, hoher Räuberdruck.', btn: 'Lavastrom auslösen', run: () => { S.env[0].ground = 0.85; S.env[0].pred = 1; sim.mark('Lavastrom'); syncControls(); } },
+      { t: 'Beobachte etwa 40 Generationen und halte Messwerte fest.' },
+      { t: 'Kontrollversuch: Starte neu, löse den Lavastrom aus und stelle den Räuberdruck sofort auf 0.' }
+    ],
+    tasks: ['Beschreibe die Veränderung der Gefiederfarbe mit und ohne Räuber.', 'Erkläre, warum erst der Kontrollversuch zeigt, dass Räuber die Ursache sind.', 'Beurteile die zweite Vermutung („jeder Fink färbt sich um“) anhand angetippter Einzeltiere.'],
+    expect: 'Mit Räubern steigt der mittlere Dunkelanteil im Modell in rund 40 Generationen von etwa 50 % auf 75 bis 80 %. Ohne Räuber schwankt er nur zufällig um 50 %. Die Farbe eines einzelnen Tieres bleibt lebenslang gleich.' },
+  { id: 'drift', tab: 'Gendrift', kind: 'Zufall in kleinen Populationen', chart: 'p', hist: 'beak',
+    q: 'Wie verändert sich die Häufigkeit eines neutralen Allels in einer großen und einer kleinen Population?',
+    intro: 'Beide Inseln sind getrennt. Im Westen leben etwa 240 Finken, im Osten nur etwa 80, weil dort weniger Samen wachsen. Allel A hat keinen Einfluss auf Überleben oder Fortpflanzung. Am Anfang liegt seine Häufigkeit auf beiden Inseln bei etwa 0,5.',
+    setup: () => { const e = baseEnv(); e[1].seeds = [7, 35, 7]; return { bridge: false, pop: [250, 90], env: e }; },
+    predict: ['Die Häufigkeit bleibt auf beiden Inseln bei 0,5.', 'Sie schwankt auf der kleinen Insel stärker; das Allel kann dort verschwinden oder sich völlig durchsetzen.', 'Sie steigt auf beiden Inseln, weil sich A durchsetzt.'],
+    steps: [
+      { t: 'Starte und beobachte „Allel A“ im Zeitverlauf über etwa 60 Generationen.' },
+      { t: 'Wiederhole den Versuch mehrmals mit „Neu starten“ und notiere jeweils die Endwerte.' },
+      { t: 'Verkleinere die Westpopulation schlagartig.', btn: 'Flaschenhals im Westen: 12 überleben', run: () => { sim.bottleneck(0, 12); } }
+    ],
+    tasks: ['Vergleiche die Verläufe beider Inseln über mehrere Wiederholungen.', 'Erkläre, warum hier Zufall und nicht Selektion wirkt.', 'Erläutere die Folgen für die genetische Vielfalt kleiner Restpopulationen im Artenschutz.'],
+    expect: 'Im Osten schwankt die Häufigkeit deutlich stärker; oft ist A nach 50 bis 100 Generationen verloren oder fixiert. Im Westen sind die Schwankungen langsamer, aber vorhanden. Die Richtung ist von Lauf zu Lauf verschieden. Der Flaschenhals verschiebt die Häufigkeit sprunghaft (Zufallsauswahl der Überlebenden).' },
+  { id: 'art', tab: 'Artbildung', kind: 'Allopatrische Artbildung', chart: 'cross', hist: 'beak',
+    q: 'Unter welchen Bedingungen werden aus einer Art zwei?',
+    intro: 'Eine Landbrücke verbindet beide Inseln, die Finken bilden eine Fortpflanzungsgemeinschaft. Dann steigt der Meeresspiegel.',
+    setup: () => ({ bridge: true, pop: [200, 200], env: baseEnv() }),
+    predict: ['Wird die Landbrücke später wieder frei, vermischen sich beide Populationen zu einer Art.', 'Es bleiben zwei getrennte Arten bestehen.', 'Eine Population verdrängt die andere vollständig.'],
+    steps: [
+      { t: 'Starte und lass etwa 10 Generationen laufen.' },
+      { t: 'Trenne die Inseln.', btn: 'Landbrücke überfluten', run: () => setBridge(false) },
+      { t: 'Verändere das Nahrungsangebot: im Westen nur kleine, im Osten nur große Samen.', btn: 'Umwelt unterschiedlich machen', run: () => { S.env[0].seeds = [100, 0, 0]; S.env[1].seeds = [0, 0, 100]; sim.mark('Umwelt verschieden'); syncControls(); } },
+      { t: 'Beobachte Kreuzbarkeit und Stammbaum, bis eine zweite Art erscheint.' },
+      { t: 'Lass den Meeresspiegel wieder sinken und beobachte weitere 30 Generationen.', btn: 'Landbrücke freigeben', run: () => setBridge(true) },
+      { t: 'Kontrollversuche nach „Neu starten“: (a) nur überfluten, Umwelt gleich lassen; (b) nur die Umwelt ändern, Landbrücke offen lassen.' }
+    ],
+    tasks: ['Beschreibe den Verlauf der Kreuzbarkeit in allen drei Versuchen.', 'Erkläre, wie im Hauptversuch eine Fortpflanzungsbarriere entsteht, und ordne sie ein (präzygotisch oder postzygotisch?).', 'Beurteile anhand der Kontrollversuche die Bedeutung von geografischer Isolation und unterschiedlicher Selektion.', 'Diskutiere, ab wann man von zwei Arten sprechen sollte.'],
+    expect: 'Hauptversuch: Die Schnabelhöhen entwickeln sich auseinander, die Kreuzbarkeit fällt in etwa 20 bis 30 Generationen unter 5 %, der Stammbaum spaltet sich. Nach Freigabe der Landbrücke bleiben zwei Arten bestehen (ethologische, also präzygotische Isolation). Kontrolle (a): Kreuzbarkeit bleibt über 100 Generationen bei rund 50 %, keine Aufspaltung. Kontrolle (b): Ergebnis schwankt. In sechs Testläufen blieb es viermal bei einer Art (eine Insel wird kaum besiedelt), zweimal spaltete sich die Population trotz Genfluss. Das ist ein guter Anlass, über Artbildung mit Genfluss und über Modellgrenzen zu sprechen.' },
+  { id: 'frei', tab: 'Freies Labor', kind: 'Eigene Fragestellung', chart: 'beak', hist: 'beak',
+    q: 'Welche Frage willst du untersuchen?',
+    intro: 'Alle Regler sind frei. Formuliere eine Fragestellung und eine Hypothese, verändere immer nur eine Größe und halte Messwerte fest.',
+    setup: () => ({ bridge: true, pop: [200, 200], env: baseEnv() }),
+    predict: null, steps: [],
+    tasks: ['Disruptive Selektion: Entferne mittlere Samen und biete kleine und große an.', 'Gründereffekt: Leere eine Insel per Flaschenhals und hole 8 Gründertiere.', 'Stabilisierende Selektion: Erhöhe die Mutationsrate und beobachte die Streuung.'],
+    expect: null }
+];
+let mi = 0, predicted = {}, running = false, tps = 24, target = 0, selected = null;
+let metric = 'beak', histTrait = 'beak', log = [];
+
+/* ---------- Farben ---------- */
+let TH = {};
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  for (const k of ['ink', 'muted', 'line', 'soft', 'west', 'east', 'sea', 'sea2', 'sea3', 'surface', 'yellow']) TH[k] = cs.getPropertyValue('--' + k).trim();
+  TH.dark = cs.colorScheme === 'dark' || /^#0|^#1/.test(TH.surface);
+}
+const lerp = (a, b, t) => Math.round(a + (b - a) * t);
+const groundColor = g => `rgb(${lerp(228, 56, g)},${lerp(210, 50, g)},${lerp(162, 47, g)})`;
+const birdColor = c => `rgb(${lerp(244, 30, c)},${lerp(230, 24, c)},${lerp(190, 22, c)})`;
+const spColor = sp => `hsl(${sp.hue} 90% ${TH.dark ? 66 : 58}%)`;
+
+/* ---------- Leinwände ---------- */
+function fit(cv) {
+  const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  const w = Math.max(50, Math.round(r.width * dpr)), h = Math.max(50, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  return { w: r.width, h: r.height, dpr };
+}
+const world = $('world'), wctx = world.getContext('2d');
+const islPath = ISL.map((I, i) => { const p = new Path2D(); for (let k = 0; k <= 96; k++) { const th = k / 96 * Math.PI * 2, r = wob(i, th); const x = I.cx + Math.cos(th) * I.rx * r, y = I.cy + Math.sin(th) * I.ry * r; k ? p.lineTo(x, y) : p.moveTo(x, y); } p.closePath(); return p; });
+let seedRnd = 12345; const sr = () => (seedRnd = (seedRnd * 1664525 + 1013904223) >>> 0) / 4294967296;
+const seedPts = ISL.map((I, i) => [0, 1, 2].map(() => { const a = []; while (a.length < 90) { const x = I.cx + (sr() * 2 - 1) * I.rx, y = I.cy + (sr() * 2 - 1) * I.ry; if (inIsl(i, x, y)) a.push([x, y]); } return a; }));
+const SEEDCOL = ['#E9E36B', '#B8873A', '#4A2E14'], SEEDR = [1.5, 2.4, 3.6];
+
+function drawWorld(alpha) {
+  const { dpr } = fit(world), sc = world.width / WORLD_W, c = wctx;
+  c.setTransform(sc, 0, 0, sc, 0, 0);
+  c.fillStyle = TH.sea; c.fillRect(0, 0, WORLD_W, WORLD_H);
+  c.lineJoin = 'round';
+  const bridgePath = new Path2D(); if (bridgePath.roundRect) bridgePath.roundRect(BR.x0 - 10, BR.y0, BR.x1 - BR.x0 + 20, BR.y1 - BR.y0, 22); else bridgePath.rect(BR.x0 - 10, BR.y0, BR.x1 - BR.x0 + 20, BR.y1 - BR.y0);
+  for (const [lw, col] of [[46, TH.sea2], [20, TH.sea3]]) { c.strokeStyle = col; c.lineWidth = lw; c.stroke(islPath[0]); c.stroke(islPath[1]); if (S.bridge) c.stroke(bridgePath); }
+  if (S.bridge) { c.fillStyle = groundColor((S.env[0].ground + S.env[1].ground) / 2); c.fill(bridgePath); }
+  else { c.fillStyle = TH.sea2; c.fill(bridgePath); c.setLineDash([7, 7]); c.strokeStyle = TH.sea3; c.lineWidth = 2; c.stroke(bridgePath); c.setLineDash([]); }
+  for (let i = 0; i < 2; i++) {
+    c.fillStyle = groundColor(S.env[i].ground); c.fill(islPath[i]);
+    for (let k = 0; k < 3; k++) {
+      const nS = Math.round(S.env[i].seeds[k] / 100 * 90); c.fillStyle = SEEDCOL[k]; c.beginPath();
+      for (let j = 0; j < nS; j++) { const p = seedPts[i][k][j]; c.moveTo(p[0] + SEEDR[k], p[1]); c.arc(p[0], p[1], SEEDR[k], 0, 6.283); }
+      c.fill();
+    }
+  }
+  c.font = '500 22px "Bricolage Grotesque", sans-serif'; c.fillStyle = 'rgba(243,246,251,.85)'; c.textBaseline = 'top';
+  c.textAlign = 'left'; c.fillText('West', 22, 16); c.textAlign = 'right'; c.fillText('Ost', WORLD_W - 22, 16);
+  // Ereignisse (nur bei ruhigem Tempo)
+  if (tps <= 100) for (const f of S.fx) {
+    const age = S.tick - f.t; if (age > 10) continue;
+    c.strokeStyle = f.c === 'pred' ? `rgba(255,70,60,${1 - age / 10})` : `rgba(255,255,255,${0.5 * (1 - age / 10)})`;
+    c.lineWidth = 1.6; c.beginPath(); c.arc(f.x, f.y, 4 + age * 1.2, 0, 6.283); c.stroke();
+  }
+  if (S.fx.length > 60) S.fx = S.fx.filter(f => S.tick - f.t <= 10);
+  // Finken
+  const a = tps <= 100 ? alpha : 1, R = 4.6;
+  let selAlive = false;
+  for (const o of S.inds) {
+    const x = o.px + (o.x - o.px) * a, y = o.py + (o.y - o.py) * a;
+    const ch = Math.cos(o.h), sh = Math.sin(o.h), bl = 3 + 8 * o.beak, bw = 1.6 + 3.2 * o.beak;
+    c.fillStyle = '#F08A1C'; c.beginPath();
+    c.moveTo(x + ch * (R + bl), y + sh * (R + bl)); c.lineTo(x + ch * (R - 1) - sh * bw, y + sh * (R - 1) + ch * bw); c.lineTo(x + ch * (R - 1) + sh * bw, y + sh * (R - 1) - ch * bw); c.fill();
+    c.fillStyle = birdColor(o.col); c.beginPath(); c.arc(x, y, R, 0, 6.283); c.fill();
+    c.strokeStyle = spColor(S.species[o.sp]); c.lineWidth = 1.5; c.stroke();
+    if (o === selected) { selAlive = true; c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, R + 6, 0, 6.283); c.stroke(); }
+  }
+  if (selected && !selAlive && selected.dead !== 'shown') { selected.dead = 'shown'; showInspect(); }
+}
+
+/* ---------- Diagramme ---------- */
+function prep(cv) { const d = fit(cv), c = cv.getContext('2d'); c.setTransform(d.dpr, 0, 0, d.dpr, 0, 0); c.clearRect(0, 0, d.w, d.h); c.font = '12px "Atkinson Hyperlegible", sans-serif'; return { c, w: d.w, h: d.h }; }
+
+function drawHist() {
+  const { c, w, h } = prep($('hist')), L = 8, Rr = 8, T = 8, B = 44, pw = w - L - Rr, ph = h - T - B, NB = 24;
+  const bins = [new Array(NB + 1).fill(0), new Array(NB + 1).fill(0)];
+  for (const o of S.inds) bins[o.x < 500 ? 0 : 1][Math.round(o[histTrait] * NB)]++;
+  const max = Math.max(4, ...bins[0], ...bins[1]), bw = pw / (NB + 1);
+  c.strokeStyle = TH.line; c.lineWidth = 1; c.beginPath(); c.moveTo(L, T + ph + .5); c.lineTo(L + pw, T + ph + .5); c.stroke();
+  for (let i = 0; i < 2; i++) { c.fillStyle = i ? TH.east : TH.west; for (let b = 0; b <= NB; b++) { const v = bins[i][b]; if (!v) continue; const bh = v / max * ph; c.fillRect(L + b * bw + (i ? bw / 2 : 1), T + ph - bh, bw / 2 - 1, bh); } }
+  c.fillStyle = TH.muted; c.textAlign = 'center'; c.textBaseline = 'top';
+  const xOf = v => L + (v * NB + .5) * bw;
+  if (histTrait === 'beak') { for (const m of [6, 8, 10, 12, 14]) c.fillText(m + ' mm', xOf((m - 6) / 8), T + ph + 22); }
+  else { c.fillText('hell', xOf(0.04), T + ph + 22); c.fillText('dunkel', xOf(0.95), T + ph + 22); }
+  // Umweltmarken
+  for (let i = 0; i < 2; i++) {
+    c.fillStyle = i ? TH.east : TH.west; const y0 = T + ph + 4 + i * 8;
+    if (histTrait === 'beak') { for (let k = 0; k < 3; k++) { const s = S.env[i].seeds[k]; if (s <= 0) continue; const hw = 2 + s / 100 * 9; c.fillRect(xOf(SEED_OPT[k]) - hw, y0, hw * 2, 5); } }
+    else { const x = xOf(S.env[i].ground); c.beginPath(); c.moveTo(x, y0); c.lineTo(x - 6, y0 + 7); c.lineTo(x + 6, y0 + 7); c.fill(); }
+  }
+  $('histNote').textContent = histTrait === 'beak' ? 'Balken unter der Achse: Samenangebot je Insel.' : 'Dreiecke unter der Achse: Farbe des Untergrunds.';
+}
+
+const METRIC = {
+  beak: { note: 'Mittlere Schnabelhöhe, Band: Standardabweichung.', range: () => [6, 14], f: v => mm(v), sd: 'beakSd', sdf: 8, unit: ' mm' },
+  col: { note: 'Mittlerer Dunkelanteil des Gefieders, Band: Standardabweichung.', range: () => [0, 100], f: v => v * 100, sd: 'colSd', sdf: 100, unit: ' %' },
+  n: { note: 'Zahl der Tiere je Insel.', range: mx => [0, Math.max(50, Math.ceil(mx / 50) * 50)], f: v => v, unit: '' },
+  p: { note: 'Häufigkeit des neutralen Allels A.', range: () => [0, 1], f: v => v, unit: '' },
+  cross: { note: 'Anteil zufälliger Paare aus West und Ost, die sich als Partner akzeptieren würden. Sobald es zwei Arten gibt: Paare aus den beiden größten Arten.', range: () => [0, 100], f: v => v * 100, unit: ' %' }
+};
+function drawSeries() {
+  const { c, w, h } = prep($('series')), L = 44, Rr = 10, T = 18, B = 24, pw = w - L - Rr, ph = h - T - B, H = S.hist, M = METRIC[metric];
+  const n = H.t.length, tMax = Math.max(GEN * 10, S.tick);
+  const series = metric === 'cross' ? [H.cross] : H[metric];
+  let mx = 0; if (metric === 'n') for (const s of series) for (const v of s) if (v > mx) mx = v;
+  const [y0, y1] = M.range(mx), X = t => L + t / tMax * pw, Y = v => T + ph - (v - y0) / (y1 - y0) * ph;
+  c.strokeStyle = TH.line; c.fillStyle = TH.muted; c.lineWidth = 1; c.textBaseline = 'middle'; c.textAlign = 'right';
+  for (let k = 0; k <= 4; k++) { const v = y0 + (y1 - y0) * k / 4, y = Math.round(Y(v)) + .5; c.beginPath(); c.moveTo(L, y); c.lineTo(L + pw, y); c.stroke(); c.fillText(de(v, (y1 - y0) < 3 ? 2 : 0), L - 6, y); }
+  c.textAlign = 'center'; c.textBaseline = 'top';
+  const gMax = tMax / GEN, stepG = [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000].find(s => gMax / s <= 6) || 10000;
+  for (let g = 0; g <= gMax; g += stepG) c.fillText(g, X(g * GEN), T + ph + 6);
+  c.textAlign = 'right'; c.fillText('Gen.', L + pw, T + ph + 6 - 14 > 0 ? h - 12 : h - 12);
+  // Eingriffe
+  c.textAlign = 'left'; c.textBaseline = 'top'; let lastX = -99, row = 0;
+  for (const e of S.events) { const x = X(e.t); c.strokeStyle = TH.muted; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(x, T); c.lineTo(x, T + ph); c.stroke(); c.setLineDash([]); row = (x - lastX < 70) ? (row + 1) % 3 : 0; lastX = x; c.fillStyle = TH.muted; const tw = c.measureText(e.label).width; c.fillText(e.label, Math.min(x + 3, L + pw - tw), 2 + row * 13); }
+  series.forEach((s, i) => {
+    const col = metric === 'cross' ? TH.ink : (i ? TH.east : TH.west);
+    if (M.sd) { const sd = H[M.sd][i]; c.fillStyle = col; c.globalAlpha = .16; c.beginPath(); let st = false, pts = []; for (let k = 0; k < n; k++) { if (isNaN(s[k])) continue; pts.push(k); const y = Y(M.f(s[k]) + sd[k] * M.sdf); st ? c.lineTo(X(H.t[k]), y) : c.moveTo(X(H.t[k]), y); st = true; } for (let q = pts.length - 1; q >= 0; q--) { const k = pts[q]; c.lineTo(X(H.t[k]), Y(M.f(s[k]) - sd[k] * M.sdf)); } c.fill(); c.globalAlpha = 1; }
+    c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); let pen = false;
+    for (let k = 0; k < n; k++) { const v = s[k]; if (v === null || isNaN(v)) { pen = false; continue; } const x = X(H.t[k]), y = Y(M.f(v)); pen ? c.lineTo(x, y) : c.moveTo(x, y); pen = true; }
+    c.stroke();
+  });
+  $('seriesNote').textContent = M.note;
+}
+
+function drawTree() {
+  const { c, w, h } = prep($('tree')), L = 10, Rr = 96, T = 12, B = 24, pw = w - L - Rr, ph = h - T - B;
+  const tMax = Math.max(GEN * 10, S.tick), X = t => L + t / tMax * pw;
+  const kids = {}; for (const sp of S.species) if (sp.parent !== null) (kids[sp.parent] = kids[sp.parent] || []).push(sp);
+  const order = []; (function walk(sp) { const ks = (kids[sp.id] || []).slice().sort((a, b) => b.born - a.born); const half = Math.ceil(ks.length / 2); ks.slice(0, half).forEach(walk); order.push(sp); ks.slice(half).forEach(walk); })(S.species[0]);
+  const rowH = Math.min(34, ph / Math.max(1, order.length)), yOf = {}; const off = T + (ph - rowH * order.length) / 2;
+  order.forEach((sp, i) => yOf[sp.id] = off + rowH * (i + .5));
+  c.fillStyle = TH.muted; c.textAlign = 'center'; c.textBaseline = 'top';
+  const gMax = tMax / GEN, stepG = [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000].find(s => gMax / s <= 5) || 10000;
+  c.strokeStyle = TH.line; c.lineWidth = 1;
+  for (let g = 0; g <= gMax; g += stepG) { const x = Math.round(X(g * GEN)) + .5; c.beginPath(); c.moveTo(x, T); c.lineTo(x, T + ph); c.stroke(); c.fillText(g, x, T + ph + 6); }
+  c.lineCap = 'round';
+  for (const sp of order) {
+    const y = yOf[sp.id], x0 = X(sp.born), x1 = X(sp.died === null ? S.tick : sp.died), col = spColor(sp);
+    c.strokeStyle = col;
+    if (sp.parent !== null) { c.lineWidth = 2; c.beginPath(); c.moveTo(x0, yOf[sp.parent]); c.lineTo(x0, y); c.stroke(); }
+    c.globalAlpha = sp.died === null ? 1 : .55; c.lineWidth = sp.died === null ? Math.min(9, 2.5 + Math.sqrt(sp.n) / 3) : 2.5;
+    c.beginPath(); c.moveTo(x0, y); c.lineTo(Math.max(x1, x0 + 1), y); c.stroke(); c.globalAlpha = 1;
+    if (sp.died !== null && sp.merged !== null && yOf[sp.merged] !== undefined) { c.setLineDash([3, 4]); c.lineWidth = 2; c.beginPath(); c.moveTo(x1, y); c.lineTo(x1, yOf[sp.merged]); c.stroke(); c.setLineDash([]); }
+    c.fillStyle = sp.died === null ? TH.ink : TH.muted; c.textAlign = 'left'; c.textBaseline = 'middle';
+    if (rowH >= 13) c.fillText(sp.died === null ? `Art ${sp.name} (${sp.n})` : (sp.merged !== null ? `${sp.name} verschmolzen` : `${sp.name} erloschen`), Math.min(x1 + 8, w - Rr + 4), y);
+  }
+}
+
+/* ---------- Anzeige ---------- */
+function updateHud() {
+  const st = S.stats, alive = S.species.filter(s => s.died === null && s.n > 0).length;
+  $('hud').innerHTML = `<span><b>${Math.floor(S.tick / GEN)}</b>Generation</span><span><b>${st[0].n}</b>Tiere West</span><span><b>${st[1].n}</b>Tiere Ost</span><span><b>${alive}</b>${alive === 1 ? 'Art' : 'Arten'}</span><span><b>${S.cross === null ? '–' : de(S.cross * 100, 0) + ' %'}</b>Kreuzbarkeit</span>`;
+}
+function showInspect() {
+  const box = $('inspect'), o = selected;
+  if (!o) { box.hidden = true; return; }
+  const geno = g => { let s = '<div class="geno">'; for (let l = 0; l < LOCI; l++) s += `<span><i class="${g[2 * l] ? 'a1' : ''}"></i><i class="${g[2 * l + 1] ? 'a1' : ''}"></i></span>`; return s + '</div>'; };
+  box.hidden = false;
+  box.innerHTML = `<h3>Fink Nr. ${o.id}${o.dead ? ' (inzwischen gestorben)' : ''}</h3>
+    <div>Art ${S.species[o.sp].name}, ${o.sex ? 'Männchen' : 'Weibchen'}, Marker-Genotyp ${o.m.map(a => a ? 'A' : 'a').sort().join('')}</div>
+    <div style="margin-top:8px"><b>Schnabelhöhe ${de(mm(o.beak), 1)} mm</b>: 12 Genorte, je zwei Allele (gefüllt = „größer“)</div>${geno(o.bg)}
+    <div><b>Gefieder ${de(o.col * 100, 0)} % dunkel</b>: 12 Genorte (gefüllt = „dunkler“)</div>${geno(o.cg)}
+    <div style="color:var(--muted)">Das Erbgut eines Tieres ändert sich im Lauf seines Lebens nicht.</div>`;
+}
+world.addEventListener('click', ev => {
+  const r = world.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * WORLD_W, y = (ev.clientY - r.top) / r.height * WORLD_H;
+  let best = null, bd = Math.max(16, 22 * WORLD_W / r.width) ** 2;
+  for (const o of S.inds) { const d = (o.x - x) ** 2 + (o.y - y) ** 2; if (d < bd) { bd = d; best = o; } }
+  selected = best; showInspect();
+});
+
+/* ---------- Regler ---------- */
+function envPanel(i) {
+  const name = i ? 'Ost' : 'West';
+  let h = `<header><h2>Umwelt ${name}</h2></header>`;
+  for (let k = 0; k < 3; k++) h += `<div class="row"><label for="s${i}${k}">${SEEDNAME[k]}</label><output id="s${i}${k}o"></output><input type="range" id="s${i}${k}" min="0" max="100" step="1"></div>`;
+  h += `<div class="row"><label for="g${i}">Untergrund (hell bis dunkel)</label><output id="g${i}o"></output><input type="range" id="g${i}" min="0" max="100" step="1"></div>`;
+  h += `<div class="row"><label for="p${i}">Räuberdruck</label><output id="p${i}o"></output><input type="range" id="p${i}" min="0" max="100" step="1"></div>`;
+  $('env' + i).innerHTML = h;
+  for (let k = 0; k < 3; k++) $(`s${i}${k}`).addEventListener('input', e => { S.env[i].seeds[k] = +e.target.value; syncControls(); });
+  $('g' + i).addEventListener('input', e => { S.env[i].ground = e.target.value / 100; syncControls(); });
+  $('p' + i).addEventListener('input', e => { S.env[i].pred = e.target.value / 100; syncControls(); });
+}
+function syncControls() {
+  for (let i = 0; i < 2; i++) {
+    for (let k = 0; k < 3; k++) { $(`s${i}${k}`).value = S.env[i].seeds[k]; $(`s${i}${k}o`).textContent = S.env[i].seeds[k]; }
+    $('g' + i).value = Math.round(S.env[i].ground * 100); $(`g${i}o`).textContent = Math.round(S.env[i].ground * 100) + ' %';
+    $('p' + i).value = Math.round(S.env[i].pred * 100); $(`p${i}o`).textContent = Math.round(S.env[i].pred * 100) + ' %';
+  }
+  $('mu').value = Math.round(S.mu * 1000); $('muOut').textContent = de(S.mu * 100, 1) + ' %';
+  const b = $('bridge'); b.setAttribute('aria-pressed', S.bridge); b.classList.toggle('on', S.bridge); b.textContent = S.bridge ? 'Landbrücke: offen' : 'Landbrücke: überflutet';
+}
+function setBridge(open) { sim.setBridge(open); syncControls(); }
+function chips(id, get, set) { $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; set(b.dataset.v); paintChips(id, get()); redraw(); }); }
+function paintChips(id, v) { for (const b of $(id).querySelectorAll('button')) b.setAttribute('aria-pressed', b.dataset.v === String(v)); }
+
+/* ---------- Experimentkarte ---------- */
+function renderMission() {
+  const m = MISSIONS[mi], el = $('mission');
+  let h = `<h2>${m.tab}</h2><p class="kind">${m.kind}</p><p class="q">${m.q}</p><p>${m.intro}</p>`;
+  if (m.predict) {
+    h += `<h3>Deine Vermutung</h3><div class="predict">`;
+    m.predict.forEach((p, i) => h += `<label><input type="radio" name="pred" value="${i}" ${predicted[m.id] === i ? 'checked' : ''}><span>${p}</span></label>`);
+    h += `</div>`;
+  }
+  if (m.steps.length) { h += `<h3>Durchführung</h3><ol class="steps">`; m.steps.forEach((s, i) => h += `<li>${s.t}${s.btn ? `<button class="btn" data-step="${i}">${s.btn}</button>` : ''}</li>`); h += `</ol>`; }
+  h += `<h3>${m.steps.length ? 'Auswertung' : 'Ideen'}</h3><ul class="tasks">${m.tasks.map(t => `<li>${t}</li>`).join('')}</ul>`;
+  if (m.expect) h += `<details><summary>Erwartungshorizont für die Lehrkraft</summary><p>${m.expect}</p></details>`;
+  el.innerHTML = h;
+  updateGate();
+}
+$('mission').addEventListener('change', e => { if (e.target.name === 'pred') { predicted[MISSIONS[mi].id] = +e.target.value; updateGate(); } });
+$('mission').addEventListener('click', e => { const b = e.target.closest('button[data-step]'); if (!b) return; MISSIONS[mi].steps[+b.dataset.step].run(); redraw(); });
+function gated() { const m = MISSIONS[mi]; return !!m.predict && predicted[m.id] === undefined; }
+function updateGate() { const g = gated(); $('gate').hidden = !g; $('play').disabled = g; if (g) setRunning(false); }
+function setRunning(r) { running = r && !gated(); $('play').textContent = running ? 'Pause' : (S.tick ? 'Weiter' : 'Starten'); }
+function loadMission(i, keepPrediction) {
+  mi = i; const m = MISSIONS[i];
+  if (!keepPrediction) delete predicted[m.id];
+  const cfg = m.setup(); cfg.mu = 0.004; sim.init(cfg); S.disp = 0.5;
+  selected = null; showInspect(); metric = m.chart; histTrait = m.hist; target = 0;
+  paintChips('metric', metric); paintChips('histTrait', histTrait); paintChips('target', target);
+  for (const b of $('tabs').children) b.setAttribute('aria-selected', +b.dataset.i === i);
+  setRunning(false); syncControls(); renderMission(); redraw();
+}
+
+/* ---------- Messprotokoll ---------- */
+const LOGHEAD = ['Experiment', 'Gen.', 'Tiere W', 'Schnabel W (mm)', 'Gefieder W (%)', 'Allel A W', 'Tiere O', 'Schnabel O (mm)', 'Gefieder O (%)', 'Allel A O', 'Kreuzbarkeit (%)', 'Arten'];
+function renderLog() {
+  if (!log.length) { $('logWrap').innerHTML = '<p class="empty">Noch keine Messwerte. „Messwert festhalten“ schreibt den aktuellen Stand in die Tabelle.</p>'; return; }
+  $('logWrap').innerHTML = `<table><thead><tr>${LOGHEAD.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${log.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+$('logAdd').addEventListener('click', () => {
+  sim.computeStats(); const st = S.stats, row = [MISSIONS[mi].tab, Math.floor(S.tick / GEN)];
+  for (let i = 0; i < 2; i++) row.push(st[i].n, st[i].n ? de(mm(st[i].beak), 2) : '–', st[i].n ? de(st[i].col * 100, 0) : '–', st[i].n ? de(st[i].p, 2) : '–');
+  row.push(S.cross === null ? '–' : de(S.cross * 100, 0), S.species.filter(s => s.died === null && s.n > 0).length);
+  log.push(row); renderLog();
+});
+$('logClear').addEventListener('click', () => { log = []; renderLog(); });
+$('logCopy').addEventListener('click', async e => {
+  const txt = [LOGHEAD, ...log].map(r => r.join('\t')).join('\n'); let ok = false;
+  try { await navigator.clipboard.writeText(txt); ok = true; } catch (err) {
+    try { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); } catch (e2) { ok = false; }
+  }
+  const b = e.currentTarget, old = 'Tabelle kopieren'; b.textContent = ok ? 'Kopiert' : 'Kopieren nicht möglich'; setTimeout(() => b.textContent = old, 1600);
+});
+
+/* ---------- Aufbau ---------- */
+MISSIONS.forEach((m, i) => { const b = document.createElement('button'); b.setAttribute('role', 'tab'); b.dataset.i = i; b.textContent = m.tab; b.addEventListener('click', () => loadMission(i)); $('tabs').appendChild(b); });
+[[6, '¼×'], [24, '1×'], [96, '4×'], [384, '16×'], [1200, '50×']].forEach(([v, l]) => { const b = document.createElement('button'); b.textContent = l; b.dataset.v = v; b.setAttribute('aria-pressed', v === tps); b.addEventListener('click', () => { tps = v; paintChips('speed', v); }); $('speed').appendChild(b); });
+envPanel(0); envPanel(1);
+chips('metric', () => metric, v => metric = v); chips('histTrait', () => histTrait, v => histTrait = v); chips('target', () => target, v => target = +v);
+$('play').addEventListener('click', () => setRunning(!running));
+$('restart').addEventListener('click', () => loadMission(mi, true));
+$('bridge').addEventListener('click', () => { setBridge(!S.bridge); redraw(); });
+$('mu').addEventListener('input', e => { S.mu = e.target.value / 1000; syncControls(); });
+const note = t => { $('evNote').textContent = t; };
+$('evDrought').addEventListener('click', () => { setSeeds(target, [0, 10, 60], 'Dürre'); note(`Dürre auf der ${target ? 'Ost' : 'West'}insel: fast nur noch große, harte Samen.`); redraw(); });
+$('evNormal').addEventListener('click', () => { setSeeds(target, [20, 100, 20], 'Normaljahr'); note('Samenangebot wie zu Beginn.'); redraw(); });
+$('evBottle').addEventListener('click', () => { sim.bottleneck(target, 12); note('Zufällig ausgewählte 12 Tiere haben überlebt.'); redraw(); });
+$('evFound').addEventListener('click', () => { const n = sim.founders(1 - target, target, 8); note(n ? `${n} Tiere sind von der ${target ? 'West' : 'Ost'}insel herübergekommen.` : 'Auf der anderen Insel lebt kein Tier, das kommen könnte.'); redraw(); });
+
+function redraw() { drawWorld(1); drawHist(); drawSeries(); drawTree(); updateHud(); }
+let acc = 0, last = performance.now(), lastCharts = 0;
+function frame(now) {
+  const dt = Math.min(100, now - last); last = now;
+  if (running) {
+    acc += dt * tps / 1000; const t0 = performance.now();
+    while (acc >= 1) { sim.step(); acc -= 1; if (performance.now() - t0 > 13) { acc = 0; break; } }
+    if (!S.inds.length) { setRunning(false); note('Alle Finken sind ausgestorben. „Neu starten“ setzt das Experiment zurück.'); }
+  }
+  drawWorld(Math.min(1, acc));
+  if (now - lastCharts > (running ? 220 : 800)) { drawHist(); drawSeries(); drawTree(); updateHud(); lastCharts = now; }
+  requestAnimationFrame(frame);
+}
+readTheme();
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readTheme(); redraw(); });
+new MutationObserver(() => { readTheme(); redraw(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+window.addEventListener('resize', redraw);
+renderLog(); loadMission(0);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

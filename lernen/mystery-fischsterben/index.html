@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mystery Fischsterben im Badesee</title>
+<style>
+/* Layout: blauer Kopfbereich im Schuldesign, darunter ein Arbeitsbereich pro Schritt (Auftrag, Karten, Gefüge, Hypothesen, Aufgaben) */
+:root {
+  --bg: #f5f8fd; --surface: #ffffff; --ink: #231F20; --muted: #555b66;
+  --accent: #176FC0; --soft: #E5EBF8; --line: #7FAFDC; --border: #d3deef;
+  --good: #23784f; --good-soft: #dff1e7; --warn: #B33A0B; --warn-soft: #FDF0E6; --hero: #176FC0;
+  --font-display: Nunito, "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1624; --surface: #17223a; --ink: #e8eef8; --muted: #a3b1c9;
+    --accent: #7FAFDC; --soft: #1b3355; --line: #4f86c4; --border: #2a3a58;
+    --good: #6fd0a0; --good-soft: #1b3428; --warn: #f0a070; --warn-soft: #3a2418; --hero: #0F4F8C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1624; --surface: #17223a; --ink: #e8eef8; --muted: #a3b1c9;
+  --accent: #7FAFDC; --soft: #1b3355; --line: #4f86c4; --border: #2a3a58;
+  --good: #6fd0a0; --good-soft: #1b3428; --warn: #f0a070; --warn-soft: #3a2418; --hero: #0F4F8C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { font-size: 112.5%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: 1.55; padding-bottom: 64px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; text-wrap: balance; }
+p { margin: 0 0 .6em; }
+button, textarea, select { font: inherit; color: inherit; }
+button:focus-visible, textarea:focus-visible, select:focus-visible, .node:focus-visible { outline: 3px solid var(--line); outline-offset: 2px; }
+
+.hero { background: var(--hero); color: #fff; position: relative; overflow: hidden; padding: 28px 16px 72px; }
+.hero-in { max-width: 66rem; margin: 0 auto; display: flex; gap: 24px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; position: relative; z-index: 1; }
+.eyebrow { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: #E5EBF8; font-weight: 600; }
+.hero h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 900; margin: 6px 0 8px; }
+.hero p { color: #fff; max-width: 46ch; margin: 0; }
+.wm { border-left: 3px solid #7FAFDC; padding-left: 12px; font: 800 1.1rem/1.15 var(--font-display); }
+.wave { position: absolute; left: 0; bottom: -1px; width: 100%; height: 56px; }
+.theme { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.5); background: rgba(255,255,255,.15); color: #fff; cursor: pointer; z-index: 2; }
+
+.wrap { max-width: 66rem; margin: 0 auto; padding: 0 16px; }
+.steps { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 20px; }
+.steps button { flex: 1 1 9rem; text-align: left; background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 0; min-height: 52px; }
+.steps button small { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.steps button b { font-family: var(--font-display); font-size: .98rem; }
+.steps button[aria-current="step"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.steps button[aria-current="step"] small { color: #E5EBF8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .steps button[aria-current="step"] { color: #0f1624; } :root:not([data-theme="light"]) .steps button[aria-current="step"] small { color: #17223a; } }
+:root[data-theme="dark"] .steps button[aria-current="step"] { color: #0f1624; }
+:root[data-theme="dark"] .steps button[aria-current="step"] small { color: #17223a; }
+
+.panel { display: flex; flex-direction: column; gap: 16px; }
+.panel h2 { font-size: 1.6rem; color: var(--accent); }
+.lead { color: var(--muted); max-width: 70ch; }
+.box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.box.q { border-left: 5px solid var(--accent); font-size: 1.1rem; }
+.box ol, .box ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 700; cursor: pointer; min-height: 44px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn { color: #0f1624; } }
+:root[data-theme="dark"] .btn { color: #0f1624; }
+.btn.ghost { background: var(--surface); color: var(--accent); border: 1.5px solid var(--accent); }
+.btn:disabled { opacity: .4; cursor: default; }
+.fb { border-radius: 10px; padding: 12px 16px; background: var(--soft); border: 1px solid var(--border); }
+.fb ul { margin: 6px 0 0; padding-left: 1.2em; }
+.fb.ok { background: var(--good-soft); border-color: var(--good); }
+.fb.warn { background: var(--warn-soft); border-color: var(--warn); }
+.count { font-weight: 700; }
+
+/* Karten */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 2px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card h3 { font-size: 1.05rem; }
+.card h3 span { color: var(--accent); margin-right: 6px; }
+.card p { margin: 0; font-size: .96rem; }
+.card.h { border-color: var(--good); background: var(--good-soft); }
+.card.u { border-color: var(--accent); background: var(--soft); }
+.card.n { border-style: dashed; opacity: .72; }
+.acts { display: flex; gap: 6px; margin-top: auto; }
+.acts button { flex: 1; min-height: 40px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); cursor: pointer; font-size: .85rem; font-weight: 600; }
+.acts button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.acts button[data-b="h"][aria-pressed="true"] { background: var(--good); border-color: var(--good); }
+.acts button[data-b="n"][aria-pressed="true"] { background: var(--muted); border-color: var(--muted); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .acts button[aria-pressed="true"] { color: #0f1624; } }
+:root[data-theme="dark"] .acts button[aria-pressed="true"] { color: #0f1624; }
+
+/* Diagramm */
+.chart { width: 100%; height: auto; display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+.chart text { fill: var(--muted); font: 600 11px var(--font-body); }
+.chart .grid { stroke: var(--border); stroke-width: 1; }
+.chart .axis { stroke: var(--muted); stroke-width: 1.2; }
+.chart .data { stroke: var(--accent); fill: none; stroke-width: 2.6; }
+.chart .dot { fill: var(--accent); }
+.chart .sat { stroke: var(--muted); stroke-dasharray: 6 4; stroke-width: 1.5; }
+.chart .crit { stroke: var(--warn); stroke-dasharray: 2 4; stroke-width: 2; }
+.chart text.v { fill: var(--ink); font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: .82rem; color: var(--muted); margin-top: 6px; }
+.legend i { display: inline-block; width: 22px; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
+
+/* Wirkungsgefüge */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1.5px solid var(--border); background: var(--surface); border-radius: 99px; padding: 4px 11px; cursor: pointer; font-size: .86rem; min-height: 36px; }
+.chip[aria-pressed="true"] { background: var(--soft); border-color: var(--accent); font-weight: 700; }
+.gwrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.gcanvas { position: relative; min-width: 800px; min-height: 520px; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 22px 22px; touch-action: pan-y; }
+.gcanvas svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.node { position: absolute; width: 168px; height: 62px; border: 2px solid var(--accent); background: var(--surface); border-radius: 10px; padding: 6px 10px; font-size: .86rem; line-height: 1.2; font-weight: 600; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; display: flex; align-items: center; gap: 8px; z-index: 2; }
+.node b { font-family: var(--font-display); color: var(--accent); font-size: 1.1rem; }
+.node.sel { background: var(--accent); color: #fff; }
+.node.sel b { color: #fff; }
+.node.drag { cursor: grabbing; box-shadow: 0 6px 16px rgba(0,0,0,.25); z-index: 5; }
+.bub { position: absolute; transform: translate(-50%, -50%); z-index: 3; display: flex; border-radius: 99px; overflow: hidden; border: 1.5px solid var(--line); background: var(--surface); font-size: .78rem; font-weight: 700; }
+.bub button { border: 0; background: transparent; cursor: pointer; padding: 4px 9px; min-height: 30px; }
+.bub .s { color: var(--accent); }
+.bub .s.q { color: var(--warn); }
+.bub .x { color: var(--muted); border-left: 1px solid var(--border); }
+.detail { min-height: 4.5em; }
+.detail h3 { font-size: 1.05rem; margin-bottom: 4px; }
+.gmsg { color: var(--muted); font-size: .92rem; }
+
+/* Hypothesen und Aufgaben */
+.hyp { display: flex; flex-direction: column; gap: 10px; }
+.hyp h3 { font-size: 1.15rem; }
+.hyp select, textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; background: var(--bg); padding: 9px 10px; }
+textarea { min-height: 7em; resize: vertical; }
+.task { display: flex; flex-direction: column; gap: 8px; }
+.task h3 { font-size: 1.1rem; }
+.tag { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: var(--soft); color: var(--accent); margin-right: 6px; }
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 24px; }
+.foot { margin-top: 32px; font-size: .85rem; color: var(--muted); max-width: 70ch; }
+.sr { position: absolute; left: -9999px; }
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" aria-label="Zurück"><style>.lernangebot-leiste{all:initial!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;width:100%!important;min-height:44px!important;padding:0 8px!important;background:#eef2f7!important;border-bottom:1px solid rgba(10,45,83,.1)!important;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI Variable Text","Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:-.01em!important}.lernangebot-leiste a{all:initial!important;display:inline-flex!important;align-items:center!important;gap:2px!important;box-sizing:border-box!important;min-height:36px!important;padding:0 12px 0 6px!important;border-radius:999px!important;color:#0f6f8f!important;font:inherit!important;cursor:pointer!important}.lernangebot-leiste a:hover{background:rgba(10,45,83,.07)!important}.lernangebot-leiste a:focus-visible{outline:3px solid #0f7f6c!important;outline-offset:2px!important}.lernangebot-leiste svg{display:block!important;width:20px!important;height:20px!important;flex:none!important}@media (prefers-color-scheme:dark){.lernangebot-leiste{background:#061a33!important;border-bottom-color:rgba(255,255,255,.1)!important}.lernangebot-leiste a{color:#6fd3bf!important}.lernangebot-leiste a:hover{background:rgba(255,255,255,.08)!important}.lernangebot-leiste a:focus-visible{outline-color:#6fd3bf!important}}@media print{.lernangebot-leiste{display:none!important}}</style><a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>Lernangebote</a></nav>
+<div class="hero">
+  <button class="theme" id="theme" aria-label="Hell oder Dunkel umschalten" title="Hell oder Dunkel">◐</button>
+  <div class="hero-in">
+    <div>
+      <span class="eyebrow">Biologie Oberstufe · Ökologie · Doppelstunde 1</span>
+      <h1>Mystery Fischsterben im Badesee</h1>
+      <p>Am Morgen des 14. Juli treiben Hunderte tote Fische im See. Das Wasser ist nicht vergiftet. Findet heraus, was passiert ist.</p>
+    </div>
+    <div class="wm" role="img" aria-label="Gymnasium Bruchhausen-Vilsen">Gymnasium<br>Bruchhausen-Vilsen</div>
+  </div>
+  <svg class="wave" aria-hidden="true" viewBox="0 0 794 60" preserveAspectRatio="none"><path d="M0 38 C 180 8, 420 70, 794 22 L 794 60 L 0 60 Z" fill="#7FAFDC" opacity="0.55"/><path d="M0 50 C 240 24, 520 66, 794 40 L 794 60 L 0 60 Z" style="fill: var(--bg)"/></svg>
+</div>
+
+<div class="wrap">
+  <nav class="steps" id="steps" aria-label="Schritte"></nav>
+  <main class="panel" id="main" aria-live="polite"></main>
+  <div class="nav"><button class="btn ghost" id="prev">Zurück</button><button class="btn" id="next">Weiter</button></div>
+  <p class="foot">Alle Messwerte sind fiktiv. Die Zusammenhänge (Löslichkeit von Sauerstoff, Fotosynthese, Zellatmung, Eutrophierung) sind fachlich realistisch. Diese Seite arbeitet ohne KI und ohne Datenübertragung. Eingaben bleiben nur in dieser Seite und sind nach dem Neuladen weg. Kopiere wichtige Texte vorher mit dem Knopf im letzten Schritt.</p>
+</div>
+
+<script>
+const CARDS = [
+  { id: 1, t: "Der See", x: "Der Badesee ist 4 ha groß und höchstens 6 m tief. Er liegt windgeschützt zwischen Wald und Ackerflächen. Über einen Entwässerungsgraben fließt Wasser von den Äckern in den See." },
+  { id: 2, t: "Der Morgen des 14. Juli", x: "Früh am Morgen treiben Hunderte Fische tot an der Oberfläche, viele weitere schnappen an der Oberfläche nach Luft. Betroffen sind vor allem große Fische (Hechte, Zander, Brassen). Das Wasser ist grünlich trüb." },
+  { id: 3, t: "Das Wetter", x: "Seit neun Tagen herrschen über 30 °C bei fast völliger Windstille. An den letzten beiden Tagen war es bedeckt und diesig." },
+  { id: 4, t: "Wassertemperatur", x: "Oberfläche: 26 °C. In 5 m Tiefe: 14 °C. In etwa 2,5 m Tiefe liegt eine scharfe Temperaturgrenze. Das warme Oberflächenwasser vermischt sich nicht mit dem kalten Tiefenwasser." },
+  { id: 5, t: "Sauerstoff im Wasser (Sättigung)", x: "Wasser kann nur begrenzt Sauerstoff lösen. Diese Menge nimmt mit steigender Temperatur ab: 10 °C: 11,3 mg/L · 20 °C: 9,1 mg/L · 25 °C: 8,3 mg/L · 30 °C: 7,5 mg/L." },
+  { id: 6, t: "Sauerstoff im Tagesverlauf", x: "Messreihe an der Oberfläche (1 m Tiefe), fiktive Messwerte:", chart: true },
+  { id: 7, t: "Die Fische", x: "Fische sind wechselwarm: Bei höherer Temperatur steigt ihr Stoffwechsel und damit ihr Sauerstoffbedarf. Große Fische brauchen absolut mehr Sauerstoff. Die meisten heimischen Arten geraten unter etwa 3 mg/L in Atemnot, unter etwa 1–2 mg/L sterben sie (Richtwerte)." },
+  { id: 8, t: "Nährstoffe", x: "Gesamtphosphor im See: 0,12 mg/L (fiktiver Messwert). Nährstoffarme Seen liegen meist unter 0,02 mg/L (Richtwert). Nach starkem Regen im Mai wurde viel Dünger von den Äckern durch den Graben eingeschwemmt." },
+  { id: 9, t: "Die Algen", x: "Die Sichttiefe beträgt nur 0,6 m (vor 20 Jahren: 3,5 m). An der Oberfläche treiben blaugrüne Schlieren. Der Algengehalt (Chlorophyll a) beträgt 85 µg/L (fiktiver Messwert, sehr hoch)." },
+  { id: 10, t: "Algen: Erzeuger und Verbraucher", x: "Algen betreiben bei Licht Fotosynthese und geben dabei Sauerstoff ab. Wie alle Lebewesen betreiben sie rund um die Uhr Zellatmung und verbrauchen dabei Sauerstoff." },
+  { id: 11, t: "Absterbende Algen", x: "Wegen der bedeckten Tage haben die Algen weniger Licht und sterben in großer Zahl ab. Sie sinken zum Seegrund. Dort bauen Bakterien die organische Substanz ab. Der Bodenschlamm ist inzwischen 40 cm dick und riecht faulig." },
+  { id: 12, t: "Sauerstoff im Tiefenwasser", x: "Messung um 6 Uhr: In 5 m Tiefe sind nur 0,2 mg/L Sauerstoff gelöst (fiktiver Messwert)." },
+  { id: 13, t: "Giftstoffe?", x: "Das Labor der Kreisbehörde fand weder Pestizide noch Schwermetalle oder andere Schadstoffe in einer Menge, die Fische schädigt. Auch der Nitritwert ist unauffällig." },
+  { id: 14, t: "Krankheit?", x: "Das Veterinäramt hat tote Fische untersucht: keine Krankheitserreger, keine Parasiten. Die Fische waren zuvor gesund und gut genährt." },
+  { id: 15, t: "Ein Sommer vor drei Jahren", x: "Auch damals war der See algenreich. Das Wetter war aber windig, die Oberfläche hatte nur 21 °C. Es gab kein Fischsterben." },
+  { id: 16, t: "Badebetrieb", x: "An heißen Tagen kommen bis zu 800 Badegäste. Die Badewasserqualität (Darmbakterien) war ohne Beanstandung." },
+  { id: 17, t: "Dorffest", x: "Am Vorabend fand am Seeufer ein Dorffest mit Musik und Feuerwerk statt." }
+];
+CARDS.push(
+  { id: 18, t: "Kormorane", x: "Im Wald am Seeufer brütet seit Jahren eine Kormorankolonie. Am Morgen des 14. Juli wurden mehrere Kormorane beim Fischen beobachtet." },
+  { id: 19, t: "Geschichte des Sees", x: "Der See entstand 1962 als Kiesgrube und wurde nach dem Ende des Abbaus geflutet. Seit 2005 gehört er der Gemeinde." }
+);
+const ORDER = [2, 16, 5, 14, 12, 18, 3, 9, 17, 8, 15, 10, 19, 6, 1, 11, 13, 7, 4];
+const byId = Object.fromEntries(CARDS.map(c => [c.id, c]));
+CARDS.sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id));
+const DISP = {}; CARDS.forEach((c, i) => { DISP[c.id] = i + 1; });
+const dn = id => DISP[id];
+const mapK = s => s.replace(/(Karten?) (\d+(?:(?:, | und )\d+)*)/g, (m, w, nums) => w + " " + nums.replace(/\d+/g, d => dn(+d)));
+const lbl = id => "Karte " + dn(id) + " (" + byId[id].t + ")";
+
+// Erwartete Beziehungen: von, nach, Wirkung (+ gleichsinnig, - gegensinnig, * beides akzeptiert)
+const EXPECT = [
+  [8, 9, "+"], [9, 11, "+"], [3, 11, "+"], [11, 6, "-"], [10, 6, "*"],
+  [3, 4, "+"], [4, 5, "-"], [5, 6, "+"], [4, 7, "+"], [4, 12, "-"],
+  [6, 2, "-"], [7, 2, "+"], [12, 2, "-"]
+];
+const HYP = [
+  { k: "Vergiftung", s: "Die Fische wurden vergiftet.", card: 13 },
+  { k: "Krankheit", s: "Eine Fischseuche hat die Tiere getötet.", card: 14 },
+  { k: "Hitze allein", s: "Allein die Hitze hat die Fische getötet.", card: 15 }
+];
+const HELP = [
+  "Frage dich: Wann ist im See am meisten Sauerstoff da, wann am wenigsten? Welche Lebewesen erzeugen Sauerstoff, welche verbrauchen ihn? (Karten 6 und 10)",
+  "Beginne bei der Ursache auf den Äckern (Karte 8) und folge den Pfeilen: Nährstoffe → Algen → … Verbinde danach Temperatur, Windstille und Sauerstoff (Karten 3, 4, 5, 12).",
+  "Prüfe jede Hypothese mit der Frage: Welche Karte spricht dafür, welche dagegen? Warum starben die Fische nicht schon vor drei Jahren, obwohl der See damals auch algenreich war?"
+];
+const STEPS = [["Start", "Auftrag"], ["Schritt 1", "Karten sortieren"], ["Schritt 2", "Wirkungsgefüge"], ["Schritt 3", "Hypothesen prüfen"], ["Schritt 4", "Aufgaben"]];
+
+const S = { step: 0, bin: {}, inG: new Set(), gInit: false, pos: {}, edges: [], sel: null, open: null, hint: 0, hyp: {}, text: {} };
+const $ = (s, r = document) => r.querySelector(s);
+const main = $("#main");
+const NW = 168, NH = 62;
+
+/* ---------- Diagramm ---------- */
+function chartSVG() {
+  const lab = ["6", "8", "10", "12", "14", "16", "18", "20", "22", "0", "2", "4", "6"];
+  const o = [1.6, 4.5, 9.0, 12.5, 14.2, 14.0, 12.0, 8.5, 5.5, 3.9, 2.8, 2.0, 1.6];
+  const W = 640, H = 300, L = 46, R = 16, T = 18, B = 48;
+  const x = i => L + i * (W - L - R) / 12, y = v => T + (1 - v / 16) * (H - T - B);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Liniendiagramm: Sauerstoffgehalt an der Oberfläche von 6 Uhr bis 6 Uhr am Folgetag, Maximum 14,2 mg/L um 14 Uhr, Minimum 1,6 mg/L um 6 Uhr">`;
+  [0, 4, 8, 12, 16].forEach(v => { s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
+  s += `<line class="axis" x1="${L}" x2="${L}" y1="${T}" y2="${y(0)}"/><line class="axis" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/>`;
+  lab.forEach((l, i) => { s += `<text x="${x(i)}" y="${y(0) + 16}" text-anchor="middle">${l}</text>`; });
+  s += `<text x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle">Uhrzeit (13. Juli 6 Uhr bis 14. Juli 6 Uhr)</text>`;
+  s += `<text x="12" y="${(T + y(0)) / 2}" text-anchor="middle" transform="rotate(-90 12 ${(T + y(0)) / 2})">Sauerstoff in mg/L</text>`;
+  s += `<line class="sat" x1="${L}" x2="${W - R}" y1="${y(8.1)}" y2="${y(8.1)}"/><line class="crit" x1="${L}" x2="${W - R}" y1="${y(3)}" y2="${y(3)}"/>`;
+  s += `<polyline class="data" points="${o.map((v, i) => x(i) + "," + y(v)).join(" ")}"/>`;
+  o.forEach((v, i) => { s += `<circle class="dot" cx="${x(i)}" cy="${y(v)}" r="3.5"/>`; });
+  s += `<text class="v" x="${x(4)}" y="${y(14.2) - 9}" text-anchor="middle">14,2</text>`;
+  s += `<text class="v" x="${x(0) + 8}" y="${y(1.6) - 9}" text-anchor="start">1,6</text><text class="v" x="${x(12) - 6}" y="${y(1.6) - 9}" text-anchor="end">1,6</text></svg>`;
+  s += `<div class="legend"><span><i style="border-color:var(--accent)"></i>Sauerstoff (1 m Tiefe)</span><span><i style="border-top-style:dashed;border-color:var(--muted)"></i>Sättigung bei 26 °C (ca. 8,1 mg/L)</span><span><i style="border-top-style:dotted;border-color:var(--warn)"></i>Atemnot der meisten Fische (ca. 3 mg/L, Richtwert)</span></div>`;
+  return s;
+}
+
+/* ---------- Schritte ---------- */
+function stepper() {
+  $("#steps").innerHTML = STEPS.map((s, i) => `<button data-i="${i}" ${i === S.step ? 'aria-current="step"' : ""}><small>${s[0]}</small><b>${s[1]}</b></button>`).join("");
+  $("#prev").disabled = S.step === 0;
+  $("#next").disabled = S.step === STEPS.length - 1;
+}
+function go(n) {
+  S.step = Math.max(0, Math.min(STEPS.length - 1, n));
+  stepper(); render(); window.scrollTo({ top: 0 });
+}
+function render() { [r0, r1, r2, r3, r4][S.step](); }
+
+function r0() {
+  main.innerHTML = `
+  <h2>Euer Auftrag</h2>
+  <div class="box q"><b>Leitfrage:</b> Warum sterben im Sommer die Fische im Badesee?</div>
+  <p class="lead">Ihr arbeitet zu dritt oder zu viert. Auf 19 Infokarten stehen Beobachtungen und Messwerte. Nicht jede Karte hilft bei der Lösung.</p>
+  <div class="box"><ol>
+    <li><b>Karten sortieren.</b> Entscheidet für jede Karte: hilfreich, unklar oder nicht hilfreich. Begründet eure Wahl im Team.</li>
+    <li><b>Wirkungsgefüge bauen.</b> Legt die wichtigen Karten auf der Fläche an und verbindet sie mit Pfeilen. Entscheidet bei jedem Pfeil: „je mehr …, desto mehr“ oder „desto weniger“.</li>
+    <li><b>Hypothesen prüfen.</b> Vergiftung, Krankheit oder Hitze allein: Welche Karte spricht jeweils dagegen?</li>
+    <li><b>Aufgaben bearbeiten.</b> Beschreibt, erklärt und beurteilt. Danach vergleicht ihr mit den anderen Gruppen.</li>
+  </ol></div>
+  <div class="bar"><button class="btn" id="start">Los geht’s</button></div>`;
+  $("#start").onclick = () => go(1);
+}
+
+function cardHTML(c) {
+  const b = S.bin[c.id] || "";
+  const p = (k, txt) => `<button data-b="${k}" aria-pressed="${b === k}">${txt}</button>`;
+  return `<article class="card ${b}" data-id="${c.id}"><h3><span>${dn(c.id)}</span>${c.t}</h3><p>${c.x}</p>${c.chart ? chartSVG() : ""}<div class="acts" role="group" aria-label="Karte ${dn(c.id)} einordnen">${p("h", "Hilfreich")}${p("u", "Unklar")}${p("n", "Nicht hilfreich")}</div></article>`;
+}
+function r1() {
+  main.innerHTML = `
+  <h2>Karten sortieren</h2>
+  <p class="lead">Lest jede Karte und ordnet sie ein. Ihr könnt jederzeit umsortieren. Karten mit Messwerten könnt ihr mit anderen Karten verbinden: Was folgt woraus?</p>
+  <div class="bar"><span class="count" id="cnt"></span><button class="btn ghost" id="chk">Sortierung prüfen</button></div>
+  <div id="fb"></div>
+  <div class="cards" id="cards">${CARDS.map(cardHTML).join("")}</div>`;
+  count();
+  $("#cards").onclick = e => {
+    const b = e.target.closest("button[data-b]"); if (!b) return;
+    const card = b.closest(".card"), id = +card.dataset.id, k = b.dataset.b;
+    S.bin[id] = S.bin[id] === k ? "" : k;
+    card.className = "card " + (S.bin[id] || "");
+    card.querySelectorAll("button[data-b]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.b === S.bin[id])));
+    count();
+  };
+  $("#chk").onclick = () => {
+    const n = Object.values(S.bin).filter(Boolean).length, out = [];
+    if (n < CARDS.length) out.push(`Du hast erst ${n} von ${CARDS.length} Karten eingeordnet.`);
+    [16, 17, 18, 19].forEach(id => { if (S.bin[id] === "h") out.push(`${lbl(id)}: Welche Verbindung gibt es zwischen dieser Karte und dem Sauerstoffgehalt im See?`); });
+    [13, 14, 15].forEach(id => { if (S.bin[id] === "n") out.push(`${lbl(id)}: Auch Karten, die etwas ausschließen, können wichtig sein. Wofür brauchst du sie später?`); });
+    [12, 5, 11].forEach(id => { if (S.bin[id] === "n") out.push(`${lbl(id)}: Prüfe noch einmal, ob diese Karte etwas zum Sauerstoffverlauf beiträgt.`); });
+    $("#fb").innerHTML = out.length ? `<div class="fb warn"><b>Hinweise</b><ul>${out.map(x => `<li>${x}</li>`).join("")}</ul></div>` : `<div class="fb ok"><b>Gut sortiert.</b> Keine auffälligen Fehlgriffe. Weiter zum Wirkungsgefüge.</div>`;
+  };
+}
+function count() {
+  const c = { h: 0, u: 0, n: 0 }; Object.values(S.bin).forEach(v => { if (v) c[v]++; });
+  $("#cnt").textContent = `Hilfreich ${c.h} · Unklar ${c.u} · Nicht hilfreich ${c.n} · Offen ${CARDS.length - c.h - c.u - c.n}`;
+}
+
+/* ---------- Wirkungsgefüge ---------- */
+function slotFor() {
+  const used = Object.entries(S.pos).filter(([id]) => S.inG.has(+id)).map(([, p]) => p);
+  for (let i = 0; i < 40; i++) {
+    const p = { x: 16 + (i % 4) * 196, y: 16 + Math.floor(i / 4) * 104 };
+    if (!used.some(u => Math.abs(u.x - p.x) < 60 && Math.abs(u.y - p.y) < 40)) return p;
+  }
+  return { x: 16, y: 16 };
+}
+function r2() {
+  if (!S.gInit) { CARDS.forEach(c => { if (S.bin[c.id] === "h") S.inG.add(c.id); }); S.gInit = true; }
+  S.inG.forEach(id => { if (!S.pos[id]) S.pos[id] = slotFor(); });
+  main.innerHTML = `
+  <h2>Wirkungsgefüge bauen</h2>
+  <p class="lead">Wählt die Karten, die in euer Gefüge gehören. Tippt dann eine Karte an und danach die Karte, auf die sie wirkt. Es entsteht ein Pfeil. Tippt auf das Feld am Pfeil, um „desto mehr“ oder „desto weniger“ festzulegen. Karten lassen sich verschieben.</p>
+  <div class="chips" id="chips"></div>
+  <div class="gwrap"><div class="gcanvas" id="gc"><svg id="gs" aria-hidden="true"></svg><div id="gb"></div></div></div>
+  <div class="gmsg" id="gmsg"></div>
+  <div class="box detail" id="detail"><span class="gmsg">Tippe eine Karte an, um ihren Text hier zu lesen.</span></div>
+  <div class="bar"><button class="btn" id="gchk">Wirkungsgefüge prüfen</button><button class="btn ghost" id="ghint">Tipp</button></div>
+  <div id="gfb"></div>`;
+  drawChips(); drawNodes(); drawEdges();
+  $("#chips").onclick = e => {
+    const b = e.target.closest("button[data-id]"); if (!b) return;
+    const id = +b.dataset.id;
+    if (S.inG.has(id)) { S.inG.delete(id); S.edges = S.edges.filter(x => x.a !== id && x.b !== id); if (S.sel === id) S.sel = null; }
+    else { S.inG.add(id); S.pos[id] = slotFor(); }
+    drawChips(); drawNodes(); drawEdges(); msg();
+  };
+  $("#gb").onclick = e => {
+    const b = e.target.closest("button[data-i]"); if (!b) return;
+    const i = +b.dataset.i;
+    if (b.dataset.act === "x") S.edges.splice(i, 1);
+    else { const ed = S.edges[i]; ed.sign = ed.sign === null ? "+" : ed.sign === "+" ? "-" : "+"; }
+    drawEdges();
+  };
+  $("#gchk").onclick = checkG;
+  $("#ghint").onclick = () => { S.hint = S.hint % 3 + 1; $("#gfb").innerHTML = `<div class="fb"><b>Tipp ${S.hint} von 3</b><p>${mapK(HELP[S.hint - 1])}</p></div>`; };
+  msg();
+}
+function drawChips() {
+  $("#chips").innerHTML = CARDS.map(c => `<button class="chip" data-id="${c.id}" aria-pressed="${S.inG.has(c.id)}">${dn(c.id)} ${c.t}</button>`).join("");
+}
+function msg() {
+  const m = $("#gmsg"); if (!m) return;
+  m.textContent = S.sel ? `Ausgewählt: ${lbl(S.sel)}. Tippe jetzt die Karte an, auf die sie wirkt. Zweites Tippen auf dieselbe Karte hebt die Auswahl auf.` : (S.inG.size ? "" : "Wähle oben mindestens drei Karten aus.");
+}
+function drawNodes() {
+  const gc = $("#gc");
+  gc.querySelectorAll(".node").forEach(n => n.remove());
+  let maxY = 0;
+  S.inG.forEach(id => {
+    const p = S.pos[id], n = document.createElement("div");
+    n.className = "node" + (S.sel === id ? " sel" : ""); n.dataset.id = id; n.tabIndex = 0;
+    n.style.left = p.x + "px"; n.style.top = p.y + "px";
+    n.innerHTML = `<b>${dn(id)}</b><span>${byId[id].t}</span>`;
+    bindNode(n, id); gc.appendChild(n); maxY = Math.max(maxY, p.y + NH);
+  });
+  gc.style.height = Math.max(520, maxY + 90) + "px";
+}
+function bindNode(n, id) {
+  let sx, sy, ox, oy, moved = false, down = false;
+  n.addEventListener("pointerdown", e => { down = true; moved = false; sx = e.clientX; sy = e.clientY; ox = S.pos[id].x; oy = S.pos[id].y; n.setPointerCapture(e.pointerId); });
+  n.addEventListener("pointermove", e => {
+    if (!down) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!moved && Math.hypot(dx, dy) < 6) return;
+    moved = true; n.classList.add("drag");
+    const gc = $("#gc");
+    S.pos[id] = { x: Math.max(4, Math.min(gc.clientWidth - NW - 4, ox + dx)), y: Math.max(4, oy + dy) };
+    n.style.left = S.pos[id].x + "px"; n.style.top = S.pos[id].y + "px";
+    drawEdges();
+  });
+  const up = () => {
+    if (!down) return; down = false; n.classList.remove("drag");
+    if (moved) { const mx = Math.max(...[...S.inG].map(i => S.pos[i].y + NH)); $("#gc").style.height = Math.max(520, mx + 90) + "px"; return; }
+    tapNode(id);
+  };
+  n.addEventListener("pointerup", up);
+  n.addEventListener("pointercancel", () => { down = false; n.classList.remove("drag"); });
+  n.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tapNode(id); } });
+}
+function tapNode(id) {
+  S.open = id; showDetail(id);
+  if (S.sel === null) S.sel = id;
+  else if (S.sel === id) S.sel = null;
+  else {
+    if (!S.edges.some(e => e.a === S.sel && e.b === id)) S.edges.push({ a: S.sel, b: id, sign: null });
+    S.sel = null;
+  }
+  $("#gc").querySelectorAll(".node").forEach(n => n.classList.toggle("sel", +n.dataset.id === S.sel));
+  drawEdges(); msg();
+}
+function showDetail(id) {
+  const c = byId[id];
+  $("#detail").innerHTML = `<h3>${dn(c.id)} ${c.t}</h3><p>${c.x}</p>${c.chart ? chartSVG() : ""}`;
+}
+function drawEdges() {
+  const svg = $("#gs"), layer = $("#gb");
+  let s = `<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill: var(--accent)"/></marker></defs>`, b = "";
+  S.edges.forEach((e, i) => {
+    const A = S.pos[e.a], B = S.pos[e.b]; if (!A || !B) return;
+    let ax = A.x + NW / 2, ay = A.y + NH / 2, bx = B.x + NW / 2, by = B.y + NH / 2;
+    const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy); if (len < 1) return;
+    const ux = dx / len, uy = dy / len;
+    const t = Math.min(Math.abs(dx) > 0 ? (NW / 2) / Math.abs(dx) : 1e9, Math.abs(dy) > 0 ? (NH / 2) / Math.abs(dy) : 1e9);
+    const rev = S.edges.some(o => o.a === e.b && o.b === e.a), off = rev ? 10 : 0, nx = -uy * off, ny = ux * off;
+    const x1 = ax + dx * t + ux * 3 + nx, y1 = ay + dy * t + uy * 3 + ny, x2 = bx - dx * t - ux * 5 + nx, y2 = by - dy * t - uy * 5 + ny;
+    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="2.4" marker-end="url(#ah)" style="stroke: var(--accent)"/>`;
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+    const txt = e.sign === "+" ? "desto mehr" : e.sign === "-" ? "desto weniger" : "mehr / weniger?";
+    b += `<div class="bub" style="left:${mx}px;top:${my}px"><button class="s ${e.sign ? "" : "q"}" data-i="${i}" data-act="s" aria-label="Wirkung von Karte ${dn(e.a)} auf Karte ${dn(e.b)} ändern">${txt}</button><button class="x" data-i="${i}" data-act="x" aria-label="Pfeil löschen">✕</button></div>`;
+  });
+  svg.innerHTML = s; layer.innerHTML = b;
+}
+function checkG() {
+  const out = [], q = [], dir = [], sg = [];
+  let ok = 0;
+  EXPECT.forEach(([a, b, sign]) => {
+    const f = S.edges.find(e => e.a === a && e.b === b), r = S.edges.find(e => e.a === b && e.b === a);
+    if (f) {
+      if (sign !== "*" && f.sign && f.sign !== sign) sg.push(`${lbl(a)} → ${lbl(b)}`);
+      else if (sign !== "*" && !f.sign) sg.push(`${lbl(a)} → ${lbl(b)} (noch nicht festgelegt)`);
+      else ok++;
+    } else if (r) dir.push(`${lbl(b)} und ${lbl(a)}`);
+    else q.push(`Wie wirkt ${lbl(a)} auf ${lbl(b)}?`);
+  });
+  const total = EXPECT.length;
+  out.push(`<b>${ok} von ${total} Beziehungen stimmen</b> in Richtung und Wirkung.`);
+  const list = (title, arr) => arr.length ? `<li>${title}<ul>${arr.slice(0, 4).map(x => `<li>${x}</li>`).join("")}</ul></li>` : "";
+  let html = `<ul>${list("Pfeilrichtung prüfen bei:", dir)}${list("Wirkung („desto mehr“ oder „desto weniger“) prüfen bei:", sg)}${list("Noch offen. Fragen zum Weiterdenken:", q)}</ul>`;
+  const needed = new Set(EXPECT.flat().filter(v => typeof v === "number"));
+  const missingNodes = [...needed].filter(id => !S.inG.has(id));
+  if (missingNodes.length) html += `<p>Für ein vollständiges Gefüge fehlen noch Karten, die ihr bisher nicht verwendet.</p>`;
+  const extra = S.edges.filter(e => !EXPECT.some(x => x[0] === e.a && x[1] === e.b) && !EXPECT.some(x => x[0] === e.b && x[1] === e.a)).length;
+  if (extra) html += `<p>${extra} eurer Verbindung(en) kommen im Musterweg nicht vor. Prüft, ob ihr sie mit den Karten begründen könnt.</p>`;
+  const done = ok === total && !extra;
+  $("#gfb").innerHTML = `<div class="fb ${done ? "ok" : ok >= total - 3 ? "" : "warn"}">${out[0]}${done ? "<p>Euer Wirkungsgefüge ist vollständig. Weiter zu den Hypothesen.</p>" : html}</div>`;
+}
+
+/* ---------- Hypothesen ---------- */
+function r3() {
+  const opts = `<option value="">Karte wählen …</option>` + CARDS.map(c => `<option value="${c.id}">${dn(c.id)} ${c.t}</option>`).join("");
+  main.innerHTML = `
+  <h2>Hypothesen prüfen</h2>
+  <p class="lead">Drei Erklärungen stehen im Raum. Wählt zu jeder Hypothese die Karte, die sie widerlegt oder relativiert, und begründet in einem Satz.</p>
+  ${HYP.map((h, i) => `<div class="box hyp"><h3>Hypothese ${i + 1}: ${h.k}</h3><p>„${h.s}“</p>
+    <select id="hs${i}" aria-label="Karte zu Hypothese ${i + 1}">${opts}</select>
+    <textarea id="ht${i}" placeholder="Begründung in ein bis zwei Sätzen"></textarea>
+    <div class="bar"><button class="btn ghost" data-i="${i}">Prüfen</button></div><div id="hf${i}"></div></div>`).join("")}`;
+  HYP.forEach((h, i) => {
+    $("#hs" + i).value = S.hyp[i] ? S.hyp[i].sel : ""; $("#ht" + i).value = S.hyp[i] ? S.hyp[i].txt : "";
+    const save = () => { S.hyp[i] = { sel: $("#hs" + i).value, txt: $("#ht" + i).value }; };
+    $("#hs" + i).onchange = save; $("#ht" + i).oninput = save;
+  });
+  main.onclick = e => {
+    const b = e.target.closest("button[data-i]"); if (!b || S.step !== 3) return;
+    const i = +b.dataset.i, v = +$("#hs" + i).value, h = HYP[i], f = $("#hf" + i);
+    if (!v) { f.innerHTML = `<div class="fb warn">Wähle zuerst eine Karte.</div>`; return; }
+    if (v === h.card) {
+      f.innerHTML = i === 2
+        ? `<div class="fb ok"><b>Gute Wahl.</b> Der Vergleich zeigt: Auch damals war der See algenreich, aber kühler und windig. Hitze allein reicht also nicht. Welche weiteren Faktoren müssen zusammenkommen?</div>`
+        : `<div class="fb ok"><b>Passt.</b> Diese Karte schließt die Hypothese aus. Formuliert die Begründung in eigenen Worten.</div>`;
+    } else {
+      f.innerHTML = i === 2
+        ? `<div class="fb warn">Diese Karte erklärt nicht, warum Hitze allein nicht reicht. Suche einen Fall, in dem die Bedingungen anders waren und trotzdem Algen da waren.</div>`
+        : `<div class="fb warn">Diese Karte spricht nicht direkt gegen die Hypothese. Welche Untersuchung hat geprüft, ob ${i === 0 ? "Schadstoffe" : "Erreger oder Parasiten"} im Spiel waren?</div>`;
+    }
+  };
+}
+
+/* ---------- Aufgaben ---------- */
+const TASKS = [
+  { k: "a1", n: "1", op: "Beschreibe", afb: "I", p: 4, q: "Beschreibe den Verlauf des Sauerstoffgehalts an der Oberfläche (Karte 6) im Tagesverlauf und gib an, wann der Wert für die Fische kritisch wird.", chart: true },
+  { k: "a2", n: "2", op: "Nenne", afb: "I", p: 4, q: "Nenne aus den Infokarten je drei abiotische und biotische Faktoren des Sees." },
+  { k: "a4", n: "4", op: "Erkläre", afb: "II", p: 6, q: "Erkläre, warum der Sauerstoffgehalt gerade in den frühen Morgenstunden am niedrigsten ist und warum die Fische nicht in tiefere Wasserschichten ausweichen konnten." },
+  { k: "a5", n: "5", op: "Beurteile", afb: "III", p: 6, q: "Beurteile die Hypothesen „Vergiftung“, „Krankheit“ und „Hitze allein“ anhand der Karten. Nimm Stellung, welche Faktorenkombination das Fischsterben am besten erklärt, und begründe mit Karte 15." },
+  { k: "az", n: "Zusatz", op: "Entwickle", afb: "III", p: 4, q: "Entwickle zwei Maßnahmen, mit denen die Gemeinde ein erneutes Fischsterben verhindern kann, und begründe sie aus dem Wirkungsgefüge." }
+];
+function r4() {
+  main.innerHTML = `
+  <h2>Aufgaben</h2>
+  <p class="lead">Aufgabe 3 ist euer Wirkungsgefüge aus Schritt 2. Die übrigen Aufgaben bearbeitet ihr hier einzeln.</p>
+  ${TASKS.map(t => `<div class="box task"><h3><span class="tag">AFB ${t.afb}</span>Aufgabe ${t.n} · ${t.p} Punkte</h3><p>${mapK(t.q)}</p>${t.chart ? chartSVG() : ""}<textarea id="${t.k}" aria-label="Antwort zu Aufgabe ${t.n}"></textarea></div>`).join("")}
+  <div class="bar"><button class="btn" id="copy">Meine Antworten kopieren</button></div>
+  <div id="cfb"></div>`;
+  TASKS.forEach(t => { const el = $("#" + t.k); el.value = S.text[t.k] || ""; el.oninput = () => { S.text[t.k] = el.value; }; });
+  $("#copy").onclick = async () => {
+    const lines = [];
+    lines.push("MYSTERY FISCHSTERBEN – MEINE ANTWORTEN", "");
+    const g = S.edges.filter(e => S.pos[e.a] && S.pos[e.b]).map(e => `${byId[e.a].t} → ${e.sign === "+" ? "desto mehr" : e.sign === "-" ? "desto weniger" : "?"} → ${byId[e.b].t}`);
+    lines.push("Aufgabe 3 (Wirkungsgefüge):", g.length ? g.join("\n") : "(noch leer)", "");
+    HYP.forEach((h, i) => { const v = S.hyp[i]; lines.push(`Hypothese ${h.k}: ${v && v.sel ? "Karte " + dn(+v.sel) : "-"} ${v ? v.txt : ""}`); });
+    lines.push("");
+    TASKS.forEach(t => lines.push(`Aufgabe ${t.n}:`, S.text[t.k] || "(leer)", ""));
+    const text = lines.join("\n");
+    try { await navigator.clipboard.writeText(text); $("#cfb").innerHTML = `<div class="fb ok">Kopiert. Füge den Text in dein Heft-Dokument ein.</div>`; }
+    catch (e) {
+      $("#cfb").innerHTML = `<div class="fb warn">Das Kopieren wurde blockiert. Markiere den Text unten selbst und kopiere ihn.</div><textarea id="cout" readonly></textarea>`;
+      const o = $("#cout"); o.value = text; o.focus(); o.select();
+    }
+  };
+}
+
+/* ---------- Start ---------- */
+$("#steps").onclick = e => { const b = e.target.closest("button[data-i]"); if (b) go(+b.dataset.i); };
+$("#prev").onclick = () => go(S.step - 1);
+$("#next").onclick = () => go(S.step + 1);
+function applyTheme(t) { if (t) document.documentElement.setAttribute("data-theme", t); }
+$("#theme").onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(cur === "dark" ? "light" : "dark");
+};
+go(0);
+</script>
+</body>
+</html>

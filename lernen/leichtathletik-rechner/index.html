@@ -74,6 +74,13 @@ details summary{cursor:pointer;font:700 1.35rem "Barlow Condensed","Arial Narrow
 .vbody img{display:block;width:100%;max-width:900px;margin:0 auto 12px;background:#fff;border-radius:6px;cursor:zoom-in}
 .vbody.zoom img{width:200%;max-width:none;cursor:zoom-out}
 .vhint{text-align:center;color:var(--muted);font-size:.9rem;margin:0 0 10px}
+.tpick{display:flex;gap:6px;align-items:stretch;margin-top:2px}
+.tcol{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:110px}
+.tcol .btn{width:100%;padding:8px 0;font-size:1.2rem;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.tval{font:800 2.2rem/1.1 "Barlow Condensed","Arial Narrow",sans-serif;font-variant-numeric:tabular-nums}
+.tcol small{color:var(--muted);font-size:.8rem}
+.tsep{align-self:center;font:800 2.2rem "Barlow Condensed","Arial Narrow",sans-serif;padding-bottom:18px}
+.tpick.untouched .tval{opacity:.4}
 </style>
 <link rel="stylesheet" href="../schriften/schriften.css">
 </head>
@@ -87,8 +94,13 @@ details summary{cursor:pointer;font:700 1.35rem "Barlow Condensed","Arial Narrow
     <label for="disc">Disziplin</label>
     <select id="disc"></select>
     <p class="hint" id="weight"></p>
+    <div id="srmodewrap" style="display:none"><label for="srmode">Eingabe</label><select id="srmode"><option value="lb">Level und Bahn</option><option value="t">Gesamtzeit</option></select></div>
     <label for="val" id="vallabel">Leistung</label>
     <input id="val" inputmode="decimal" autocomplete="off" placeholder="">
+    <div id="tpick" class="tpick" style="display:none"></div>
+    <div id="srstep" class="btnrow" style="display:none"><button class="btn" id="srdown" type="button" aria-label="Eine Bahn zurück" style="flex:1;font-size:1.25rem;touch-action:manipulation;user-select:none;-webkit-user-select:none">▼ Bahn</button><button class="btn primary" id="srup" type="button" aria-label="Eine Bahn weiter" style="flex:1;font-size:1.25rem;touch-action:manipulation;user-select:none;-webkit-user-select:none">▲ Bahn</button></div>
+    <div id="bahnwrap" style="display:none"><label for="bahn">Bahn im Level</label><input id="bahn" inputmode="numeric" autocomplete="off" placeholder="z. B. 3"></div>
+    <div id="distwrap" style="display:none"></div>
     <p class="hint" id="fmt"></p>
   </section>
 
@@ -100,7 +112,7 @@ details summary{cursor:pointer;font:700 1.35rem "Barlow Condensed","Arial Narrow
       <div class="half">
         <h3>Jungen</h3>
         <div class="nums">
-          <div><span id="b-pts-m">–</span><small>Punkte</small></div>
+          <div class="ptsbox"><span id="b-pts-m">–</span><small class="ptslbl">Punkte</small></div>
           <div><span id="b-note-m">–</span><small>NP</small></div>
         </div>
         <p class="next" id="b-next-m"></p>
@@ -108,7 +120,7 @@ details summary{cursor:pointer;font:700 1.35rem "Barlow Condensed","Arial Narrow
       <div class="half">
         <h3>Mädchen</h3>
         <div class="nums">
-          <div><span id="b-pts-w">–</span><small>Punkte</small></div>
+          <div class="ptsbox"><span id="b-pts-w">–</span><small class="ptslbl">Punkte</small></div>
           <div><span id="b-note-w">–</span><small>NP</small></div>
         </div>
         <p class="next" id="b-next-w"></p>
@@ -124,8 +136,9 @@ details summary{cursor:pointer;font:700 1.35rem "Barlow Condensed","Arial Narrow
     <div class="btnrow">
       <button class="btn primary" id="add" type="button">Ergebnis hinzufügen</button>
       <button class="btn" id="clear" type="button">Liste leeren</button>
+      <button class="btn" id="pdf" type="button">Als PDF speichern</button>
     </div>
-    <p class="hint">Die Liste wird nicht gespeichert und ist nach dem Schließen weg. Bitte keine vollen Namen eintragen.</p>
+    <p class="hint">Die Liste wird nicht gespeichert und ist nach dem Schließen weg – vorher mit „Als PDF speichern“ sichern. Bitte keine vollen Namen eintragen.</p>
     <div class="tablewrap" style="margin-top:12px">
       <table>
         <thead><tr><th>Kürzel</th><th>Disziplin</th><th>Leistung</th><th>Jungen</th><th>Mädchen</th></tr></thead>
@@ -146,6 +159,8 @@ details summary{cursor:pointer;font:700 1.35rem "Barlow Condensed","Arial Narrow
   </div>
 </div>
 
+<script src="jspdf.umd.min.js"></script>
+<script src="jspdf.plugin.autotable.min.js"></script>
 <script id="logic">
 // Punktestufen 100, 95, … 0 (21 Werte je Disziplin), Werte aus der Wertungstabelle.
 const PTS = Array.from({length:21},(_,i)=>100-5*i);
@@ -169,6 +184,52 @@ const DISCIPLINES = [
  D("Speerwurf","d","m","42.50 41.90 41.20 39.70 38.90 38.00 37.10 36.10 35.10 33.90 32.70 31.50 30.00 28.50 27.00 25.20 23.40 21.60 19.80 18.00 16.20","28.00 27.50 27.00 25.80 25.30 24.80 24.40 23.80 23.20 22.50 21.80 21.10 20.30 19.50 18.70 17.50 16.50 15.50 14.50 13.50 12.50",{group:"Wurf",weight:{m:"800 g (U18: 700 g)",w:"600 g (U18: 500 g)"}}),
  D("Schleuderball","d","m","48.00 47.50 47.00 45.00 44.00 43.00 41.50 40.00 39.50 37.00 35.50 34.00 31.50 29.00 26.50 24.00 21.50 19.00 16.50 13.50 10.50","40.50 40.00 39.50 39.00 38.50 36.50 35.50 34.50 33.50 32.50 31.00 29.50 27.50 25.50 23.50 21.50 19.50 17.50 15.00 12.50 10.00",{group:"Wurf",weight:{m:"1,5 kg",w:"1,0 kg"}})
 ];
+// Shuttle-Run (20-m-Pendellauf): Vorschlag Version A (anspruchsvoll), nicht amtlich.
+// Schwellen als [Level, Bahn] fuer 15 … 01 NP; dazwischen gilt der niedrigere Wert.
+const SR_BAHNEN=[0,7,8,8,9,9,10,10,11,11,11,12,12,13,13,13,14,14,15,15,16,16];
+DISCIPLINES.push({name:"Shuttle-Run (20 m)",kind:"sr",unit:"lvl",group:"Ausdauertest",
+  m:[[12,12],[12,6],[11,12],[11,6],[10,11],[10,6],[9,11],[9,6],[8,11],[8,6],[7,10],[7,5],[6,10],[6,5],[5,9]],
+  w:[[9,11],[9,6],[8,11],[8,6],[7,10],[7,5],[6,10],[6,5],[5,9],[5,5],[4,9],[4,5],[3,8],[3,4],[2,8]]});
+function srTotal(l,b){let t=0;for(let i=1;i<l;i++)t+=SR_BAHNEN[i];return t+b;}
+// Gesamtzeit aus dem Protokoll: Level n mit 8 + 0,5n km/h, 20 m je Bahn (berechnet, nicht gemessen)
+function srTime(l,b){let t=0;for(let i=1;i<l;i++)t+=SR_BAHNEN[i]*72/(8+0.5*i);return t+b*72/(8+0.5*l);}
+function srFmt(s){s=Math.round(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+// Zeit (Sekunden) → letzte bis dahin vollständig gelaufene Bahn; 0,5 s Toleranz wegen gerundeter Anzeigezeiten
+function srFromTime(sec){let best=[1,0];for(let l=1;l<SR_BAHNEN.length;l++){for(let b=1;b<=SR_BAHNEN[l];b++){if(srTime(l,b)<=sec+0.5)best=[l,b];else return best;}}return best;}
+function srScore(d,g,l,b){
+  const v=srTotal(l,b), th=d[g];
+  for(let i=0;i<th.length;i++){ if(v>=srTotal(th[i][0],th[i][1])) return {np:15-i,total:v,next:i>0?{np:16-i,lb:th[i-1]}:null}; }
+  return {np:0,total:v,next:{np:1,lb:th[th.length-1]},below:true};
+}
+
+// Ausdauerorientierte Wettkämpfe (EB-Sport 2019, Kap. 2.1.8): Richtwerte in h:mm inkl. Wechselzeiten, 15 … 01 NP.
+// Abweichende Distanzen: Schwimmen 2:00 min/100 m, Radfahren 2:00 min/km, Laufen 4:30 min/km.
+function parseHM(s){
+  s=String(s==null?"":s).trim().replace(/\s/g,"");
+  const p=s.split(":");
+  if(p.length<2||p.length>3||!p.every(x=>/^\d+$/.test(x))) return NaN;
+  const h=+p[0], m=+p[1], sec=p.length===3?+p[2]:0;
+  if(m>=60||sec>=60) return NaN;
+  return h*60+m+sec/60; // in Minuten
+}
+function fmtHM(min){const t=Math.round(min*60);const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;return h+":"+String(m).padStart(2,"0")+(s?":"+String(s).padStart(2,"0"):"");}
+function fmtMS(min){const t=Math.round(Math.abs(min)*60);return Math.floor(t/60)+":"+String(t%60).padStart(2,"0")+" min";}
+const EW_RATE={swim:2,bike:2,run:4.5};
+const EW=(name,parts,m,w)=>({name,kind:"ew",unit:"hm",group:"Ausdauerwettkampf",parts,m:m.split(" ").map(parseHM),w:w.split(" ").map(parseHM)});
+DISCIPLINES.push(
+  EW("Triathlon (500 m · 20 km · 5 km)",[{k:"swim",label:"Schwimmen",d:500,u:"m"},{k:"bike",label:"Radfahren",d:20,u:"km"},{k:"run",label:"Laufen",d:5,u:"km"}],
+    "1:17 1:19 1:21 1:23 1:25 1:27 1:29 1:31 1:33 1:35 1:37 1:39 1:41 1:43 1:45","1:25 1:27 1:29 1:31 1:33 1:35 1:37 1:39 1:41 1:43 1:45 1:47 1:49 1:51 1:53"),
+  EW("Duathlon (3 km · 20 km · 1,5 km)",[{k:"run",label:"Laufen 1",d:3,u:"km"},{k:"bike",label:"Radfahren",d:20,u:"km"},{k:"run",label:"Laufen 2",d:1.5,u:"km"}],
+    "1:04 1:06 1:08 1:10 1:12 1:14 1:16 1:18 1:20 1:22 1:24 1:26 1:28 1:30 1:32","1:12 1:14 1:16 1:18 1:20 1:22 1:24 1:26 1:28 1:30 1:32 1:34 1:36 1:38 1:40"),
+  EW("Swim-and-run (750 m · 5 km)",[{k:"swim",label:"Schwimmen",d:750,u:"m"},{k:"run",label:"Laufen",d:5,u:"km"}],
+    "0:41 0:43 0:45 0:47 0:49 0:51 0:53 0:55 0:57 0:59 1:01 1:03 1:05 1:07 1:09","0:45 0:47 0:49 0:51 0:53 0:55 0:57 0:59 1:01 1:03 1:05 1:07 1:09 1:11 1:13")
+);
+function ewShift(d,dists){let s=0;d.parts.forEach((p,i)=>{const x=dists[i];s+=(p.k==="swim"?(x-p.d)/100:(x-p.d))*EW_RATE[p.k];});return s;}
+function ewScore(d,g,v,shift){
+  const th=d[g].map(t=>t+shift);
+  for(let i=0;i<th.length;i++){ if(v<=th[i]+1e-9) return {np:15-i,next:i>0?{np:16-i,value:th[i-1]}:null}; }
+  return {np:0,next:{np:1,value:th[th.length-1]},below:true};
+}
 
 // "2:31,5" → 151.5 · "12,3" → 12.3 · "151.5" → 151.5
 function parseValue(s){
@@ -223,7 +284,7 @@ if(typeof module!=="undefined") module.exports={DISCIPLINES,PTS,parseValue,score
 
   function labelOf(d){return d.label?"Hürden (J: 110 m · M: 100 m)":d.name;}
   function buildSelect(){
-    ["Lauf","Sprung","Wurf"].forEach(gr=>{
+    ["Lauf","Sprung","Wurf","Ausdauerwettkampf","Ausdauertest"].forEach(gr=>{
       const og=document.createElement("optgroup"); og.label=gr;
       DISCIPLINES.forEach((d,i)=>{if(d.group===gr){const o=document.createElement("option");o.value=i;o.textContent=labelOf(d);og.appendChild(o);}});
       disc.appendChild(og);
@@ -234,14 +295,21 @@ if(typeof module!=="undefined") module.exports={DISCIPLINES,PTS,parseValue,score
     const d=current();
     $("weight").textContent=d.weight?"Gerät Jungen: "+d.weight.m+" · Mädchen: "+d.weight.w+". U18-Gewicht gilt, wenn der Prüfling jahrgangsmäßig noch zur U18 gehört.":"";
     $("weight").style.display=d.weight?"block":"none";
-    if(d.unit==="min"){ $("vallabel").textContent="Zeit (min:sek)"; val.placeholder="z. B. 3:05,4"; $("fmt").textContent="Format min:sek, Zehntel mit Komma."; }
+    $("srmodewrap").style.display=d.kind==="sr"?"block":"none"; const srT=d.kind==="sr"&&$("srmode").value==="t"; $("srstep").style.display="none"; val.readOnly=srT; $("bahnwrap").style.display=(d.kind==="sr"&&$("srmode").value==="lb")?"block":"none"; $("opendoc").style.display=(d.kind==="sr"||d.kind==="ew")?"none":""; $("distwrap").style.display=d.kind==="ew"?"block":"none"; if(d.kind==="ew") buildDist(d);
+    if(d.kind==="sr"){ const tm=$("srmode").value==="t"; $("vallabel").textContent=tm?"Gesamtzeit (min:sek)":"Level"; val.placeholder=tm?"▲ drücken":"z. B. 10"; $("fmt").textContent=tm?"Mit ▲/▼ bahnweise einstellen, gedrückt halten läuft schnell durch. Gewertet wird die letzte vollständig gelaufene Bahn (Zeiten aus dem Protokoll berechnet).":"Level und Bahn eingeben, z. B. Level 10, Bahn 3. Bahn 0 = Level gerade erreicht. Die Gesamtzeit ist aus dem Protokoll berechnet, nicht gemessen."; $("weight").textContent="Eigene Vorschlagstabelle (Version A, anspruchsvoll), keine EB-Disziplin – Fachkonferenz-Beschluss nötig. Bahnen pro Level nach Standardprotokoll (L1: 7, L2–3: 8, L4–5: 9, L6–7: 10, L8–10: 11, L11–12: 12); mit eigener Audiodatei abgleichen."; $("weight").style.display="block"; }
+    else if(d.kind==="ew"){ $("vallabel").textContent="Gesamtzeit (h:mm)"; val.placeholder="z. B. 1:23:40"; $("fmt").textContent="Gesamtzeit inkl. Wechselzeiten, Format h:mm oder h:mm:ss. Zwischen zwei Tabellenwerten gilt der niedrigere Punktwert."; $("weight").textContent="Richtwerte EB-Sport 2019 (Kap. 2.1.8). Der Fachprüfungsausschuss legt die Kriterien unter Berücksichtigung von Streckenprofil und Untergrund fest. Nicht bei extremer Witterung; Radfahren ohne Windschatten, mit Helm."; $("weight").style.display="block"; }
+    else if(d.unit==="min"){ $("vallabel").textContent="Zeit (min:sek)"; val.placeholder="z. B. 3:05,4"; $("fmt").textContent="Format min:sek, Zehntel mit Komma."; }
     else if(d.kind==="t"){ $("vallabel").textContent="Zeit (Sekunden)"; val.placeholder="z. B. 12,4"; $("fmt").textContent="Sekunden, Zehntel mit Komma."; }
     else { $("vallabel").textContent="Weite/Höhe (Meter)"; val.placeholder="z. B. 4,85"; $("fmt").textContent="Meter, Zentimeter mit Komma."; }
+    setupPicker(d);
   }
   function clearHalves(){G.forEach(g=>{$("b-pts-"+g).textContent="–";$("b-note-"+g).textContent="–";$("b-next-"+g).textContent="";});}
   let last=null;
   function calc(){
     const d=current(); $("b-disc").textContent=labelOf(d);
+    document.querySelectorAll(".ptsbox").forEach(e=>e.style.display=(d.kind==="sr"||d.kind==="ew")?"none":"");
+    if(d.kind==="sr"){ calcSR(d); return; }
+    if(d.kind==="ew"){ calcEW(d); return; }
     const v=parseValue(val.value); last=null;
     if(!val.value.trim()){ clearHalves(); $("b-msg").textContent="Leistung eingeben."; return; }
     if(isNaN(v)||v<=0){ clearHalves(); $("b-msg").textContent=d.unit==="min"?"Bitte als min:sek eingeben, z. B. 3:05,4.":"Bitte eine Zahl eingeben, z. B. "+(d.kind==="t"?"12,4.":"4,85."); return; }
@@ -256,6 +324,57 @@ if(typeof module!=="undefined") module.exports={DISCIPLINES,PTS,parseValue,score
     });
     last={who:$("who").value.trim()||"–",disc:labelOf(d),perf:fmtValue(v,d),m:out.m,w:out.w};
   }
+  function buildDist(d){
+    const w=$("distwrap"); w.innerHTML="";
+    d.parts.forEach((p,i)=>{
+      const lb=document.createElement("label"); lb.htmlFor="dist"+i; lb.textContent="Distanz "+p.label+" ("+p.u+")";
+      const inp=document.createElement("input"); inp.id="dist"+i; inp.inputMode="decimal"; inp.autocomplete="off"; inp.value=String(p.d).replace(".",","); inp.oninput=calc;
+      w.appendChild(lb); w.appendChild(inp);
+    });
+    const h=document.createElement("p"); h.className="hint"; h.textContent="Standarddistanzen sind vorausgefüllt. Bei Abweichung wird die Tabelle nach dem Berechnungsschlüssel verschoben (zulässig bis 20 % je Disziplin)."; w.appendChild(h);
+  }
+  function calcEW(d){
+    last=null;
+    const vs=val.value.trim();
+    if(!vs){ clearHalves(); $("b-msg").textContent="Gesamtzeit eingeben."; return; }
+    const v=parseHM(vs);
+    if(isNaN(v)||v<=0){ clearHalves(); $("b-msg").textContent="Bitte als h:mm oder h:mm:ss eingeben, z. B. 1:23 oder 1:23:40."; return; }
+    const dists=d.parts.map((p,i)=>parseValue(($("dist"+i)||{}).value));
+    if(dists.some(x=>isNaN(x)||x<=0)){ clearHalves(); $("b-msg").textContent="Bitte alle Distanzen als Zahl eingeben."; return; }
+    const sh=ewShift(d,dists), msgs=[];
+    if(Math.abs(sh)>1e-9) msgs.push("Tabelle angepasst um "+(sh>0?"+":"−")+fmtMS(sh)+" (Berechnungsschlüssel).");
+    const warn=d.parts.filter((p,i)=>Math.abs(dists[i]-p.d)>0.2*p.d+1e-9).map(p=>p.label);
+    if(warn.length) msgs.push("Achtung: "+warn.join(", ")+" weicht um mehr als 20 % vom Standard ab.");
+    $("b-msg").textContent=msgs.join(" ");
+    $("b-disc").textContent=labelOf(d)+" · Gesamtzeit "+fmtHM(v);
+    const out={};
+    G.forEach(g=>{
+      const r=ewScore(d,g,v,sh), np=String(r.np).padStart(2,"0"); out[g]=np+" NP";
+      $("b-note-"+g).textContent=np;
+      $("b-next-"+g).textContent= r.next ? (r.below?"Unter der Tabelle. ":"")+"Nächste Stufe ("+String(r.next.np).padStart(2,"0")+" NP): "+fmtHM(r.next.value) : "Höchstwertung erreicht.";
+    });
+    last={who:$("who").value.trim()||"–",disc:labelOf(d),perf:fmtHM(v),m:out.m,w:out.w};
+  }
+  function calcSR(d){
+    last=null;
+    const ls=val.value.trim(), bs=$("bahn").value.trim();
+    const tm=$("srmode").value==="t";
+    if(!ls){ clearHalves(); $("b-msg").textContent=tm?"Gesamtzeit eingeben.":"Level und Bahn eingeben."; return; }
+    let l,b;
+    if(tm){ const sec=parseValue(ls); if(isNaN(sec)||sec<=0){ clearHalves(); $("b-msg").textContent="Bitte als min:sek eingeben, z. B. 9:44."; return; } [l,b]=srFromTime(sec); }
+    else { l=/^\d+$/.test(ls)?parseInt(ls,10):NaN; b=bs===""?0:(/^\d+$/.test(bs)?parseInt(bs,10):NaN); }
+    if(!(l>=1&&l<SR_BAHNEN.length)){ clearHalves(); $("b-msg").textContent="Level als ganze Zahl von 1 bis "+(SR_BAHNEN.length-1)+" eingeben."; return; }
+    if(isNaN(b)||b<0||b>SR_BAHNEN[l]){ clearHalves(); $("b-msg").textContent="Level "+l+" hat "+SR_BAHNEN[l]+" Bahnen. Bahn 0 bis "+SR_BAHNEN[l]+" eingeben."; return; }
+    $("b-msg").textContent=(!tm&&bs==="")?"Keine Bahn eingegeben – gerechnet mit Bahn 0.":"";
+    const zt=srFmt(srTime(l,b)); $("b-disc").textContent=labelOf(d)+(tm?" · eingegeben "+srFmt(parseValue(ls))+" →":" ·")+" Level "+l+", Bahn "+b+" · Gesamtzeit "+zt;
+    const out={};
+    G.forEach(g=>{
+      const r=srScore(d,g,l,b), np=String(r.np).padStart(2,"0"); out[g]=np+" NP";
+      $("b-note-"+g).textContent=np;
+      $("b-next-"+g).textContent= r.next ? (r.below?"Unter der Tabelle. ":"")+"Nächste Stufe ("+String(r.next.np).padStart(2,"0")+" NP): Level "+r.next.lb[0]+", Bahn "+r.next.lb[1]+" ("+srFmt(srTime(r.next.lb[0],r.next.lb[1]))+")" : "Höchstwertung erreicht.";
+    });
+    last={who:$("who").value.trim()||"–",disc:labelOf(d),perf:"Level "+l+"/"+b+" ("+zt+")",m:out.m,w:out.w};
+  }
   function renderList(){
     const tb=$("list"); tb.innerHTML="";
     results.forEach(r=>{const tr=document.createElement("tr");
@@ -263,10 +382,95 @@ if(typeof module!=="undefined") module.exports={DISCIPLINES,PTS,parseValue,score
       tb.appendChild(tr);});
     $("listempty").style.display=results.length?"none":"block";
   }
+  // Zeit-Stepper: Wert intern in Zehntelsekunden, Überträge (59 s → 1:00) automatisch
+  const tp={t:0,touched:false,cfg:null};
+  function pickCfg(d){
+    if(d.kind==="ew") return {cols:[["Std",36000],["Min",600],["Sek",10]],seps:[":",":"],def:Math.round(d.m[7]*600),
+      hint:"Gesamtzeit inkl. Wechselzeiten mit ▲/▼ einstellen (gedrückt halten = schnell). Zwischen zwei Tabellenwerten gilt der niedrigere Punktwert."};
+    if(d.kind==="sr") return $("srmode").value==="t"?{cols:[["Min",600],["Sek",10]],seps:[":"],def:3000,
+      hint:"Laufzeit bis zum Abbruch mit ▲/▼ einstellen (gedrückt halten = schnell). Gewertet wird die letzte vollständig gelaufene Bahn (Zeiten aus dem Protokoll berechnet)."}:null;
+    const h="Mit ▲/▼ einstellen, gedrückt halten läuft schnell durch. Überträge rechnet der Rechner selbst (z. B. 59 s → 1:00).";
+    if(d.kind==="t"&&d.unit==="min") return {cols:[["Min",600],["Sek",10],["Zehntel",1]],seps:[":",","],def:Math.round(parseValue(d.m[10])*10),hint:h};
+    if(d.kind==="t") return {cols:[["Sek",10],["Zehntel",1]],seps:[","],def:Math.round(parseValue(d.m[10])*10),hint:h};
+    return null;
+  }
+  function tpRender(){
+    const c=tp.cfg; if(!c) return;
+    const parts=c.cols.map((col,i)=>{const S=col[1],P=i?c.cols[i-1][1]:0;let v=Math.floor(tp.t/S);if(P)v%=P/S;const s=String(v).padStart(P&&P/S>=60?2:1,"0");$("tv"+i).textContent=s;return s;});
+    $("tpick").classList.toggle("untouched",!tp.touched);
+    val.value=tp.touched?parts.reduce((a,v,i)=>i?a+c.seps[i-1]+v:v,""):"";
+    calc();
+  }
+  function holdStep(el,delta){
+    let t1,t2; const stop=()=>{clearTimeout(t1);clearInterval(t2);};
+    const go=()=>{tp.t=Math.max(0,tp.t+delta);tp.touched=true;tpRender();};
+    el.addEventListener("pointerdown",e=>{e.preventDefault();stop();go();t1=setTimeout(()=>{t2=setInterval(go,90);},400);});
+    ["pointerup","pointerleave","pointercancel"].forEach(ev=>el.addEventListener(ev,stop));
+    el.addEventListener("click",e=>{if(e.detail===0)go();});
+    el.addEventListener("contextmenu",e=>e.preventDefault());
+  }
+  function setupPicker(d){
+    const c=pickCfg(d), w=$("tpick"); tp.cfg=c; w.innerHTML="";
+    val.style.display=c?"none":""; w.style.display=c?"flex":"none";
+    if(!c) return;
+    $("fmt").textContent=c.hint;
+    tp.t=Math.max(0,c.def||0); tp.touched=false;
+    c.cols.forEach((col,i)=>{
+      if(i){const s=document.createElement("div");s.className="tsep";s.textContent=c.seps[i-1];w.appendChild(s);}
+      const box=document.createElement("div"); box.className="tcol";
+      const up=document.createElement("button"); up.type="button"; up.className="btn"; up.textContent="▲"; up.setAttribute("aria-label",col[0]+" plus");
+      const v=document.createElement("div"); v.className="tval"; v.id="tv"+i;
+      const dn=document.createElement("button"); dn.type="button"; dn.className="btn"; dn.textContent="▼"; dn.setAttribute("aria-label",col[0]+" minus");
+      const lb=document.createElement("small"); lb.textContent=col[0];
+      box.append(up,v,dn,lb); w.appendChild(box);
+      holdStep(up,col[1]); holdStep(dn,-col[1]);
+    });
+    tpRender();
+  }
+  let srIdx=0;
+  const SR_MAX=SR_BAHNEN.reduce((a,b)=>a+b,0);
+  function srIdxToLB(n){let l=1;while(l<SR_BAHNEN.length-1&&n>SR_BAHNEN[l]){n-=SR_BAHNEN[l];l++;}return [l,Math.min(n,SR_BAHNEN[l])];}
+  function srSet(n){srIdx=Math.max(0,Math.min(SR_MAX,n));const lb=srIdxToLB(srIdx);val.value=srIdx?srFmt(srTime(lb[0],lb[1])):"";calc();}
+  function holdBtn(el,dir){
+    let t1,t2; const stop=()=>{clearTimeout(t1);clearInterval(t2);};
+    el.addEventListener("pointerdown",e=>{e.preventDefault();stop();srSet(srIdx+dir);t1=setTimeout(()=>{t2=setInterval(()=>srSet(srIdx+dir),70);},400);});
+    ["pointerup","pointerleave","pointercancel"].forEach(ev=>el.addEventListener(ev,stop));
+    el.addEventListener("click",e=>{if(e.detail===0)srSet(srIdx+dir);});
+    el.addEventListener("contextmenu",e=>e.preventDefault());
+  }
+  holdBtn($("srup"),1); holdBtn($("srdown"),-1);
+  val.addEventListener("keydown",e=>{if(!val.readOnly)return;if(e.key==="ArrowUp"){e.preventDefault();srSet(srIdx+1);}else if(e.key==="ArrowDown"){e.preventDefault();srSet(srIdx-1);}});
   disc.onchange=()=>{updateMeta();calc();};
-  val.oninput=calc; $("who").oninput=calc;
-  $("add").onclick=()=>{calc(); if(!last){val.focus();return;} results.push(last); renderList(); val.value=""; $("who").value=""; calc(); $("who").focus();};
+  $("srmode").onchange=()=>{val.value="";$("bahn").value="";srIdx=0;updateMeta();calc();val.focus();};
+  val.oninput=calc; $("bahn").oninput=calc; $("who").oninput=calc;
+  $("add").onclick=()=>{calc(); if(!last){val.focus();return;} results.push(last); renderList(); val.value=""; $("bahn").value=""; srIdx=0; if(tp.cfg){tp.touched=false;tpRender();} $("who").value=""; calc(); $("who").focus();};
   $("clear").onclick=()=>{if(results.length&&confirm("Alle Ergebnisse aus der Liste entfernen?")){results.length=0;renderList();}};
+  // PDF-Export der Ergebnisliste (jsPDF + AutoTable); Download als Datei
+  function pdfSafe(s){return String(s==null?"":s).replace(/\u2192/g,"->").replace(/[\u2212\u2013\u2014]/g,"-").replace(/[^\x20-\x7E\u00A0-\u00FF]/g,"");}
+  function buildPDF(){
+    const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:"mm",format:"a4"});
+    const now=new Date(), datum=now.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"});
+    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.text("Leichtathletik-Rechner - Ergebnisliste",14,18);
+    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text("Stand: "+datum+"   ·   "+results.length+(results.length===1?" Eintrag":" Einträge"),14,25);
+    doc.autoTable({startY:30,
+      head:[["Nr.","Kürzel","Disziplin","Leistung","Jungen","Mädchen"]],
+      body:results.map((r,i)=>[String(i+1),r.who,r.disc,r.perf,r.m,r.w].map(pdfSafe)),
+      styles:{font:"helvetica",fontSize:9,cellPadding:2},
+      headStyles:{fillColor:[31,56,100],textColor:255},
+      alternateRowStyles:{fillColor:[245,245,245]},
+      columnStyles:{0:{halign:"right",cellWidth:10},3:{halign:"right"},4:{halign:"right"},5:{halign:"right"}},
+      didDrawPage:()=>{doc.setFontSize(8);doc.setTextColor(120);doc.text("Seite "+doc.getNumberOfPages(),196,290,{align:"right"});doc.setTextColor(0);}
+    });
+    return {blob:doc.output("blob"),name:"Ergebnisliste_"+now.toISOString().slice(0,10)+".pdf"};
+  }
+  async function exportPDF(){
+    if(!results.length){ alert("Die Liste ist noch leer."); return; }
+    if(!(window.jspdf&&window.jspdf.jsPDF)){ alert("Die PDF-Funktion konnte nicht geladen werden. Bitte die Seite neu laden."); return; }
+    const {blob,name}=buildPDF();
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+  }
+  $("pdf").onclick=exportPDF;
   const viewer=$("viewer"), vbody=$("vbody");
   $("opendoc").onclick=()=>{viewer.classList.add("open");document.body.style.overflow="hidden";$("closedoc").focus();};
   function closeDoc(){viewer.classList.remove("open");vbody.classList.remove("zoom");document.body.style.overflow="";$("opendoc").focus();}

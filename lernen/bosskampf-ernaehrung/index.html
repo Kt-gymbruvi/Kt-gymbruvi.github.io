@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bosskampf: Gesunde Ernährung (Biologie, Klasse 7)</title>
+<style>
+:root{--blue:#176FC0;--light:#E5EBF8;--mid:#7FAFDC;--ink:#1B2430;--muted:#3C4A5C;--ok:#1B6B2F;--bad:#A12626;--warn:#7A4300;--focus:#0B3A66;--line:#5C6F86}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{font-size:18px;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);background:var(--light);line-height:1.55;font-size:1rem}
+h1,h2,h3{line-height:1.25;margin:.2rem 0 .6rem}
+h1{font-size:1.6rem}h2{font-size:1.35rem}h3{font-size:1.1rem}
+p{margin:.4rem 0 .8rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:0;background:#fff;color:var(--blue);padding:.7rem 1rem;z-index:20;font-weight:800}
+.skip:focus{left:8px;top:8px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;box-shadow:0 0 0 6px #fff}
+.top{position:relative;background:#fff;border-bottom:4px solid var(--blue);overflow:hidden}
+.top .in{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;max-width:1100px;margin:0 auto;position:relative;z-index:1;flex-wrap:wrap}
+.logo{border:2px dashed var(--blue);color:var(--blue);border-radius:10px;padding:.4rem .8rem;min-width:150px;min-height:64px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:.9rem;background:#fff}
+.kicker{margin:0;color:var(--muted);font-weight:700;font-size:.95rem}
+.wave{position:absolute;right:0;bottom:0;width:60%;height:100%;z-index:0;pointer-events:none}
+main{max-width:1100px;margin:0 auto;padding:1rem}
+main:focus{outline:none}
+.card{background:#fff;border:2px solid var(--mid);border-radius:16px;padding:1rem 1.2rem;margin-bottom:1rem}
+.btn{min-height:48px;min-width:48px;padding:.55rem 1.2rem;border-radius:12px;border:2px solid var(--blue);background:var(--blue);color:#fff;font:inherit;font-weight:800;cursor:pointer;touch-action:manipulation}
+.btn.secondary{background:#fff;color:var(--blue)}
+.btn[disabled]{background:#E5EBF8;border-color:var(--line);color:#3C4A5C;cursor:not-allowed}
+.btn.big{display:block;width:100%;text-align:left;padding:.9rem 1.1rem;margin:.5rem 0}
+.btn.big small{display:block;font-weight:700;font-size:.9rem;opacity:1}
+.linkbtn{background:none;border:none;color:#0F5AA0;text-decoration:underline;font:inherit;min-height:48px;padding:.4rem .6rem;cursor:pointer}
+.row{display:grid;grid-template-columns:minmax(150px,1fr) 2fr;gap:.6rem;align-items:center;padding:.6rem;border:2px solid transparent;border-radius:12px;margin-bottom:.4rem;background:#F4F7FC}
+.row.ok{border-color:var(--ok)}.row.bad{border-color:var(--bad)}
+.row label,.row .lab{font-weight:800}
+.row .st{grid-column:1/-1;font-weight:800;font-size:.95rem}
+.row.ok .st{color:var(--ok)}.row.bad .st{color:var(--bad)}
+@media(max-width:640px){.row{grid-template-columns:1fr}}
+select,input[type=text],textarea{font:inherit;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:10px;padding:.5rem .6rem;min-height:48px;width:100%}
+textarea{min-height:130px;resize:vertical}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{font-weight:800;padding:0;margin-bottom:.4rem}
+.opt{display:flex;gap:.7rem;align-items:flex-start;padding:.6rem .7rem;border:2px solid var(--line);border-radius:12px;margin:.4rem 0;background:#fff;min-height:48px;cursor:pointer}
+.opt input{width:24px;height:24px;margin:.15rem 0 0;flex:none;accent-color:var(--blue)}
+.opt.bad{border-color:var(--bad);background:#FBEFEF}.opt.ok{border-color:var(--ok);background:#EDF7F0}
+.tag{display:inline-block;background:var(--light);border:1px solid var(--line);border-radius:8px;padding:0 .45rem;font-size:.9rem;font-weight:800;margin-right:.4rem}
+.fight{display:grid;grid-template-columns:minmax(210px,290px) 1fr;gap:1rem;align-items:start}
+@media(max-width:860px){.fight{grid-template-columns:1fr}}
+.boss{width:100%;max-width:260px;height:auto;display:block;margin:0 auto}
+.boss .x{display:none}
+.boss.dead{transform:rotate(14deg);opacity:.85}.boss.dead .x{display:inline}.boss.dead .eyes{display:none}
+.boss.hit{animation:shake .5s}
+.boss.laugh{animation:bob .6s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-3deg)}75%{transform:translateX(8px) rotate(3deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media(prefers-reduced-motion:reduce){.boss.hit,.boss.laugh{animation:none}}
+.bubble{background:var(--light);border:2px solid var(--mid);border-radius:14px;padding:.6rem .9rem;margin-top:.6rem}
+.hud{display:flex;flex-wrap:wrap;gap:.6rem 1.2rem;align-items:center;margin-bottom:.8rem}
+.steps{display:flex;gap:.4rem;flex-wrap:wrap;list-style:none;padding:0;margin:0}
+.steps li{border:2px solid var(--line);border-radius:999px;padding:.15rem .7rem;font-size:.9rem;font-weight:700;background:#fff}
+.steps li.cur{background:var(--blue);color:#fff;border-color:var(--blue)}
+.steps li.done{border-color:var(--ok);color:var(--ok)}
+.hearts{font-size:1.5rem;letter-spacing:.1rem;color:var(--bad);white-space:nowrap}
+.hp{display:flex;gap:4px;margin:.3rem 0}
+.hp span{flex:1;height:16px;border:2px solid var(--line);border-radius:6px;background:var(--bad)}
+.hp span.gone{background:#fff}
+.badges{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.3rem}
+.badge{border:2px solid var(--blue);color:var(--blue);border-radius:8px;padding:0 .5rem;font-weight:800;font-size:.9rem;background:#fff}
+.fb{border-radius:12px;padding:.7rem 1rem;margin:.8rem 0;border:2px solid var(--line);background:#fff}
+.fb:focus{outline:3px solid var(--focus)}
+.fb.ok{border-color:var(--ok);background:#EDF7F0}.fb.bad{border-color:var(--bad);background:#FBEFEF}.fb.info{border-color:var(--blue);background:#EEF4FB}
+.fb h3{margin-top:0}.fb.ok h3{color:var(--ok)}.fb.bad h3{color:var(--bad)}
+.fb ul{padding-left:1.2rem;margin:.3rem 0}.fb li{margin:.4rem 0}
+.tips{margin:.8rem 0}
+.tipcard{border:2px dashed var(--blue);border-radius:12px;padding:.5rem .8rem;margin:.4rem 0;background:#F4F7FC}
+.actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem}
+table{border-collapse:collapse;width:100%;margin:.5rem 0}
+th,td{border:2px solid var(--mid);padding:.4rem .6rem;text-align:left;vertical-align:top}
+th{background:var(--light)}
+.tw{overflow-x:auto}
+.sw{display:flex;gap:1rem;flex-wrap:wrap}
+.sw figure{margin:0;border:2px solid var(--mid);border-radius:12px;padding:.5rem;flex:1 1 200px;background:#fff}
+.sw svg{width:72px;height:72px;display:block;margin-bottom:.3rem}
+.sum{font-weight:800;font-size:1.1rem;padding:.5rem .8rem;background:var(--light);border-radius:10px;margin:.5rem 0}
+.chips{font-size:.9rem;color:var(--muted);font-weight:700}
+footer{max-width:1100px;margin:0 auto;padding:1rem;color:var(--muted);font-size:.95rem}
+.teacher h3{margin-top:1.2rem}.teacher .card{border-color:var(--blue)}
+.small{font-size:.95rem;color:var(--muted)}
+</style>
+<link rel="stylesheet" href="../schriften/schriften.css">
+</head>
+<body>
+<nav class="lernangebot-leiste" aria-label="Zurück"><style>.lernangebot-leiste{all:initial!important;display:flex!important;align-items:center!important;box-sizing:border-box!important;width:100%!important;min-height:44px!important;padding:0 8px!important;background:#eef2f7!important;border-bottom:1px solid rgba(10,45,83,.1)!important;font:500 16px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI Variable Text","Segoe UI",Roboto,Arial,sans-serif!important;letter-spacing:-.01em!important}.lernangebot-leiste a{all:initial!important;display:inline-flex!important;align-items:center!important;gap:2px!important;box-sizing:border-box!important;min-height:36px!important;padding:0 12px 0 6px!important;border-radius:999px!important;color:#0f6f8f!important;font:inherit!important;cursor:pointer!important}.lernangebot-leiste a:hover{background:rgba(10,45,83,.07)!important}.lernangebot-leiste a:focus-visible{outline:3px solid #0f7f6c!important;outline-offset:2px!important}.lernangebot-leiste svg{display:block!important;width:20px!important;height:20px!important;flex:none!important}@media (prefers-color-scheme:dark){.lernangebot-leiste{background:#061a33!important;border-bottom-color:rgba(255,255,255,.1)!important}.lernangebot-leiste a{color:#6fd3bf!important}.lernangebot-leiste a:hover{background:rgba(255,255,255,.08)!important}.lernangebot-leiste a:focus-visible{outline-color:#6fd3bf!important}}@media print{.lernangebot-leiste{display:none!important}}</style><a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>Lernangebote</a></nav>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+<header class="top">
+  <svg class="wave" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path d="M0 80 C100 30 200 130 300 80 S500 30 600 70 L600 120 L0 120 Z" fill="#E5EBF8"/>
+    <path d="M0 100 C120 60 220 140 330 100 S520 60 600 95 L600 120 L0 120 Z" fill="#7FAFDC" opacity=".55"/>
+  </svg>
+  <div class="in">
+    <div class="logo" role="img" aria-label="Platzhalter für das Schullogo">Schullogo<br>(Platzhalter)</div>
+    <div><p class="kicker">Biologie · Klasse 7 · Gesunde Ernährung</p><h1>Bosskampf gegen Kalorius</h1></div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+<noscript><div class="card">Dieses Material braucht JavaScript.</div></noscript>
+
+<section id="s-start" aria-labelledby="h-start">
+  <div class="card">
+    <h2 id="h-start">Kalorius, der Fast-Food-Gigant, greift an!</h2>
+    <p>Kalorius behauptet, sein Burger-Menü sei „perfekt für dich“. Wenn du das Ende der Einheit erreicht hast, kannst du beweisen, dass er sich irrt. Du kämpfst allein, ohne Namen und ohne Anmeldung.</p>
+    <h3>Das trainierst du</h3>
+    <ul>
+      <li>Ich ordne Nährstoffe ihrer Hauptaufgabe zu und weiß, welche Energie liefern.</li>
+      <li>Ich wähle den passenden Nachweis (Stärke, Fett, Eiweiß, Traubenzucker) und deute Ergebnisse richtig.</li>
+      <li>Ich berechne den Energiegehalt einer Mahlzeit und den Anteil am Tagesbedarf.</li>
+      <li>Ich bewerte eine Mahlzeit und stelle eine bessere zusammen.</li>
+    </ul>
+    <h3>So funktioniert der Kampf</h3>
+    <ul>
+      <li>Du hast <b>Herzen</b> (Versuche). Jede falsche Antwort kostet ein Herz. Kalorius zeigt dir dann die fachliche Folge deines Fehlers.</li>
+      <li>Es gibt <b>vier Phasen</b>. Nur wer Wissen, Experimentieren, Rechnen und Bewerten <b>kombiniert</b>, besiegt Kalorius.</li>
+      <li><b>Tipp-Karten</b> geben Denkanstöße, aber nie die Lösung.</li>
+      <li>Verlierst du, bekommst du einen <b>Lernhinweis</b> und einen neuen Versuch mit neuen Zahlen.</li>
+    </ul>
+    <p class="small">Anforderungsbereiche: <b>AFB I</b> Wissen wiedergeben · <b>AFB II</b> Wissen anwenden · <b>AFB III</b> beurteilen und begründen.</p>
+    <h3>Wähle deine Stufe (gleiche Aufgaben, unterschiedliche Unterstützung)</h3>
+    <button class="btn big" id="lvl1" type="button">Stufe 1: Lehrling <small>6 Herzen · Aufgaben in kleineren Schritten · Hinweise zu Themen sichtbar</small></button>
+    <button class="btn big secondary" id="lvl2" type="button">Stufe 2: Meister <small>5 Herzen · Aufgaben offener · mehr Ablenker · du begründest und wählst selbst</small></button>
+  </div>
+</section>
+
+<section id="s-fight" hidden aria-label="Bosskampf">
+  <div class="fight">
+    <aside class="card" aria-label="Kalorius">
+      <svg id="boss" class="boss" viewBox="0 0 200 215" role="img" aria-label="Kalorius, ein Burger-Monster mit bösem Gesicht">
+        <path d="M30 168h140v8a22 22 0 0 1-22 22H52a22 22 0 0 1-22-22z" fill="#B96A23"/>
+        <rect x="18" y="140" width="164" height="28" rx="14" fill="#5A3A22"/>
+        <polygon points="22,128 178,128 156,152 100,138 44,152" fill="#E8913A"/>
+        <path d="M16 126q10-14 20 0t20 0 20 0 20 0 20 0 20 0 20 0 20 0" fill="none" stroke="#3F8F34" stroke-width="10" stroke-linecap="round"/>
+        <path d="M18 122C18 52 58 22 100 22s82 30 82 100z" fill="#C97B2B"/>
+        <g fill="#F3D9A8"><ellipse cx="45" cy="52" rx="6" ry="3" transform="rotate(-25 45 52)"/><ellipse cx="100" cy="38" rx="6" ry="3"/><ellipse cx="150" cy="55" rx="6" ry="3" transform="rotate(25 150 55)"/><ellipse cx="75" cy="45" rx="5" ry="2.5" transform="rotate(-10 75 45)"/><ellipse cx="125" cy="45" rx="5" ry="2.5" transform="rotate(10 125 45)"/></g>
+        <g class="eyes"><circle cx="70" cy="85" r="13" fill="#fff"/><circle cx="130" cy="85" r="13" fill="#fff"/><circle cx="73" cy="88" r="5.5" fill="#1B1B1B"/><circle cx="127" cy="88" r="5.5" fill="#1B1B1B"/></g>
+        <g class="x" stroke="#1B1B1B" stroke-width="5" stroke-linecap="round"><path d="M60 75l20 20M80 75L60 95M120 75l20 20M140 75l-20 20"/></g>
+        <path d="M52 66l32 10M148 66l-32 10" stroke="#3A2412" stroke-width="6" stroke-linecap="round"/>
+        <path d="M64 106q36 28 72 0z" fill="#3A1111"/>
+        <path d="M72 107l6 9 6-8 6 10 6-10 6 9 6-9 6 10 6-10 6 8" fill="none" stroke="#fff" stroke-width="3"/>
+      </svg>
+      <div class="bubble" id="bubble" aria-live="off"></div>
+      <p class="small" style="margin-top:.8rem">Lebenskraft von Kalorius:</p>
+      <div class="hp" id="hp" role="img" aria-label=""></div>
+    </aside>
+    <div>
+      <div class="hud card">
+        <ol class="steps" id="steps" aria-label="Phasen"></ol>
+        <div><span class="sr">Herzen:</span><span class="hearts" id="hearts" role="img" aria-label=""></span></div>
+      </div>
+      <div class="card" id="taskcard"></div>
+    </div>
+  </div>
+</section>
+
+<section id="s-lose" hidden aria-labelledby="h-lose">
+  <div class="card">
+    <h2 id="h-lose" tabindex="-1">Kalorius lacht – aber das ist noch nicht das Ende!</h2>
+    <p>Alle Herzen sind verbraucht. Das ist kein Scheitern, sondern Material zum Lernen. Das solltest du dir merken:</p>
+    <ul id="lose-notes"></ul>
+    <p>Bei einem neuen Versuch bekommst du neue Zahlen und neue Proben, aber die gleichen Kompetenzen. Nutze diesmal die Tipp-Karten früher.</p>
+    <div class="actions">
+      <button class="btn" id="lose-again" type="button">Neuer Versuch mit neuen Zahlen</button>
+      <button class="btn secondary" id="lose-start" type="button">Zurück zum Start (Stufe wechseln)</button>
+    </div>
+  </div>
+</section>
+
+<section id="s-win" hidden aria-labelledby="h-win">
+  <div class="card">
+    <h2 id="h-win" tabindex="-1">Sieg! Kalorius ist besiegt.</h2>
+    <svg viewBox="0 0 200 215" class="boss dead" role="img" aria-label="Besiegter Kalorius" style="max-width:140px">
+      <path d="M30 168h140v8a22 22 0 0 1-22 22H52a22 22 0 0 1-22-22z" fill="#B96A23"/><rect x="18" y="140" width="164" height="28" rx="14" fill="#5A3A22"/><path d="M18 122C18 52 58 22 100 22s82 30 82 100z" fill="#C97B2B"/>
+      <g stroke="#1B1B1B" stroke-width="5" stroke-linecap="round"><path d="M60 75l20 20M80 75L60 95M120 75l20 20M140 75l-20 20"/></g>
+    </svg>
+    <p id="win-sum"></p>
+    <h3>Dein Rückblick nach Kompetenzbereichen</h3>
+    <ul id="win-komp"></ul>
+    <p class="small">Dieser Rückblick wird nur auf deinem Bildschirm angezeigt und nicht gespeichert.</p>
+    <div class="actions">
+      <button class="btn" id="win-again" type="button">Noch einmal kämpfen (neue Zahlen)</button>
+      <button class="btn secondary" id="win-start" type="button">Zurück zum Start</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<section id="teacher" class="teacher" hidden style="max-width:1100px;margin:0 auto;padding:1rem">
+  <div class="card" id="t-gate">
+    <h2>Lehrkraft-Ansicht</h2>
+    <p>Hier stehen Lösungen und der Erwartungshorizont. Gib den Code ein. <span class="small">(Hinweis: Das ist nur eine Hürde gegen versehentliches Öffnen, kein Schutz vor dem Auslesen des Quelltexts.)</span></p>
+    <label for="t-code" style="font-weight:800">Code</label>
+    <input id="t-code" type="text" autocomplete="off" style="max-width:260px">
+    <div class="actions"><button class="btn" id="t-open" type="button">Öffnen</button><button class="btn secondary" id="t-cancel" type="button">Zurück zum Spiel</button></div>
+    <p id="t-err" class="small" role="alert"></p>
+  </div>
+  <div id="t-body" hidden></div>
+</section>
+
+<footer>
+  <button class="linkbtn" id="btn-teacher" type="button">Lehrkraft-Ansicht</button>
+  <p>Es werden keine Namen oder persönlichen Daten erfasst, gespeichert oder gesendet. Dieses Material arbeitet ohne KI und ohne Netzwerkverbindung (außer dem Laden der Schriftart).</p>
+</footer>
+<div id="live" class="sr" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var E={fett:39,kh:17,ew:17}, TAG=9500, MAXKJ=3800, CODE='bio7';
+var PH=['Nährstoff-Schild','Labor-Duell','Kalorien-Kanone','Finale: Menü-Falle'];
+var MENUS=[
+ {main:{name:'Kalorius-Burger',f:30,k:45,e:25},side:{name:'Pommes-Berg',f:20,k:50,e:5,grp:'kh',chip:'Kohlenhydrate, Fett'},drink:{name:'Cola (0,5 l)',f:0,k:53,e:0},sideWord:'Pommes',drinkWord:'Cola'},
+ {main:{name:'Mega-Hot-Dog',f:25,k:40,e:15},side:{name:'Nuggets-Box',f:22,k:20,e:18,grp:'ew',chip:'Eiweiß, Fett, Kohlenhydrate'},drink:{name:'Limonade (0,5 l)',f:0,k:55,e:0},sideWord:'Nuggets',drinkWord:'Limonade'}
+];
+var TESTS={
+ iod:{name:'Iod-Kaliumiodid-Lösung',stoff:'Stärke',pos:'blau-schwarze Färbung'},
+ gluc:{name:'Glucoseteststreifen',stoff:'Traubenzucker (Glucose)',pos:'Farbumschlag des Streifens (Farbskala der Packung)'},
+ fett:{name:'Fettfleckprobe auf Papier',stoff:'Fett',pos:'durchscheinender Fleck, der nach dem Trocknen bleibt'},
+ biu:{name:'Biuret-Probe',stoff:'Eiweiß',pos:'violette Färbung'}
+};
+var $=function(id){return document.getElementById(id);};
+function kj(it){return it.f*E.fett+it.k*E.kh+it.e*E.ew;}
+function fmt(n){var s=String(Math.round(n*10)/10).replace('.',',');var p=s.split(',');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,' ');return p.join(',');}
+function parseNum(s){s=String(s).toLowerCase().replace(/kj|%/g,'').replace(/[\s  ]/g,'');if(!s)return NaN;if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');else s=s.replace(',','.');if(!/^-?\d+(\.\d+)?$/.test(s))return NaN;return parseFloat(s);}
+function rng(seed){var s=(seed*7919+12345)%233280;return function(){s=(s*9301+49297)%233280;return s/233280;};}
+function shuffle(a,seed){var r=rng(seed),b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function el(tag,attrs,kids){var n=document.createElement(tag);if(attrs)Object.keys(attrs).forEach(function(k){var v=attrs[k];if(k==='class')n.className=v;else if(k==='html')n.innerHTML=v;else if(k==='text')n.textContent=v;else if(k.slice(0,2)==='on')n.addEventListener(k.slice(2),v);else if(v===true)n.setAttribute(k,'');else if(v!==false&&v!=null)n.setAttribute(k,v);});(kids||[]).forEach(function(c){if(c==null)return;n.appendChild(typeof c==='string'?document.createTextNode(c):c);});return n;}
+function say(t){var l=$('live');l.textContent='';setTimeout(function(){l.textContent=t;},30);}
+function mark(row,ok,txt){row.classList.remove('ok','bad');row.classList.add(ok?'ok':'bad');var st=row.querySelector('.st');if(!st){st=el('div',{class:'st'});row.appendChild(st);}st.textContent=(ok?'✓ Richtig. ':'✗ Noch nicht richtig. ')+(txt||'');}
+function swatch(key){
+ var c={iod:'#1B1840',gluc:'#4E9A3E',biu:'#7B3F9E'};
+ if(key==='fett')return '<svg viewBox="0 0 72 72" aria-hidden="true" focusable="false"><rect x="4" y="4" width="64" height="64" rx="6" fill="#F6F1E4" stroke="#5C6F86" stroke-width="2"/><ellipse cx="36" cy="36" rx="16" ry="13" fill="#E7DCBC" stroke="#8A7A4A" stroke-width="2" stroke-dasharray="3 2"/></svg>';
+ if(key==='gluc')return '<svg viewBox="0 0 72 72" aria-hidden="true" focusable="false"><rect x="26" y="4" width="20" height="64" rx="4" fill="#fff" stroke="#5C6F86" stroke-width="2"/><rect x="26" y="40" width="20" height="18" fill="'+c.gluc+'"/></svg>';
+ return '<svg viewBox="0 0 72 72" aria-hidden="true" focusable="false"><circle cx="36" cy="36" r="30" fill="'+c[key]+'" stroke="#5C6F86" stroke-width="2"/></svg>';
+}
+
+/* ---------- Zustand ---------- */
+var S=null;
+function newState(level,attempt){return {level:level,attempt:attempt,v:attempt%2,hearts:level===1?6:5,max:level===1?6:5,idx:0,tasks:null,tipsTotal:0,tipN:{},errs:[],errCount:{},done:0,res:{},over:false};}
+
+/* ---------- Aufgaben ---------- */
+var ROWS={
+ ew:{label:'Eiweiße (Proteine)',text:'Baustoffe: Sie bauen zum Beispiel Muskeln und Zellen auf.',folge:'Eiweiße sind vor allem Baumaterial für Muskeln und Gewebe. Wer sie falsch einordnet, plant Ernährung für Wachstum und Training falsch.'},
+ kh:{label:'Kohlenhydrate (z. B. Stärke, Zucker)',text:'Betriebsstoffe: Sie liefern vor allem schnell verfügbare Energie.',folge:'Kohlenhydrate liefern schnell verfügbare Energie. Wer das verwechselt, plant Energie für Lernen und Sport falsch.'},
+ fett:{label:'Fette',text:'Energiereichster Nährstoff: Sie liefern pro Gramm am meisten Energie und dienen als Speicher.',folge:'Fett liefert pro Gramm mehr als doppelt so viel Energie wie Kohlenhydrate. Wer das vergisst, unterschätzt fettreiche Speisen.'},
+ vit:{label:'Vitamine',text:'Reglerstoffe: Sie steuern Abläufe im Körper und liefern keine Energie.',folge:'Vitamine liefern keine Energie. Wer sie für Energielieferanten hält, ersetzt Essen durch Tabletten und hat trotzdem zu wenig Energie.'},
+ min:{label:'Mineralstoffe (z. B. Calcium)',text:'Bau- und Reglerstoffe: zum Beispiel Calcium für Knochen und Zähne; sie liefern keine Energie.',folge:'Mineralstoffe wie Calcium werden auch als Baumaterial gebraucht (Knochen, Zähne), liefern aber keine Energie.'},
+ ball:{label:'Ballaststoffe',text:'Kaum verdaulich: Sie fördern die Verdauung und sättigen.',folge:'Ballaststoffe sind kaum verdaulich und deshalb kaum Energielieferanten, aber wichtig für die Verdauung.'},
+ wasser:{label:'Wasser',text:'Lösungs- und Transportmittel im Körper; es liefert keine Energie.',folge:'Wasser liefert keine Energie, ist aber lebenswichtig als Lösungs- und Transportmittel.'}
+};
+
+function radioGroup(body,name,legend,opts,seed,showTag){
+ var fs=el('fieldset'),list=[];fs.appendChild(el('legend',{text:legend}));
+ shuffle(opts,seed).forEach(function(o){
+  var inp=el('input',{type:'radio',name:name,value:o.id});
+  var lab=el('label',{class:'opt'},[inp,el('span',{},[showTag&&o.tag?el('span',{class:'tag',text:o.tag}):null,o.text])]);
+  fs.appendChild(lab);list.push({o:o,inp:inp,lab:lab});
+ });
+ body.appendChild(fs);
+ return list;
+}
+function choiceCheck(list,okHtml){
+ var sel=list.filter(function(x){return x.inp.checked;})[0];
+ list.forEach(function(x){x.lab.classList.remove('bad','ok');});
+ if(!sel)return {invalid:'Wähle zuerst eine Antwort aus.'};
+ if(sel.o.ok){sel.lab.classList.add('ok');return {ok:true,html:okHtml};}
+ sel.lab.classList.add('bad');
+ return {ok:false,items:['<b>Deine Antwort:</b> „'+sel.o.text+'“<br>'+sel.o.why],notes:[sel.o.note||sel.o.why]};
+}
+
+function buildTasks(S){
+ var M=MENUS[S.v],L=S.level,sd=S.attempt*17,T=[];
+ var burgerKJ=kj(M.main),sideKJ=kj(M.side),drinkKJ=kj(M.drink),totalKJ=burgerKJ+sideKJ+drinkKJ;
+ var pct=totalKJ/TAG*100;
+
+ /* 1.1 Zuordnung */
+ (function(){
+  var ids=L===1?['ew','kh','fett','vit']:['ew','kh','fett','vit','min','ball','wasser'],ctl=[];
+  T.push({id:'1.1',phase:0,afb:'I',komp:'Fachwissen',title:'Wer macht was im Körper?',
+   boss:'„Nährstoffe sind doch alle gleich – Hauptsache, viel Essen!“',
+   instr:'Widerlege Kalorius: Ordne jedem Nährstoff seine Hauptaufgabe zu.',
+   tips:['Frage dich bei jedem Stoff: Baut er etwas auf, liefert er Energie oder steuert er Vorgänge?','Die Begriffe Baustoff, Betriebsstoff und Reglerstoff helfen. Überlege, welche Stoffe Energie liefern.','Energie liefern vor allem Kohlenhydrate, Fette und Eiweiße. Vitamine, Mineralstoffe und Wasser liefern keine Energie.'],
+   render:function(body){
+    var fs=el('fieldset');fs.appendChild(el('legend',{text:'Wähle für jeden Nährstoff die passende Aussage.'}));
+    shuffle(ids,sd+2).forEach(function(id){
+     var sel=el('select',{id:'s-'+id,'data-row':id},[el('option',{value:'',text:'– bitte wählen –'})]);
+     shuffle(ids,sd+5).forEach(function(o){sel.appendChild(el('option',{value:o,text:ROWS[o].text}));});
+     var row=el('div',{class:'row'},[el('label',{for:'s-'+id,text:ROWS[id].label}),sel]);
+     fs.appendChild(row);ctl.push({id:id,sel:sel,row:row});
+    });
+    body.appendChild(fs);
+   },
+   check:function(){
+    var miss=0,wrong=[];
+    ctl.forEach(function(c){var v=c.sel.value;if(!v){miss++;return;}if(v===c.id)mark(c.row,true);else{mark(c.row,false);wrong.push(c);}});
+    if(miss)return {invalid:'Wähle zuerst für jede Zeile eine Aussage aus.'};
+    if(!wrong.length)return {ok:true,html:'<p>Alle Zuordnungen stimmen. Nährstoffe haben unterschiedliche Aufgaben; nur Kohlenhydrate, Fette und Eiweiße sind die Energielieferanten.</p>'};
+    return {ok:false,items:wrong.map(function(c){var ch=c.sel.value;return '<b>'+ROWS[c.id].label+':</b> Deine Aussage „'+ROWS[ch].text+'“ beschreibt '+ROWS[ch].label+'. <i>Fachliche Folge:</i> '+ROWS[c.id].folge;}),notes:wrong.map(function(c){return ROWS[c.id].folge;})};
+   },
+   teach:function(){return {loes:ids.map(function(i){return ROWS[i].label+' → '+ROWS[i].text;}).join('<br>'),erw:'Alle Zeilen korrekt; die Begriffe Bau-, Betriebs- und Reglerstoff werden sinnvoll verwendet.',fehl:'Vitamine/Mineralstoffe als Energielieferanten; Vitamine und Mineralstoffe verwechselt; Wasser als Energielieferant. Vereinfachung: Eiweiße können ebenfalls Energie liefern (wird in Phase 3 mit 17 kJ/g gerechnet); Ballaststoffe liefern kaum, aber nicht null Energie.'};}
+  });
+ })();
+
+ /* 1.2 Behauptung widerlegen */
+ (function(){
+  var opts=[
+   {id:'a',ok:true,text:'Falsch. Vitamine und Mineralstoffe regeln Vorgänge im Körper, liefern aber keine Energie. Energie kommt aus Kohlenhydraten, Fetten und Eiweißen – ohne Essen fehlt sie.'},
+   {id:'b',ok:false,text:'Richtig, aber nur bei Vitamin C.',why:'Auch Vitamin C liefert keine Energie. Folge: Wer sich nur mit Tabletten „versorgt“, hat trotz Vitaminen Energiemangel.',note:'Kein Vitamin liefert Energie; Vitamine sind Reglerstoffe.'},
+   {id:'c',ok:false,text:'Falsch, denn Wasser liefert die meiste Energie.',why:'Wasser liefert keine Energie. Es ist Lösungs- und Transportmittel. Folge: Wer nur Wasser trinkt, nimmt keine Energie auf.',note:'Wasser liefert keine Energie; Fette liefern pro Gramm am meisten.'}];
+  if(L===2)opts.push({id:'d',ok:false,text:'Teilweise richtig: Mineralstoffe liefern Energie, Vitamine nicht.',why:'Auch Mineralstoffe liefern keine Energie, sie dienen als Bau- und Reglerstoffe (z. B. Calcium für Knochen).',note:'Weder Vitamine noch Mineralstoffe liefern Energie.'});
+  var list;
+  T.push({id:'1.2',phase:0,afb:'II',komp:'Fachwissen',title:'Kalorius’ Tabletten-Trick',
+   boss:'„Vitamine und Mineralstoffe sind meine stärksten Energielieferanten. Schluck Tabletten, Essen brauchst du nicht!“',
+   instr:'Wähle die Antwort, die Kalorius fachlich richtig widerlegt.',
+   tips:['Lies Kalorius’ Satz genau: Welche Behauptung über Energie steckt darin?','Überlege, aus welchen drei Nährstoffgruppen der Körper Energie gewinnt.','Vitamine und Mineralstoffe steuern Vorgänge oder bauen auf. Sie werden nicht zur Energiegewinnung „verbrannt“.'],
+   render:function(body){list=radioGroup(body,'c12','Welche Antwort ist richtig?',opts,sd+3,false);},
+   check:function(){return choiceCheck(list,'<p>Genau: Vitamine und Mineralstoffe liefern keine Energie. Tabletten können Essen nicht ersetzen.</p>');},
+   teach:function(){return {loes:'Antwort a: Vitamine und Mineralstoffe liefern keine Energie (Regler-/Baustoffe); Energie liefern Kohlenhydrate, Fette, Eiweiße.',erw:'Die Behauptung wird fachlich widerlegt und die drei Energielieferanten genannt.',fehl:'„Vitamine geben Kraft“ (Alltagsvorstellung); Vitamintabletten ersetzen Essen.'};}
+  });
+ })();
+
+ /* 2.1 Nachweise */
+ (function(){
+  var probes=S.v===0?[{p:'Kartoffelscheibe',t:'iod'},{p:'Erdnuss (auf Papier zerdrückt)',t:'fett'},{p:'verdünntes Hühnereiklar',t:'biu'}]:[{p:'gekochte Reiskörner',t:'iod'},{p:'Traubenzucker-Lösung',t:'gluc'},{p:'Sonnenblumenkerne (auf Papier zerdrückt)',t:'fett'}];
+  var ctl=[],keys=['iod','gluc','fett','biu'];
+  T.push({id:'2.1',phase:1,afb:'I',komp:'Erkenntnisgewinnung',title:'Beweise es im Labor',
+   boss:'„Ihr Schüler glaubt nur, was ihr seht? Dann beweist mir, was in meinen Zutaten steckt!“',
+   instr:L===1?'Wähle für jede Probe den Nachweis, der den gesuchten Stoff anzeigt.':'Wähle für jede Probe den passenden Nachweis und das Ergebnis, das du bei einem positiven Befund erwartest.',
+   tips:['Jeder Nachweis passt nur zu einem Stoff. Frage zuerst: Welchen Stoff suche ich?','Die Nachweise sind nach dem benannt, was sie anzeigen: Der Glucoseteststreifen zeigt Traubenzucker, die Fettfleckprobe zeigt Fett.','Iod-Kaliumiodid-Lösung → Stärke · Glucoseteststreifen → Traubenzucker · Fettfleckprobe → Fett · Biuret-Probe → Eiweiß.'],
+   render:function(body){
+    var fs=el('fieldset');fs.appendChild(el('legend',{text:'Welcher Nachweis passt?'}));
+    probes.forEach(function(pr,i){
+     var sel=el('select',{id:'t'+i,'data-probe':i,'data-kind':'test'},[el('option',{value:'',text:'– Nachweis wählen –'})]);
+     shuffle(keys,sd+i).forEach(function(k){sel.appendChild(el('option',{value:k,text:TESTS[k].name}));});
+     var kids=[el('div',{class:'lab',html:'Probe: <b>'+pr.p+'</b><br>Gesucht: <b>'+TESTS[pr.t].stoff+'</b>'}),el('div',{},[el('label',{for:'t'+i,class:'sr',text:'Nachweis für '+pr.p}),sel])];
+     var res=null;
+     if(L===2){res=el('select',{id:'r'+i,'data-probe':i,'data-kind':'res'},[el('option',{value:'',text:'– erwartetes positives Ergebnis –'})]);
+      shuffle(keys.concat(['none']),sd+i+9).forEach(function(k){res.appendChild(el('option',{value:k,text:k==='none'?'keine Veränderung':TESTS[k].pos}));});
+      kids[1].appendChild(el('label',{for:'r'+i,class:'sr',text:'Erwartetes positives Ergebnis für '+pr.p}));kids[1].appendChild(res);}
+     var row=el('div',{class:'row'},kids);fs.appendChild(row);ctl.push({pr:pr,sel:sel,res:res,row:row});
+    });
+    body.appendChild(fs);
+    body.appendChild(el('p',{class:'small',text:'Sicherheit im echten Unterricht: Schutzbrille tragen; die Biuret-Probe arbeitet mit Natronlauge (ätzend). Hier wird nur simuliert.'}));
+   },
+   check:function(){
+    var miss=0,wrong=[];
+    ctl.forEach(function(c){var v=c.sel.value;if(!v||(c.res&&!c.res.value)){miss++;return;}
+     var okT=v===c.pr.t,okR=!c.res||c.res.value===c.pr.t;
+     if(okT&&okR)mark(c.row,true);else{mark(c.row,false);wrong.push({c:c,okT:okT,okR:okR});}});
+    if(miss)return {invalid:'Fülle zuerst alle Felder aus.'};
+    if(!wrong.length){
+     var h='<p>Alle Nachweise passen. Das sind deine Laborbefunde:</p><div class="sw">';
+     ctl.forEach(function(c){var t=TESTS[c.pr.t];h+='<figure>'+swatch(c.pr.t)+'<figcaption>'+c.pr.p+' + '+t.name+': <b>'+t.pos+'</b> → '+t.stoff+' nachgewiesen.</figcaption></figure>';});
+     return {ok:true,html:h+'</div>'};}
+    var items=[],notes=[];
+    wrong.forEach(function(w){var c=w.c,pr=c.pr;
+     if(!w.okT){var ch=TESTS[c.sel.value];items.push('<b>'+pr.p+':</b> Mit „'+ch.name+'“ weist du '+ch.stoff+' nach, nicht '+TESTS[pr.t].stoff+'. <i>Fachliche Folge:</i> Das Ergebnis sagt nichts über '+TESTS[pr.t].stoff+' aus. Ein „negatives“ Ergebnis mit dem falschen Test beweist nicht, dass der Stoff fehlt.');notes.push('Jeder Nachweis zeigt nur einen Stoff an. Ein negatives Ergebnis mit dem falschen Test beweist nicht, dass der Stoff fehlt.');}
+     else{items.push('<b>'+pr.p+':</b> Der Nachweis stimmt, aber das erwartete positive Ergebnis nicht. <i>Fachliche Folge:</i> Ohne das richtige Merkmal kannst du ein positives Ergebnis nicht erkennen.');notes.push('Merkmale positiver Nachweise: Iod → blau-schwarz, Biuret → violett, Fettfleck → durchscheinender Fleck, Glucosestreifen → Farbumschlag laut Packung.');}});
+    return {ok:false,items:items,notes:notes};
+   },
+   teach:function(){return {loes:probes.map(function(p){return p.p+' → '+TESTS[p.t].name+' ('+TESTS[p.t].pos+')';}).join('<br>'),erw:'Passender Nachweis je Stoff; auf Stufe 2 zusätzlich das positive Ergebnis.',fehl:'Verwechslung Glucosestreifen/Iod; Fettfleck mit Wasserfleck gleichgesetzt; „negativer Test = Stoff nicht enthalten“ auch bei falschem Test.'};}
+  });
+ })();
+
+ /* 2.2 Protokoll deuten */
+ (function(){
+  var pw=M.sideWord,pn=S.v===0?'Pommes (zerdrückt)':'Nuggets (zerdrückt)';
+  var opts=[
+   {id:'a',ok:true,text:'Kalorius irrt: Die blau-schwarze Färbung zeigt Stärke an, und Stärke ist ein Kohlenhydrat. Der Streifen weist nur freien Traubenzucker nach. Die Probe enthält also Kohlenhydrate und Fett.'},
+   {id:'b',ok:false,text:'Kalorius hat recht: Wenn der Glucoseteststreifen nichts anzeigt, sind keine Kohlenhydrate enthalten.',why:'Der Streifen zeigt nur freien Traubenzucker. Stärke besteht aus vielen verketteten Traubenzucker-Bausteinen und wird nicht angezeigt. <i>Folge:</i> Du würdest kohlenhydratreiche Speisen als „kohlenhydratfrei“ einstufen.',note:'Der Glucoseteststreifen zeigt nur freien Traubenzucker. Stärke ist ein Kohlenhydrat und wird mit Iod nachgewiesen.'},
+   {id:'c',ok:false,text:'Die blau-schwarze Färbung zeigt Fett an, also gibt es Fett, aber keine Kohlenhydrate.',why:'Blau-schwarz mit Iod zeigt Stärke an, nicht Fett. Fett zeigt der Fettfleck. <i>Folge:</i> Du verwechselst zwei Nachweise und ziehst falsche Schlüsse.',note:'Iod-Lösung färbt Stärke blau-schwarz; Fett zeigt der Fettfleck.'}];
+  if(L===2)opts.push({id:'d',ok:false,text:'Der bleibende Fettfleck beweist, dass die Probe Stärke enthält.',why:'Der Fettfleck zeigt Fett, nicht Stärke. Stärke zeigt die Iod-Lösung.',note:'Fettfleck = Fett; Iod → Stärke.'});
+  var list;
+  T.push({id:'2.2',phase:1,afb:'II',komp:'Erkenntnisgewinnung',title:'Das Laborprotokoll lügt nicht',
+   boss:'„Meine '+pw+' enthalten keine Kohlenhydrate! Der Zuckerstreifen blieb farblos – schaut selbst!“',
+   instr:'Lies das Protokoll. Welche Schlussfolgerung ist richtig?',
+   tips:['Ordne jedes Ergebnis seinem Test zu: Was zeigt blau-schwarz an? Was zeigt der Fettfleck an?','Der Glucoseteststreifen reagiert nur auf Traubenzucker, der frei vorliegt.','Stärke besteht aus vielen verketteten Traubenzucker-Bausteinen und gehört zu den Kohlenhydraten.'],
+   render:function(body){
+    body.appendChild(el('div',{class:'tw',html:'<table><caption class="sr">Laborprotokoll</caption><thead><tr><th scope="col">Probe</th><th scope="col">Test</th><th scope="col">Beobachtung</th></tr></thead><tbody><tr><th scope="row" rowspan="3">'+pn+'</th><td>Iod-Kaliumiodid-Lösung</td><td>blau-schwarze Färbung</td></tr><tr><td>Fettfleckprobe auf Papier</td><td>durchscheinender Fleck bleibt</td></tr><tr><td>Glucoseteststreifen</td><td>keine Verfärbung</td></tr></tbody></table>'}));
+    list=radioGroup(body,'c22','Welche Aussage stimmt?',opts,sd+4,false);},
+   check:function(){return choiceCheck(list,'<p>Richtig. Ein negativer Glucosestreifen heißt nur: kein <i>freier</i> Traubenzucker. Stärke ist trotzdem ein Kohlenhydrat.</p>');},
+   teach:function(){return {loes:'Antwort a: Iod blau-schwarz → Stärke (Kohlenhydrat); Fettfleck → Fett; Glucosestreifen negativ → nur: kein freier Traubenzucker.',erw:'Zuordnung Beobachtung → Stoff und Grenze des negativen Ergebnisses werden erkannt.',fehl:'„Kein Zucker nachgewiesen = keine Kohlenhydrate“; Verwechslung der Nachweise.'};}
+  });
+ })();
+
+ /* 3.1 Energie Hauptgericht */
+ (function(){
+  var m=M.main,F=m.f*E.fett,K=m.k*E.kh,P=m.e*E.ew,tot=F+K+P,fields=[];
+  T.push({id:'3.1',phase:2,afb:'II',komp:'Erkenntnisgewinnung',title:'Wie viel Energie steckt im '+m.name+'?',
+   boss:'„Meine Kalorien-Kanone feuert! Mein '+m.name+' ist doch fast nur Eiweiß – da ist kaum Energie drin!“',
+   instr:L===1?'Berechne die Energie in kJ, zuerst je Nährstoff, dann die Summe.':'Berechne die Gesamtenergie des '+m.name+' in kJ.',
+   tips:['Energie eines Nährstoffs = Masse in g × Energie je g.','Rechne jeden Nährstoff einzeln und addiere dann.','Methode an einem anderen Beispiel: 10 g Fett → 10 × 39 kJ = 390 kJ; 10 g Kohlenhydrate → 10 × 17 kJ = 170 kJ.'],
+   render:function(body){
+    body.appendChild(el('div',{class:'tw',html:'<table><caption class="sr">Nährstoffe im '+m.name+'</caption><thead><tr><th scope="col">Nährstoff</th><th scope="col">Masse im '+m.name+'</th><th scope="col">Energie je Gramm</th></tr></thead><tbody><tr><th scope="row">Fett</th><td>'+m.f+' g</td><td>39 kJ/g</td></tr><tr><th scope="row">Kohlenhydrate</th><td>'+m.k+' g</td><td>17 kJ/g</td></tr><tr><th scope="row">Eiweiß</th><td>'+m.e+' g</td><td>17 kJ/g</td></tr></tbody></table><p class="small">Gerundete Rechenwerte; Nährwerte des Menüs sind für die Aufgabe ausgedacht.</p>'}));
+    var defs=L===1?[['fett','Energie aus Fett (kJ)',F],['kh','Energie aus Kohlenhydraten (kJ)',K],['ew','Energie aus Eiweiß (kJ)',P],['sum','Gesamtenergie (kJ)',tot]]:[['sum','Gesamtenergie (kJ)',tot]];
+    var fs=el('fieldset');fs.appendChild(el('legend',{text:'Deine Ergebnisse'}));
+    defs.forEach(function(d){var inp=el('input',{type:'text',inputmode:'decimal',id:'f-'+d[0],'data-f':d[0],autocomplete:'off'});var row=el('div',{class:'row'},[el('label',{for:'f-'+d[0],text:d[1]}),inp]);fs.appendChild(row);fields.push({k:d[0],inp:inp,row:row,ans:d[2]});});
+    body.appendChild(fs);
+   },
+   check:function(){
+    var bad=[],miss=0,notes=[];
+    fields.forEach(function(f){var v=parseNum(f.inp.value);if(isNaN(v)){miss++;return;}
+     if(Math.abs(v-f.ans)<=2){mark(f.row,true);return;}
+     mark(f.row,false);var msg;
+     if(f.k==='sum'){
+      var mods=[[m.f*17+K+P,'Du hast Fett mit 17 kJ/g gerechnet. Fett liefert aber 39 kJ/g.'],[K+P,'Es fehlt das Fett in deiner Summe.'],[F+P,'Es fehlen die Kohlenhydrate in deiner Summe.'],[F+K,'Es fehlt das Eiweiß in deiner Summe.'],[m.f+m.k+m.e,'Du hast nur die Gramm addiert, nicht die Energie.']];
+      msg=mods.filter(function(x){return Math.abs(x[0]-v)<=2;}).map(function(x){return x[1];})[0]||'Rechne Masse × Energie je Gramm für jeden Nährstoff und addiere die drei Ergebnisse.';
+     }else if(f.k==='fett'&&Math.abs(v-m.f*17)<=2)msg='Du hast Fett mit 17 kJ/g gerechnet. Fett liefert aber 39 kJ/g.';
+     else msg='Rechne Masse in g × Energie je g für diesen Nährstoff.';
+     bad.push('<b>'+f.row.querySelector('label').textContent+':</b> '+msg+(f.k==='sum'||f.k==='fett'?' <i>Fachliche Folge:</i> Du würdest den Energiegehalt falsch einschätzen. Fett hat mehr als doppelt so viel Energie je Gramm wie Kohlenhydrate oder Eiweiß.':''));
+     notes.push(msg+' Fett liefert 39 kJ/g, Kohlenhydrate und Eiweiß je 17 kJ/g.');});
+    if(miss)return {invalid:'Trage zuerst in alle Felder eine Zahl ein.'};
+    if(!bad.length){S.res.burgerKJ=tot;return {ok:true,html:'<p>Richtig: '+fmt(tot)+' kJ. Obwohl Eiweiß der kleinste Posten ist, liefert allein das Fett '+fmt(F)+' kJ.</p>'};}
+    return {ok:false,items:bad,notes:notes};
+   },
+   teach:function(){return {loes:'Fett '+m.f+'×39='+F+' kJ; KH '+m.k+'×17='+K+' kJ; Eiweiß '+m.e+'×17='+P+' kJ; Summe '+tot+' kJ (Toleranz ±2).',erw:'Richtiger Ansatz (Masse × Energie/g), korrekte Summe, Einheit kJ.',fehl:'Fett wie Kohlenhydrate gerechnet (17 statt 39); ein Posten vergessen; Gramm addiert. Hinweis: Packungsangaben nutzen oft 37 kJ/g für Fett; hier gilt der Aufgabenwert 39.'};}
+  });
+ })();
+
+ /* 3.2 Menü + Anteil */
+ (function(){
+  var s=M.side,d=M.drink,fields=[];
+  T.push({id:'3.2',phase:2,afb:'II',komp:'Erkenntnisgewinnung',title:'Das ganze Menü: Wie viel vom Tagesbedarf?',
+   boss:'„'+M.main.name+', '+s.name+' und '+d.name+' – mein Standardmenü! Das ist doch höchstens ein Zehntel von dem, was du am Tag brauchst!“',
+   instr:L===1?'Berechne die Energie des Getränks, die Gesamtenergie und den Anteil am Tagesbedarf.':'Berechne die Gesamtenergie des Menüs und den Anteil am Tagesbedarf (auf ganze Prozent).',
+   tips:['Das Getränk enthält nur Zucker, also nur Kohlenhydrate. Rechne wie vorher: Masse × 17 kJ/g.','Anteil in % = (Energie des Menüs : Tagesbedarf) × 100.','Prüfe dein Ergebnis: Eine Mahlzeit ist weniger als ein ganzer Tagesbedarf. Muss der Anteil dann unter oder über 100 % liegen?'],
+   render:function(body){
+    var html;
+    if(L===1)html='<table><caption class="sr">Energie der Menü-Teile</caption><thead><tr><th scope="col">Teil</th><th scope="col">Energie</th></tr></thead><tbody><tr><th scope="row">'+M.main.name+'</th><td>'+fmt(burgerKJ)+' kJ</td></tr><tr><th scope="row">'+s.name+'</th><td>'+fmt(sideKJ)+' kJ</td></tr><tr><th scope="row">'+d.name+'</th><td>nur Kohlenhydrate: '+d.k+' g</td></tr></tbody></table>';
+    else html='<table><caption class="sr">Nährstoffe der Menü-Teile</caption><thead><tr><th scope="col">Teil</th><th scope="col">Fett</th><th scope="col">Kohlenhydrate</th><th scope="col">Eiweiß</th></tr></thead><tbody><tr><th scope="row">'+M.main.name+'</th><td colspan="3">Energie schon berechnet: '+fmt(burgerKJ)+' kJ</td></tr><tr><th scope="row">'+s.name+'</th><td>'+s.f+' g</td><td>'+s.k+' g</td><td>'+s.e+' g</td></tr><tr><th scope="row">'+d.name+'</th><td>'+d.f+' g</td><td>'+d.k+' g</td><td>'+d.e+' g</td></tr></tbody></table>';
+    body.appendChild(el('div',{class:'tw',html:html+'<p>Tagesbedarf in dieser Aufgabe: <b>9 500 kJ</b> (ausgedachter Beispielwert, kein Richtwert). Energie je Gramm: Fett 39 kJ, Kohlenhydrate 17 kJ, Eiweiß 17 kJ.</p>'}));
+    var defs=L===1?[['drink','Energie des Getränks (kJ)'],['sum','Gesamtenergie des Menüs (kJ)'],['pct','Anteil am Tagesbedarf (%)']]:[['sum','Gesamtenergie des Menüs (kJ)'],['pct','Anteil am Tagesbedarf (%, ganze Zahl)']];
+    var fs=el('fieldset');fs.appendChild(el('legend',{text:'Deine Ergebnisse'}));
+    defs.forEach(function(x){var inp=el('input',{type:'text',inputmode:'decimal',id:'g-'+x[0],'data-f':x[0],autocomplete:'off'});var row=el('div',{class:'row'},[el('label',{for:'g-'+x[0],text:x[1]}),inp]);fs.appendChild(row);fields.push({k:x[0],inp:inp,row:row});});
+    body.appendChild(fs);
+   },
+   check:function(){
+    var bad=[],notes=[],miss=0;
+    fields.forEach(function(f){var v=parseNum(f.inp.value);if(isNaN(v)){miss++;return;}var ok,msg;
+     if(f.k==='drink'){ok=Math.abs(v-drinkKJ)<=2;msg=Math.abs(v-d.k)<=2?'Du hast nur die Gramm übernommen. Rechne: '+d.k+' g × 17 kJ/g.':'Rechne Masse × 17 kJ/g, denn das Getränk liefert nur Kohlenhydrate.';}
+     else if(f.k==='sum'){ok=Math.abs(v-totalKJ)<=5;
+      var mods=[[burgerKJ+sideKJ,'Das Getränk fehlt in deiner Summe.'],[burgerKJ+drinkKJ,'Die Beilage fehlt in deiner Summe.'],[sideKJ+drinkKJ,'Das Hauptgericht fehlt in deiner Summe.'],[burgerKJ+(s.f*17+s.k*17+s.e*17)+drinkKJ,'Bei der Beilage hast du Fett mit 17 kJ/g gerechnet statt mit 39 kJ/g.']];
+      msg=mods.filter(function(x){return Math.abs(x[0]-v)<=5;}).map(function(x){return x[1];})[0]||'Addiere die Energie aller drei Teile.';}
+     else{ok=Math.abs(v-pct)<=1;msg=Math.abs(v-TAG/totalKJ*100)<=2?'Du hast das Verhältnis umgedreht. Anteil = Teil : Ganzes, also Menü : Tagesbedarf.':(v<2?'Du hast vergessen, mit 100 zu multiplizieren.':'Anteil in % = (Energie des Menüs : 9 500 kJ) × 100.');}
+     if(ok)mark(f.row,true);else{mark(f.row,false);bad.push('<b>'+f.row.querySelector('label').textContent+':</b> '+msg+' <i>Fachliche Folge:</i> Du würdest die Energiemenge der Mahlzeit falsch beurteilen.');notes.push(msg);}});
+    if(miss)return {invalid:'Trage zuerst in alle Felder eine Zahl ein.'};
+    if(!bad.length){S.res.kj=totalKJ;S.res.pct=Math.round(pct);return {ok:true,html:'<p>Richtig: '+fmt(totalKJ)+' kJ, das sind rund '+Math.round(pct)+' % des Tagesbedarfs in einer einzigen Mahlzeit. Merke dir dieses Ergebnis für das Finale!</p>'};}
+    return {ok:false,items:bad,notes:notes};
+   },
+   teach:function(){return {loes:'Hauptgericht '+burgerKJ+' kJ + Beilage '+sideKJ+' kJ + Getränk '+drinkKJ+' kJ = '+totalKJ+' kJ; '+totalKJ+' : 9 500 × 100 = '+(Math.round(pct*10)/10)+' % → '+Math.round(pct)+' % (Toleranz ±1 %).',erw:'Teilenergien korrekt, Summe korrekt, Prozentrechnung (Teil : Ganzes × 100).',fehl:'Getränk vergessen; Verhältnis umgedreht; Faktor 100 vergessen; Energie des Getränks als „zählt nicht“ gesehen.'};}
+  });
+ })();
+
+ /* 4.1 Argumente (Kombination) */
+ (function(){
+  var d=M.drink,list=[];
+  var opts=[
+   {id:'e',ok:true,tag:'Energie',text:'Schon diese eine Mahlzeit liefert etwa '+(S.res.pct||Math.round(pct))+' % des Tagesbedarfs (Beispielwert 9 500 kJ). Das ist viel für eine von mehreren Mahlzeiten am Tag.'},
+   {id:'n',ok:true,tag:'Nährstoffe',text:'Das Menü enthält kein Obst und kein Gemüse. Es liefert kaum Vitamine, Mineralstoffe und Ballaststoffe, also kaum Reglerstoffe.'},
+   {id:'g',ok:true,tag:'Getränk',text:d.name+' liefert etwa '+d.k+' g Kohlenhydrate (Zucker), also viel Energie fast nur aus Zucker. Wasser liefert dagegen keine Energie.'},
+   {id:'w1',ok:false,tag:'Fett',text:'Fett ist grundsätzlich schädlich und sollte ganz vermieden werden.',why:'Zu pauschal: Fette sind lebensnotwendig. Sie liefern Energie, bauen Zellen mit auf und werden gebraucht, um die Vitamine A, D, E und K aufzunehmen. Entscheidend sind Menge und Auswahl.'},
+   {id:'w2',ok:false,tag:'Nachweis',text:'Der Glucoseteststreifen blieb farblos, also steckt in dem Menü kein Zucker.',why:'Der Streifen zeigt nur Traubenzucker (Glucose). Andere Zucker und Stärke zeigt er nicht an. Ein negatives Ergebnis beweist nicht, dass „kein Zucker“ enthalten ist.'},
+   {id:'w3',ok:false,tag:'Kohlenhydrate',text:'Kohlenhydrate sind schlecht, deshalb darf eine Mahlzeit keine enthalten.',why:'Kohlenhydrate sind wichtige Betriebsstoffe. Das Problem ist hier die Menge an Zucker und das Fehlen von Ballaststoffen, nicht die Stoffgruppe selbst.'}];
+  if(L===2)opts.push({id:'w4',ok:false,tag:'Eiweiß',text:'Das Menü enthält viel Eiweiß, also ist es automatisch ausgewogen.',why:'Eine ausgewogene Mahlzeit braucht passende Energie, genug Reglerstoffe und Ballaststoffe. Viel Eiweiß allein reicht nicht.'});
+  T.push({id:'4.1',phase:3,afb:'III',komp:'Bewertung',title:'Finale: Widerlege Kalorius mit Argumenten',
+   boss:'„Mein Menü ist perfekt ausgewogen! Es liefert alles, was du brauchst, und genau die richtige Energiemenge!“',
+   instr:'Wähle <b>alle</b> Argumente, die Kalorius’ Behauptung fachlich widerlegen. Nutze dabei dein Ergebnis aus Phase 3: <b>'+fmt(S.res.kj||totalKJ)+' kJ ≈ '+(S.res.pct||Math.round(pct))+' % des Tagesbedarfs</b>.',
+   tips:['Du brauchst drei Argumente aus verschiedenen Bereichen: Energie, Nährstoffe und Getränk.','Prüfe jede Aussage: Stimmt sie fachlich, und widerlegt sie Kalorius wirklich?','Aussagen mit „grundsätzlich“, „ganz“ oder „automatisch“ sind verdächtig. Vergleiche sie mit dem, was du in den Phasen 1 und 2 gelernt hast.'],
+   render:function(body){
+    var fs=el('fieldset');fs.appendChild(el('legend',{text:'Mehrfachauswahl: Welche Argumente stimmen?'}));
+    shuffle(opts,sd+6).forEach(function(o){var inp=el('input',{type:'checkbox',value:o.id});var lab=el('label',{class:'opt'},[inp,el('span',{},[L===1?el('span',{class:'tag',text:'Thema: '+o.tag}):null,o.text])]);fs.appendChild(lab);list.push({o:o,inp:inp,lab:lab});});
+    body.appendChild(fs);
+   },
+   check:function(){
+    list.forEach(function(x){x.lab.classList.remove('bad','ok');});
+    var sel=list.filter(function(x){return x.inp.checked;});
+    if(!sel.length)return {invalid:'Wähle mindestens ein Argument aus.'};
+    var wrong=sel.filter(function(x){return !x.o.ok;}),right=sel.filter(function(x){return x.o.ok;});
+    right.forEach(function(x){x.lab.classList.add('ok');});
+    if(wrong.length){wrong.forEach(function(x){x.lab.classList.add('bad');});
+     return {ok:false,items:wrong.map(function(x){return '<b>Falsches Argument:</b> „'+x.o.text+'“<br><i>Fachliche Folge:</i> '+x.o.why;}),notes:wrong.map(function(x){return x.o.why;})};}
+    if(right.length<3){return {soft:true,html:'<p>Alles, was du gewählt hast, stimmt. Dir fehlen noch <b>'+(3-right.length)+'</b> Argument(e). Du verlierst dafür kein Herz. Denke an die drei Bereiche Energie, Nährstoffe und Getränk.</p>'};}
+    return {ok:true,html:'<p>Alle drei Argumente sitzen: Energie (mit deiner Rechnung), fehlende Reglerstoffe und Zuckergetränk. Du hast Wissen, Experiment-Deutung und Rechnung kombiniert.</p>'};
+   },
+   teach:function(){return {loes:'Richtig: (1) Energie ≈ '+Math.round(pct)+' % des Tagesbedarfs, (2) kein Obst/Gemüse → kaum Reglerstoffe/Ballaststoffe, (3) Getränk mit '+d.k+' g Zucker. Falsch: Fett pauschal schädlich; „Streifen farblos = kein Zucker“; Kohlenhydrate pauschal schlecht'+(L===2?'; viel Eiweiß = ausgewogen':'')+'.',erw:'Alle drei richtigen Argumente, kein falsches; Kombination aus Phase 1 (Nährstoffe), 2 (Nachweisgrenze) und 3 (Rechnung).',fehl:'Pauschale Urteile („Fett ist schlecht“); negative Testergebnisse überinterpretiert. Hinweis: „kaum Vitamine“ ist eine Aussage über das fiktive Menü ohne Obst/Gemüse.'};}
+  });
+ })();
+
+ /* 4.2 Menü bauen */
+ (function(){
+  var items=[
+   {id:'main',name:M.main.name,kj:burgerKJ,grp:'both',chip:'Eiweiß, Fett, Kohlenhydrate'},
+   {id:'side',name:M.side.name,kj:sideKJ,grp:M.side.grp,chip:M.side.chip},
+   {id:'drink',name:M.drink.name,kj:drinkKJ,grp:'sugar',chip:'Zucker (Kohlenhydrate)'},
+   {id:'salat',name:'Gemischter Salat (150 g)',kj:250,grp:'vg',chip:'Vitamine, Ballaststoffe'},
+   {id:'nudel',name:'Vollkornnudeln, gekocht (200 g)',kj:1050,grp:'kh',chip:'Kohlenhydrate, Ballaststoffe'},
+   {id:'huhn',name:'Hähnchenbrust, gebraten (100 g)',kj:650,grp:'ew',chip:'Eiweiß'},
+   {id:'apfel',name:'Apfel (150 g)',kj:330,grp:'vg',chip:'Vitamine, Ballaststoffe'},
+   {id:'wasser',name:'Wasser (0,5 l)',kj:0,grp:'water',chip:'keine Energie'}];
+  var list=[],sumEl;
+  function sel(){return list.filter(function(x){return x.inp.checked;}).map(function(x){return x.it;});}
+  function upd(){var s=sel().reduce(function(a,b){return a+b.kj;},0);sumEl.textContent='Summe: '+fmt(s)+' kJ (Ziel: höchstens '+fmt(MAXKJ)+' kJ)';}
+  T.push({id:'4.2',phase:3,afb:'III',komp:'Bewertung',title:'Stelle ein besseres Menü zusammen',
+   boss:'„Dann baut doch ein besseres Menü – wenn ihr das schafft!“',
+   instr:'Wähle Speisen und Getränke. Dein Menü muss <b>alle</b> Kriterien erfüllen:<ul><li>höchstens '+fmt(MAXKJ)+' kJ (Annahme für diese Aufgabe: etwa 40 % des Beispiel-Tagesbedarfs)</li><li>mindestens 3 Speisen (Getränke zählen nicht mit)</li><li>mindestens eine Quelle für Eiweiß, eine für Kohlenhydrate und etwas Obst oder Gemüse</li><li>als Getränk Wasser, kein Zuckergetränk</li></ul><span class="small">Energiewerte sind gerundete Beispielwerte nur für diese Aufgabe.</span>',
+   tips:['Lies die Kriterien noch einmal. Welche Nährstoffgruppen und Reglerstoffe fehlen im Menü von Kalorius?','Beginne mit je einer Zutat für Kohlenhydrate, Eiweiß und Obst/Gemüse. Behalte die Summe im Blick.','Eines der Getränke liefert 0 kJ und enthält keinen Zucker.'],
+   render:function(body){
+    var fs=el('fieldset');fs.appendChild(el('legend',{text:'Dein Menü (Mehrfachauswahl)'}));
+    shuffle(items,sd+7).forEach(function(it){var inp=el('input',{type:'checkbox',value:it.id});inp.addEventListener('change',upd);var lab=el('label',{class:'opt'},[inp,el('span',{},[it.name+' – '+fmt(it.kj)+' kJ',L===1?el('div',{class:'chips',text:it.chip}):null])]);fs.appendChild(lab);list.push({it:it,inp:inp,lab:lab});});
+    body.appendChild(fs);sumEl=el('div',{class:'sum',role:'status','aria-live':'polite'});body.appendChild(sumEl);upd();
+   },
+   check:function(){
+    var s=sel();if(!s.length)return {invalid:'Wähle zuerst Speisen für dein Menü aus.'};
+    var total=s.reduce(function(a,b){return a+b.kj;},0);
+    function has(f){return s.some(f);}
+    var speisen=s.filter(function(i){return i.grp!=='water'&&i.id!=='drink';}).length;
+    var crit=[
+     [total<=MAXKJ,'Energie: '+fmt(total)+' kJ'+(total<=MAXKJ?'':' – das sind mehr als '+fmt(MAXKJ)+' kJ. Eine zu energiereiche Mahlzeit deckt zu viel des Tagesbedarfs.'),'Prüfe immer die Gesamtenergie einer Mahlzeit, nicht nur einzelne Speisen.'],
+     [speisen>=3,'Mindestens 3 Speisen'+(speisen>=3?'':' – du hast '+speisen+'. Mit zu wenigen Speisen fehlt meist mindestens ein Nährstoff.'),'Eine Mahlzeit sollte mehrere Nährstoffgruppen abdecken.'],
+     [has(function(i){return i.grp==='ew'||i.grp==='both';}),'Eiweißquelle'+(has(function(i){return i.grp==='ew'||i.grp==='both';})?'':' fehlt – Eiweiße liefern den Baustoff für Muskeln und Gewebe.'),'Eiweißquelle einplanen (Baustoff).'],
+     [has(function(i){return i.grp==='kh'||i.grp==='both';}),'Kohlenhydratquelle'+(has(function(i){return i.grp==='kh'||i.grp==='both';})?'':' fehlt – ohne Kohlenhydrate fehlt schnell verfügbare Energie.'),'Kohlenhydratquelle einplanen (Betriebsstoff).'],
+     [has(function(i){return i.grp==='vg';}),'Obst oder Gemüse'+(has(function(i){return i.grp==='vg';})?'':' fehlt – dann fehlen Reglerstoffe (Vitamine, Mineralstoffe) und Ballaststoffe.'),'Obst oder Gemüse liefern Vitamine, Mineralstoffe und Ballaststoffe.'],
+     [has(function(i){return i.id==='wasser';})&&!has(function(i){return i.id==='drink';}),'Getränk: Wasser, kein Zuckergetränk'+((has(function(i){return i.id==='wasser';})&&!has(function(i){return i.id==='drink';}))?'':' – Zuckergetränke liefern viel Energie ohne weitere Nährstoffe.'),'Wasser statt Zuckergetränk wählen.']];
+    var failed=crit.filter(function(c){return !c[0];});
+    if(!failed.length)return {ok:true,html:'<p>Dein Menü erfüllt alle Kriterien: '+fmt(total)+' kJ, also etwa '+Math.round(total/TAG*100)+' % des Beispiel-Tagesbedarfs.</p>'};
+    return {ok:false,items:failed.map(function(c){return '<b>Kriterium nicht erfüllt:</b> '+c[1];}),notes:failed.map(function(c){return c[2];})};
+   },
+   teach:function(){return {loes:'Mehrere richtige Lösungen. Beispiel: Vollkornnudeln (1 050) + Hähnchen (650) + Salat (250) + Wasser = 1 950 kJ. Auch zulässig: '+M.main.name+' (' + burgerKJ + ') + Salat + Apfel + Wasser = ' + (burgerKJ+250+330) + ' kJ. Nicht zulässig: '+M.main.name+' + '+M.side.name+' + Salat + Wasser = '+(burgerKJ+sideKJ+250)+' kJ (> 3 800).',erw:'Alle sechs Kriterien erfüllt; Rechnung der Summe nachvollziehbar.',fehl:'Gesamtenergie nicht addiert; Getränk vergessen; Apfelschorle o. Ä. fehlt hier bewusst, damit Wasser das einzige zuckerfreie Getränk ist. Die Obergrenze 3 800 kJ ist eine Aufgabenannahme.'};}
+  });
+ })();
+
+ /* 4.3 Begründung */
+ (function(){
+  var ta,boxes=[],cnt;
+  T.push({id:'4.3',phase:3,afb:'III',komp:'Bewertung',title:'Finalschlag: Begründe in eigenen Worten',
+   boss:'„Nur Worte können mich jetzt noch retten. Begründe, warum dein Menü besser ist als meins!“',
+   instr:'Schreibe 2–3 Sätze: Warum ist dein Menü besser als das von Kalorius? Schreibe <b>keine Namen oder persönlichen Angaben</b>. Dein Text wird nicht gespeichert und nicht gesendet.',
+   tips:['Ein Satz mit „weil“ macht aus einer Behauptung eine Begründung.','Nenne Zahlen aus deiner Rechnung, zum Beispiel die Energie der beiden Menüs.','Satzbaustein: „Mein Menü ist besser, weil … Außerdem …, denn … (Fachbegriff wie Reglerstoffe, Ballaststoffe, Kohlenhydrate).“'],
+   render:function(body){
+    ta=el('textarea',{id:'free','aria-describedby':'cnt'});body.appendChild(el('label',{for:'free',style:'font-weight:800',text:'Deine Begründung'}));body.appendChild(ta);
+    cnt=el('p',{id:'cnt',class:'small',text:'0 Zeichen (mindestens 40)'});body.appendChild(cnt);ta.addEventListener('input',function(){cnt.textContent=ta.value.length+' Zeichen (mindestens 40)';});
+    var fs=el('fieldset');fs.appendChild(el('legend',{text:'Vergleiche deinen Text mit den Kriterien (ehrliche Selbsteinschätzung, mindestens 2 Häkchen):'}));
+    ['Ich habe die Energie mit Zahlen verglichen (mein Menü und das von Kalorius).','Ich habe mindestens einen Nährstoff oder Reglerstoff fachlich richtig benannt.','Ich habe begründet (weil, denn, deshalb) und nicht nur behauptet.'].forEach(function(t,i){var inp=el('input',{type:'checkbox','data-self':i});fs.appendChild(el('label',{class:'opt'},[inp,el('span',{text:t})]));boxes.push(inp);});
+    body.appendChild(fs);
+   },
+   check:function(){
+    if(ta.value.trim().length<40)return {invalid:'Schreibe mindestens zwei Sätze (mindestens 40 Zeichen).'};
+    if(boxes.filter(function(b){return b.checked;}).length<2)return {invalid:'Lies deinen Text noch einmal und prüfe ihn mit den Kriterien. Mindestens zwei Kriterien sollten erfüllt sein. Verbessere sonst deinen Text.'};
+    return {ok:true,html:'<p>Finalschlag gelungen! Du hast begründet bewertet. Eine Rückmeldung zu deinem Text kann nur deine Lehrkraft oder ein Mitschüler geben.</p>'};
+   },
+   teach:function(){return {loes:'Offene Aufgabe, keine Musterlösung. Mögliche Aspekte: Energievergleich mit Zahlen ('+fmt(totalKJ)+' kJ bei Kalorius), Reglerstoffe/Ballaststoffe durch Obst/Gemüse, Zuckergetränk vs. Wasser, ausgewogene Zusammensetzung.',erw:'Drei Kriterien: (1) Zahlenvergleich, (2) Fachbegriff korrekt, (3) Begründung mit weil/denn. Das Programm prüft nur Mindestlänge und Selbsteinschätzung (Grenze: ehrlichkeitsbasiert).',fehl:'Reine Behauptungen („ist gesünder“) ohne Begründung; Fachbegriffe falsch verwendet; Verbote statt Abwägung („Fett ist schlecht“).'};}
+  });
+ })();
+ return T;
+}
+
+/* ---------- Ablauf ---------- */
+function show(id){['s-start','s-fight','s-lose','s-win'].forEach(function(s){$(s).hidden=(s!==id);});window.scrollTo(0,0);}
+function hearts(){var h='';for(var i=0;i<S.max;i++)h+=i<S.hearts?'♥':'♡';var e=$('hearts');e.textContent=h;e.setAttribute('aria-label','Noch '+S.hearts+' von '+S.max+' Herzen');}
+function hud(){
+ var st=$('steps');st.innerHTML='';var cur=S.tasks[S.idx].phase;
+ PH.forEach(function(n,i){var allDone=S.tasks.filter(function(t){return t.phase===i;}).every(function(t){return t.solved;});
+  var li=el('li',{class:i===cur?'cur':(allDone?'done':''),text:(allDone?'✓ ':'')+(i+1)+'. '+n});if(i===cur)li.setAttribute('aria-current','step');st.appendChild(li);});
+ hearts();
+ var hp=$('hp');hp.innerHTML='';var n=S.tasks.length;for(var i=0;i<n;i++)hp.appendChild(el('span',{class:i<S.done?'gone':''}));
+ hp.setAttribute('aria-label','Lebenskraft von Kalorius: '+(n-S.done)+' von '+n);
+}
+function bubble(t,txt){$('bubble').innerHTML='<b>Kalorius:</b> '+txt;}
+function anim(c){var b=$('boss');b.classList.remove('hit','laugh');void b.offsetWidth;b.classList.add(c);}
+function startFight(level,attempt){S=newState(level,attempt);S.tasks=buildTasks(S);$('boss').classList.remove('dead','hit','laugh');show('s-fight');renderTask();}
+function renderTask(){
+ var t=S.tasks[S.idx],c=$('taskcard');c.innerHTML='';hud();bubble(t,t.boss);
+ var head=el('h2',{id:'th',tabindex:'-1',text:'Aufgabe '+t.id+': '+t.title});
+ c.appendChild(el('div',{class:'badges'},[el('span',{class:'badge',text:'Phase '+(t.phase+1)+': '+PH[t.phase]}),el('span',{class:'badge','aria-label':'Anforderungsbereich '+t.afb,text:'AFB '+t.afb}),el('span',{class:'badge',text:t.komp})]));
+ c.appendChild(head);c.appendChild(el('p',{html:t.instr}));
+ var body=el('fieldset',{id:'tbody'});c.appendChild(body);t.render(body);
+ var tips=el('div',{class:'tips'});var tb=el('button',{class:'btn secondary',type:'button',id:'btn-tip',text:'Tipp-Karte ziehen (0/3)'});var tc=el('div',{id:'tipcards'});tips.appendChild(tb);tips.appendChild(tc);c.appendChild(tips);
+ S.tipN[t.id]=0;
+ tb.addEventListener('click',function(){var n=S.tipN[t.id];if(n>=3)return;var card=el('div',{class:'tipcard',tabindex:'-1',html:'<b>Tipp '+(n+1)+' von 3:</b> '+t.tips[n]});tc.appendChild(card);S.tipN[t.id]=n+1;S.tipsTotal++;tb.textContent=n+1>=3?'Keine weiteren Tipp-Karten':'Tipp-Karte ziehen ('+(n+1)+'/3)';if(n+1>=3)tb.disabled=true;card.focus();});
+ var fb=el('div',{id:'fb',role:'region','aria-label':'Rückmeldung',tabindex:'-1',hidden:true});c.appendChild(fb);
+ var ac=el('div',{class:'actions'});
+ ac.appendChild(el('button',{class:'btn',type:'button',id:'btn-check',text:'Prüfen',onclick:doCheck}));
+ ac.appendChild(el('button',{class:'btn',type:'button',id:'btn-next',hidden:true,text:'Weiter',onclick:next}));
+ c.appendChild(ac);
+ head.focus();
+}
+function showFb(kind,html){var fb=$('fb');fb.hidden=false;fb.className='fb '+kind;fb.innerHTML=html;fb.focus();}
+function doCheck(){
+ var t=S.tasks[S.idx],r=t.check();
+ if(r.invalid){showFb('info','<p>'+r.invalid+'</p>');return;}
+ if(r.soft){showFb('info',r.html);return;}
+ if(r.ok){
+  S.done++;t.solved=true;anim('hit');
+  $('tbody').disabled=true;$('btn-check').hidden=true;$('btn-tip').disabled=true;
+  var last=S.idx===S.tasks.length-1;var nb=$('btn-next');nb.hidden=false;nb.textContent=last?'Kalorius besiegen!':'Weiter zu Aufgabe '+S.tasks[S.idx+1].id;
+  showFb('ok','<h3><span aria-hidden="true">✅</span> Treffer! Kalorius’ Schutz bricht.</h3>'+r.html);hud();say('Richtig. Kalorius verliert Lebenskraft.');
+  if(last)$('boss').classList.add('dead');
+  return;}
+ S.hearts--;S.errCount[t.id]=(S.errCount[t.id]||0)+1;
+ (r.notes||[]).forEach(function(n){if(!S.errs.some(function(e){return e.note===n;}))S.errs.push({id:t.id,komp:t.komp,note:n});});
+ anim('laugh');hearts();
+ var h='<h3><span aria-hidden="true">💥</span> Fehler – Kalorius landet einen Treffer! Du verlierst 1 Herz.</h3><ul>'+r.items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ul>';
+ if(S.hearts<=0){S.over=true;$('btn-check').hidden=true;$('btn-tip').disabled=true;var nb2=$('btn-next');nb2.hidden=false;nb2.textContent='Weiter zum Lernhinweis';h+='<p><b>Keine Herzen mehr.</b> Auf der nächsten Seite findest du Lernhinweise und kannst neu starten.</p>';}
+ else h+='<p>Noch '+S.hearts+' Herz(en). Lies die Erklärung, nutze eine Tipp-Karte und versuche es erneut.</p>';
+ showFb('bad',h);say('Falsch. Noch '+S.hearts+' Herzen.');
+}
+function next(){
+ if(S.over){loseScreen();return;}
+ if(S.idx>=S.tasks.length-1){winScreen();return;}
+ S.idx++;renderTask();
+}
+function loseScreen(){
+ var ul=$('lose-notes');ul.innerHTML='';
+ var seen=S.errs.slice(0,6);
+ if(!seen.length)ul.appendChild(el('li',{text:'Lies die Rückmeldungen genau und nutze die Tipp-Karten.'}));
+ seen.forEach(function(e){ul.appendChild(el('li',{html:'<b>'+e.komp+' (Aufgabe '+e.id+'):</b> '+e.note}));});
+ show('s-lose');$('h-lose').focus();
+}
+function winScreen(){
+ var kb={};S.tasks.forEach(function(t){kb[t.komp]=kb[t.komp]||{ok:true,list:[]};if(S.errCount[t.id]){kb[t.komp].ok=false;kb[t.komp].list.push(t.id);}});
+ var ul=$('win-komp');ul.innerHTML='';
+ Object.keys(kb).forEach(function(k){ul.appendChild(el('li',{text:k+': '+(kb[k].ok?'ohne Fehler gelöst.':'Fehler bei Aufgabe '+kb[k].list.join(', ')+' – schaue sie dir noch einmal an.')}));});
+ $('win-sum').textContent='Du hast mit '+S.hearts+' von '+S.max+' Herzen gewonnen und '+S.tipsTotal+' Tipp-Karte(n) genutzt. Wissen, Experimentieren, Rechnen und Bewerten gemeinsam haben Kalorius besiegt.';
+ show('s-win');$('h-win').focus();
+}
+
+/* ---------- Lehrkraft-Ansicht ---------- */
+function teacherBody(){
+ var b=$('t-body');b.innerHTML='';
+ var A=buildTasks(Object.assign(newState(2,0),{res:{pct:52,kj:4976}})),B=buildTasks(Object.assign(newState(2,1),{res:{pct:46,kj:4349}}));
+ b.appendChild(el('div',{class:'card',html:'<h2>Lehrkraft-Ansicht: Lösungen und Erwartungshorizont</h2><p>Variante A (1. Versuch) und Variante B (2. Versuch) haben unterschiedliche Zahlen und Proben. Stufe 1 und 2 verlangen dieselbe Kernaufgabe; Stufe 1 gibt kleinere Schritte (z. B. Teilergebnisse in 3.1/3.2, Themenhinweise in 4.1/4.2), Stufe 2 ist offener (mehr Ablenker, positives Ergebnis in 2.1 wählen).</p><h3>Annahmen und Modellgrenzen</h3><ul><li>Rechenwerte: Fett 39 kJ/g, Kohlenhydrate und Eiweiß je 17 kJ/g (gerundet; Packungen nutzen oft 37 kJ/g für Fett).</li><li>Tagesbedarf 9 500 kJ und alle Nährwerte der Menüs sind ausgedachte Aufgabenwerte; 3 800 kJ als Obergrenze ist eine Aufgabenannahme.</li><li>Eiweiße gelten in Phase 1 als „Baustoffe“, werden in Phase 3 aber als Energielieferanten gerechnet (Vereinfachung).</li><li>Der Glucoseteststreifen zeigt nur Glucose; Farbumschlag hängt vom Produkt ab.</li><li>Aufgabe 4.3 ist nicht automatisch bewertbar; die Selbsteinschätzung ist ehrlichkeitsbasiert.</li></ul>'}));
+ var h='<div class="tw"><table><thead><tr><th scope="col">Aufgabe</th><th scope="col">AFB / Kompetenz</th><th scope="col">Lösung Variante A</th><th scope="col">Lösung Variante B</th><th scope="col">Erwartungshorizont</th><th scope="col">Typische Fehlvorstellungen</th></tr></thead><tbody>';
+ A.forEach(function(t,i){var a=t.teach(),bb=B[i].teach();h+='<tr><th scope="row">'+t.id+' '+t.title+'</th><td>AFB '+t.afb+'<br>'+t.komp+'</td><td>'+a.loes+'</td><td>'+(a.loes===bb.loes?'wie A':bb.loes)+'</td><td>'+a.erw+'</td><td>'+a.fehl+'</td></tr>';});
+ h+='</tbody></table></div>';
+ b.appendChild(el('div',{class:'card',html:h}));
+ b.appendChild(el('div',{class:'card',html:'<h3>Zuordnung zu Kompetenzbereichen (von mir zu prüfen)</h3><p>Fachwissen: 1.1, 1.2 (Nährstoffe, Funktionen, Energielieferanten). Erkenntnisgewinnung: 2.1, 2.2 (Nachweise, Auswertung), 3.1, 3.2 (Energie berechnen). Bewertung: 4.1, 4.2, 4.3. Die Zuordnung zu konkreten Inhalten des Kerncurriculums habe ich nicht belegt; bitte selbst abgleichen.</p>'}));
+ b.appendChild(el('div',{class:'actions'},[el('button',{class:'btn secondary',type:'button',id:'t-close',text:'Lehrkraft-Ansicht schließen',onclick:closeTeacher})]));
+}
+var lastScreen='s-start';
+function openGate(){['s-start','s-fight','s-lose','s-win'].forEach(function(s){if(!$(s).hidden)lastScreen=s;});$('main').hidden=true;$('teacher').hidden=false;$('t-gate').hidden=false;$('t-body').hidden=true;$('t-err').textContent='';$('t-code').value='';$('t-code').focus();}
+function closeTeacher(){$('teacher').hidden=true;$('t-body').innerHTML='';$('t-body').hidden=true;$('main').hidden=false;$('btn-teacher').focus();}
+function tryOpen(){if($('t-code').value.trim().toLowerCase()===CODE){$('t-gate').hidden=true;teacherBody();$('t-body').hidden=false;$('t-body').querySelector('h2').setAttribute('tabindex','-1');$('t-body').querySelector('h2').focus();}else $('t-err').textContent='Der Code stimmt nicht.';}
+
+$('lvl1').addEventListener('click',function(){startFight(1,0);});
+$('lvl2').addEventListener('click',function(){startFight(2,0);});
+$('lose-again').addEventListener('click',function(){startFight(S.level,S.attempt+1);});
+$('win-again').addEventListener('click',function(){startFight(S.level,S.attempt+1);});
+$('lose-start').addEventListener('click',function(){show('s-start');});
+$('win-start').addEventListener('click',function(){show('s-start');});
+$('btn-teacher').addEventListener('click',openGate);
+$('t-open').addEventListener('click',tryOpen);
+$('t-cancel').addEventListener('click',closeTeacher);
+$('t-code').addEventListener('keydown',function(e){if(e.key==='Enter')tryOpen();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('teacher').hidden)closeTeacher();});
+})();
+</script>
+</body>
+</html>
