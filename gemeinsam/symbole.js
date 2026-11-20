@@ -49,8 +49,28 @@
     schluessel: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>',
   }
 
+  // Bereiche, Werkzeuge und Fächer erscheinen im einheitlichen Logo-Stil (flach, Dunkelgrün und Orange);
+  // die schlichten Linien-Symbole oben bleiben für Bedienelemente (Suche, Pfeile, Menü …).
+  const BASIS = (function () {
+    const s = document.currentScript && document.currentScript.src
+    return s ? s.replace(/[^/]*$/, '') : ''
+  })()
+  const LOGOS = {
+    tafel: 'tafel', bildschirm: 'tafel', lernen: 'lernen', klassen: 'klassen', haus: 'startseite',
+    timer: 'timer', uhr: 'timer', wuerfel: 'gruppen', ampel: 'ampel', werkzeug: 'werkzeuge',
+    notenbuch: 'notenbuch', sonne: 'modus-hell', mond: 'modus-dunkel', blatt: 'blatt', laufen: 'laufen',
+  }
+
   /** Erzeugt ein dekoratives Symbol. Die Größe kommt aus dem CSS (.symbol), die Farbe aus der Textfarbe. */
   function symbol(name) {
+    if (LOGOS[name] && BASIS) {
+      const bild = document.createElement('img')
+      bild.src = BASIS + LOGOS[name] + '-logo.svg'
+      bild.alt = ''
+      bild.className = 'symbol symbol-logo'
+      bild.setAttribute('aria-hidden', 'true')
+      return bild
+    }
     const zeichnung = SYMBOLE[name]
     if (!zeichnung) return null
     const svg = document.createElementNS(SVG, 'svg')

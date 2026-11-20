@@ -69,6 +69,14 @@ a {
   height: 1.5em;
   flex-shrink: 0;
 }
+/* Symbole im Logo-Stil (flache Zeichnung mit eigener Kachel) */
+.symbol-logo {
+  display: block;
+  border-radius: 24%;
+}
+.symbol-feld:has(.symbol-logo) {
+  background: transparent;
+}
 
 .inhalt,
 .fuss {
@@ -102,9 +110,7 @@ a {
 .marke img {
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 0.75rem; /* wie ein App-Symbol */
-  background: #ffffff; /* das Logo hat weißen Grund – auch im dunklen Modus */
-  box-shadow: 0 0 0 1px var(--haarlinie);
+  /* Form, Grund und Rand stecken schon in der Logo-Zeichnung */
 }
 .marke-text {
   display: flex;

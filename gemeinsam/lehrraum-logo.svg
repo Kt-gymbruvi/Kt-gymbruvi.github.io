@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Lehrraum">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <g transform="translate(256 262) scale(.78) translate(-256 -256)">
+      <path d="M134 88H66Q36 88 36 118V372Q36 402 66 402H118V488L200 402H428" fill="none" stroke="#0f5c47" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M78 78H134V326H282a14 14 0 0 1 14 14V352a14 14 0 0 1-14 14H112a34 34 0 0 1-34-34Z" fill="#0f5c47" stroke="#0f5c47" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M187 104H318a64 64 0 0 1 0 128H187M312 240L396 346" fill="none" stroke="#ff8a14" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="375" y="45" width="38" height="38" rx="8" fill="#ffc58a"/>
+      <rect x="432" y="8" width="54" height="54" rx="10" fill="#ff8a14"/>
+      <rect x="420" y="82" width="36" height="36" rx="8" fill="#ff8a14"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sport">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <path d="M300 196L252 296" fill="none" stroke="#ffffff" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M300 196L252 296" fill="none" stroke="#0f5c47" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M252 296L322 346L312 420" fill="none" stroke="#ffffff" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M252 296L322 346L312 420" fill="none" stroke="#0f5c47" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M252 296L186 352L116 348" fill="none" stroke="#ffffff" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M252 296L186 352L116 348" fill="none" stroke="#0f5c47" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M296 214L362 252L404 228" fill="none" stroke="#ffffff" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M296 214L362 252L404 228" fill="none" stroke="#0f5c47" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M288 216L232 240L204 204" fill="none" stroke="#ffffff" stroke-width="58" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M288 216L232 240L204 204" fill="none" stroke="#0f5c47" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="334" cy="126" r="46" fill="#ff8a14" stroke="#ffffff" stroke-width="10"/>
+  </g>
+</svg>

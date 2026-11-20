@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Biologie">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <path d="M96 408C96 232 214 120 416 100C416 300 316 408 96 408Z" fill="#ff8a14" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M120 388L330 178" fill="none" stroke="#ffffff" stroke-width="34" stroke-linecap="round"/>
+    <path d="M120 388L330 178" fill="none" stroke="#0f5c47" stroke-width="20" stroke-linecap="round"/>
+    <path d="M214 294l4-72M214 294l72 4" fill="none" stroke="#0f5c47" stroke-width="16" stroke-linecap="round"/>
+  </g>
+</svg>

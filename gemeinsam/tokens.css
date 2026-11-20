@@ -16,48 +16,48 @@
   color-scheme: light;
 
   /* Marke (in beiden Modi gleich) */
-  --navy: #0a2d53;
-  --navy-hell: #14407a;
-  --navy-dunkel: #061d38;
-  --tuerkis: #2cb69c; /* Logo, Flächen, Schmuck */
-  --tuerkis-hell: #6fd3bf;
-  --tuerkis-kraeftig: #0f7f6c; /* Knöpfe mit weißer Schrift, Text auf Hell */
+  --navy: #0f5c47;
+  --navy-hell: #16745a;
+  --navy-dunkel: #0a3d30;
+  --tuerkis: #ff8a14; /* Logo, Flächen, Schmuck */
+  --tuerkis-hell: #ffb067;
+  --tuerkis-kraeftig: #0f5c47; /* Knöpfe mit weißer Schrift, Text auf Hell */
 
   /* Flächen und Text (wie Tafel und Notenbuch) */
-  --seite: #eef2f7; /* Hintergrund der Seite */
+  --seite: #f3f6f2; /* Hintergrund der Seite */
   --flaeche: #ffffff; /* Karten, Fenster, Aufklappfelder */
-  --flaeche-2: #e9eef5; /* Eingabefelder, ruhige Knöpfe */
+  --flaeche-2: #e8efeb; /* Eingabefelder, ruhige Knöpfe */
   --flaeche-hoch: #ffffff; /* gewähltes Segment, über --flaeche-2 */
   --glas: rgb(255 255 255 / 0.78); /* schwebende Leisten, mit Unschärfe dahinter */
-  --schwebe: rgb(10 45 83 / 0.07); /* Fläche unter der Maus */
-  --druecken: rgb(10 45 83 / 0.12); /* Fläche beim Drücken */
-  --text: #0a2d53;
-  --text-2: #5a6b85;
-  --haarlinie: rgb(10 45 83 / 0.1); /* feine Ränder um Karten und Leisten, Trenner in Listen */
-  --linie: #dce3ed; /* feste Linie, z. B. Fuß */
-  --linie-stark: #9aa9c2;
-  --verweis: #0f6f8f;
-  --akzent: #0f7f6c; /* Hauptknopf */
-  --akzent-schwebe: #0c6a5a;
+  --schwebe: rgb(15 92 71 / 0.07); /* Fläche unter der Maus */
+  --druecken: rgb(15 92 71 / 0.12); /* Fläche beim Drücken */
+  --text: #0c3d31;
+  --text-2: #5b6f68;
+  --haarlinie: rgb(15 92 71 / 0.1); /* feine Ränder um Karten und Leisten, Trenner in Listen */
+  --linie: #d9e4de; /* feste Linie, z. B. Fuß */
+  --linie-stark: #a3b8ae;
+  --verweis: #0f5c47;
+  --akzent: #0f5c47; /* Hauptknopf */
+  --akzent-schwebe: #0a4636;
   --akzent-text: #ffffff;
-  --akzent-hell: #e1f5f0;
-  --gewaehlt: #0a2d53; /* gewählter Punkt in Leisten und Segmenten */
+  --akzent-hell: #fff1e0;
+  --gewaehlt: #0f5c47; /* gewählter Punkt in Leisten und Segmenten */
   --gewaehlt-text: #ffffff;
-  --fokus: #0f7f6c;
+  --fokus: #d96d00;
   --fehler: #c4291f;
-  --schatten: 0 1px 2px rgb(10 45 83 / 0.06), 0 8px 28px rgb(10 45 83 / 0.1);
-  --schatten-hoch: 0 2px 6px rgb(10 45 83 / 0.08), 0 18px 48px rgb(10 45 83 / 0.18);
-  --schatten-klein: 0 1px 2px rgb(10 45 83 / 0.06), 0 2px 8px rgb(10 45 83 / 0.05);
-  --abdunkeln: rgb(6 26 51 / 0.45); /* hinter Fenstern */
+  --schatten: 0 1px 2px rgb(15 92 71 / 0.06), 0 8px 28px rgb(15 92 71 / 0.1);
+  --schatten-hoch: 0 2px 6px rgb(15 92 71 / 0.08), 0 18px 48px rgb(15 92 71 / 0.18);
+  --schatten-klein: 0 1px 2px rgb(15 92 71 / 0.06), 0 2px 8px rgb(15 92 71 / 0.05);
+  --abdunkeln: rgb(5 30 24 / 0.45); /* hinter Fenstern */
 
   /* Seitenleiste und einfache Kopfleiste (in beiden Modi dunkelblau) */
-  --kopf: #0a2d53;
+  --kopf: #0f5c47;
   --kopf-text: #ffffff;
-  --kopf-text-2: #b9c7dc;
+  --kopf-text-2: #b6d3c7;
 
   /* Akzentfarben der Bereiche: kräftig (Text, Symbol) und hell (Fläche) */
-  --tafel: #0f7f6c;
-  --tafel-hell: #e1f5f0;
+  --tafel: #0f5c47;
+  --tafel-hell: #e3f1ec;
   --unterrichten: #1d4fc4;
   --unterrichten-hell: #e6eefc;
   --interaktion: #6a3fb8;
@@ -68,10 +68,10 @@
   --bibliothek-hell: #e6f4e3;
 
   /* Eigene Farben der Anwendungen (bleiben in beiden Modi gleich) */
-  --quizzo: #0b1f4d;
-  --quizzo-text: #ffc928;
-  --klassenfunk: #0d3b42;
-  --klassenfunk-text: #ff9a82;
+  --quizzo: #0f5c47;
+  --quizzo-text: #ff8a14;
+  --klassenfunk: #0f5c47;
+  --klassenfunk-text: #ff8a14;
 
   /* Signalfarben (Ampel, Warnungen) – in beiden Modi gleich, wie die Systemfarben von Apple */
   --signal-rot: #ff3b30;
@@ -101,34 +101,34 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-design='hell']) {
     color-scheme: dark;
-    --seite: #061a33;
-    --flaeche: #10294a;
-    --flaeche-2: #163a69;
-    --flaeche-hoch: #2a5288;
-    --glas: rgb(16 41 74 / 0.92);
+    --seite: #07241c;
+    --flaeche: #0d3329;
+    --flaeche-2: #144536;
+    --flaeche-hoch: #1d5a47;
+    --glas: rgb(13 51 41 / 0.92);
     --schwebe: rgb(255 255 255 / 0.08);
     --druecken: rgb(255 255 255 / 0.14);
     --text: #ffffff;
-    --text-2: #b9c7dc;
+    --text-2: #b6d3c7;
     --haarlinie: rgb(255 255 255 / 0.1);
-    --linie: #23446f;
-    --linie-stark: #4f74ab;
-    --verweis: #6fd3bf;
-    --akzent: #2cb69c;
-    --akzent-schwebe: #6fd3bf;
-    --akzent-text: #06241f;
-    --akzent-hell: #0f3d3a;
-    --gewaehlt: #2cb69c;
-    --gewaehlt-text: #06241f;
-    --fokus: #6fd3bf;
+    --linie: #215545;
+    --linie-stark: #3f7d68;
+    --verweis: #ffb067;
+    --akzent: #ff8a14;
+    --akzent-schwebe: #ffb067;
+    --akzent-text: #2b1500;
+    --akzent-hell: #3a2410;
+    --gewaehlt: #ff8a14;
+    --gewaehlt-text: #2b1500;
+    --fokus: #ffb067;
     --fehler: #ffb4ab;
     --schatten: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 28px rgb(0 0 0 / 0.35);
     --schatten-hoch: 0 2px 6px rgb(0 0 0 / 0.35), 0 18px 48px rgb(0 0 0 / 0.5);
     --schatten-klein: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.2);
     --abdunkeln: rgb(0 0 0 / 0.6);
-    --kopf: #041427;
-    --tafel: #6fd3bf;
-    --tafel-hell: #0f3d3a;
+    --kopf: #05281f;
+    --tafel: #ffb067;
+    --tafel-hell: #3a2410;
     --unterrichten: #a9c5ff;
     --unterrichten-hell: #17357a;
     --interaktion: #cdbbff;
@@ -142,34 +142,34 @@
 
 :root[data-design='dunkel'] {
   color-scheme: dark;
-  --seite: #061a33;
-  --flaeche: #10294a;
-  --flaeche-2: #163a69;
-  --flaeche-hoch: #2a5288;
-  --glas: rgb(16 41 74 / 0.92);
+  --seite: #07241c;
+  --flaeche: #0d3329;
+  --flaeche-2: #144536;
+  --flaeche-hoch: #1d5a47;
+  --glas: rgb(13 51 41 / 0.92);
   --schwebe: rgb(255 255 255 / 0.08);
   --druecken: rgb(255 255 255 / 0.14);
   --text: #ffffff;
-  --text-2: #b9c7dc;
+  --text-2: #b6d3c7;
   --haarlinie: rgb(255 255 255 / 0.1);
-  --linie: #23446f;
-  --linie-stark: #4f74ab;
-  --verweis: #6fd3bf;
-  --akzent: #2cb69c;
-  --akzent-schwebe: #6fd3bf;
-  --akzent-text: #06241f;
-  --akzent-hell: #0f3d3a;
-  --gewaehlt: #2cb69c;
-  --gewaehlt-text: #06241f;
-  --fokus: #6fd3bf;
+  --linie: #215545;
+  --linie-stark: #3f7d68;
+  --verweis: #ffb067;
+  --akzent: #ff8a14;
+  --akzent-schwebe: #ffb067;
+  --akzent-text: #2b1500;
+  --akzent-hell: #3a2410;
+  --gewaehlt: #ff8a14;
+  --gewaehlt-text: #2b1500;
+  --fokus: #ffb067;
   --fehler: #ffb4ab;
   --schatten: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 28px rgb(0 0 0 / 0.35);
   --schatten-hoch: 0 2px 6px rgb(0 0 0 / 0.35), 0 18px 48px rgb(0 0 0 / 0.5);
   --schatten-klein: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.2);
   --abdunkeln: rgb(0 0 0 / 0.6);
-  --kopf: #041427;
-  --tafel: #6fd3bf;
-  --tafel-hell: #0f3d3a;
+  --kopf: #05281f;
+  --tafel: #ffb067;
+  --tafel-hell: #3a2410;
   --unterrichten: #a9c5ff;
   --unterrichten-hell: #17357a;
   --interaktion: #cdbbff;

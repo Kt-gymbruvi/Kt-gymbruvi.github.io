@@ -168,20 +168,11 @@
   }
 
   // ---------- Begrüßung ----------
-  /** Schlichte Zeichnung einer Tafel (eigene Zeichnung, kein Foto) */
-  const TAFELBILD =
-    '<svg viewBox="0 0 320 200" role="presentation" focusable="false">' +
-    '<rect x="150" y="14" width="150" height="24" rx="12" fill="var(--tuerkis-hell)" opacity=".35"/>' +
-    '<rect x="40" y="30" width="240" height="130" rx="10" fill="var(--navy)"/>' +
-    '<rect x="50" y="40" width="220" height="110" rx="5" fill="#ffffff"/>' +
-    '<path d="M70 78c18-16 30 14 48-2s26 12 44 0" fill="none" stroke="var(--tuerkis)" stroke-width="6" stroke-linecap="round"/>' +
-    '<path d="M70 108h96M70 126h62" stroke="var(--navy)" stroke-width="6" stroke-linecap="round" opacity=".25"/>' +
-    '<circle cx="222" cy="108" r="22" fill="none" stroke="var(--tuerkis)" stroke-width="5"/>' +
-    '<path d="M213 112c4 6 14 6 18 0M214 101h.1M230 101h.1" fill="none" stroke="var(--tuerkis)" stroke-width="5" stroke-linecap="round"/>' +
-    '<path d="M120 160l-12 30M200 160l12 30" stroke="var(--navy)" stroke-width="8" stroke-linecap="round"/>' +
-    '<rect x="262" y="52" width="18" height="18" rx="4" fill="var(--tuerkis)"/><rect x="288" y="40" width="12" height="12" rx="3" fill="var(--tuerkis-hell)"/><rect x="286" y="66" width="10" height="10" rx="3" fill="var(--tuerkis)"/>' +
-    '</svg>'
-  $('begruessung-bild').innerHTML = TAFELBILD // feste Zeichnung aus dieser Datei
+  /** Zeichnung der Tafel im Logo-Stil (eigene Zeichnung, kein Foto) */
+  const bildTafel = el('img')
+  bildTafel.src = 'gemeinsam/willkommen-bild.svg'
+  bildTafel.alt = ''
+  $('begruessung-bild').append(bildTafel)
 
   function zeichneBegruessung() {
     $('begruessung-titel').textContent = lehrkraft ? SEITE.willkommen || 'Willkommen!' : SEITE.gastTitel || 'Mitmachen und lernen'

@@ -49,7 +49,8 @@ body[data-rolle='lehrkraft'] .nur-gast {
   flex: 0 1 9rem;
   min-width: 0;
 }
-.begruessung-bild svg {
+.begruessung-bild svg,
+.begruessung-bild img {
   display: block;
   width: 100%;
   height: auto;
@@ -282,7 +283,10 @@ a.kachel:active {
 }
 .titel-symbol {
   display: flex;
-  font-size: 0.9rem;
+}
+.titel-symbol .symbol {
+  width: 2rem;
+  height: 2rem;
 }
 
 /* ---------- Meine Klassen: kleine Karten in einer Reihe, die ganze Karte führt zur Tafel ---------- */
