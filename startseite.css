@@ -169,13 +169,13 @@ a.kachel:active {
   height: 3rem;
   overflow: hidden;
   border: 1px solid var(--haarlinie);
-  background: transparent;
+  background: #fff; /* die Logos sind für helle Flächen gezeichnet */
 }
 .hat-bild .logo-bild {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 .leisten-punkt .hat-bild {
   flex: none;
@@ -183,6 +183,7 @@ a.kachel:active {
   height: 1.5rem;
   overflow: hidden;
   border-radius: 0.4rem;
+  background: #fff;
 }
 .kachel.farbe-tafel { --farbe: var(--tafel); --farbe-hell: var(--tafel-hell); }
 .kachel.farbe-unterrichten { --farbe: var(--unterrichten); --farbe-hell: var(--unterrichten-hell); }
