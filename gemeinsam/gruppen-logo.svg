@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Gruppen und Zufall">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a77bf5"/><stop offset="1" stop-color="#6a3fb8"/></linearGradient></defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <g stroke="#0a2d53" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+    <g transform="rotate(-10 180 258)"><rect x="82" y="160" width="196" height="196" rx="38" fill="#fffaf0"/>
+      <g fill="#0a2d53" stroke="none"><circle cx="128" cy="206" r="15"/><circle cx="232" cy="206" r="15"/><circle cx="180" cy="258" r="15"/><circle cx="128" cy="310" r="15"/><circle cx="232" cy="310" r="15"/></g></g>
+    <g transform="rotate(12 340 320)"><rect x="244" y="224" width="176" height="176" rx="36" fill="#ffc928"/>
+      <g fill="#0a2d53" stroke="none"><circle cx="290" cy="270" r="14"/><circle cx="332" cy="312" r="14"/><circle cx="374" cy="354" r="14"/></g></g>
+  </g>
+  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffc928" stroke-width="12"/>
+</svg>

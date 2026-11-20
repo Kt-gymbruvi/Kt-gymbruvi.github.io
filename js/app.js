@@ -33,6 +33,7 @@
       b.src = bild
       b.alt = ''
       huelle.classList.add('hat-bild')
+      if (bild.endsWith('.svg')) huelle.classList.add('bild-rund') // Form und Rand sind schon im Bild
       huelle.append(b)
       return huelle
     }
@@ -138,7 +139,7 @@
   function zeichneDesignKnopf() {
     const dunkel = window.LehrraumDesign && window.LehrraumDesign.aktuell() === 'dunkel'
     designKnopf.textContent = ''
-    designKnopf.append(zeichen(dunkel ? 'sonne' : 'mond'), el('span', null, dunkel ? 'Heller Modus' : 'Dunkler Modus'))
+    designKnopf.append(zeichen(dunkel ? 'sonne' : 'mond', null, dunkel ? 'gemeinsam/modus-hell-logo.svg' : 'gemeinsam/modus-dunkel-logo.svg'), el('span', null, dunkel ? 'Heller Modus' : 'Dunkler Modus'))
   }
   if (window.LehrraumDesign) {
     designKnopf.addEventListener('click', () => window.LehrraumDesign.umschalten())
@@ -293,7 +294,7 @@
     WERKZEUGE.filter((w) => (w.bereich || 'Allgemein') === b).forEach((w) => {
       const li = el('li')
       const a = verweis('werkzeug', w.adresse)
-      a.append(zeichen(w.symbol || 'werkzeug', 'werkzeug-symbol'))
+      a.append(zeichen(w.symbol || 'werkzeug', 'werkzeug-symbol', w.bild))
       const textteil = el('span', 'werkzeug-text')
       textteil.append(el('span', 'werkzeug-titel', w.titel))
       if (w.text) textteil.append(el('span', 'werkzeug-info', w.text))

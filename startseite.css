@@ -171,11 +171,20 @@ a.kachel:active {
   border: 1px solid var(--haarlinie);
   background: #fff; /* die Logos sind für helle Flächen gezeichnet */
 }
+.hat-bild.bild-rund,
+.kachel-symbol.hat-bild.bild-rund {
+  border: 0;
+  background: transparent;
+}
 .hat-bild .logo-bild {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+.werkzeug-symbol.hat-bild {
+  overflow: hidden;
+  background: transparent;
 }
 .leisten-punkt .hat-bild {
   flex: none;

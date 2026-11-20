@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Lernangebote">
+  <defs><linearGradient id="l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb23d"/><stop offset="1" stop-color="#f07800"/></linearGradient></defs>
+  <rect width="512" height="512" rx="112" fill="url(#l)"/>
+  <g stroke="#0a2d53" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M74 232L74 392C150 380 214 384 256 412C298 384 362 380 438 392L438 232Z" fill="#1d4fc4"/>
+    <path d="M256 412L256 238C216 214 150 208 90 220L90 368C156 358 218 362 256 412Z" fill="#fffaf0"/>
+    <path d="M256 412L256 238C296 214 362 208 422 220L422 368C356 358 294 362 256 412Z" fill="#fffaf0"/>
+    <path d="M122 262C158 256 196 260 226 274M122 298C158 292 196 296 226 310M286 274C316 260 354 256 390 262M286 310C316 296 354 292 390 298" fill="none" stroke="#f07800" stroke-width="10"/>
+    <path d="M256 198c-44 0-72-30-72-68 0-40 32-70 72-70s72 30 72 70c0 38-28 68-72 68Z" fill="#ffc928"/>
+    <path d="M232 200h48v22a10 10 0 0 1-10 10h-28a10 10 0 0 1-10-10Z" fill="#fff"/>
+    <path d="M232 128c0-14 10-24 24-24" fill="none" stroke="#fff" stroke-width="12"/>
+  </g>
+  <g stroke="#fff" stroke-width="12" stroke-linecap="round" fill="none"><path d="M120 76l20 22M392 76l-20 22M80 140h26M406 140h26"/></g>
+  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffc928" stroke-width="12"/>
+</svg>

@@ -34,16 +34,16 @@ const PLATTFORM = 'https://kt-gymbruvi.github.io'
  *   adresse: Ziel. Solange sie fehlt (null), ist der Bereich noch nicht gebaut („folgt“, nur für Lehrkräfte sichtbar).
  */
 window.NAVIGATION = [
-  { titel: 'Startseite', symbol: 'haus', adresse: './', hier: true },
-  { titel: 'Meine Klassen', symbol: 'klassen', adresse: PLATTFORM + '/Lehrraum/#/klassen', nur: 'lehrkraft' },
-  { titel: 'Notenbuch', symbol: 'notenbuch', adresse: PLATTFORM + '/Notenbuch/', nur: 'lehrkraft' },
+  { titel: 'Startseite', symbol: 'haus', bild: 'gemeinsam/startseite-logo.svg', adresse: './', hier: true },
+  { titel: 'Meine Klassen', symbol: 'klassen', bild: 'gemeinsam/klassen-logo.svg', adresse: PLATTFORM + '/Lehrraum/#/klassen', nur: 'lehrkraft' },
+  { titel: 'Notenbuch', symbol: 'notenbuch', bild: 'gemeinsam/notenbuch-logo.svg', adresse: PLATTFORM + '/Notenbuch/', nur: 'lehrkraft' },
   { titel: 'Quizzo', symbol: 'pokal', bild: 'gemeinsam/quizzo-symbol.png', adresse: PLATTFORM + '/Quizzo/' },
   { titel: 'Klassenfunk', symbol: 'megafon', bild: 'gemeinsam/klassenfunk-symbol.png', adresse: PLATTFORM + '/Klassenfunk/' },
-  { titel: 'Lernangebote', symbol: 'lernen', adresse: 'lernen/' },
-  { titel: 'Interaktive Tafel', symbol: 'bildschirm', adresse: PLATTFORM + '/Lehrraum/#/tafel', nur: 'lehrkraft' },
-  { titel: 'Tafel (Gast)', symbol: 'bildschirm', adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1', nur: 'gast' }, // ohne Anmeldung, nichts wird gespeichert
+  { titel: 'Lernangebote', symbol: 'lernen', bild: 'gemeinsam/lernen-logo.svg', adresse: 'lernen/' },
+  { titel: 'Interaktive Tafel', symbol: 'bildschirm', bild: 'gemeinsam/tafel-logo.svg', adresse: PLATTFORM + '/Lehrraum/#/tafel', nur: 'lehrkraft' },
+  { titel: 'Tafel (Gast)', symbol: 'bildschirm', bild: 'gemeinsam/tafel-logo.svg', adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1', nur: 'gast' }, // ohne Anmeldung, nichts wird gespeichert
   { titel: 'Materialien', symbol: 'bibliothek', adresse: '#material-bereich', nur: 'material' }, // erscheint nur, wenn es Materialien gibt
-  { titel: 'Werkzeuge', symbol: 'werkzeug', adresse: '#werkzeuge-bereich' },
+  { titel: 'Werkzeuge', symbol: 'werkzeug', bild: 'gemeinsam/werkzeuge-logo.svg', adresse: '#werkzeuge-bereich' },
 ]
 
 /**
@@ -64,6 +64,7 @@ window.MITMACHEN = {
 window.LINKS = [
   {
     symbol: 'klassen',
+    bild: 'gemeinsam/klassen-logo.svg',
     farbe: 'unterrichten',
     titel: 'Meine Klassen',
     text: 'Klassenräume verwalten und starten',
@@ -91,6 +92,7 @@ window.LINKS = [
   },
   {
     symbol: 'lernen',
+    bild: 'gemeinsam/lernen-logo.svg',
     farbe: 'lernen',
     titel: 'Lernangebote',
     text: 'Materialien und Lernpfade',
@@ -99,6 +101,7 @@ window.LINKS = [
   },
   {
     symbol: 'bildschirm',
+    bild: 'gemeinsam/tafel-logo.svg',
     farbe: 'tafel',
     titel: 'Interaktive Tafel',
     text: 'Digital unterrichten',
@@ -107,6 +110,7 @@ window.LINKS = [
   },
   {
     symbol: 'bildschirm',
+    bild: 'gemeinsam/tafel-logo.svg',
     farbe: 'tafel',
     titel: 'Tafel als Gast',
     text: 'Ohne Anmeldung schreiben und zeichnen – nichts wird gespeichert',
@@ -136,6 +140,7 @@ window.WERKZEUGE = [
   {
     bereich: 'Unterricht',
     symbol: 'timer',
+    bild: 'gemeinsam/timer-logo.svg',
     titel: 'Timer',
     text: 'Countdown für Arbeitsphasen – groß für den Beamer, mit Signalton.',
     adresse: 'werkzeuge/timer/',
@@ -143,6 +148,7 @@ window.WERKZEUGE = [
   {
     bereich: 'Unterricht',
     symbol: 'wuerfel',
+    bild: 'gemeinsam/gruppen-logo.svg',
     titel: 'Gruppen & Zufall',
     text: 'Gruppen oder Paare auslosen, eine Person ziehen. Namen bleiben auf diesem Gerät.',
     adresse: 'werkzeuge/gruppen/',
@@ -150,6 +156,7 @@ window.WERKZEUGE = [
   {
     bereich: 'Unterricht',
     symbol: 'ampel',
+    bild: 'gemeinsam/ampel-logo.svg',
     titel: 'Lautstärke­ampel', // ­ = Trennstelle, falls der Platz (Handy) nicht reicht
     text: 'Zeigt am Beamer, wie laut es in der Klasse ist. Das Mikrofon wird nur auf diesem Gerät ausgewertet, nichts aufgenommen.',
     adresse: 'werkzeuge/lautstaerke/',

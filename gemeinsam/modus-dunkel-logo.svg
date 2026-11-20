@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Dunkler Modus">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4fc0"/><stop offset="1" stop-color="#1c2161"/></linearGradient></defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <g stroke="#0a2d53" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M316 82A178 178 0 1 0 430 332A140 140 0 0 1 316 82Z" fill="#ffc928"/>
+    <path d="M388 96L398 124L426 134L398 144L388 172L378 144L350 134L378 124Z" fill="#fff" stroke-width="8"/>
+    <path d="M440 232L446 248L462 254L446 260L440 276L434 260L418 254L434 248Z" fill="#ffc928" stroke-width="8"/>
+  </g>
+  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffc928" stroke-width="12"/>
+</svg>
