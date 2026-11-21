@@ -145,11 +145,13 @@ body {
   color: var(--ls-text);
   -webkit-font-smoothing: antialiased;
 }
+/* Keine eigene Farbe für Überschriften: Viele Angebote haben einen dunklen Kopfbereich (.hero, header.top) mit
+   heller Schrift, die die Überschrift erbt. Eine feste dunkle Farbe hier machte sie dort unlesbar. Die Farben
+   der Artefakte kommen ohnehin aus ihren (oben umgestellten) Variablen. */
 h1,
 h2,
 h3,
 h4 {
-  color: var(--ls-text);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -160,9 +162,9 @@ h1 {
 h2 {
   font-weight: 700;
 }
+/* .top p nicht: .top ist in mehreren Angeboten ein dunkler Kopfbereich */
 .sub,
-.lead,
-.top p {
+.lead {
   color: var(--ls-text-2);
 }
 
@@ -280,6 +282,17 @@ button.btn,
 .steps button.done .n {
   background: var(--ls-gruen);
   border-color: var(--ls-gruen);
+  color: #ffffff; /* sonst Grün auf Grün (Versuchsplaner) */
+}
+/* Turnierplaner: .pick ist dort kein Knopf, sondern die Auswahl im dunklen Kopf – keine weiße Pille */
+.top .pick {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+/* Leichtathletik-Rechner: Überschriften „Jungen/Mädchen“ auf der dunkelgrünen Tafel hell statt Rot */
+.board .half h3 {
+  color: #ffb067;
 }
 .seg {
   border: 0 !important;

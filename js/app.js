@@ -224,7 +224,7 @@
     liste.textContent = ''
     LINKS.filter(sichtbar).forEach((l) => {
       if (!l.adresse && !SEITE.geplantesZeigen) return
-      const li = el('li')
+      const li = el('li', l.handy === false ? 'nicht-handy' : null)
       const a = l.adresse ? verweis('kachel', l.adresse) : el('div', 'kachel geplant')
       if (l.farbe) a.classList.add('farbe-' + l.farbe)
       a.append(zeichen(l.symbol || 'verweis', 'kachel-symbol', l.bild))

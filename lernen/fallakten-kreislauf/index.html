@@ -382,9 +382,10 @@ let chainPick = [];
 let chainChecked = null;
 
 function load(){
-  try{ if(localStorage.getItem("fk-teacher")==="1") teacher = true; }catch(e){}
+  // Lehrkraft-Ansicht nicht mehr im Gerät merken (geteilte Schul-iPads blieben sonst darin); alten Eintrag löschen
+  try{ localStorage.removeItem("fk-teacher"); }catch(e){}
   try{ const s = JSON.parse(localStorage.getItem("fk-solved")||"[]"); if(Array.isArray(s)) solved = new Set(s); }catch(e){}
-  if(location.hash === "#lehrkraft"){ teacher = true; try{ localStorage.setItem("fk-teacher","1"); }catch(e){} }
+  if(location.hash === "#lehrkraft"){ teacher = true; }
 }
 function saveSolved(){ try{ localStorage.setItem("fk-solved", JSON.stringify([...solved])); }catch(e){} }
 
@@ -728,7 +729,7 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet(); });
 window.addEventListener("hashchange", () => {
-  if(location.hash === "#lehrkraft"){ teacher = true; try{ localStorage.setItem("fk-teacher","1"); }catch(e){} render(false); }
+  if(location.hash === "#lehrkraft"){ teacher = true; render(false); }
 });
 
 load();

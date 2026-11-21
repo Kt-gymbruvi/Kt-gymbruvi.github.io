@@ -1,6 +1,8 @@
 /*
  * Lehrraum – gemeinsame Gestaltungswerte (Farben, Abstände, Schrift) für alle Seiten ohne Build-Schritt.
- * Farben aus dem Logo: Dunkelblau und Türkis (Türkis ersetzt das frühere Gelb).
+ * Farben aus dem Logo: Dunkelgrün (#0f5c47) und Orange (#ff8a14), seit 20.11.2026.
+ * Achtung: Die Namen --navy und --tuerkis stammen aus der früheren Fassung (Dunkelblau/Türkis);
+ * --navy ist heute Dunkelgrün, --tuerkis Orange. Umbenennen erst, wenn Tafel und Notenbuch mitziehen.
  * Heller Modus ist die Grundlage; der dunkle Modus gilt, wenn das Gerät ihn verlangt oder wenn
  * <html data-design="dunkel"> gesetzt ist (Umschalter: gemeinsam/design.js).
  * Wer hier eine Farbe ändert, muss sie im dunklen Block zweimal ändern (Gerät und Umschalter).
@@ -10,7 +12,7 @@
  * Wer hier etwas ändert, gleicht es dort an (Liste der Entsprechungen: docs/DECISIONS.md, 2026-11-18).
  *
  * Stil: ruhig und hell wie ein Werkzeug von Apple – Systemschrift, weiße Flächen mit Haarlinie und weichem
- * Schatten, schwebende Leisten aus „Glas“, Pillenknöpfe. Dunkelblau zeigt das Gewählte, Türkis den Fokus.
+ * Schatten, schwebende Leisten aus „Glas“, Pillenknöpfe. Dunkelgrün zeigt das Gewählte, Orange den Fokus.
  */
 :root {
   color-scheme: light;
@@ -50,7 +52,7 @@
   --schatten-klein: 0 1px 2px rgb(15 92 71 / 0.06), 0 2px 8px rgb(15 92 71 / 0.05);
   --abdunkeln: rgb(5 30 24 / 0.45); /* hinter Fenstern */
 
-  /* Seitenleiste und einfache Kopfleiste (in beiden Modi dunkelblau) */
+  /* Seitenleiste und einfache Kopfleiste (in beiden Modi dunkelgrün) */
   --kopf: #0f5c47;
   --kopf-text: #ffffff;
   --kopf-text-2: #b6d3c7;

@@ -86,9 +86,13 @@ body[data-rolle='lehrkraft'] .nur-gast {
   letter-spacing: 0.2em;
   transition: box-shadow var(--schnell), background-color var(--schnell);
 }
+/* Platzhalter als Hinweis („6 Ziffern“), nicht wie eine schon eingetragene PIN */
 .pin-form input::placeholder {
   color: var(--text-2);
-  opacity: 0.45;
+  opacity: 0.7;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 .pin-form input:focus {
   background: var(--flaeche);
@@ -618,6 +622,13 @@ a.kachel:active {
   .pin-knoepfe .knopf {
     flex: 1 1 auto;
     white-space: nowrap;
+  }
+  /* Gast am Handy (meist Schüler): nur die PIN zählt. Tafel-Knopf, Tafel-Bild und Kachel „Tafel als Gast“
+     weglassen – die Tafel braucht man am Beamer oder iPad, nicht auf dem Handy. */
+  body[data-rolle='gast'] #begruessung-knopf,
+  body[data-rolle='gast'] .begruessung-bild,
+  body[data-rolle='gast'] .kacheln .nicht-handy {
+    display: none;
   }
   .eintrag {
     flex-wrap: wrap;

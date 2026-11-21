@@ -1,14 +1,29 @@
 # Projektstand – Startseite kt-gymbruvi.github.io
 
-Stand: 12.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`, veröffentlicht am 12.11.2026). Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
+Stand: 21.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`). Zweig `sofort-paket` (Fehler aus dem Audit vom 21.11.2026) wartet auf Zustimmung. Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
+
+## Audit und Sofort-Paket (21.11.2026, Zweig `sofort-paket`, nicht veröffentlicht)
+Ganzheitliches Audit (Startseite, Lernangebote, Werkzeuge, Einstieg Quizzo/Klassenfunk; live und im Code). Behoben auf dem Zweig:
+- `lernen/lernstil.css` gab Überschriften eine feste dunkle Farbe – in Angeboten mit dunklem Kopf (Phasenanalyse, Mystery Fischsterben, Turnierplaner, Akrobatik) war der Titel unlesbar (Kontrast 1,5:1). Jetzt erben Überschriften die Farbe. Außerdem: Schrittnummern im Versuchsplaner (Grün auf Grün), Turnier-Auswahl im Turnierplaner (weiß auf weiß), „Jungen/Mädchen“ im Leichtathletik-Rechner (Rot auf Grün), AFB-Marken in Artbildung.
+- Seitlicher Überlauf am Handy: Wasserpest-Labor (666 px) und Phasenanalyse (431 px) – Grid-Spalten mit `minmax(0,1fr)`.
+- Fallakten Kreislauf merkt sich die Lehrkraft-Ansicht (`#lehrkraft`) nicht mehr im Gerät.
+- Logos Quizzo/Klassenfunk von 512 auf 128 px (zusammen 407 KB → 43 KB; vorher 88 % der Startseite).
+- Startseite ohne Anmeldung am Handy: nur PIN, ohne Tafel-Knopf, Tafel-Bild und Kachel „Tafel als Gast“ (`handy: false` in `inhalte.js`); Platzhalter „6 Ziffern“ statt „123456“.
+- Geprüft: alle 47 Angebote automatisch bei 375 px (Überlauf, Kontrast), Handy-Bilder, Startseite hell/dunkel, Handy/Desktop. Nicht geprüft: echte Geräte.
+
+Offen aus dem Audit (Reihenfolge nach Nutzen):
+1. Anmeldung der Startseite erneuert die gemeinsame Sitzung nicht (`lernen/datenbank.js` liest sie nur, solange sie gültig ist) – morgens erscheint wahrscheinlich die Gastfassung. Mit echtem Konto prüfen und `refresh_token` nutzen.
+2. Lehrkraft-Hinweise und Erwartungshorizonte stehen in 17 Angeboten offen auf der Seite (`details.teacher`, Knopf „Lehrkraft-Ansicht“, `#lehrkraft`). Entscheidung der Lehrkraft nötig: so lassen, an Anmeldung koppeln oder aus den öffentlichen Seiten herausnehmen.
+3. Gleiche Adresse für Notenbuch/Tafel und 46 KI-erzeugte Lernseiten: jede Seite könnte Anmelde-Token lesen und den Schlüsselbund benutzen. Langfristig eigene Adresse für sensible Apps, Lernangebote abschotten (iframe sandbox/CSP).
+4. Ein PIN-Einstieg für Quiz und Abstimmung; einheitlicher Rückweg in Quizzo/Klassenfunk/Lernangeboten; dunkler Modus für Lernangebote; automatische Darstellungsprüfung in `pruefen.mjs`; Token-Namen `--navy`/`--tuerkis` neutral benennen.
 
 ## Einheitliche Gestaltung im Stil der Tafel (veröffentlicht am 18.11.2026)
 - Schritt 1 von 4 erledigt (18.11.2026): gemeinsame Basis. `gemeinsam/tokens.css` hat die Werte der Tafel (Systemschrift, Glas, Haarlinie, Schatten, Rundung, Bewegung); `gemeinsam/grundlage.css` hat leichtere Schriftstärken, Knöpfe, die beim Drücken nachgeben, graue Eingabefelder mit Fokusring, Fenster mit unscharfem Hintergrund und neue Bausteine (`.glas`, `.karte-flaeche`, `.symbol-feld`, `.liste-gruppe`, `.segmente`, `.chip`, `.eingabe`).
 - Schritt 2 erledigt (18.11.2026): Übersicht der Lernangebote neu (`lernen/index.html`, `lernen/lernen.css`): Glas-Navigationsleiste „‹ Lehrraum“ mit Umschalter hell/dunkel, Seitenleiste Fach › Jahrgang › Thema wie in den Einstellungen, Angebote als gruppierte Listen mit Fach-Symbol (neue Symbole `blatt`, `laufen` statt Emojis), leiser QR-Knopf, Chips. Handy: Fächer als Segment-Umschalter, Jahrgänge und Themen als Chips. Bearbeiten-Modus und Speicherleiste im selben Stil. Geprüft hell/dunkel, Handy, Beamer 1920 px, Bearbeiten mit nachgestellter Anmeldung.
 - Schritt 3 erledigt (18.11.2026, nach Entwurf und Zustimmung der Lehrkraft): Startseite mit heller, schwebender Seitenleiste (statt dunkelblau), Kopfzeile ohne Fläche und kleinerem Logo, Begrüßung als weiße Karte mit großem Titel, weiße Kacheln mit Bereichsfarbe nur im Symbol-Quadrat, leise QR-Symbole statt „QR“-Plaketten, Klassen als graue Felder, Werkzeuge im selben Stil; Handy als Raster wie App-Symbole. Geprüft hell/dunkel, Gast und angemeldet (mit Beispielklassen nachgestellt), Handy mit offenem Menü, Beamer 1920 px.
 - Schritt 4 erledigt (18.11.2026): Werkzeuge (Timer, Gruppen & Zufall, Lautstärkeampel) und Herzfrequenz-Zonen mit Glas-Kopfzeile „‹ Startseite“/„‹ Lernangebote“ und Umschalter hell/dunkel (`werkzeuge/werkzeug.js`), weißen Karten, grauen Feldern, ohne Emojis; Ampelfarben als Tokens `--signal-rot/-gelb/-gruen`. Leiste „‹ Lernangebote“ in allen 40 übernommenen Angeboten hell im Stil der Tafel, zentral in `lernen/werkzeug/leiste.mjs` (auch von `uebernehmen.mjs` genutzt). Impressum mit heller Glas-Kopfleiste. Geprüft hell/dunkel, Handy; `pruefen.mjs` ohne Befund.
-- Lernangebote im Stil der Startseite (21.11.2026, Zweig `lernen-neuer-stil`, noch nicht in `main`): `lernen/lernstil.css` + `lernen/werkzeug/stil.mjs` für alle 46 Artefakte, nur heller Modus, Dunkelgrün/Orange. Offen: dunkler Modus, Beamerbreite und Klick-Test der Angebote, bestehender seitlicher Überlauf in Wasserpest-Labor und Phasenanalyse (Handy).
+- Lernangebote im Stil der Startseite (21.11.2026, inzwischen in `main` und live): `lernen/lernstil.css` + `lernen/werkzeug/stil.mjs` für alle 46 Artefakte, nur heller Modus, Dunkelgrün/Orange. Offen: dunkler Modus, Beamerbreite und Klick-Test der Angebote. Unlesbare Titel und der Überlauf am Handy sind auf dem Zweig `sofort-paket` behoben (siehe unten).
 - Das alte dunkle Design `style.css` ist gelöscht (18.11.2026, mit Zustimmung der Lehrkraft).
 - Veröffentlicht nach Zustimmung der Lehrkraft. Offen: auf echtem iPad und am Beamer ansehen.
 
@@ -29,7 +44,7 @@ Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITEC
   - Die Klassen liest `gemeinsam/klassen.js` aus dem Speicher des Geräts (IndexedDB der Lehrraum-App, nur lesend). Angelegt werden sie in der Lehrraum-App (`/Lehrraum/#/klassen`).
   - **Schlanke Fassung ohne Anmeldung:** „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Kacheln Quizzo, Klassenfunk, Lernangebote, Werkzeuge.
   - Materialliste mit Suche/Fachfilter/QR (derzeit leer und deshalb ausgeblendet).
-- **Gemeinsame Gestaltung** (`gemeinsam/`): `tokens.css` (Dunkelblau/Türkis aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
+- **Gemeinsame Gestaltung** (`gemeinsam/`): `tokens.css` (Dunkelgrün/Orange aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
 - **Werkzeuge** (`werkzeuge/`): Timer (Beamer, Signalton, Bildschirm bleibt an), Gruppen & Zufall (Namen nur im Gerät), Lautstärkeampel (Mikrofon nur lokal ausgewertet, „Ruhe messen“, Grenzen/Reaktionszeit einstellbar, optionaler Ton, Vollbild). Aussehen aus `gemeinsam/` und `werkzeug.css`.
 - **Lernangebote** (`lernen/`): 41 Einträge in `angebote.js` (32 Biologie Kl. 5–13, 9 Sport inkl. Oberstufe), Übersicht nach Fach › Jahrgang › Thema mit Suche und QR; Bearbeitungsmodus `lernen/#bearbeiten` für die angemeldete Lehrkraft (Supabase-Tabelle `lernangebote`, nutzt auch eine bestehende Quizzo-Anmeldung). Übersicht noch im alten Design.
 - Herzfrequenz-Zonen liegen seit 08.11.2026 unter `lernen/herzfrequenz-zonen/` (Sport, Kl. 11 und 12/13); `werkzeuge/herzfrequenz/` leitet weiter.
@@ -51,8 +66,6 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 - Neue Startseite nur in der Vorschau geprüft (1280 px und Handy 375 px, hell und dunkel, beide Fassungen) – nicht auf echtem iPad, Smartboard oder Beamer.
 - **Die Anmeldung auf der Startseite ist auch nach der Veröffentlichung nicht mit einem echten Konto geprüft** (das muss die Lehrkraft tun). Die volle Fassung wurde mit einer nachgestellten Sitzung angesehen. Ungeprüft ist insbesondere, ob Quizzo, Klassenfunk und die Tafel eine hier begonnene Anmeldung übernehmen (umgekehrt – erst dort anmelden – nutzt die Startseite den schon bisher verwendeten Weg).
 - Das Begrüßungsbild ist eine einfache Zeichnung; das Foto aus dem Entwurf liegt nicht als Datei vor.
-- Die Lehrraum-App (Tafel) verwendet im dunklen Modus noch Gelb als Akzent; Umstellung auf Türkis steht aus.
-- Lernübersicht und Werkzeuge haben noch das alte, dunkle Design und den Rückweg „← Startseite“; das wirkt neben der neuen Startseite uneinheitlich, bis Etappe 1.2 erledigt ist.
 - „Meine Klassen“: Zusammenspiel live geprüft (in der Lehrraum-App angelegte Klasse erscheint auf der Startseite, „Zur Tafel“ öffnet ihre Tafel). In der lokalen Vorschau teilen sich Startseite und Lehrraum keinen Speicher.
 - Frühere Notiz, erledigt: Sie brauchen die Klassenverwaltung und die Tafel aus dem Repository `Lehrraum`, das es noch nicht gibt.
 - `.claude/launch.json` (Vorschau über das Vite aus `../Quizzo`) ist lokal angelegt und bewusst nicht committet.

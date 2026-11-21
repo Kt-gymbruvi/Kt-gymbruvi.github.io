@@ -60,6 +60,7 @@ window.MITMACHEN = {
  *   farbe: 'unterrichten' | 'lernen' | 'tafel' | 'interaktion' | 'bibliothek' | 'quizzo' | 'klassenfunk'
  *   bild: eigenes Logo (Pfad) statt Symbol, nur für Quizzo und Klassenfunk
  *   textGast: anderer Text ohne Anmeldung (optional)
+ *   handy: false = auf schmalen Bildschirmen ohne Anmeldung ausblenden (optional)
  */
 window.LINKS = [
   {
@@ -117,6 +118,7 @@ window.LINKS = [
     adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1',
     qr: false,
     nur: 'gast',
+    handy: false, // am Handy ohne Anmeldung ausgeblendet (dort zählt nur die PIN)
   },
 ]
 
