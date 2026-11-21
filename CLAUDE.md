@@ -17,6 +17,7 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Werkzeuge: `werkzeuge/<ordner>/index.html`, gemeinsames Aussehen `gemeinsam/` + `werkzeuge/werkzeug.css`, Kopfzeile ergänzt von `werkzeuge/werkzeug.js` (Pfeil, Umschalter hell/dunkel).
 - Lernangebote: `lernen/<ordner>/index.html`, Liste in `lernen/angebote.js` (Fach › Jahrgang › Thema), Übersicht `lernen/index.html` + `lernen/lernen.js`.
 - Ordnung der Lernangebote (Titel, Text, Fach, Stufen, Thema, Reihenfolge, sichtbar) kann die angemeldete Lehrkraft unter `lernen/#bearbeiten` ändern; gespeichert in der Quizzo-Supabase-Tabelle `lernangebote` (Migration 009 im Quizzo-Repo), Zugriff über REST in `lernen/datenbank.js`. Ohne Datenbank gilt `angebote.js`. Ein Angebot erscheint nur, wenn es in `angebote.js` steht (Dateien müssen existieren).
+- Lehrkraft-Hinweise in Lernangeboten (Erwartungshorizonte, „Für Lehrkräfte“) nur mit Anmeldung: als `<details class="teacher">` oder mit `data-lehrkraft` auszeichnen; `lernen/lehrkraft.js` (von `lernen/werkzeug/stil.mjs` eingesetzt) und `lernen/lernstil.css` blenden sie für Gäste aus. Nur Sichtschutz – keine Prüfungslösungen hineinschreiben.
 
 ## Konventionen
 - Oberfläche, Bezeichner, Kommentare und Commit-Nachrichten auf Deutsch.
@@ -26,7 +27,7 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Werkzeuge mit Glas-Kopfzeile „‹ Startseite“, Lernangebote mit Leiste „‹ Lernangebote“ aus `lernen/werkzeug/leiste.mjs` (Aussehen dort ändern, dann `node lernen/werkzeug/leiste.mjs` erneuert sie in allen Angeboten).
 - Navigationspunkte ohne `adresse` sind noch nicht gebaute Bereiche („folgt“); nie auf eine Seite verlinken, die es nicht gibt.
 - Handy (Hochformat), iPad und Beamer müssen funktionieren. Startseite kompakt halten: Kacheln, Klassen und Werkzeuge stehen nebeneinander, nicht untereinander.
-- Claude-Artefakt übernehmen: `node lernen/werkzeug/uebernehmen.mjs <datei.html> <ordner>` (lokale Schriften, Leiste, Prüfung), dann Eintrag in `lernen/angebote.js`. Anleitung: `werkzeuge/ANLEITUNG.md`.
+- Claude-Artefakt übernehmen: `node lernen/werkzeug/uebernehmen.mjs <datei.html> <ordner>` (lokale Schriften, Leiste, Prüfung), danach `node lernen/werkzeug/stil.mjs <ordner>` (Stil und Lehrkraft-Prüfung), dann Eintrag in `lernen/angebote.js`. Anleitung: `werkzeuge/ANLEITUNG.md`.
 - Wird ein Werkzeug/Angebot verschoben: alte Adresse als Weiterleitungsseite stehen lassen (QR-Codes, Lesezeichen).
 
 ## Datenschutz und Sicherheit

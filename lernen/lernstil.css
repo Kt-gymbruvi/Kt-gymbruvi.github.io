@@ -357,3 +357,9 @@ textarea:focus {
 :root[data-ls='buehne'] .top h1 {
   color: var(--stage-ink);
 }
+
+/* ---------- Lehrkraft-Hinweise nur mit Anmeldung (lernen/lehrkraft.js setzt html.lehrkraft-an) ---------- */
+html:not(.lehrkraft-an) .teacher,
+html:not(.lehrkraft-an) [data-lehrkraft] {
+  display: none !important;
+}

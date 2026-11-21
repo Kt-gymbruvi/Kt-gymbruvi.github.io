@@ -14,7 +14,7 @@ Ganzheitliches Audit (Startseite, Lernangebote, Werkzeuge, Einstieg Quizzo/Klass
 
 Offen aus dem Audit (Reihenfolge nach Nutzen):
 1. Anmeldung der Startseite erneuert die gemeinsame Sitzung nicht (`lernen/datenbank.js` liest sie nur, solange sie gültig ist) – morgens erscheint wahrscheinlich die Gastfassung. Mit echtem Konto prüfen und `refresh_token` nutzen.
-2. Lehrkraft-Hinweise und Erwartungshorizonte stehen in 17 Angeboten offen auf der Seite (`details.teacher`, Knopf „Lehrkraft-Ansicht“, `#lehrkraft`). Entscheidung der Lehrkraft nötig: so lassen, an Anmeldung koppeln oder aus den öffentlichen Seiten herausnehmen.
+2. Erledigt auf Zweig `lehrkraft-hinweise` (Entscheidung der Lehrkraft 21.11.2026: „nur nach Anmeldung“): `lernen/lehrkraft.js` + Regel in `lernstil.css` blenden Lehrkraft-Hinweise ohne Anmeldung aus (16 Angebote). Sichtschutz, kein Zugriffsschutz – die Texte stehen weiter im Quelltext. Bewusst sichtbar geblieben: Musterlösungen zu Übungsaufgaben (Artbildung, Biomechanische Prinzipien, Plasmolyse, Räuber-Beute, Synapse, Zellzyklus), weil sie der Selbstkontrolle der Schüler dienen.
 3. Gleiche Adresse für Notenbuch/Tafel und 46 KI-erzeugte Lernseiten: jede Seite könnte Anmelde-Token lesen und den Schlüsselbund benutzen. Langfristig eigene Adresse für sensible Apps, Lernangebote abschotten (iframe sandbox/CSP).
 4. Ein PIN-Einstieg für Quiz und Abstimmung; einheitlicher Rückweg in Quizzo/Klassenfunk/Lernangeboten; dunkler Modus für Lernangebote; automatische Darstellungsprüfung in `pruefen.mjs`; Token-Namen `--navy`/`--tuerkis` neutral benennen.
 

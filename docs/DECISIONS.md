@@ -93,6 +93,14 @@ Grundlage: `docs/PROJECT_AUDIT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.m
 - Ohne Anmeldung zeigt die Startseite „Tafel als Gast“ → `/Lehrraum/#/tafel?gast=1`. Der Gast arbeitet in einer eigenen, beim Start geleerten IndexedDB (`lehrraum-gast`), ohne Klassen, ohne Server-Abgleich; die Daten der Lehrkraft auf dem Gerät bleiben unberührt.
 - Umgesetzt im Repo `Lehrraum` (`src/speicher/gast.ts`); dort noch nicht veröffentlicht – erst Lehrraum veröffentlichen, dann die Startseite, sonst führt der Link in die normale Tafel.
 
+## Lehrkraft-Hinweise in Lernangeboten nur mit Anmeldung (21.11.2026)
+- Erwartungshorizonte, Hinweise „Für Lehrkräfte“ und Lehrkraft-Ansichten erscheinen nur, wenn auf dem Gerät eine Lehrkraft angemeldet ist (gemeinsame Supabase-Sitzung oder Anmeldung der Lernübersicht). Entscheidung der Lehrkraft nach dem Audit.
+- Umsetzung ohne Umbau der Artefakte: `lernen/lehrkraft.js` (im `<head>`, setzt `html.lehrkraft-an` und `window.LehrkraftAngemeldet`), `lernstil.css` blendet `.teacher` und `[data-lehrkraft]` aus. Eigene Lehrkraft-Ansichten (`#lehrkraft` in Fallakten und Lebensmittel sortieren, Inselwelt, Bosskampf) fragen `window.LehrkraftAngemeldet`.
+- Nur Sichtschutz: Die Texte bleiben im Quelltext der öffentlichen Seite. Echter Schutz hieße, sie in die Datenbank (RLS) zu verlegen – derzeit nicht nötig, weil es keine Prüfungslösungen sind.
+- Geprüft wird nur, ob eine Sitzung im Gerät liegt (nicht ihre Ablaufzeit), damit die Hinweise nicht verschwinden, nur weil seit einer Stunde keine App die Sitzung erneuert hat.
+- Musterlösungen zu Übungsaufgaben bleiben sichtbar (Selbstkontrolle der Schüler).
+- Neue Angebote: Lehrkraft-Inhalte als `<details class="teacher">` oder mit `data-lehrkraft` auszeichnen; `stil.mjs` setzt `lehrkraft.js` ein.
+
 ## Lernangebote im Stil der Startseite (21.11.2026, Zweig `lernen-neuer-stil`)
 - Die übernommenen Artefakte behalten ihr eigenes `<style>`; danach lädt `lernen/lernstil.css` und überschreibt deren Farbvariablen mit den Werten der Startseite (hell, Dunkelgrün `#0f5c47`, Orange `#ff8a14`), setzt die Systemschrift und glättet dicke Ränder/harte Schatten.
 - `<html data-theme="light">` schaltet den dunklen Block der Artefakte ab (vorerst nur heller Modus). Dunkel später: Attribut entfernen und passende dunkle Werte in `lernstil.css` ergänzen.

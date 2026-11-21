@@ -1,4 +1,4 @@
-// Stil der Startseite für Lernangebote: bindet lernen/lernstil.css ein und stellt <html data-theme="light"> ein
+// Stil der Startseite für Lernangebote: bindet lernen/lernstil.css und lernen/lehrkraft.js ein und stellt <html data-theme="light"> ein
 // (die Artefakte schalten ihren dunklen Block bei data-theme="light" ab – vorerst nur heller Modus).
 //
 // Aufruf ohne Argumente: in allen lernen/<ordner>/index.html einsetzen bzw. erneuern.
@@ -10,6 +10,8 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const LINK = '<link rel="stylesheet" href="../lernstil.css">'
+// Lehrkraft-Hinweise nur mit Anmeldung (lernen/lehrkraft.js), direkt nach dem Stil, damit nichts aufblitzt
+const SKRIPT = '<script src="../lehrkraft.js"></script>'
 
 /** Setzt data-theme="light" am ersten <html> und den Stil-Link ans Ende des <head>. */
 export function mitStil(html) {
@@ -23,6 +25,8 @@ export function mitStil(html) {
       neu = neu.replace(/<\/head>/i, `${LINK}\n</head>`)
     }
   }
+  if (!neu.includes('lehrkraft.js')) neu = neu.replace(LINK, `${LINK}
+${SKRIPT}`)
   return neu
 }
 
