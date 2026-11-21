@@ -1,0 +1,346 @@
+/*
+ * Lernangebote im Stil der Startseite (nur heller Modus): ruhige weiße Flächen mit Haarlinie, Systemschrift,
+ * Pillenknöpfe; Farbe nur als Akzent – Dunkelgrün für Gewähltes und Hauptknöpfe, Orange für Hervorhebungen.
+ *
+ * Die Angebote sind eigenständige Claude-Artefakte mit eigenen Farbvariablen. Dieses Blatt wird NACH ihrem
+ * <style> geladen (<link rel="stylesheet" href="../lernstil.css">), setzt deren Variablen auf die Werte der
+ * Startseite (gemeinsam/tokens.css) und glättet die auffälligsten Formen (dicke Ränder, harte Schatten).
+ * Fachliche Farben (Zuchtmerkmale, Gruppen im Bestimmungsschlüssel) bleiben unterscheidbar, aber gedämpft
+ * innerhalb der Grün-/Orange-Familie. Der dunkle Modus ist hier bewusst noch ausgeschlossen.
+ */
+
+/* ---------- Variablen aller drei Artefakt-Familien auf die Startseiten-Werte setzen ---------- */
+:root,
+:root:not([data-theme='light']),
+:root[data-theme='dark'] {
+  color-scheme: light;
+
+  /* Werte der Startseite */
+  --ls-seite: #f3f6f2;
+  --ls-flaeche: #ffffff;
+  --ls-flaeche-2: #e8efeb;
+  --ls-text: #0c3d31;
+  --ls-text-2: #5b6f68;
+  --ls-gruen: #0f5c47;
+  --ls-gruen-hell: #e3f1ec;
+  --ls-orange: #ff8a14;
+  --ls-orange-text: #b25a00;
+  --ls-orange-hell: #fff1e0;
+  --ls-haarlinie: rgb(15 92 71 / 0.1);
+  --ls-linie: #d9e4de;
+  --ls-fokus: #d96d00;
+  --ls-fehler: #c4291f;
+  --ls-schatten: 0 1px 2px rgb(15 92 71 / 0.06), 0 2px 8px rgb(15 92 71 / 0.05);
+  --ls-schrift: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, Arial, sans-serif;
+
+  /* Familie „Kennzeichen“ */
+  --bg: var(--ls-seite);
+  --paper: var(--ls-flaeche);
+  --grid: #e8efeb;
+  --ink: var(--ls-text);
+  --edge: var(--ls-gruen);
+  --shadow: #cfe0d8;
+  --muted: var(--ls-text-2);
+  --leaf: var(--ls-gruen);
+  --leaf-soft: var(--ls-gruen-hell);
+  --on-leaf: #ffffff;
+  --sun: var(--ls-orange);
+  --berry: var(--ls-orange-text);
+  --berry-soft: var(--ls-orange-hell);
+  --on-berry: #ffffff;
+  --node: #ffffff;
+  --focus: var(--ls-fokus);
+
+  /* Familie „Zuchtsimulator / Versuchsplaner“ */
+  --surface: var(--ls-flaeche);
+  --surface-2: var(--ls-flaeche-2);
+  --line: var(--ls-linie);
+  --navy: var(--ls-gruen);
+  --yellow: var(--ls-orange);
+  --yellow-ink: #7a3d00;
+  --ok: #1d7a55;
+  --ok-bg: var(--ls-gruen-hell);
+  --err: var(--ls-fehler);
+  --err-bg: #fde8e6;
+  --warn-bg: var(--ls-orange-hell);
+  --c-groesse: #0f5c47;
+  --c-beine: #d96d00;
+  --c-rumpf: #4f9a6b;
+  --c-ohren: #8a5a2b;
+  --c-fell: #5b6f68;
+  --ground: #e8efeb;
+
+  /* Familie „Bestimmungsschlüssel“ */
+  --panel: var(--ls-flaeche);
+  --panel-2: #eef3ef;
+  --ink-soft: var(--ls-text-2);
+  --brand: var(--ls-gruen);
+  --brand-ink: #ffffff;
+  --sign: var(--ls-orange);
+  --sign-hi: #ffb067;
+  --sign-ink: #2b1500;
+  --accent: #d96d00;
+  --g-laub: #2d6a2f;
+  --g-nadel: #0f5c47;
+  --g-voegel: #b25a00;
+  --g-wirbel: #5b6f68;
+  --g-pilze: #8a5a2b;
+  --g-wasser: #3f8a7a;
+  --good: #1d7a55;
+  --good-bg: var(--ls-gruen-hell);
+  --bad: var(--ls-fehler);
+  --bad-bg: #fde8e6;
+  --note: #7a3d00;
+  --note-bg: var(--ls-orange-hell);
+
+  /* Weitere Namen, die in den übrigen Angeboten vorkommen (Hauptfarbe, Flächen, Hervorhebung).
+     Fachliche Farben (Blut, Organe, Zellteile, Meer, Allele …) bleiben dort unangetastet. */
+  --accent: var(--ls-gruen);
+  --accent-ink: #ffffff;
+  --accent-soft: var(--ls-gruen-hell);
+  --acc: var(--ls-gruen);
+  --acc-ink: #ffffff;
+  --primary: var(--ls-gruen);
+  --on-primary: #ffffff;
+  --soft: #eef3ef;
+  --surface2: #f3f6f2;
+  --text: var(--ls-text);
+  --chip: var(--ls-flaeche-2);
+  --border: var(--ls-linie);
+  --desk: var(--ls-seite);
+  --mat: var(--ls-flaeche-2);
+  --stage: #eef3ef;
+  --board: var(--ls-gruen);
+  --board-ink: #ffffff;
+  --navy2: #16745a;
+  --on-navy: #ffffff;
+  --gold: var(--ls-orange);
+  --gold-soft: var(--ls-orange-hell);
+  --on-gold: #2b1500;
+  --on-yellow: #2b1500;
+  --warn: var(--ls-orange-text);
+  --danger: var(--ls-fehler);
+  --u: var(--ls-gruen);
+  --o: var(--ls-orange);
+  --blue: var(--ls-gruen);
+  --light: var(--ls-gruen-hell);
+  --mid: #8bbfae;
+  --hero: var(--ls-gruen);
+  --teach: var(--ls-orange-hell);
+  --zoneA: #e8efeb;
+  --zoneB: #f6f8f5;
+  --zoneC: #eef3ef;
+}
+
+/* ---------- Schrift: Systemschrift wie auf der Startseite ---------- */
+html body,
+html body * {
+  font-family: var(--ls-schrift) !important;
+}
+html body .emo {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', var(--ls-schrift) !important;
+}
+body {
+  background: var(--ls-seite);
+  color: var(--ls-text);
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3,
+h4 {
+  color: var(--ls-text);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+h1 {
+  font-size: clamp(1.7rem, 4.4vw, 2.4rem);
+  line-height: 1.1;
+}
+h2 {
+  font-weight: 700;
+}
+.sub,
+.lead,
+.top p {
+  color: var(--ls-text-2);
+}
+
+/* ---------- Leiste „‹ Lernangebote“ (überschreibt die Werte aus leiste.mjs) ---------- */
+html .lernangebot-leiste {
+  background: rgb(255 255 255 / 0.78) !important;
+  border-bottom: 1px solid var(--ls-haarlinie) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+}
+html .lernangebot-leiste a {
+  color: var(--ls-gruen) !important;
+  font-weight: 600 !important;
+}
+html .lernangebot-leiste a:hover {
+  background: rgb(15 92 71 / 0.07) !important;
+}
+html .lernangebot-leiste a:focus-visible {
+  outline-color: var(--ls-fokus) !important;
+}
+
+/* ---------- Karten: weiß, Haarlinie, weicher Schatten statt dicker Rand und harter Schatten ---------- */
+.card,
+.goal,
+.stage,
+.panel,
+.box,
+details,
+.sheet,
+.tile {
+  background: var(--ls-flaeche);
+  border: 1px solid var(--ls-haarlinie) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: var(--ls-schatten) !important;
+}
+.stage {
+  /* Kästchenpapier bleibt, aber ganz leise */
+  background-color: var(--ls-flaeche);
+  background-image: linear-gradient(#eef3ef 1px, transparent 1px), linear-gradient(90deg, #eef3ef 1px, transparent 1px);
+}
+.ex div,
+.falle,
+.einfach,
+.merk {
+  border-width: 1px !important;
+  border-radius: 0.75rem !important;
+}
+.ex div {
+  border-color: var(--ls-haarlinie) !important;
+  background: var(--ls-gruen-hell);
+}
+.falle {
+  border-color: rgb(178 90 0 / 0.3) !important;
+}
+.einfach {
+  border-style: solid !important;
+  border-color: var(--ls-haarlinie) !important;
+  background: var(--ls-seite);
+}
+
+/* ---------- Knöpfe: Pillen, Hauptknopf dunkelgrün, Auswahl dunkelgrün ---------- */
+.btn,
+button.btn,
+.pick,
+.tab,
+.steps button,
+.seg button {
+  border-width: 1px !important;
+  box-shadow: none !important;
+  transform: none !important;
+  font-weight: 600 !important;
+}
+.btn,
+.pick,
+.tab,
+.steps button {
+  border-color: var(--ls-haarlinie) !important;
+  background: var(--ls-flaeche);
+  color: var(--ls-text);
+  border-radius: 999px !important;
+}
+.btn:hover:not(:disabled),
+.pick:hover,
+.tab:hover,
+.steps button:hover {
+  background: rgb(15 92 71 / 0.07);
+}
+.btn.primary,
+.btn.sun {
+  background: var(--ls-gruen) !important;
+  border-color: var(--ls-gruen) !important;
+  color: #ffffff !important;
+}
+.btn.primary:hover:not(:disabled) {
+  background: #0a4636 !important;
+}
+.btn.quiet {
+  color: var(--ls-text-2);
+}
+.btn.danger {
+  color: var(--ls-fehler);
+  border-color: rgb(196 41 31 / 0.35) !important;
+}
+.pick[aria-pressed='true'],
+.tab[aria-selected='true'],
+.steps button[aria-current='step'],
+.seg button[aria-pressed='true'] {
+  background: var(--ls-gruen) !important;
+  border-color: var(--ls-gruen) !important;
+  color: #ffffff !important;
+}
+.steps button.done .n {
+  background: var(--ls-gruen);
+  border-color: var(--ls-gruen);
+}
+.seg {
+  border: 0 !important;
+  background: var(--ls-flaeche-2);
+}
+.steps .n {
+  border-width: 1px !important;
+}
+
+/* ---------- Eingabefelder wie auf der Startseite ---------- */
+select,
+input[type='text'],
+input[type='date'],
+input[type='search'],
+textarea {
+  border: 1px solid var(--ls-haarlinie) !important;
+  border-radius: 0.75rem !important;
+  background: var(--ls-flaeche-2);
+  color: var(--ls-text);
+}
+select:focus,
+input:focus,
+textarea:focus {
+  border-color: var(--ls-gruen) !important;
+  background: var(--ls-flaeche);
+}
+:focus-visible {
+  outline: 3px solid var(--ls-fokus) !important;
+  outline-offset: 2px;
+}
+
+/* ---------- Bestimmungsschlüssel: Wegweiser als sanfte Pfeile, Orange nur als Akzent ---------- */
+.sign {
+  background: var(--ls-orange-hell);
+  color: var(--ls-text);
+  box-shadow: inset 4px 0 0 var(--ls-orange);
+}
+.sign:hover,
+.sign:focus-visible {
+  background: #ffe3c2;
+}
+.sign .ab {
+  background: var(--ls-orange);
+  color: #2b1500;
+}
+.sign svg {
+  color: var(--ls-orange-text);
+}
+.tabs {
+  gap: 0.4rem;
+}
+
+/* ---------- Angebote mit dunkler Bühne (3D-Ansicht): Bühne in Dunkelgrün wie die Seitenleiste der Startseite ---------- */
+:root[data-ls='buehne'] {
+  --stage-a: #0a3d30;
+  --stage-b: #0f5c47;
+  --stage-ink: #ffffff;
+  --stage-line: #215545;
+  --stage-muted: #b6d3c7;
+}
+:root[data-ls='buehne'] h1,
+:root[data-ls='buehne'] .top h1 {
+  color: var(--stage-ink);
+}

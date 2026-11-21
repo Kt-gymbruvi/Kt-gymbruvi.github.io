@@ -92,3 +92,10 @@ Grundlage: `docs/PROJECT_AUDIT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.m
 ## Tafel als Gast (ohne Anmeldung)
 - Ohne Anmeldung zeigt die Startseite „Tafel als Gast“ → `/Lehrraum/#/tafel?gast=1`. Der Gast arbeitet in einer eigenen, beim Start geleerten IndexedDB (`lehrraum-gast`), ohne Klassen, ohne Server-Abgleich; die Daten der Lehrkraft auf dem Gerät bleiben unberührt.
 - Umgesetzt im Repo `Lehrraum` (`src/speicher/gast.ts`); dort noch nicht veröffentlicht – erst Lehrraum veröffentlichen, dann die Startseite, sonst führt der Link in die normale Tafel.
+
+## Lernangebote im Stil der Startseite (21.11.2026, Zweig `lernen-neuer-stil`)
+- Die übernommenen Artefakte behalten ihr eigenes `<style>`; danach lädt `lernen/lernstil.css` und überschreibt deren Farbvariablen mit den Werten der Startseite (hell, Dunkelgrün `#0f5c47`, Orange `#ff8a14`), setzt die Systemschrift und glättet dicke Ränder/harte Schatten.
+- `<html data-theme="light">` schaltet den dunklen Block der Artefakte ab (vorerst nur heller Modus). Dunkel später: Attribut entfernen und passende dunkle Werte in `lernstil.css` ergänzen.
+- Fachliche Farben (Blut, Organe, Zellteile, Meer, Allele, Gruppenfarben) bleiben bewusst bestehen; nur Gestaltungsfarben wurden umgestellt.
+- Einsetzen/Erneuern in allen Angeboten: `node lernen/werkzeug/stil.mjs` (Angebote mit `gemeinsam/tokens.css`, z. B. Herzfrequenz-Zonen, werden übersprungen). Angebot mit dunkler 3D-Bühne: `data-ls="buehne"` (Genetiklabor 3D).
+- Neu übernommene Artefakte: nach `uebernehmen.mjs` zusätzlich `node lernen/werkzeug/stil.mjs <ordner>` ausführen.
