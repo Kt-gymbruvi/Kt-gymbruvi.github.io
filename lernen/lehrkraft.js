@@ -31,5 +31,13 @@
     an = false // Speicher gesperrt (z. B. privater Modus): als Gast behandeln
   }
   window.LehrkraftAngemeldet = an
-  if (an) document.documentElement.classList.add('lehrkraft-an')
+  if (an) {
+    document.documentElement.classList.add('lehrkraft-an')
+  } else {
+    // Die Regel steht auch in lernstil.css; hier noch einmal, damit eine zwischengespeicherte ältere
+    // lernstil.css (GitHub Pages: bis zu 10 Minuten) die Hinweise nicht doch zeigt.
+    const stil = document.createElement('style')
+    stil.textContent = '.teacher,[data-lehrkraft]{display:none!important}'
+    document.head.appendChild(stil)
+  }
 })()
