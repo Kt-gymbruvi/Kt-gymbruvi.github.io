@@ -42,6 +42,16 @@
       else weg = setTimeout(() => o.beiGegner(false), 6000)
     })
 
+    // Jede Nachricht des Gegners zeigt: Er ist da – auch wenn die Anwesenheitsliste kurz etwas anderes meldet
+    ;['zug', 'sync'].forEach((e) =>
+      raum.auf(e, (d) => {
+        if (gid && d.von === gid && o.beiGegner) {
+          clearTimeout(weg)
+          o.beiGegner(true)
+        }
+      }),
+    )
+
     window.addEventListener('pagehide', () => raum.verlassen())
     return {
       seite,

@@ -31,7 +31,29 @@
     let erneut = 0
     let meta = null
     const warteschlange = [] // Nachrichten, die vor dem Beitritt gesendet wurden
-    const anwesende = new Map() // Schlüssel → meta
+    // Anwesenheit: je Schlüssel (Person) mehrere Einträge, jeder mit eigener Kennung („phx_ref“). Wer seine Angaben ändert oder die Seite
+    // wechselt, meldet erst einen neuen Eintrag an und den alten ab – beides kann in getrennten Nachrichten kommen. Deshalb darf eine
+    // Abmeldung nur ihren eigenen Eintrag löschen, nie die ganze Person (sonst wirkt jemand fälschlich als weg).
+    const anwesende = new Map() // Schlüssel → Map(Kennung → meta), in der Reihenfolge des Eintreffens
+    const eintraege = () => {
+      const l = []
+      anwesende.forEach((metas) => {
+        const letzte = [...metas.values()].pop()
+        if (letzte) l.push(letzte)
+      })
+      return l
+    }
+    const trage = (k, metas) =>
+      (metas || []).forEach((m) => {
+        if (!anwesende.has(k)) anwesende.set(k, new Map())
+        anwesende.get(k).set(m.phx_ref || 'ohne-' + anwesende.get(k).size, m)
+      })
+    const nimm = (k, metas) => {
+      const m = anwesende.get(k)
+      if (!m) return
+      ;(metas || []).forEach((x) => m.delete(x.phx_ref || ''))
+      if (!m.size) anwesende.delete(k)
+    }
 
     const status = (s) => o.beiStatus && o.beiStatus(s)
 
@@ -42,7 +64,7 @@
     }
 
     function meldeAnwesenheit() {
-      if (o.beiAnwesenheit) o.beiAnwesenheit([...anwesende.values()])
+      if (o.beiAnwesenheit) o.beiAnwesenheit(eintraege())
     }
 
     function verbinden() {
@@ -81,18 +103,13 @@
           if (o.beiNachricht) o.beiNachricht(m.payload.event, m.payload.payload)
         } else if (m.event === 'presence_state') {
           anwesende.clear()
-          Object.keys(m.payload || {}).forEach((k) => {
-            const metas = m.payload[k].metas || []
-            if (metas.length) anwesende.set(k, metas[metas.length - 1])
-          })
+          Object.keys(m.payload || {}).forEach((k) => trage(k, m.payload[k].metas))
           meldeAnwesenheit()
         } else if (m.event === 'presence_diff') {
           const p = m.payload || {}
-          Object.keys(p.leaves || {}).forEach((k) => anwesende.delete(k))
-          Object.keys(p.joins || {}).forEach((k) => {
-            const metas = p.joins[k].metas || []
-            if (metas.length) anwesende.set(k, metas[metas.length - 1])
-          })
+          // erst neue Einträge, dann Abmeldungen: so bleibt jemand, der gerade neu angemeldet wurde, auch dann da, wenn die Abmeldung des alten Eintrags später kommt
+          Object.keys(p.joins || {}).forEach((k) => trage(k, p.joins[k].metas))
+          Object.keys(p.leaves || {}).forEach((k) => nimm(k, p.leaves[k].metas))
           meldeAnwesenheit()
         }
       }
