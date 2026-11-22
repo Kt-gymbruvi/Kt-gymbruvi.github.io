@@ -480,10 +480,13 @@
     try {
       const sitzung = await DB.anmelden(email, passwort)
       // Die Anmeldung auch dort ablegen, wo Quizzo, Klassenfunk und die Tafel sie suchen – dann gilt sie überall
-      try {
-        localStorage.setItem(GEMEINSAM, JSON.stringify(sitzung))
-      } catch {
-        /* dann gilt sie nur hier */
+      if (window.LehrraumSitzung) window.LehrraumSitzung.speichern(sitzung)
+      else {
+        try {
+          localStorage.setItem(GEMEINSAM, JSON.stringify(sitzung))
+        } catch {
+          /* dann gilt sie nur hier */
+        }
       }
       $('anmelde-passwort').value = ''
       anmeldeDialog.close()

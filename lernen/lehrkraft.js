@@ -41,5 +41,40 @@
     const stil = document.createElement('style')
     stil.textContent = '.teacher,[data-lehrkraft]{display:none!important}'
     document.head.appendChild(stil)
+    erneuernUndNeuLaden()
+  }
+
+  /* Liegt eine abgelaufene gemeinsame Sitzung mit Erneuerungstoken im Gerät (Lehrkraft, die seit über einer Stunde keine
+     App geöffnet hat), wird sie erneuert (gemeinsam/sitzung.js) und die Seite einmal neu geladen – die Angebote prüfen die
+     Anmeldung beim Start. Ohne Anmeldung, ohne Netz oder bei widerrufener Sitzung passiert nichts (Gast-Ansicht). */
+  function erneuernUndNeuLaden() {
+    let s
+    try {
+      s = JSON.parse(localStorage.getItem(GEMEINSAM) || 'null')
+    } catch {
+      return
+    }
+    if (!s || !s.refresh_token) return
+    try {
+      if (Date.now() - Number(sessionStorage.getItem('lehrkraft-erneuert') || 0) < 60_000) return // keine Schleife
+    } catch {
+      return
+    }
+    const quelle = document.currentScript && document.currentScript.src
+    if (!quelle) return
+    const modul = document.createElement('script')
+    modul.src = new URL('../gemeinsam/sitzung.js', quelle).href
+    modul.onload = () => {
+      window.LehrraumSitzung.erneuern().then((neu) => {
+        if (!neu) return
+        try {
+          sessionStorage.setItem('lehrkraft-erneuert', String(Date.now()))
+        } catch {
+          return
+        }
+        location.reload()
+      })
+    }
+    document.head.appendChild(modul)
   }
 })()

@@ -93,6 +93,16 @@ Grundlage: `docs/PROJECT_AUDIT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.m
 - Ohne Anmeldung zeigt die Startseite „Tafel als Gast“ → `/Lehrraum/#/tafel?gast=1`. Der Gast arbeitet in einer eigenen, beim Start geleerten IndexedDB (`lehrraum-gast`), ohne Klassen, ohne Server-Abgleich; die Daten der Lehrkraft auf dem Gerät bleiben unberührt.
 - Umgesetzt im Repo `Lehrraum` (`src/speicher/gast.ts`); dort noch nicht veröffentlicht – erst Lehrraum veröffentlichen, dann die Startseite, sonst führt der Link in die normale Tafel.
 
+## Gemeinsame Sitzung erneuern (22.11.2026)
+- `gemeinsam/sitzung.js` erneuert eine abgelaufene Supabase-Sitzung mit dem Erneuerungstoken und schreibt sie im Format von supabase-js zurück (gleicher Schlüssel wie Quizzo, Klassenfunk, Tafel). Grund: Der Zugriffstoken gilt etwa eine Stunde; wer morgens direkt die Startseite oder ein Lernangebot öffnet, wurde als Gast behandelt.
+- Erneuerungstoken werden vom Server rotiert (einmal gültig, kurzes Wiederverwendungsfenster). Deshalb erneuert in einem Browser immer nur ein Tab (Web Lock `lehrraum-sitzung`), und vor dem Erneuern wird der Speicher noch einmal gelesen.
+- Ist der Erneuerungstoken widerrufen oder fehlt das Netz, bleibt die gespeicherte Sitzung unverändert (Quizzo entscheidet) und die Seite zeigt die Gastfassung.
+- `lernen/lehrkraft.js` lädt das Modul nur bei abgelaufener Sitzung mit Erneuerungstoken und lädt die Seite danach einmal neu (Sperre 60 s gegen Schleifen).
+
+## Darstellungsprüfung im Browser (22.11.2026)
+- `werkzeuge/darstellung.mjs` startet lokal Chrome/Edge (DevTools-Protokoll, ohne npm-Pakete), liefert die Seiten über einen Mini-Server auf 127.0.0.1 aus und misst Überlauf, Textkontrast und Konsolenfehler. Anlass: `pruefen.mjs` liest nur Quelltext und übersah unlesbare Titel und Überlauf. An der Version vor dem Sofort-Paket getestet: findet alle damaligen Fehler.
+- Kontrast: unter 3:1 Fehler, 3–4,5:1 Hinweis (`--streng` macht daraus Fehler). Reine Symbole (●●●) und aus dem Bild geschobene Screenreader-Texte zählen nicht.
+
 ## Lehrkraft-Hinweise in Lernangeboten nur mit Anmeldung (21.11.2026)
 - Erwartungshorizonte, Hinweise „Für Lehrkräfte“ und Lehrkraft-Ansichten erscheinen nur, wenn auf dem Gerät eine Lehrkraft angemeldet ist (gemeinsame Supabase-Sitzung oder Anmeldung der Lernübersicht). Entscheidung der Lehrkraft nach dem Audit.
 - Umsetzung ohne Umbau der Artefakte: `lernen/lehrkraft.js` (im `<head>`, setzt `html.lehrkraft-an` und `window.LehrkraftAngemeldet`), `lernstil.css` blendet `.teacher` und `[data-lehrkraft]` aus. Eigene Lehrkraft-Ansichten (`#lehrkraft` in Fallakten und Lebensmittel sortieren, Inselwelt, Bosskampf) fragen `window.LehrkraftAngemeldet`.

@@ -55,7 +55,9 @@
         sessionStorage.removeItem(EIGENE_SITZUNG)
       }
     }
-    // Quizzo-Anmeldung nur lesen (nicht erneuern – das macht Quizzo selbst)
+    // Gemeinsame Anmeldung (Quizzo, Klassenfunk, Tafel, Startseite): gültig oder mit dem Erneuerungstoken erneuert
+    // (gemeinsam/sitzung.js) – sonst wäre morgens, nach über einer Stunde ohne offene App, die Gastfassung zu sehen.
+    if (window.LehrraumSitzung) return window.LehrraumSitzung.erneuern()
     const q = lies(localStorage, QUIZZO_SITZUNG)
     return gueltig(q) ? q : null
   }
