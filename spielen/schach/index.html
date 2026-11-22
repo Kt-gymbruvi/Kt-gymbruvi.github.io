@@ -173,6 +173,9 @@
     <script src="../../gemeinsam/symbole.js"></script>
     <script src="../../werkzeuge/werkzeug.js"></script>
     <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../online-spiel.js"></script>
     <script src="../steuerung.js"></script>
     <script>
       ;(function () {
@@ -181,7 +184,7 @@
         const GLYPH = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟︎' }
         const brett = document.getElementById('brett')
         const FARBEN = ['Weiß', 'Schwarz']
-        const GRUND = { schachmatt: 'Schachmatt', patt: 'Patt – Unentschieden', wiederholung: 'Dreimal dieselbe Stellung – Unentschieden', '50-zuege': '50 Züge ohne Schlag – Unentschieden', material: 'Zu wenig Material – Unentschieden' }
+        const GRUND = { schachmatt: 'Schachmatt', patt: 'Patt – Unentschieden', wiederholung: 'Dreimal dieselbe Stellung – Unentschieden', '50-zuege': '50 Züge ohne Schlag – Unentschieden', aufgabe: 'Aufgabe', material: 'Zu wenig Material – Unentschieden' }
         let s = null
         let verlauf = []
         let sel = -1
@@ -190,8 +193,25 @@
         let gesperrt = false
         let lauf = 0
 
+        // Online-Partie (aus der Lobby geöffnet)? Dann Züge über den Raum senden und empfangen.
+        const online = window.OnlineSpiel.start({
+          beiZug: (z) => entfernterZug(z),
+          beiAufgabe: () => aufgegeben(false),
+          beiGegner: (da) => steuerung && steuerung.hinweis && steuerung.hinweis(da ? '' : 'Dein Gegner ist nicht mehr verbunden.'),
+        })
+        const GEGNER = () => (online ? online.gegner : 'Der Rechner')
+
         const steuerung = window.Spielsteuerung(document.getElementById('steuerung'), {
           farben: FARBEN,
+          online: online && {
+            gegner: online.gegner,
+            seite: online.seite,
+            lobby: online.lobby,
+            aufgeben: () => {
+              online.gibAuf()
+              aufgegeben(true)
+            },
+          },
           neu,
           zurueck() {
             if (gesperrt || !verlauf.length) return
@@ -208,7 +228,7 @@
         const mensch = () => steuerung.modus === 'lokal' || seite(s.amZug) === steuerung.ich
 
         function ausrichtung() {
-          if (steuerung.modus === 'rechner') return steuerung.ich === 1 ? 'w' : 'b'
+          if (steuerung.modus !== 'lokal') return steuerung.ich === 1 ? 'w' : 'b'
           return gedreht ? 'b' : 'w'
         }
 
@@ -265,11 +285,13 @@
             const g = GRUND[s.ende.grund]
             if (!s.ende.sieger) return steuerung.status(g)
             const w = s.ende.sieger
-            const text = steuerung.modus === 'rechner' ? (seite(w) === steuerung.ich ? 'Schachmatt – du hast gewonnen!' : 'Schachmatt – der Rechner gewinnt.') : 'Schachmatt – ' + FARBEN[seite(w) - 1] + ' gewinnt!'
-            return steuerung.status(text, steuerung.modus === 'rechner' && seite(w) !== steuerung.ich ? 'schlecht' : 'gut')
+            const gegen = steuerung.modus !== 'lokal'
+            const wie = s.ende.grund === 'aufgabe' ? 'Aufgabe' : 'Schachmatt'
+            const text = gegen ? (seite(w) === steuerung.ich ? wie + ' – du hast gewonnen!' : wie + ' – ' + GEGNER() + ' gewinnt.') : wie + ' – ' + FARBEN[seite(w) - 1] + ' gewinnt!'
+            return steuerung.status(text, gegen && seite(w) !== steuerung.ich ? 'schlecht' : 'gut')
           }
           const zusatz = s.imSchach ? ' Schach!' : ''
-          if (steuerung.modus === 'rechner') return steuerung.status((mensch() ? 'Du bist dran.' : 'Der Rechner denkt …') + zusatz)
+          if (steuerung.modus !== 'lokal') return steuerung.status((mensch() ? 'Du bist dran.' : online ? GEGNER() + ' ist am Zug.' : 'Der Rechner denkt …') + zusatz)
           steuerung.status(FARBEN[seite(s.amZug) - 1] + ' ist am Zug.' + zusatz)
         }
 
@@ -280,7 +302,31 @@
           s = n
           sel = -1
           zeichnen()
+          if (online) {
+            online.sendeZug({ von: z.von, nach: z.nach, promo: z.promo })
+            if (s.ende) online.fertig()
+          }
           rechnerDran()
+        }
+
+        // Zug des Gegners (oder beim Neuladen: nachgeholte Züge)
+        function entfernterZug(z) {
+          const n = S.ziehe(s, z)
+          if (!n) return
+          verlauf.push(s)
+          s = n
+          sel = -1
+          zeichnen()
+          if (s.ende && online) online.fertig()
+        }
+
+        function aufgegeben(ich) {
+          if (s.ende) return
+          const eigene = steuerung.ich === 1 ? 'w' : 'b'
+          s = Object.assign({}, s, { ende: { sieger: ich ? (eigene === 'w' ? 'b' : 'w') : eigene, grund: 'aufgabe' } })
+          sel = -1
+          zeichnen()
+          if (online) online.fertig()
         }
 
         function klick(i) {
@@ -340,7 +386,7 @@
           verlauf = []
           sel = -1
           zeichnen()
-          document.getElementById('hinweis').textContent = steuerung.modus === 'rechner' ? 'Das Brett steht so, dass deine Figuren unten sind.' : 'Mit „Brett drehen“ siehst du es aus Sicht von Schwarz.'
+          document.getElementById('hinweis').textContent = steuerung.modus !== 'lokal' ? 'Das Brett steht so, dass deine Figuren unten sind.' : 'Mit „Brett drehen“ siehst du es aus Sicht von Schwarz.'
           rechnerDran()
         }
         neu()

@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spielraum</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <style>
+      .schmal {
+        max-width: 30rem;
+        margin: 0 auto;
+      }
+      .raumkopf {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .code {
+        font-size: 2.2rem;
+        font-weight: 300;
+        letter-spacing: 0.12em;
+        font-variant-numeric: tabular-nums;
+      }
+      #qr {
+        flex: none;
+        width: 7.5rem;
+        height: 7.5rem;
+        padding: 0.4rem;
+        border-radius: var(--radius);
+        background: #fff; /* QR-Codes brauchen hellen Grund */
+      }
+      #qr svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .liste {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .zeile {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.75rem;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+      }
+      .zeile .text {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .zeile .klein {
+        color: var(--text-2);
+        font-size: 0.85rem;
+      }
+      .leer {
+        color: var(--text-2);
+        font-size: 0.95rem;
+      }
+      .anbieten {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      #verbindung {
+        font-size: 0.85rem;
+        color: var(--text-2);
+      }
+      #verbindung.aus {
+        color: var(--fehler);
+      }
+      #fehler {
+        margin: 0.5rem 0 0;
+        color: var(--fehler);
+        font-size: 0.9rem;
+      }
+      .formular-zeile {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: end;
+      }
+      .formular-zeile .feld {
+        flex: 1 1 10rem;
+      }
+      label.haken {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 2.5rem;
+      }
+      label.haken input {
+        width: 1.2rem;
+        height: 1.2rem;
+        accent-color: var(--akzent);
+      }
+      .raum-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 20rem;
+        gap: 1.25rem;
+        align-items: start;
+      }
+      .raum-grid > * {
+        min-width: 0;
+      }
+      @media (max-width: 52rem) {
+        .raum-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Spiele</a>
+      <h1>Spielraum</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <!-- 1. Noch kein Raum -->
+      <div id="start" class="schmal" hidden>
+        <section class="werkzeug-karte">
+          <h2 style="margin-top: 0">Spielraum</h2>
+          <p class="hinweis">Hier spielt die Klasse gegeneinander: Einer legt einen Raum an, alle anderen kommen mit dem Code oder dem QR-Code hinein.</p>
+          <div class="knopf-reihe">
+            <button type="button" class="knopf gross" id="neuer-raum">Neuen Raum anlegen</button>
+          </div>
+        </section>
+        <section class="werkzeug-karte" style="margin-top: 1rem">
+          <h2 style="margin-top: 0">Mit Code beitreten</h2>
+          <form id="code-form" class="formular-zeile" novalidate>
+            <label class="feld">Raumcode
+              <input id="code-feld" type="text" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="z. B. K7P2QX" />
+            </label>
+            <button type="submit" class="knopf">Beitreten</button>
+          </form>
+          <p id="code-fehler" class="hinweis" style="color: var(--fehler)" hidden></p>
+        </section>
+      </div>
+
+      <!-- 2. Name wählen -->
+      <div id="name" class="schmal" hidden>
+        <section class="werkzeug-karte">
+          <h2 style="margin-top: 0">Wie heißt du im Spiel?</h2>
+          <p class="hinweis">Ein Spitzname reicht. Er wird nur im Raum angezeigt und nirgends gespeichert.</p>
+          <form id="name-form" class="formular-zeile" novalidate>
+            <label class="feld">Spitzname
+              <input id="name-feld" type="text" maxlength="20" autocomplete="off" />
+            </label>
+            <button type="submit" class="knopf">Los</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- 3. Im Raum -->
+      <div id="raum" class="raum-grid" hidden>
+        <div>
+          <section class="werkzeug-karte">
+            <h2 style="margin-top: 0">Spiel anbieten</h2>
+            <div class="anbieten" id="anbieten"></div>
+            <p class="hinweis" id="anbieten-hinweis" style="margin: 0.75rem 0 0"></p>
+          </section>
+          <section class="werkzeug-karte" style="margin-top: 1rem">
+            <h2 style="margin-top: 0">Angebote</h2>
+            <ul class="liste" id="angebote"></ul>
+          </section>
+          <section class="werkzeug-karte" style="margin-top: 1rem">
+            <h2 style="margin-top: 0">Laufende Spiele</h2>
+            <ul class="liste" id="laufend"></ul>
+          </section>
+          <p id="fehler" role="alert" hidden></p>
+        </div>
+        <div class="seite">
+          <section class="werkzeug-karte">
+            <div class="raumkopf">
+              <div>
+                <div class="hinweis" style="margin: 0">Raumcode</div>
+                <div class="code" id="code"></div>
+                <button type="button" class="knopf zweit klein" id="link-kopieren" style="margin-top: 0.4rem">Link kopieren</button>
+              </div>
+              <div id="qr" aria-label="QR-Code zum Raum" role="img"></div>
+            </div>
+            <p id="verbindung" role="status" style="margin: 0.75rem 0 0"></p>
+          </section>
+          <section class="werkzeug-karte">
+            <h2>Im Raum (<span id="anzahl">0</span>)</h2>
+            <ul class="liste" id="anwesende"></ul>
+          </section>
+          <section class="werkzeug-karte" id="leitung-karte" hidden>
+            <h2>Erlaubte Spiele</h2>
+            <div id="erlaubt"></div>
+          </section>
+          <div class="knopf-reihe">
+            <button type="button" class="knopf zweit" id="verlassen">Raum verlassen</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../../js/qrcode.min.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const R = window.Spielraum
+        const $ = (id) => document.getElementById(id)
+        const params = new URLSearchParams(location.search)
+        let code = (params.get('raum') || '').toUpperCase()
+        let raum = null
+        let wartetAuf = null // { partie } – ich habe bei einem Angebot angefragt
+        let gestartet = false
+
+        const zeige = (welches) => {
+          ;['start', 'name', 'raum'].forEach((id) => ($(id).hidden = id !== welches))
+        }
+        const leitungsKey = () => 'spielraum-leitung-' + code
+        const istLeitung = () => {
+          try {
+            return sessionStorage.getItem(leitungsKey()) === '1'
+          } catch {
+            return false
+          }
+        }
+
+        function ansicht() {
+          if (!R.istCode(code)) {
+            if (code) {
+              $('code-fehler').hidden = false
+              $('code-fehler').textContent = 'Der Code hat sechs Zeichen (Buchstaben und Ziffern).'
+            }
+            return zeige('start')
+          }
+          if (!R.meinName()) {
+            zeige('name')
+            return $('name-feld').focus()
+          }
+          betreten()
+        }
+
+        $('neuer-raum').addEventListener('click', () => {
+          code = R.neuerCode()
+          try {
+            sessionStorage.setItem(leitungsKey(), '1')
+          } catch {
+            /* egal */
+          }
+          history.replaceState(null, '', '?raum=' + code)
+          ansicht()
+        })
+        $('code-form').addEventListener('submit', (e) => {
+          e.preventDefault()
+          const c = $('code-feld').value.trim().toUpperCase()
+          if (!R.istCode(c)) {
+            $('code-fehler').hidden = false
+            $('code-fehler').textContent = 'Der Code hat sechs Zeichen (Buchstaben und Ziffern).'
+            return
+          }
+          code = c
+          history.replaceState(null, '', '?raum=' + code)
+          ansicht()
+        })
+        $('name-feld').value = R.meinName()
+        $('name-form').addEventListener('submit', (e) => {
+          e.preventDefault()
+          if (!R.bereinige($('name-feld').value)) return $('name-feld').focus()
+          R.setzeName($('name-feld').value)
+          ansicht()
+        })
+
+        function adresse() {
+          return location.origin + location.pathname + '?raum=' + code
+        }
+
+        function betreten() {
+          zeige('raum')
+          $('code').textContent = code
+          window.QRCode.toString(adresse(), { type: 'svg', margin: 0, errorCorrectionLevel: 'M' }, (f, svg) => {
+            if (!f) $('qr').innerHTML = svg // von der QR-Bibliothek erzeugtes SVG, keine Eingabe von außen
+          })
+          const leitung = istLeitung()
+          let erlaubteSpiele = Object.keys(R.SPIELE)
+          raum = R.betreten(code, { name: R.meinName(), leitung, spiele: erlaubteSpiele })
+          $('leitung-karte').hidden = !leitung
+          if (leitung) {
+            const box = $('erlaubt')
+            Object.keys(R.SPIELE).forEach((s) => {
+              const l = document.createElement('label')
+              l.className = 'haken'
+              const c = document.createElement('input')
+              c.type = 'checkbox'
+              c.checked = true
+              c.addEventListener('change', () => {
+                erlaubteSpiele = [...box.querySelectorAll('input')].filter((x) => x.checked).map((x) => x.dataset.spiel)
+                raum.setze({ spiele: erlaubteSpiele })
+              })
+              c.dataset.spiel = s
+              l.append(c, document.createTextNode(R.SPIELE[s]))
+              box.append(l)
+            })
+          }
+
+          raum.auf('status', (s) => {
+            const v = $('verbindung')
+            v.className = s === 'verbunden' ? '' : 'aus'
+            v.textContent = s === 'verbunden' ? 'Verbunden.' : s === 'verbindet' ? 'Verbinde …' : 'Verbindung weg – versuche es erneut …'
+          })
+          raum.auf('anwesenheit', zeichnen)
+
+          // Jemand will bei meinem Angebot mitspielen
+          raum.auf('beitritt', (d) => {
+            const a = raum.ich.angebot
+            if (gestartet || !a || a.partie !== d.partie || typeof d.von !== 'string' || d.von === raum.id) return
+            if (!raum.anwesend().some((x) => x.id === d.von)) return
+            const fremd = { id: d.von, name: R.bereinige(d.name) || 'Gast' }
+            const ich = { id: raum.id, name: raum.ich.name }
+            const ichZuerst = Math.random() < 0.5
+            const spieler = ichZuerst ? [ich, fremd] : [fremd, ich]
+            gestartet = true
+            raum.sende('start', { partie: a.partie, spiel: a.spiel, spieler })
+            raum.setze({ angebot: null })
+            losSpielen(a.partie, a.spiel, spieler)
+          })
+          // Start einer Partie, bei der ich mitspiele (oder: ein Angebot ist vergeben)
+          raum.auf('start', (d) => {
+            if (!Array.isArray(d.spieler) || d.spieler.length !== 2 || !R.SPIELE[d.spiel]) return
+            if (gestartet) return
+            if (d.spieler.some((s) => s && s.id === raum.id)) {
+              gestartet = true
+              losSpielen(d.partie, d.spiel, d.spieler)
+            } else if (wartetAuf && wartetAuf.partie === d.partie) {
+              wartetAuf = null
+              meldung('Dieses Angebot ist schon vergeben.')
+              zeichnen()
+            }
+          })
+        }
+
+        function meldung(text) {
+          const f = $('fehler')
+          f.hidden = !text
+          f.textContent = text || ''
+        }
+
+        function losSpielen(partie, spiel, spieler) {
+          const seite = spieler[0].id === raum.id ? 1 : 2
+          const gegnerPerson = spieler[seite === 1 ? 1 : 0]
+          raum.verlassen()
+          location.href =
+            '../' + spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(partie) + '&seite=' + seite + '&gegner=' + encodeURIComponent(gegnerPerson.name) + '&gid=' + encodeURIComponent(gegnerPerson.id)
+        }
+
+        function zeichnen() {
+          if (!raum) return
+          const liste = raum.anwesend()
+          const erlaubt = raum.erlaubt()
+          $('anzahl').textContent = String(liste.length)
+
+          // Anwesende
+          const a = $('anwesende')
+          a.textContent = ''
+          liste
+            .slice()
+            .sort((x, y) => (x.rolle === 'leitung' ? -1 : 0) - (y.rolle === 'leitung' ? -1 : 0) || String(x.name).localeCompare(String(y.name), 'de'))
+            .forEach((p) => {
+              const li = document.createElement('li')
+              li.className = 'zeile'
+              const t = document.createElement('span')
+              t.className = 'text'
+              t.textContent = R.bereinige(p.name) + (p.id === raum.id ? ' (du)' : '')
+              const k = document.createElement('span')
+              k.className = 'klein'
+              k.textContent = p.rolle === 'leitung' ? 'Leitung' : p.spielt ? 'spielt' : p.angebot ? 'bietet an' : ''
+              li.append(t, k)
+              a.append(li)
+            })
+
+          // Spiel anbieten
+          const an = $('anbieten')
+          an.textContent = ''
+          const meins = raum.ich.angebot
+          if (meins) {
+            const t = document.createElement('span')
+            t.textContent = 'Du bietest „' + R.SPIELE[meins.spiel] + '“ an. Sobald jemand einsteigt, geht es los.'
+            const b = document.createElement('button')
+            b.type = 'button'
+            b.className = 'knopf zweit'
+            b.textContent = 'Angebot zurückziehen'
+            b.addEventListener('click', () => raum.setze({ angebot: null }))
+            an.append(t, b)
+          } else {
+            erlaubt.forEach((s) => {
+              const b = document.createElement('button')
+              b.type = 'button'
+              b.className = 'knopf'
+              b.textContent = R.SPIELE[s]
+              b.disabled = !!wartetAuf
+              b.addEventListener('click', () => {
+                meldung('')
+                raum.setze({ angebot: { partie: R.zufallText(8), spiel: s } })
+              })
+              an.append(b)
+            })
+            if (!erlaubt.length) an.textContent = 'Die Leitung hat gerade kein Spiel freigegeben.'
+          }
+          $('anbieten-hinweis').textContent = meins || wartetAuf ? '' : 'Wähle ein Spiel. Deine Mitschüler sehen es dann unter „Angebote“ und können einsteigen.'
+
+          // Angebote anderer
+          const ang = $('angebote')
+          ang.textContent = ''
+          const offen = liste.filter((p) => p.id !== raum.id && p.angebot && R.SPIELE[p.angebot.spiel])
+          if (wartetAuf && !offen.some((p) => p.angebot.partie === wartetAuf.partie)) wartetAuf = null
+          if (!offen.length) {
+            const li = document.createElement('li')
+            li.className = 'leer'
+            li.textContent = 'Gerade bietet niemand ein Spiel an. Biete selbst eins an!'
+            ang.append(li)
+          }
+          offen.forEach((p) => {
+            const li = document.createElement('li')
+            li.className = 'zeile'
+            const t = document.createElement('span')
+            t.className = 'text'
+            t.textContent = R.bereinige(p.name) + ' sucht ' + R.SPIELE[p.angebot.spiel]
+            const b = document.createElement('button')
+            b.type = 'button'
+            b.className = 'knopf klein'
+            const wartet = wartetAuf && wartetAuf.partie === p.angebot.partie
+            b.textContent = wartet ? 'Warte …' : 'Mitspielen'
+            b.disabled = !!wartetAuf || !!raum.ich.angebot
+            b.title = raum.ich.angebot ? 'Zieh zuerst dein eigenes Angebot zurück.' : ''
+            b.addEventListener('click', () => {
+              wartetAuf = { partie: p.angebot.partie }
+              raum.sende('beitritt', { partie: p.angebot.partie, von: raum.id, name: raum.ich.name })
+              zeichnen()
+            })
+            li.append(t, b)
+            ang.append(li)
+          })
+
+          // Laufende Spiele (jede Partie nur einmal)
+          const lauf = $('laufend')
+          lauf.textContent = ''
+          const gesehen = new Set()
+          liste
+            .filter((p) => p.spielt && R.SPIELE[p.spielt.spiel])
+            .forEach((p) => {
+              if (gesehen.has(p.spielt.partie)) return
+              gesehen.add(p.spielt.partie)
+              const li = document.createElement('li')
+              li.className = 'zeile'
+              const t = document.createElement('span')
+              t.className = 'text'
+              t.textContent = R.bereinige(p.name) + ' gegen ' + R.bereinige(p.spielt.gegner) + ' – ' + R.SPIELE[p.spielt.spiel]
+              li.append(t)
+              lauf.append(li)
+            })
+          if (!gesehen.size) {
+            const li = document.createElement('li')
+            li.className = 'leer'
+            li.textContent = 'Noch läuft kein Spiel.'
+            lauf.append(li)
+          }
+        }
+
+        $('link-kopieren').addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(adresse())
+            $('link-kopieren').textContent = 'Kopiert'
+          } catch {
+            $('link-kopieren').textContent = adresse()
+          }
+        })
+        $('verlassen').addEventListener('click', () => {
+          if (raum) raum.verlassen()
+          location.href = '../'
+        })
+        window.addEventListener('pagehide', () => raum && !gestartet && raum.verlassen())
+
+        ansicht()
+      })()
+    </script>
+  </body>
+</html>

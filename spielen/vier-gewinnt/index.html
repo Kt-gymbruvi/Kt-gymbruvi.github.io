@@ -96,6 +96,9 @@
     <script src="../../gemeinsam/symbole.js"></script>
     <script src="../../werkzeuge/werkzeug.js"></script>
     <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../online-spiel.js"></script>
     <script src="../steuerung.js"></script>
     <script>
       ;(function () {
@@ -110,8 +113,25 @@
         let gesperrt = false // Rechner denkt
         let lauf = 0
 
+        // Online-Partie (aus der Lobby geöffnet)? Dann Züge über den Raum senden und empfangen.
+        const online = window.OnlineSpiel.start({
+          beiZug: (z) => entfernterZug(z),
+          beiAufgabe: () => aufgegeben(false),
+          beiGegner: (da) => steuerung && steuerung.hinweis && steuerung.hinweis(da ? '' : 'Dein Gegner ist nicht mehr verbunden.'),
+        })
+        const GEGNER = () => (online ? online.gegner : 'Der Rechner')
+
         const steuerung = window.Spielsteuerung(document.getElementById('steuerung'), {
           farben: FARBEN,
+          online: online && {
+            gegner: online.gegner,
+            seite: online.seite,
+            lobby: online.lobby,
+            aufgeben: () => {
+              online.gibAuf()
+              aufgegeben(true)
+            },
+          },
           neu,
           zurueck() {
             if (gesperrt || verlauf.length < 1) return
@@ -171,10 +191,11 @@
         function statusText() {
           if (s.ende) {
             if (!s.ende.sieger) return steuerung.status('Unentschieden!', '')
-            const text = steuerung.modus === 'rechner' ? (s.ende.sieger === steuerung.ich ? 'Du hast gewonnen!' : 'Der Rechner hat gewonnen.') : FARBEN[s.ende.sieger - 1] + ' gewinnt!'
-            return steuerung.status(text, steuerung.modus === 'rechner' && s.ende.sieger !== steuerung.ich ? 'schlecht' : 'gut')
+            const gegen = steuerung.modus !== 'lokal'
+            const text = gegen ? (s.ende.sieger === steuerung.ich ? 'Du hast gewonnen!' : GEGNER() + ' hat gewonnen.') : FARBEN[s.ende.sieger - 1] + ' gewinnt!'
+            return steuerung.status(text, gegen && s.ende.sieger !== steuerung.ich ? 'schlecht' : 'gut')
           }
-          const text = steuerung.modus === 'rechner' ? (mensch() ? 'Du bist dran.' : 'Der Rechner denkt …') : FARBEN[s.amZug - 1] + ' ist am Zug.'
+          const text = steuerung.modus !== 'lokal' ? (mensch() ? 'Du bist dran.' : online ? GEGNER() + ' ist am Zug.' : 'Der Rechner denkt …') : FARBEN[s.amZug - 1] + ' ist am Zug.'
           steuerung.status(text)
         }
 
@@ -185,7 +206,28 @@
           verlauf.push(s)
           s = n
           zeichnen(true)
+          if (online) {
+            online.sendeZug(c)
+            if (s.ende) online.fertig()
+          }
           rechnerDran()
+        }
+
+        // Zug des Gegners (oder beim Neuladen: nachgeholte Züge)
+        function entfernterZug(c) {
+          const n = window.VierGewinnt.ziehe(s, c)
+          if (!n) return
+          verlauf.push(s)
+          s = n
+          zeichnen(true)
+          if (s.ende && online) online.fertig()
+        }
+
+        function aufgegeben(ich) {
+          if (s.ende) return
+          s = Object.assign({}, s, { ende: { sieger: ich ? 3 - steuerung.ich : steuerung.ich, linie: [] } })
+          zeichnen(false)
+          if (online) online.fertig()
         }
 
         function rechnerDran() {

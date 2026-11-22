@@ -5,6 +5,8 @@
  *   optionen.farben    ['Rot', 'Gelb']  Namen von Spieler 1 (beginnt) und Spieler 2
  *   optionen.neu()     Neues Spiel (liest modus/stufe/ich aus dem Rückgabewert)
  *   optionen.zurueck() Letzten Zug zurücknehmen (im Rechnermodus: die letzten beiden)
+ *   optionen.online    { gegner, seite, lobby, aufgeben() } – Online-Partie: keine Auswahl, dafür „Aufgeben“ und „Zur Lobby“
+ *                      (modus ist dann 'online', ich = seite)
  */
 ;(function () {
   'use strict'
@@ -45,6 +47,43 @@
     status.setAttribute('role', 'status')
     status.setAttribute('aria-live', 'polite')
     karte.append(status)
+    const api = (extra) =>
+      Object.defineProperties(Object.assign(z, extra || {}), {
+        status: {
+          value: (text, artKlasse) => {
+            status.textContent = text || ''
+            status.className = 'status' + (artKlasse ? ' ' + artKlasse : '')
+          },
+        },
+      })
+
+    if (o.online) {
+      z.modus = 'online'
+      z.ich = o.online.seite
+      const gruppe = el('div', 'gruppe')
+      gruppe.append(el('h2', null, 'Online gegen ' + o.online.gegner))
+      gruppe.append(el('p', 'hinweis', 'Du spielst ' + farben[o.online.seite - 1] + (o.online.seite === 1 ? ' und beginnst.' : '.')))
+      const hinweis = el('p', 'hinweis')
+      hinweis.style.color = 'var(--fehler)'
+      gruppe.append(hinweis)
+      karte.append(gruppe)
+      const reihe = el('div', 'knopf-reihe')
+      reihe.style.marginTop = '1rem'
+      const auf = el('button', 'knopf zweit', 'Aufgeben')
+      auf.type = 'button'
+      auf.addEventListener('click', () => {
+        if (confirm('Wirklich aufgeben?')) o.online.aufgeben()
+      })
+      const lobby = el('a', 'knopf', 'Zur Lobby')
+      lobby.href = o.online.lobby
+      reihe.append(lobby, auf)
+      karte.append(reihe)
+      ziel.append(karte)
+      return api({
+        hinweis: (text) => (hinweis.textContent = text || ''),
+        aufgabeAus: () => (auf.hidden = true),
+      })
+    }
 
     const art = segmente('Spielart', [['lokal', 'Zu zweit'], ['rechner', 'Gegen Rechner']], z.modus, (w) => {
       z.modus = w
@@ -74,14 +113,7 @@
     karte.append(reihe)
     ziel.append(karte)
 
-    return Object.defineProperties(z, {
-      status: {
-        value: (text, artKlasse) => {
-          status.textContent = text || ''
-          status.className = 'status' + (artKlasse ? ' ' + artKlasse : '')
-        },
-      },
-    })
+    return api()
   }
 
   window.Spielsteuerung = Spielsteuerung

@@ -137,6 +137,9 @@
     <script src="../../gemeinsam/symbole.js"></script>
     <script src="../../werkzeuge/werkzeug.js"></script>
     <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../online-spiel.js"></script>
     <script src="../steuerung.js"></script>
     <script>
       ;(function () {
@@ -154,8 +157,25 @@
         let gesperrt = false
         let lauf = 0
 
+        // Online-Partie (aus der Lobby geöffnet)? Dann Züge über den Raum senden und empfangen.
+        const online = window.OnlineSpiel.start({
+          beiZug: (z) => entfernterZug(z),
+          beiAufgabe: () => aufgegeben(false),
+          beiGegner: (da) => steuerung && steuerung.hinweis && steuerung.hinweis(da ? '' : 'Dein Gegner ist nicht mehr verbunden.'),
+        })
+        const GEGNER = () => (online ? online.gegner : 'Der Rechner')
+
         const steuerung = window.Spielsteuerung(document.getElementById('steuerung'), {
           farben: FARBEN,
+          online: online && {
+            gegner: online.gegner,
+            seite: online.seite,
+            lobby: online.lobby,
+            aufgeben: () => {
+              online.gibAuf()
+              aufgegeben(true)
+            },
+          },
           neu,
           zurueck() {
             if (gesperrt || !verlauf.length) return
@@ -235,7 +255,7 @@
             const d = document.createElement('div')
             d.className = 'spielerzeile' + (!s.ende && s.amZug === w ? ' dran' : '')
             const kopf = document.createElement('b')
-            const ichText = steuerung.modus === 'rechner' ? (w === steuerung.ich ? ' (du)' : ' (Rechner)') : ''
+            const ichText = steuerung.modus !== 'lokal' ? (w === steuerung.ich ? ' (du)' : online ? '' : ' (Rechner)') : ''
             kopf.textContent = FARBEN[w - 1] + ichText
             const info = document.createElement('span')
             const aufBrett = s.brett[w]
@@ -249,13 +269,14 @@
           }
           if (s.ende) {
             if (!s.ende.sieger) return steuerung.status('Unentschieden!')
-            const text = steuerung.modus === 'rechner' ? (s.ende.sieger === steuerung.ich ? 'Du hast gewonnen!' : 'Der Rechner hat gewonnen.') : FARBEN[s.ende.sieger - 1] + ' gewinnt!'
-            return steuerung.status(text, steuerung.modus === 'rechner' && s.ende.sieger !== steuerung.ich ? 'schlecht' : 'gut')
+            const gegen = steuerung.modus !== 'lokal'
+            const text = gegen ? (s.ende.sieger === steuerung.ich ? 'Du hast gewonnen!' : GEGNER() + ' hat gewonnen.') : FARBEN[s.ende.sieger - 1] + ' gewinnt!'
+            return steuerung.status(text, gegen && s.ende.sieger !== steuerung.ich ? 'schlecht' : 'gut')
           }
-          if (!mensch()) return steuerung.status('Der Rechner denkt …')
-          const wer = steuerung.modus === 'rechner' ? 'Du' : FARBEN[s.amZug - 1]
+          if (!mensch()) return steuerung.status(online ? GEGNER() + ' ist am Zug.' : 'Der Rechner denkt …')
+          const wer = steuerung.modus !== 'lokal' ? 'Du' : FARBEN[s.amZug - 1]
           if (wartetAufNimm) return steuerung.status(wer + ': Mühle! Nimm einen gegnerischen Stein.')
-          steuerung.status(wer + (steuerung.modus === 'rechner' ? ' bist' : ' ist') + (s.vorrat[s.amZug] > 0 ? ' dran: Stein setzen.' : ' dran: Stein ziehen.'))
+          steuerung.status(wer + (steuerung.modus !== 'lokal' ? ' bist' : ' ist') + (s.vorrat[s.amZug] > 0 ? ' dran: Stein setzen.' : ' dran: Stein ziehen.'))
         }
 
         function ausfuehren(z) {
@@ -266,8 +287,33 @@
           gewaehlt = -1
           wartetAufNimm = null
           zeichnen()
+          if (online) {
+            online.sendeZug(z)
+            if (s.ende) online.fertig()
+          }
           rechnerDran()
           return true
+        }
+
+        // Zug des Gegners (oder beim Neuladen: nachgeholte Züge)
+        function entfernterZug(z) {
+          const n = M.ziehe(s, z)
+          if (!n) return
+          verlauf.push(s)
+          s = n
+          gewaehlt = -1
+          wartetAufNimm = null
+          zeichnen()
+          if (s.ende && online) online.fertig()
+        }
+
+        function aufgegeben(ich) {
+          if (s.ende) return
+          s = Object.assign({}, s, { ende: { sieger: ich ? 3 - steuerung.ich : steuerung.ich } })
+          gewaehlt = -1
+          wartetAufNimm = null
+          zeichnen()
+          if (online) online.fertig()
         }
 
         function klick(i) {
