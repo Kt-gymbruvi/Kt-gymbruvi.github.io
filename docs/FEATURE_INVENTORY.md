@@ -249,7 +249,7 @@ Hell-/Dunkel-Anpassung. Technische Merkmale: **G** = speichert im Gerät · **Z*
 | Lautstärkeampel | ✅ | Fensterdarstellung |
 | Arbeitsauftrag | – | neu |
 | Stundenablauf | – | neu |
-| QR-Code | ✅ als Dialog auf Startseite und Lernübersicht | frei wählbare Adresse, Fenster |
+| QR-Code | ✅ als Dialog auf Startseite und Lernübersicht | Fenster (frei wählbare Adresse: Werkzeug `werkzeuge/qr-code/` auf der Startseite) |
 | Klassenfunk, Quizzo, Lernangebote | ✅ als eigene Anwendungen | Start aus der Tafel, Fenster |
 | Notizen / Post-its | – | neu |
 | **Klassenverwaltung** (5) | nur ein Namensfeld im Gruppen-Werkzeug | alles |

@@ -163,6 +163,13 @@ window.WERKZEUGE = [
     text: 'Zeigt am Beamer, wie laut es in der Klasse ist. Das Mikrofon wird nur auf diesem Gerät ausgewertet, nichts aufgenommen.',
     adresse: 'werkzeuge/lautstaerke/',
   },
+  {
+    bereich: 'Unterricht',
+    symbol: 'qr',
+    titel: 'QR-Code erstellen',
+    text: 'Aus einem Link einen QR-Code machen – groß für den Beamer oder als Bild zum Ausdrucken.',
+    adresse: 'werkzeuge/qr-code/',
+  },
 ]
 
 /**

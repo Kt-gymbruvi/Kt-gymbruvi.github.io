@@ -26,6 +26,7 @@ werkzeuge/
   timer/index.html
   gruppen/index.html
   lautstaerke/index.html
+  qr-code/index.html
   pruefen.mjs           Prüfskript (siehe unten)
 ```
 

@@ -46,7 +46,7 @@ Offen aus dem Audit (Reihenfolge nach Nutzen):
   - **Schlanke Fassung ohne Anmeldung:** „Mitmachen“ mit PIN (weiter zu Quizzo oder Klassenfunk), Kacheln Quizzo, Klassenfunk, Lernangebote, Werkzeuge.
   - Materialliste mit Suche/Fachfilter/QR (derzeit leer und deshalb ausgeblendet).
 - **Gemeinsame Gestaltung** (`gemeinsam/`): `tokens.css` (Dunkelgrün/Orange aus dem Logo, hell/dunkel, Bereichsfarben, Maße), `grundlage.css` (Seitengerüst mit Kopfzeile und Seitenleiste, Suche, Konto, Knöpfe, Fenster, Fuß), `symbole.js` (28 eigene SVG-Symbole), `design.js` (Umschalter), `logo.png` und `logo-klein.png`.
-- **Werkzeuge** (`werkzeuge/`): Timer (Beamer, Signalton, Bildschirm bleibt an), Gruppen & Zufall (Namen nur im Gerät), Lautstärkeampel (Mikrofon nur lokal ausgewertet, „Ruhe messen“, Grenzen/Reaktionszeit einstellbar, optionaler Ton, Vollbild). Aussehen aus `gemeinsam/` und `werkzeug.css`.
+- **Werkzeuge** (`werkzeuge/`): Timer (Beamer, Signalton, Bildschirm bleibt an), Gruppen & Zufall (Namen nur im Gerät), Lautstärkeampel (Mikrofon nur lokal ausgewertet, „Ruhe messen“, Grenzen/Reaktionszeit einstellbar, optionaler Ton, Vollbild). QR-Code erstellen (`werkzeug/qr-code/`, freie http/https-Adresse, Vollbild, PNG speichern; Code entsteht im Browser). Aussehen aus `gemeinsam/` und `werkzeug.css`.
 - **Lernangebote** (`lernen/`): 41 Einträge in `angebote.js` (32 Biologie Kl. 5–13, 9 Sport inkl. Oberstufe), Übersicht nach Fach › Jahrgang › Thema mit Suche und QR; Bearbeitungsmodus `lernen/#bearbeiten` für die angemeldete Lehrkraft (Supabase-Tabelle `lernangebote`, nutzt auch eine bestehende Quizzo-Anmeldung). Übersicht noch im alten Design.
 - Herzfrequenz-Zonen liegen seit 08.11.2026 unter `lernen/herzfrequenz-zonen/` (Sport, Kl. 11 und 12/13); `werkzeuge/herzfrequenz/` leitet weiter.
 - **Hilfsskripte:** `werkzeuge/pruefen.mjs` (fremde Server, KI-Aufrufe, Datenversand, Grundlagen; `--veroeffentlichen` prüft Impressum), `lernen/werkzeug/uebernehmen.mjs` (Artefakt übernehmen), `lernen/werkzeug/schriften-holen.mjs`.
@@ -57,7 +57,7 @@ Offen aus dem Audit (Reihenfolge nach Nutzen):
 index.html, startseite.css, impressum.html, .nojekyll, favicon.svg (alt, nicht mehr eingebunden)
 gemeinsam/  tokens.css, grundlage.css, symbole.js, design.js, logo.png, logo-klein.png
 js/         app.js, inhalte.js, qrcode.min.js
-werkzeuge/  ANLEITUNG.md, pruefen.mjs, werkzeug.css, werkzeug.js, timer/, gruppen/, lautstaerke/, herzfrequenz/ (Weiterleitung)
+werkzeuge/  ANLEITUNG.md, pruefen.mjs, werkzeug.css, werkzeug.js, timer/, gruppen/, lautstaerke/, qr-code/, herzfrequenz/ (Weiterleitung)
 lernen/     index.html, lernen.js, angebote.js, datenbank.js, schriften/, werkzeug/, <41 Angebotsordner>
 materialien/ (leer)
 docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY.md, ARCHITECTURE.md, IMPLEMENTATION_ROADMAP.md

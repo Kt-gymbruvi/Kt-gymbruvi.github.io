@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QR-Code erstellen</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../werkzeug.css" />
+    <style>
+      main {
+        display: grid;
+        gap: 1.25rem;
+        width: min(48rem, 100% - 2rem);
+        margin: 0 auto;
+        padding-bottom: 1.5rem;
+      }
+      .buehne {
+        display: grid;
+        justify-items: center;
+        gap: 0.75rem;
+      }
+      #bild {
+        width: min(24rem, 100%, 60dvh);
+        aspect-ratio: 1;
+        background: #fff; /* QR-Codes brauchen weißen Grund, auch im dunklen Modus */
+        border-radius: var(--radius-gross);
+        overflow: hidden;
+      }
+      #bild svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #adresse {
+        margin: 0;
+        font-weight: var(--gewicht-betont);
+        overflow-wrap: anywhere;
+        text-align: center;
+      }
+      #fehler {
+        margin: 0;
+        color: var(--fehler);
+        font-weight: var(--gewicht-betont);
+      }
+      :fullscreen main {
+        place-content: center;
+        min-height: 100dvh;
+      }
+      :fullscreen .werkzeug-kopf,
+      :fullscreen .eingabe,
+      :fullscreen .knopf-reihe,
+      :fullscreen .hinweis {
+        display: none;
+      }
+      :fullscreen #bild {
+        width: min(80dvh, 90vw);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../">Startseite</a>
+      <h1>QR-Code erstellen</h1>
+    </header>
+    <main>
+      <div class="eingabe werkzeug-karte">
+        <label class="feld"
+          >Adresse (Link)
+          <input id="eingabe" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="z. B. kt-gymbruvi.github.io" />
+          <small>Mit oder ohne „https://“. Der Code entsteht auf diesem Gerät, nichts wird verschickt.</small>
+        </label>
+        <p id="fehler" role="alert" hidden></p>
+      </div>
+
+      <div class="buehne" id="buehne" hidden>
+        <div id="bild"></div>
+        <p id="adresse"></p>
+      </div>
+
+      <div class="knopf-reihe" id="knoepfe" hidden>
+        <button class="knopf gross" id="vollbild" type="button">Vollbild</button>
+        <button class="knopf zweit gross" id="speichern" type="button">Als Bild speichern</button>
+      </div>
+      <p class="hinweis">Nur Links (http/https). Am Beamer: „Vollbild“, zum Ausdrucken: „Als Bild speichern“.</p>
+    </main>
+
+    <script src="../../js/qrcode.min.js"></script>
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../werkzeug.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const $ = (id) => document.getElementById(id)
+        const MAX = 1000
+
+        // Eingabe → Adresse (nur http/https; ohne Schema gilt https) oder null
+        function pruefe(eingabe) {
+          const t = eingabe.trim()
+          if (!t || t.length > MAX || /[\s\u0000-\u001f\u007f]/.test(t)) return null
+          const mitSchema = /^[a-z][a-z0-9+.-]*:/i.test(t) ? t : 'https://' + t
+          let url
+          try {
+            url = new URL(mitSchema)
+          } catch {
+            return null
+          }
+          if (url.protocol !== 'http:' && url.protocol !== 'https:') return null
+          if (!url.hostname.includes('.') && url.hostname !== 'localhost') return null
+          return url.href.length <= MAX ? url.href : null
+        }
+
+        let svgText = ''
+        function verbergen() {
+          $('buehne').hidden = true
+          $('knoepfe').hidden = true
+          svgText = ''
+        }
+        function zeigen() {
+          const roh = $('eingabe').value
+          const fehler = $('fehler')
+          fehler.hidden = true
+          if (!roh.trim()) return verbergen()
+          const adresse = pruefe(roh)
+          if (!adresse) {
+            fehler.textContent = 'Das ist keine gültige Adresse (Beispiel: kt-gymbruvi.github.io).'
+            fehler.hidden = false
+            return verbergen()
+          }
+          window.QRCode.toString(adresse, { type: 'svg', margin: 2, errorCorrectionLevel: 'M' }, (err, svg) => {
+            if (err) {
+              fehler.textContent = 'Dafür ist die Adresse zu lang.'
+              fehler.hidden = false
+              return verbergen()
+            }
+            svgText = svg
+            $('bild').innerHTML = svg // SVG kommt aus der QR-Bibliothek, nicht aus der Eingabe
+            const s = $('bild').firstElementChild
+            s.setAttribute('role', 'img')
+            s.setAttribute('aria-label', 'QR-Code für ' + adresse)
+            $('adresse').textContent = adresse.replace(/^https?:\/\//, '').replace(/\/$/, '')
+            $('buehne').hidden = false
+            $('knoepfe').hidden = false
+          })
+        }
+        $('eingabe').addEventListener('input', zeigen)
+
+        $('vollbild').addEventListener('click', () => {
+          if (document.fullscreenElement) document.exitFullscreen()
+          else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {})
+        })
+
+        // Als PNG speichern: SVG auf eine Zeichenfläche malen (weißer Grund, 1024 px)
+        $('speichern').addEventListener('click', () => {
+          if (!svgText) return
+          const bild = new Image()
+          bild.onload = () => {
+            const flaeche = document.createElement('canvas')
+            flaeche.width = flaeche.height = 1024
+            const c = flaeche.getContext('2d')
+            c.fillStyle = '#fff'
+            c.fillRect(0, 0, 1024, 1024)
+            c.imageSmoothingEnabled = false
+            c.drawImage(bild, 0, 0, 1024, 1024)
+            flaeche.toBlob((blob) => {
+              if (!blob) return
+              const a = document.createElement('a')
+              a.href = URL.createObjectURL(blob)
+              a.download = 'qr-code.png'
+              a.click()
+              setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+            }, 'image/png')
+          }
+          bild.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText)
+        })
+      })()
+    </script>
+  </body>
+</html>

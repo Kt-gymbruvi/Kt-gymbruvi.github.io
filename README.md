@@ -12,7 +12,7 @@ Fast alles steht in **`js/inhalte.js`**:
 - `NAVIGATION` – die Hauptnavigation oben (Bereiche ohne Adresse erscheinen als „folgt“)
 - `MITMACHEN` – wohin die PIN-Eingabe führt (Quizzo, Klassenfunk)
 - `LINKS` – die großen Kacheln (z. B. Quizzo)
-- `WERKZEUGE` – kleine Web-Apps unter `werkzeuge/` (Timer, Gruppen & Zufall, Lautstärkeampel)
+- `WERKZEUGE` – kleine Web-Apps unter `werkzeuge/` (Timer, Gruppen & Zufall, Lautstärkeampel, QR-Code erstellen)
 - `MATERIALIEN` – die Materialliste (Fach, Klasse, Titel, Datei, Beschreibung)
 
 Neues Material: Datei nach `materialien/` legen (Name ohne Leerzeichen/Umlaute), Eintrag in
