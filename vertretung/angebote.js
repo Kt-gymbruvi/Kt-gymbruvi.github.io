@@ -1,0 +1,72 @@
+/*
+ * Angebote für Vertretungsstunden – eine Liste für die Seite „Vertretung“ und die Suche der Startseite.
+ * Neues Angebot: Ordner anlegen, hier einen Eintrag ergänzen (Komma nicht vergessen).
+ *
+ *   adresse  vom Hauptordner der Plattform aus (z. B. 'vertretung/sudoku/')
+ *   gruppe   'knobeln' | 'spiele'
+ *   logo     Name aus gemeinsam/symbole.js (zeigt gemeinsam/<name>-logo.svg)
+ *   marken   kleine Hinweise unter dem Titel
+ */
+window.VERTRETUNG_GRUPPEN = [
+  { id: 'knobeln', name: 'Knobeln', text: 'Rätsel zum Alleinlösen – jedes ist neu und genau eine Lösung.' },
+  { id: 'spiele', name: 'Spiele für zwei', text: 'Zu zweit am Gerät, gegen den Rechner oder online in der Klasse.' },
+]
+
+window.VERTRETUNG = [
+  {
+    titel: 'Sudoku',
+    text: 'Zahlen von 1 bis 9 so verteilen, dass keine doppelt vorkommt. Mit Notizen, Prüfen und Tipp.',
+    adresse: 'vertretung/sudoku/',
+    gruppe: 'knobeln',
+    logo: 'sudoku',
+    marken: ['1 Person', '3 Stufen'],
+  },
+  {
+    titel: 'Slitherlink',
+    text: 'Aus den Zahlen eine einzige geschlossene Linie legen – auf Quadraten oder Sechsecken.',
+    adresse: 'vertretung/slitherlink/',
+    gruppe: 'knobeln',
+    logo: 'slitherlink',
+    marken: ['1 Person', '3 Stufen', 'Quadrate oder Sechsecke'],
+  },
+  {
+    titel: 'Einstein-Rätsel',
+    text: 'Wer wohnt wo? Aus den Hinweisen herausfinden, wie alles zusammenpasst.',
+    adresse: 'vertretung/logikraetsel/',
+    gruppe: 'knobeln',
+    logo: 'einstein',
+    marken: ['1 Person', '3 Stufen', '3 Themen'],
+  },
+  {
+    titel: 'Vier gewinnt',
+    text: 'Vier Steine in einer Reihe: waagerecht, senkrecht oder schräg.',
+    adresse: 'spielen/vier-gewinnt/',
+    gruppe: 'spiele',
+    logo: 'viergewinnt',
+    marken: ['2 Personen', 'gegen Rechner', 'online'],
+  },
+  {
+    titel: 'Mühle',
+    text: 'Setzen, ziehen, springen – Mühlen bilden und Steine wegnehmen.',
+    adresse: 'spielen/muehle/',
+    gruppe: 'spiele',
+    logo: 'muehle',
+    marken: ['2 Personen', 'gegen Rechner', 'online'],
+  },
+  {
+    titel: 'Schach',
+    text: 'Mit allen Regeln: Rochade, en passant, Umwandlung, Matt und Patt.',
+    adresse: 'spielen/schach/',
+    gruppe: 'spiele',
+    logo: 'schach',
+    marken: ['2 Personen', 'gegen Rechner', 'online'],
+  },
+  {
+    titel: 'Spielraum',
+    text: 'Die Klasse spielt gegeneinander: Raum mit Code oder QR-Code anlegen, Spiele anbieten und einsteigen.',
+    adresse: 'spielen/lobby/',
+    gruppe: 'spiele',
+    logo: 'spielraum',
+    marken: ['ganze Klasse', 'online'],
+  },
+]

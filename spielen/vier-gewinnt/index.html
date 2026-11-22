@@ -13,7 +13,7 @@
     <style>
       #brett {
         width: 100%;
-        max-width: min(40rem, calc(100dvh - 10rem));
+        max-width: min(40rem, calc(100dvh - 15rem));
         height: auto;
         touch-action: manipulation;
         user-select: none;
@@ -74,10 +74,17 @@
   </head>
   <body>
     <header class="werkzeug-kopf">
-      <a href="../">Spiele</a>
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
       <h1>Vier gewinnt</h1>
     </header>
     <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/vier-gewinnt-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Vier gewinnt</p>
+          <p class="spielkopf-text">Vier Steine in einer Reihe gewinnen.</p>
+        </div>
+      </div>
       <div class="spiel">
         <div class="brett-flaeche"><svg id="brett" role="img" aria-label="Spielfeld Vier gewinnt"></svg></div>
         <div class="seite">

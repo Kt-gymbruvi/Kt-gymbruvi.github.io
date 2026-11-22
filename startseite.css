@@ -653,6 +653,29 @@ a.kachel:active {
   .werkzeug-info {
     display: none;
   }
+  /* Bleibt eine einzelne (sichtbare) Kachel in der letzten Reihe übrig (Klasse „allein“ setzt app.js), geht sie über die ganze Breite (mit Text) statt allein links zu stehen */
+  .kacheln li.allein {
+    grid-column: 1 / -1;
+  }
+  .kacheln li.allein .kachel {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0 0.9rem;
+    padding: 0.7rem 1rem;
+    text-align: left;
+  }
+  .kacheln li.allein .kachel-symbol {
+    grid-row: 1 / span 2;
+    margin: 0;
+  }
+  .kacheln li.allein .kachel-titel {
+    font-size: 1rem;
+  }
+  .kacheln li.allein .kachel-text {
+    display: block;
+    font-size: 0.8125rem;
+  }
   .kachel,
   .werkzeug {
     flex-direction: column;

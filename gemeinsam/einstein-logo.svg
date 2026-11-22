@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Einstein-Rätsel">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <path d="M222 120C222 80 290 80 290 120C290 148 256 150 256 178" fill="none" stroke="#ff8a14" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="256" cy="212" r="13" fill="#ff8a14"/>
+    <g stroke="#ffffff" stroke-width="8" stroke-linejoin="round">
+      <path d="M62 330L128 270L194 330Z" fill="#0f5c47"/><rect x="72" y="330" width="112" height="96" fill="#0f5c47"/>
+      <path d="M198 330L264 270L330 330Z" fill="#ff8a14"/><rect x="208" y="330" width="112" height="96" fill="#ff8a14"/>
+      <path d="M334 330L400 270L466 330Z" fill="#0f5c47"/><rect x="344" y="330" width="112" height="96" fill="#0f5c47"/>
+    </g>
+    <g fill="#ffffff">
+      <rect x="110" y="368" width="36" height="58" rx="8"/>
+      <rect x="246" y="368" width="36" height="58" rx="8"/>
+      <rect x="382" y="368" width="36" height="58" rx="8"/>
+    </g>
+  </g>
+</svg>

@@ -60,6 +60,8 @@
     tafel: 'tafel', bildschirm: 'tafel', lernen: 'lernen', klassen: 'klassen', haus: 'startseite',
     timer: 'timer', uhr: 'timer', wuerfel: 'gruppen', ampel: 'ampel', werkzeug: 'werkzeuge',
     notenbuch: 'notenbuch', sonne: 'modus-hell', mond: 'modus-dunkel', blatt: 'blatt', laufen: 'laufen',
+    vertretung: 'vertretung', sudoku: 'sudoku', slitherlink: 'slitherlink', einstein: 'einstein',
+    viergewinnt: 'vier-gewinnt', muehle: 'muehle', schach: 'schach', spielraum: 'spielraum',
   }
 
   /** Erzeugt ein dekoratives Symbol. Die Größe kommt aus dem CSS (.symbol), die Farbe aus der Textfarbe. */

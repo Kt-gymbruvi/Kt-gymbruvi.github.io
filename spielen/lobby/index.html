@@ -123,7 +123,7 @@
   </head>
   <body>
     <header class="werkzeug-kopf">
-      <a href="../">Spiele</a>
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
       <h1>Spielraum</h1>
     </header>
     <main class="werkzeug-inhalt">
@@ -485,7 +485,7 @@
         })
         $('verlassen').addEventListener('click', () => {
           if (raum) raum.verlassen()
-          location.href = '../'
+          location.href = '../../vertretung/?art=spiele'
         })
         window.addEventListener('pagehide', () => raum && !gestartet && raum.verlassen())
 

@@ -40,7 +40,7 @@ window.NAVIGATION = [
   { titel: 'Quizzo', symbol: 'pokal', bild: 'gemeinsam/quizzo-symbol.png', adresse: PLATTFORM + '/Quizzo/' },
   { titel: 'Klassenfunk', symbol: 'megafon', bild: 'gemeinsam/klassenfunk-symbol.png', adresse: PLATTFORM + '/Klassenfunk/' },
   { titel: 'Lernangebote', symbol: 'lernen', bild: 'gemeinsam/lernen-logo.svg', adresse: 'lernen/' },
-  { titel: 'Vertretung', symbol: 'raetsel', adresse: 'vertretung/' },
+  { titel: 'Vertretung', symbol: 'vertretung', bild: 'gemeinsam/vertretung-logo.svg', adresse: 'vertretung/' },
   { titel: 'Interaktive Tafel', symbol: 'bildschirm', bild: 'gemeinsam/tafel-logo.svg', adresse: PLATTFORM + '/Lehrraum/#/tafel', nur: 'lehrkraft' },
   { titel: 'Tafel (Gast)', symbol: 'bildschirm', bild: 'gemeinsam/tafel-logo.svg', adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1', nur: 'gast' }, // ohne Anmeldung, nichts wird gespeichert
   { titel: 'Materialien', symbol: 'bibliothek', adresse: '#material-bereich', nur: 'material' }, // erscheint nur, wenn es Materialien gibt
@@ -102,11 +102,12 @@ window.LINKS = [
     adresse: 'lernen/',
   },
   {
-    symbol: 'raetsel',
+    symbol: 'vertretung',
+    bild: 'gemeinsam/vertretung-logo.svg',
     farbe: 'unterrichten',
     titel: 'Vertretung',
     text: 'Rätsel und Spiele für Vertretungsstunden',
-    textGast: 'Slitherlink, Einstein-Rätsel und mehr zum Knobeln',
+    textGast: 'Sudoku, Schach, Vier gewinnt und mehr – allein oder gegeneinander',
     adresse: 'vertretung/',
   },
   {
@@ -178,34 +179,6 @@ window.WERKZEUGE = [
     titel: 'QR-Code erstellen',
     text: 'Aus einem Link einen QR-Code machen – groß für den Beamer oder als Bild zum Ausdrucken.',
     adresse: 'werkzeuge/qr-code/',
-  },
-  {
-    bereich: 'Vertretung',
-    symbol: 'raetsel',
-    titel: 'Sudoku',
-    text: 'Zahlenrätsel in drei Stufen, jedes neu und eindeutig lösbar – mit Notizen und Tipp.',
-    adresse: 'vertretung/sudoku/',
-  },
-  {
-    bereich: 'Vertretung',
-    symbol: 'raetsel',
-    titel: 'Brettspiele',
-    text: 'Vier gewinnt, Mühle und Schach – zu zweit am Gerät oder gegen den Rechner.',
-    adresse: 'spielen/',
-  },
-  {
-    bereich: 'Vertretung',
-    symbol: 'raetsel',
-    titel: 'Slitherlink',
-    text: 'Aus Zahlen eine geschlossene Linie legen – drei Stufen, jedes Rätsel neu und eindeutig lösbar.',
-    adresse: 'vertretung/slitherlink/',
-  },
-  {
-    bereich: 'Vertretung',
-    symbol: 'raetsel',
-    titel: 'Einstein-Rätsel',
-    text: 'Wer wohnt wo? Logikrätsel mit Hinweisen, drei Stufen, jedes Rätsel neu.',
-    adresse: 'vertretung/logikraetsel/',
   },
 ]
 

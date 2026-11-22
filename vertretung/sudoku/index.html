@@ -16,7 +16,7 @@
         grid-template-columns: repeat(9, 1fr);
         grid-template-rows: repeat(9, 1fr);
         width: 100%;
-        max-width: min(36rem, calc(100dvh - 10rem));
+        max-width: min(36rem, calc(100dvh - 15rem));
         aspect-ratio: 1;
         border: 3px solid var(--text);
         border-radius: 4px;
@@ -145,6 +145,13 @@
       <h1>Sudoku</h1>
     </header>
     <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/sudoku-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Sudoku</p>
+          <p class="spielkopf-text">Zahlen von 1 bis 9 in jede Zeile, Spalte und jedes 3×3-Feld.</p>
+        </div>
+      </div>
       <div class="spiel">
         <div class="brett-flaeche"><div id="gitter" role="grid" aria-label="Sudoku-Gitter"></div></div>
         <div class="seite">

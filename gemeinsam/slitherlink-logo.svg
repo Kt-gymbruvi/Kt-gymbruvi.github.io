@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Slitherlink">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <g fill="#0f5c47" opacity="0.5">
+      <circle cx="121" cy="121" r="9"/><circle cx="211" cy="121" r="9"/><circle cx="301" cy="121" r="9"/><circle cx="391" cy="121" r="9"/>
+      <circle cx="121" cy="211" r="9"/><circle cx="211" cy="211" r="9"/><circle cx="301" cy="211" r="9"/><circle cx="391" cy="211" r="9"/>
+      <circle cx="121" cy="301" r="9"/><circle cx="211" cy="301" r="9"/><circle cx="301" cy="301" r="9"/><circle cx="391" cy="301" r="9"/>
+      <circle cx="121" cy="391" r="9"/><circle cx="211" cy="391" r="9"/><circle cx="301" cy="391" r="9"/><circle cx="391" cy="391" r="9"/>
+    </g>
+    <path d="M211 121H301V211H391V301H301V391H211V301H121V211H211Z" fill="none" stroke="#0f5c47" stroke-width="20" stroke-linejoin="round" stroke-linecap="round"/>
+    <ellipse cx="256" cy="256" rx="17" ry="25" fill="none" stroke="#ff8a14" stroke-width="12"/>
+  </g>
+</svg>

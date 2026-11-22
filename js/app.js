@@ -11,6 +11,7 @@
   const LINKS = window.LINKS || []
   const KLASSEN = window.KLASSEN || null
   const WERKZEUGE = window.WERKZEUGE || []
+  const VERTRETUNG = window.VERTRETUNG || []
   const MATERIALIEN = window.MATERIALIEN || []
   const ANGEBOTE = window.ANGEBOTE || []
 
@@ -237,7 +238,17 @@
       if (l.adresse && l.qr !== false) li.append(qrKnopf(l.titel, volleAdresse(l.adresse)))
       liste.append(li)
     })
+    markiereAllein()
   }
+
+  // Handy: drei Kacheln je Reihe. Bleibt in der letzten Reihe eine einzelne sichtbare Kachel übrig, bekommt sie die Klasse „allein“
+  // (startseite.css zeigt sie dann über die ganze Breite). Ausgeblendete Kacheln zählen nicht mit.
+  function markiereAllein() {
+    const sichtbareKacheln = [...$('links').children].filter((li) => li.offsetParent !== null)
+    sichtbareKacheln.forEach((li) => li.classList.remove('allein'))
+    if (sichtbareKacheln.length % 3 === 1) sichtbareKacheln[sichtbareKacheln.length - 1].classList.add('allein')
+  }
+  window.addEventListener('resize', markiereAllein)
 
   // ---------- Meine Klassen (nur Lehrkraft; die Klassen liegen auf diesem Gerät) ----------
   let klassenLauf = 0
@@ -369,6 +380,7 @@
     return [
       ...LINKS.filter((l) => l.adresse && sichtbar(l)).map((l) => ({ titel: l.titel, text: (!lehrkraft && l.textGast) || l.text, adresse: l.adresse, symbol: l.symbol, art: 'Bereich' })),
       ...WERKZEUGE.map((w) => ({ titel: w.titel, text: w.text, adresse: w.adresse, symbol: w.symbol, art: 'Werkzeug' })),
+      ...VERTRETUNG.map((v) => ({ titel: v.titel, text: v.text, adresse: v.adresse, symbol: v.logo, art: 'Vertretung' })),
       ...ANGEBOTE.filter((a) => a.sichtbar !== false).map((a) => ({ titel: a.titel, text: a.text, adresse: 'lernen/' + a.ordner + '/', symbol: 'lernen', art: 'Lernangebot · ' + (FACHNAMEN[a.fach] || a.fach || '') })),
       ...MATERIALIEN.map((m) => ({ titel: m.titel, text: m.text, adresse: m.datei, symbol: 'datei', art: 'Material' })),
     ]

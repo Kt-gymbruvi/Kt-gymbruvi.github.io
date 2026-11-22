@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sudoku">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <rect x="92" y="92" width="328" height="328" rx="34" fill="#0f5c47"/>
+    <path d="M201 100V412M311 100V412M100 201H412M100 311H412" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
+    <g fill="none" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="#ffffff" transform="translate(130 120) scale(0.95)" d="M32 8H10L8 30C22 22 38 30 36 42C34 56 14 58 6 50"/>
+      <path stroke="#ffffff" transform="translate(344 120) scale(0.95)" d="M8 16L24 6V54"/>
+      <path stroke="#ff8a14" transform="translate(236 230) scale(0.95)" d="M8 8H32L18 28C32 26 38 40 34 48C30 58 10 58 4 48"/>
+      <path stroke="#ffffff" transform="translate(130 340) scale(0.95)" d="M6 18C6 4 34 2 34 18C34 32 8 40 6 54H36"/>
+      <path stroke="#ffffff" transform="translate(344 340) scale(0.95)" d="M32 24C32 8 8 6 8 22C8 38 32 38 32 24C32 40 28 54 12 56"/>
+    </g>
+  </g>
+</svg>

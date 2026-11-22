@@ -3,6 +3,14 @@
 Stand: 21.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`). Zweig `sofort-paket` (Fehler aus dem Audit vom 21.11.2026) wartet auf Zustimmung. Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
+## Vertretung neu aufgebaut (22.11.2026, Zweig `vertretung-neu`, nicht veröffentlicht)
+- **Logos:** Acht neue Logos im Stil der übrigen (`gemeinsam/vertretung-`, `sudoku-`, `slitherlink-`, `einstein-`, `vier-gewinnt-`, `muehle-`, `schach-`, `spielraum-logo.svg`; weißes Quadrat, Dunkelgrün und Orange), zugeordnet in `gemeinsam/symbole.js` (`LehrraumSymbol('sudoku')` liefert das Logo). Verwendet auf Kachel und Seitenleiste der Startseite, in der Vertretungsliste und im Kopf der Spielseiten.
+- **Seite `vertretung/`:** Aufbau wie die Lernangebote (Leiste „‹ Lehrraum“, links Art (Alle, Knobeln, Spiele für zwei), große Überschrift mit Einleitung, Suche, Listenzeilen mit Logo, Marken und QR-Knopf; `?art=spiele` für Links und QR-Code). Liste und Texte stehen in `vertretung/angebote.js` (eine Quelle für die Seite und die Suche der Startseite); `vertretung/vertretung.js`, `vertretung.css` (nutzt `lernen/lernen.css`). Die Vertretungs-Einträge sind aus `WERKZEUGE` entfernt (Startseite bleibt kompakt), die Suche findet sie über `window.VERTRETUNG`.
+- **Wege:** Der Spielraum steht als Karte in „Spiele für zwei“; alle Spielseiten und die Lobby führen mit „‹ Vertretung“ direkt dorthin. `spielen/` ist nur noch eine Weiterleitung auf `vertretung/?art=spiele` (alte Adresse bleibt gültig).
+- **Spielseiten:** Kopf mit Logo, Name und einem Satz (`.spielkopf` in `werkzeuge/werkzeug.css`); Bretter etwas kleiner, damit sie mit dem Kopf auf den Bildschirm passen.
+- **Startseite Handy:** Bleibt in der letzten Kachelreihe eine einzelne sichtbare Kachel übrig (ohne Anmeldung: „Vertretung“), geht sie über die ganze Breite (`markiereAllein` in `app.js`, Klasse `allein`). Nicht gelöst: Dasselbe Muster bei den Werkzeugen (ein einzelnes „QR-Code erstellen“ in der zweiten Reihe).
+- Geprüft: `pruefen.mjs`, `darstellung.mjs` (alle zehn betroffenen Seiten) ohne Befund, Ansicht Desktop und Handy hell, Vertretung dunkel, Suche, Weiterleitung. Ungeprüft: echte Geräte.
+
 ## Bereich „Vertretung“ (22.11.2026, nicht veröffentlicht)
 - Neue Kachel und Seitenleisten-Punkt „Vertretung“ (neben „Lernangebote“, öffentlich); die Kachelreihe bleibt eine Zeile, die Kacheln werden dafür schmaler. Neues Symbol `raetsel` in `gemeinsam/symbole.js`.
 - `vertretung/index.html`: Übersicht mit Knobelspielen und Hilfsmitteln für die Stunde (Timer, Gruppen, Lautstärkeampel). Weitere Angebote dort als Karte ergänzen und in `js/inhalte.js` → `WERKZEUGE` (Bereich „Vertretung“) eintragen.

@@ -13,7 +13,7 @@
     <style>
       #brett {
         width: 100%;
-        max-width: min(40rem, calc(100dvh - 10rem));
+        max-width: min(40rem, calc(100dvh - 15rem));
         height: auto;
         touch-action: manipulation;
         user-select: none;
@@ -109,10 +109,17 @@
   </head>
   <body>
     <header class="werkzeug-kopf">
-      <a href="../">Spiele</a>
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
       <h1>Mühle</h1>
     </header>
     <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/muehle-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Mühle</p>
+          <p class="spielkopf-text">Mühlen bilden und gegnerische Steine wegnehmen.</p>
+        </div>
+      </div>
       <div class="spiel">
         <div class="brett-flaeche"><svg id="brett" viewBox="0 0 360 360" role="img" aria-label="Spielfeld Mühle"></svg></div>
         <div class="seite">

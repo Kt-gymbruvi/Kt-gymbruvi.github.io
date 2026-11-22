@@ -171,3 +171,39 @@
 :fullscreen .werkzeug-kopf {
   display: none;
 }
+
+/* ---------- Kopf einer Rätsel- oder Spielseite: Logo, Name, ein Satz ---------- */
+.spielkopf {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 0 0 1rem;
+}
+.spielkopf img {
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 24%;
+}
+.spielkopf p {
+  margin: 0;
+}
+.spielkopf-titel {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: var(--gewicht-titel, 700);
+  line-height: 1.15;
+}
+.spielkopf-text {
+  margin-top: 0.15rem;
+  color: var(--text-2);
+  font-size: 0.95rem;
+}
+@media (max-width: 30rem) {
+  .spielkopf img {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .spielkopf-text {
+    font-size: 0.85rem;
+  }
+}

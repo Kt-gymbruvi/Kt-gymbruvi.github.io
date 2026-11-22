@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Spielraum">
+  <defs>
+    <clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath>
+    <g id="bauer">
+      <circle cx="256" cy="150" r="54"/>
+      <rect x="204" y="206" width="104" height="28" rx="14"/>
+      <path d="M224 232C228 290 196 330 184 382H328C316 330 284 290 288 232Z"/>
+      <rect x="148" y="378" width="216" height="46" rx="23"/>
+    </g>
+  </defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <path d="M150 112C190 70 240 70 256 98M362 112C322 70 272 70 256 98" fill="none" stroke="#ff8a14" stroke-width="18" stroke-linecap="round" opacity="0.85"/>
+    <g transform="translate(12 118) scale(0.62)" fill="#0f5c47" stroke="#ffffff" stroke-width="14" stroke-linejoin="round"><use href="#bauer"/></g>
+    <g transform="translate(184 118) scale(0.62)" fill="#ff8a14" stroke="#ffffff" stroke-width="14" stroke-linejoin="round"><use href="#bauer"/></g>
+    <rect x="84" y="412" width="344" height="18" rx="9" fill="#0f5c47" opacity="0.25"/>
+  </g>
+</svg>

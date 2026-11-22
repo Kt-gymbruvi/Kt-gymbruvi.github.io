@@ -1,0 +1,31 @@
+/* Ergänzungen zur Lernübersicht (lernen/lernen.css) für die Seite „Vertretung“: Logos statt Fachsymbole, Einleitungstext. */
+.einleitung {
+  max-width: 42rem;
+  margin: 0.5rem 0 0;
+  color: var(--text-2);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+/* Logos füllen das ganze Feld (die Logos bringen Kachel und Rand selbst mit) */
+.symbol-feld.logo {
+  width: 3rem;
+  height: 3rem;
+  background: transparent;
+}
+.symbol-feld.logo .symbol {
+  width: 100%;
+  height: 100%;
+}
+.symbol-feld.logo.klein {
+  width: 1.875rem;
+  height: 1.875rem;
+}
+.ast[aria-current='true'] .symbol-feld.logo {
+  background: transparent;
+}
+@media (max-width: 52rem) {
+  .eintrag .symbol-feld.logo {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
