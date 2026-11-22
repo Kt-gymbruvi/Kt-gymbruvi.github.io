@@ -51,11 +51,11 @@ window.VERTRETUNG = [
   },
   {
     titel: 'Chaos-Flitzer 3000',
-    text: 'Würfeln, flitzen, gemein sein: Das Rennspiel mit 36 verrückten Läufern, jeder mit einer Fähigkeit, die die Regeln bricht.',
+    text: 'Würfeln, flitzen, gemein sein: Das Rennspiel mit 36 verrückten Läufern. Am Beamer laufen, die Schüler entscheiden per Handy.',
     adresse: 'vertretung/chaos-flitzer/',
     gruppe: 'spiele',
     logo: 'chaosflitzer',
-    marken: ['2 bis 6 Personen', 'mit Computerspielern', '4 Rennen'],
+    marken: ['2 bis 6 Personen', 'Handys können beitreten', 'mit Computerspielern'],
   },
   {
     titel: 'Vier gewinnt',

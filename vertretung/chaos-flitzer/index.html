@@ -169,6 +169,14 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px dashed var(
 .ev-bar.run{animation:evBar linear forwards}
 @keyframes evBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 @media (prefers-reduced-motion:reduce){.ev{animation:none}}
+/* Handys als Mitspieler */
+.hbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding:12px;border:3px dashed color-mix(in srgb,var(--ink) 40%,transparent);border-radius:18px;background:var(--card)}
+.hqr{flex:none;width:150px;height:150px;background:#fff;border-radius:12px;padding:6px;border:3px solid var(--ink)}
+.hqr svg{display:block;width:100%;height:100%}
+.hcode{font-size:34px;letter-spacing:.14em;line-height:1.1}
+.hnames{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.hnames span{border:2px solid var(--ink);background:var(--paper);border-radius:999px;padding:1px 9px;font-weight:900;font-size:13px}
+.prow input[readonly]{opacity:.75}
 /* bubbles */#bubs{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
 .bub{position:absolute;left:0;top:0;font-family:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;font-weight:800;font-size:15px;color:#2b1b3d;background:var(--mus);border:2.5px solid #2b1b3d;border-radius:12px;padding:3px 9px 2px;white-space:nowrap;box-shadow:0 3px 0 #2b1b3d;will-change:transform}
 .bub.good{background:#9fe3a0}.bub.bad{background:#ffb0b8}.bub.gold{background:#ffe066}
@@ -207,6 +215,9 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px dashed var(
 <div id="ev" hidden role="dialog" aria-live="assertive" aria-label="Was passiert gerade"></div>
 <div id="pop" class="ov" hidden></div>
 <script src="three.min.js"></script>
+<script src="../../js/qrcode.min.js"></script>
+<script src="../../spielen/echtzeit.js"></script>
+<script src="../../spielen/raum.js"></script>
 <script>
 (()=>{
 'use strict';
@@ -332,7 +343,8 @@ async function pause(r,kind,o={}){
   const shown=lines.slice(-4);
   const why=o.why!==undefined?o.why:(kind==='abil'||kind==='mod'?`<b>${esc(def.n)}:</b> ${esc(txt(def))}`:'');
   const cpuTurn=G.focus&&isCPU(G.focus);
-  const auto=G.autoCPU&&cpuTurn;
+  const remTurn=!!G.players[r.owner].remote;
+  const auto=(G.autoCPU&&cpuTurn)||remTurn;
   const prevFocus=G.focus;
   G.focus=r;
   ev.innerHTML=`<div class="ev" style="--rc:${r.def.c}">
@@ -378,6 +390,12 @@ async function trig(src,id,quiet){
 
 /* choices: humans get buttons, CPU uses pick function */
 function choose(r,title,opts,cpuPick){
+  if(!TEST&&G.players[r.owner].remote){
+    // Handy-Spieler: Frage geht an sein Handy; fällt das Handy aus, entscheidet der Computer
+    renderWho(r);
+    return askRemote(r.owner,{art:'wahl',titel:plain(title),optionen:opts.map(o=>({l:plain(o.l),k:o.k||''}))})
+      .then(i=>i===null?(cpuPick?cpuPick(opts):opts[0].v):opts[i].v);
+  }
   if(isCPU(r)||TEST){
     showWait(r);
     return sleep(420).then(()=>cpuPick?cpuPick(opts):opts[0].v);
@@ -399,7 +417,12 @@ function choose(r,title,opts,cpuPick){
 }
 function showWait(r){
   const box=$('#actions'); if(!box) return;
-  box.innerHTML=`<div class="wait">${esc(G.players[r.owner].name)} überlegt …</div>`;
+  const pl=G.players[r.owner];
+  if(pl.remote){
+    box.innerHTML=`<div class="wait">${esc(pl.name)} überlegt am Handy … <button class="mini" id="takeover">Computer übernimmt</button></div>`;
+    const t=$('#takeover');if(t) t.onclick=()=>remTakeover(r.owner,'vom Spielleiter ersetzt');
+  }else box.innerHTML=`<div class="wait">${esc(pl.name)} überlegt …</div>`;
+  remStatus(`${pl.name} (${r.def.n}) ist dran.`);
 }
 
 /* ---------- movement ---------- */
@@ -876,6 +899,9 @@ async function startGame(){
     const n=G.players.length;
     G.per=n===2?8:4;G.perRace=n===2?2:1;
     G.players.forEach(p=>{p.team=[];p.used=new Set();p.score=0;p.firsts=0;});
+    REM.inGame=true;REM.onChange=null;
+    G.players.forEach((pl,i)=>{if(pl.remote) remSend('platz',{an:pl.remote,name:pl.name,farbe:PCOL[i]});});
+    remStatus('Das Spiel startet …');
     G.winners=[];G.race=0;G.log=[];G.nextStart=Math.floor(Math.random()*n);
     await draft();
     for(G.race=1;G.race<=4;G.race++){
@@ -932,15 +958,22 @@ function pickDraft(p,k,total,round,rounds){
   return new Promise(res=>{
     const pl=G.players[p];
     screen(`<h2>Läufer wählen</h2>
-      <p class="sub"><i class="dot" style="background:${pc(p)}"></i><b>${esc(pl.name)}</b> ${pl.cpu?'wählt …':'ist dran.'} Auslage ${round} von ${rounds}: Es wird hin und wieder zurück gewählt (Wahl ${k} von ${total}).</p>
+      <p class="sub"><i class="dot" style="background:${pc(p)}"></i><b>${esc(pl.name)}</b> ${pl.cpu?'wählt …':pl.remote?'wählt am Handy …':'ist dran.'} Auslage ${round} von ${rounds}: Es wird hin und wieder zurück gewählt (Wahl ${k} von ${total}).</p>
       ${teamsHTML()}
       <div class="grid">${G.pool.map(d=>cardHTML(d)).join('')}</div>
-      ${pl.cpu?'<div class="stick"></div>':`<div class="stick"><button class="btn big" id="take" disabled>Tippe einen Läufer an</button></div>`}`);
+      ${pl.cpu?'<div class="stick"></div>':pl.remote?'<div class="stick"><button class="btn ghost" id="takeover">Computer übernimmt</button></div>':`<div class="stick"><button class="btn big" id="take" disabled>Tippe einen Läufer an</button></div>`}`);
     const take=id=>{const d=D[id];G.pool=G.pool.filter(x=>x.id!==id);pl.team.push(d);sfx('click');res();};
-    if(pl.cpu||TEST){
+    const cpuWahl=()=>{
       const F=TEST&&qs.get('force')?qs.get('force').split(','):[];const best=G.pool.slice().sort((a,b)=>(b.r+Math.random()*1.6+(F.includes(b.id)?99:0))-(a.r+Math.random()*1.6+(F.includes(a.id)?99:0)))[0];
       const el=$(`#screen .rc[data-id="${best.id}"]`);
       sleep(380).then(()=>{if(el){el.classList.add('sel');el.scrollIntoView({block:'nearest',behavior:'smooth'});}return sleep(520);}).then(()=>take(best.id));
+    };
+    if(pl.cpu||TEST){cpuWahl();return;}
+    if(pl.remote){
+      remStatus(`${pl.name} wählt einen Läufer (Wahl ${k} von ${total}).`);
+      const t=$('#takeover');if(t) t.onclick=()=>remTakeover(p,'vom Spielleiter ersetzt');
+      askRemote(p,{art:'karten',titel:`Wahl ${k} von ${total}: Wähle einen Läufer für dein Team.`,anzahl:1,karten:G.pool.map(cardData)})
+        .then(ids=>{if(ids===null) cpuWahl(); else take(ids[0]);});
       return;
     }
     let sel=null;const btn=$('#take');
@@ -956,11 +989,12 @@ function pickDraft(p,k,total,round,rounds){
 
 async function selectRacers(){
   const n=G.players.length,chosen=Array.from({length:n},()=>[]);
-  const humans=G.players.filter(p=>!p.cpu).length;
-  G.secret=humans>1&&!TEST;
+  const localHumans=G.players.filter(p=>!p.cpu&&!p.remote).length;
+  const remotes=G.players.filter(p=>p.remote).length;
+  G.secret=(localHumans+remotes>1)&&!TEST;
   for(let k=0;k<n;k++){
     const p=(G.nextStart+k)%n;
-    if(G.secret&&!G.players[p].cpu) await passTo(p);
+    if(G.secret&&localHumans>1&&!G.players[p].cpu&&!G.players[p].remote) await passTo(p);
     chosen[p]=await pickForRace(p,chosen);
   }
   return chosen;
@@ -978,14 +1012,21 @@ function pickForRace(p,chosen){
     const avail=pl.team.filter(d=>!pl.used.has(d.id));
     const others=chosen.map((c,i)=>c.length?`<div class="team"><i class="dot" style="background:${pc(i)}"></i>${esc(G.players[i].name)} ${G.secret?'hat geheim gewählt':`schickt <span class="em">${c.map(d=>d.e).join('')}</span>`}</div>`:'').join('');
     screen(`<h2>Rennen ${G.race} von 4: ${SIDES[G.side]}</h2>
-      <p class="sub"><i class="dot" style="background:${pc(p)}"></i><b>${esc(pl.name)}</b> ${pl.cpu?'wählt …':`wählt ${need===1?'einen Läufer':'zwei Läufer'} für dieses Rennen.`}</p>
+      <p class="sub"><i class="dot" style="background:${pc(p)}"></i><b>${esc(pl.name)}</b> ${pl.cpu?'wählt …':pl.remote?'wählt am Handy …':`wählt ${need===1?'einen Läufer':'zwei Läufer'} für dieses Rennen.`}</p>
       <div class="teams">${others||'<span class="team">Noch hat niemand gewählt.</span>'}</div>
       <div class="grid">${avail.map(d=>cardHTML(d)).join('')}</div>
-      ${pl.cpu?'<div class="stick"></div>':`<div class="stick"><button class="btn big" id="take" disabled>${need===1?'Tippe einen Läufer an':'Tippe zwei Läufer an'}</button></div>`}`);
+      ${pl.cpu?'<div class="stick"></div>':pl.remote?'<div class="stick"><button class="btn ghost" id="takeover">Computer übernimmt</button></div>':`<div class="stick"><button class="btn big" id="take" disabled>${need===1?'Tippe einen Läufer an':'Tippe zwei Läufer an'}</button></div>`}`);
     const done=ids=>{ids.forEach(id=>pl.used.add(id));sfx('click');res(ids.map(id=>D[id]));};
-    if(pl.cpu||TEST){
+    const cpuWahl=()=>{
       const pick=shuffle(avail.slice()).slice(0,need);
       sleep(450).then(()=>{pick.forEach(d=>{const el=$(`#screen .rc[data-id="${d.id}"]`);if(el)el.classList.add('sel');});return sleep(550);}).then(()=>done(pick.map(d=>d.id)));
+    };
+    if(pl.cpu||TEST){cpuWahl();return;}
+    if(pl.remote){
+      remStatus(`${pl.name} wählt ${need===1?'einen Läufer':'zwei Läufer'} für Rennen ${G.race}.`);
+      const t=$('#takeover');if(t) t.onclick=()=>remTakeover(p,'vom Spielleiter ersetzt');
+      askRemote(p,{art:'karten',titel:`Rennen ${G.race}: ${need===1?'Wähle einen Läufer':'Wähle zwei Läufer'} für dieses Rennen. Die Wahl bleibt geheim.`,anzahl:need,karten:avail.map(cardData)})
+        .then(ids=>{if(ids===null) cpuWahl(); else done(ids);});
       return;
     }
     const sel=[];const btn=$('#take');
@@ -1044,7 +1085,7 @@ function status(r){
 function renderWho(r){
   const p=G.players[r.owner];
   $('#who').innerHTML=`<div class="who-e" style="--rc:${r.def.c}">${r.def.e}</div><div><div class="who-n">${esc(r.def.n)}</div><div class="who-p"><i class="dot" style="background:${pc(r.owner)}"></i>${esc(p.name)}${p.cpu?' (Computer)':''}, ${status(r)}</div><div class="who-t">${abilityText(r)}</div></div>`;
-  if(isCPU(r)) showWait(r); else $('#actions').innerHTML='';
+  if(isCPU(r)||p.remote) showWait(r); else $('#actions').innerHTML='';
 }
 
 function showRaceEnd(sr){
@@ -1086,6 +1127,85 @@ function showFinal(){
   sfx('fin');
 }
 
+/* ---------- Handys als Mitspieler ----------
+   Das Spiel läuft nur auf diesem Gerät (Beamer/Tablet). Handys treten über einen Raum bei (Echtzeit-Kanal, nichts wird gespeichert)
+   und bekommen nur die Entscheidungen ihres Spielers gestellt: Frage → Antwort. Fällt ein Handy aus, spielt der Computer weiter. */
+const REM={kanal:null,code:null,id:null,phones:new Map(),qid:0,pending:null,gone:new Map(),onChange:null,inGame:false};
+const plain=h=>{const d=document.createElement('div');d.innerHTML=h;return d.textContent.replace(/\s+/g,' ').trim();};
+const cardData=d=>({id:d.id,e:d.e,n:d.n,t:txt(d),c:d.c});
+const remUrl=()=>new URL('handy/?raum='+REM.code,location.href).href;
+function remSend(ev,d){if(REM.kanal) REM.kanal.sende(ev,d);}
+function remStatus(text){remSend('status',{text});}
+function remOpen(){
+  if(REM.kanal||!window.Echtzeit||!window.Spielraum) return;
+  REM.code=window.Spielraum.neuerCode();REM.id=window.Spielraum.meineId();
+  REM.phones=new Map();
+  REM.kanal=window.Echtzeit.oeffnen('chaosflitzer-'+REM.code,{schluessel:REM.id,beiNachricht:remMsg,beiAnwesenheit:remPresence});
+  REM.kanal.verfolge({id:REM.id,rolle:'host'});
+}
+function remClose(){
+  if(REM.kanal) REM.kanal.schliessen();
+  REM.kanal=null;REM.code=null;REM.phones=new Map();REM.pending=null;REM.inGame=false;
+  REM.gone.forEach(t=>clearTimeout(t));REM.gone.clear();
+}
+function remPresence(liste){
+  const neu=new Map();
+  liste.forEach(x=>{if(x&&x.rolle==='spieler'&&typeof x.id==='string') neu.set(x.id,{id:x.id,name:window.Spielraum.bereinige(x.name)||'Gast'});});
+  REM.phones=neu;
+  if(REM.inGame){
+    // Plätze, deren Handy fehlt: nach 20 Sekunden übernimmt der Computer
+    G.players.forEach((pl,i)=>{
+      if(!pl.remote) return;
+      if(neu.has(pl.remote)){clearTimeout(REM.gone.get(pl.remote));REM.gone.delete(pl.remote);}
+      else if(!REM.gone.has(pl.remote)) REM.gone.set(pl.remote,setTimeout(()=>remTakeover(i,'Handy nicht mehr verbunden'),20000));
+    });
+  }
+  if(REM.onChange) REM.onChange();
+}
+function remMsg(ev,d){
+  if(!d||typeof d!=='object') return;
+  if(ev==='antwort'&&REM.pending&&d.qid===REM.pending.qid){
+    const pl=G.players[REM.pending.p];
+    if(!pl||!pl.remote||pl.remote!==d.von) return; // nur vom richtigen Handy
+    const f=REM.pending.frage;let wahl=null;
+    if(f.art==='wahl'){if(Number.isInteger(d.wahl)&&d.wahl>=0&&d.wahl<f.optionen.length) wahl=d.wahl;}
+    else if(f.art==='karten'){
+      const ids=Array.isArray(d.wahl)?[...new Set(d.wahl.map(String))]:[];
+      if(ids.length===f.anzahl&&ids.every(id=>f.karten.some(k=>k.id===id))) wahl=ids;
+    }
+    if(wahl===null) return;
+    const res=REM.pending.res;REM.pending=null;res(wahl);
+  }else if(ev==='sync'&&typeof d.von==='string') remSync(d.von);
+}
+// Ein Handy meldet sich (neu geladen): Platz, offene Frage oder Wartetext noch einmal senden
+function remSync(von){
+  const i=G.players.findIndex(p=>p.remote===von);
+  if(i>=0){
+    remSend('platz',{an:von,name:G.players[i].name,farbe:PCOL[i]});
+    if(REM.pending&&REM.pending.p===i) remSendQuestion(); else remSend('status',{an:von,text:'Du bist dabei. Weiter geht es am Beamer …'});
+  }else if(REM.onChange) REM.onChange(); // Startbild: Platz neu zuweisen
+}
+function askRemote(i,frage){
+  return new Promise(res=>{
+    REM.pending={qid:++REM.qid,p:i,frage,res};
+    remSendQuestion();
+  });
+}
+function remSendQuestion(){
+  const q=REM.pending;if(!q) return;
+  const pl=G.players[q.p];if(!pl||!pl.remote) return;
+  remSend('frage',Object.assign({an:pl.remote,qid:q.qid},q.frage));
+}
+function remTakeover(i,grund){
+  const pl=G.players[i];if(!pl||!pl.remote) return;
+  const id=pl.remote;
+  pl.remote=null;pl.cpu=true;
+  clearTimeout(REM.gone.get(id));REM.gone.delete(id);
+  log(`${esc(pl.name)} wird vom Computer übernommen${grund?` (${esc(grund)})`:''}.`);
+  remSend('status',{an:id,text:'Der Computer spielt jetzt für dich.'});
+  if(REM.pending&&REM.pending.p===i){const res=REM.pending.res;REM.pending=null;res(null);}
+}
+
 /* ---------- screens ---------- */
 function screen(html,cls=''){
   const s=$('#screen');
@@ -1097,24 +1217,27 @@ function hideScreen(){$('#screen').hidden=true;$('#screen').innerHTML='';}
 
 let setupPlayers=null;
 function showSetup(){
+  REM.inGame=false;
   $('#top').hidden=true;$('#panel').hidden=true;
   clearFigs();attract();
   if(!setupPlayers) setupPlayers=[{name:'Du',cpu:false},{name:'Kiwi',cpu:true},{name:'Brösel',cpu:true},{name:'Rakete',cpu:true}];
   const renderRows=()=>{
     $('#plist').innerHTML=setupPlayers.map((p,i)=>`<div class="prow">
       <i class="dot" style="background:${pc(i)};width:22px;height:22px"></i>
-      <input value="${esc(p.name)}" data-i="${i}" maxlength="16" aria-label="Name Spieler ${i+1}">
-      <span class="seg" role="group" aria-label="Wer spielt"><button data-i="${i}" data-c="0" aria-pressed="${!p.cpu}">Mensch</button><button data-i="${i}" data-c="1" aria-pressed="${p.cpu}">Computer</button></span>
+      <input value="${esc(p.handy&&!p.phone?'':p.name)}" data-i="${i}" maxlength="16" aria-label="Name Spieler ${i+1}" ${p.handy?`readonly placeholder="wartet auf ein Handy …"`:''}>
+      <span class="seg" role="group" aria-label="Wer spielt"><button data-i="${i}" data-c="0" aria-pressed="${!p.cpu&&!p.handy}">Mensch</button>${REM.kanal?`<button data-i="${i}" data-c="2" aria-pressed="${!!p.handy}">Handy</button>`:''}<button data-i="${i}" data-c="1" aria-pressed="${p.cpu}">Computer</button></span>
       ${setupPlayers.length>2?`<button class="xbtn" data-x="${i}" aria-label="Spieler entfernen">✕</button>`:''}
     </div>`).join('');
     $('#addP').disabled=setupPlayers.length>=6;
     const n=setupPlayers.length;
+    renderHandy();
     $('#modeNote').textContent=n===2?'Zu zweit schickt jeder pro Rennen zwei Läufer ins Rennen (8 Läufer pro Team).':`Jeder stellt ein Team aus 4 Läufern zusammen und schickt pro Rennen einen davon los.`;
   };
   screen(`<a class="back" href="../">‹ Zurück zur Vertretung</a><h1 class="title" aria-label="Chaos-Flitzer 3000"><span aria-hidden="true">Chaos-Flitzer<br><span>3000</span></span></h1>
     <p class="lead">Würfeln, flitzen, gemein sein. Stellt euch ein Team aus verrückten Läufern zusammen, jeder mit einer Fähigkeit, die die Regeln bricht. Vier Rennen, die meisten Punkte gewinnen.</p>
     <div id="plist"></div>
-    <div class="prow"><button class="btn ghost" id="addP">+ Spieler</button><span class="fine" id="modeNote"></span></div>
+    <div class="prow"><button class="btn ghost" id="addP">+ Spieler</button><button class="btn ghost" id="handyB">📱 Mit Handys spielen</button><span class="fine" id="modeNote"></span></div>
+    <div id="handyBox"></div>
     <div class="settings">
       <label>Tempo <span class="seg" id="tempo">${Object.keys(TEMPO).map(k=>`<button data-t="${k}" aria-pressed="${G.tempo===k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</span></label>
       <label>1. Platz <input type="number" id="p1" min="0" max="20" value="${G.P1}"> Punkte</label>
@@ -1125,14 +1248,56 @@ function showSetup(){
       <label>Erklärungen <span class="seg" id="expl">${Object.keys(EXPL).map(k=>`<button data-x="${k}" aria-pressed="${G.explain===k}">${{all:'Alles',abil:'Fähigkeiten',off:'Aus'}[k]}</button>`).join('')}</span></label>
       <label><input type="checkbox" id="autoCPU" ${G.autoCPU?'checked':''} style="width:20px;height:20px;accent-color:var(--mag)"> Bei Computerzügen nach 4 s automatisch weiter</label>
     </div>
-    <p class="fine">„Fähigkeiten“ hält das Spiel bei jeder ausgelösten Fähigkeit und jedem besonderen Feld an und erklärt, was passiert. „Alles“ erklärt zusätzlich jeden normalen Würfelzug. Mehrere Menschen spielen an einem Gerät und reichen es weiter.</p>
+    <p class="fine">„Fähigkeiten“ hält das Spiel bei jeder ausgelösten Fähigkeit und jedem besonderen Feld an und erklärt, was passiert. „Alles“ erklärt zusätzlich jeden normalen Würfelzug. Mehrere Menschen spielen an einem Gerät und reichen es weiter. Mit „Mit Handys spielen“ treten die Schüler per QR-Code bei und entscheiden auf ihrem Handy; die Strecke läuft hier am Beamer.</p>
     <div class="stick"><button class="btn ghost" id="rulesB">Regeln</button><button class="btn big" id="go">Auswahl starten</button></div>`);
+  // Handys: Raum öffnen, QR-Code zeigen, Handys einem freien Platz zuordnen
+  const assignPhones=()=>{
+    if(!REM.kanal) return;
+    setupPlayers.forEach(p=>{if(p.phone&&!REM.phones.has(p.phone)) p.phone=null;});
+    const taken=new Set(setupPlayers.filter(p=>p.phone).map(p=>p.phone));
+    for(const ph of REM.phones.values()){
+      if(taken.has(ph.id)) continue;
+      let row=setupPlayers.find(p=>p.handy&&!p.phone);
+      if(!row&&setupPlayers.length<6){row={name:ph.name,cpu:false,handy:true,phone:null};setupPlayers.push(row);}
+      if(!row){remSend('status',{an:ph.id,text:'Das Spiel ist voll (6 Plätze).'});continue;}
+      row.phone=ph.id;row.name=ph.name;taken.add(ph.id);
+      remSend('platz',{an:ph.id,name:ph.name,farbe:PCOL[setupPlayers.indexOf(row)]});
+      remSend('status',{an:ph.id,text:'Du bist dabei. Gleich geht es los.'});
+    }
+  };
+  const renderHandy=()=>{
+    const box=$('#handyBox');if(!box) return;
+    $('#handyB').textContent=REM.kanal?'📱 Handys beenden':'📱 Mit Handys spielen';
+    if(!REM.kanal){box.innerHTML='';return;}
+    const namen=[...REM.phones.values()].map(x=>`<span>${esc(x.name)}</span>`).join('');
+    box.innerHTML=`<div class="hbox"><div class="hqr" id="hqr" role="img" aria-label="QR-Code zum Beitreten"></div><div>
+      <div class="fine">Raumcode</div><div class="hcode disp">${esc(REM.code)}</div>
+      <div class="fine">Die Schüler scannen den QR-Code oder öffnen<br><b>${esc(remUrl().replace(/^https?:\/\//,''))}</b></div>
+      <div class="fine"><b>${REM.phones.size}</b> ${REM.phones.size===1?'Handy ist':'Handys sind'} verbunden. Mit „Handy“ bei einem Platz lässt du es mitspielen.</div>
+      <div class="hnames">${namen}</div></div></div>`;
+    window.QRCode.toString(remUrl(),{type:'svg',margin:0,errorCorrectionLevel:'M'},(f,svg)=>{const q=$('#hqr');if(!f&&q) q.innerHTML=svg;});
+  };
+  REM.inGame=false;
+  REM.onChange=()=>{assignPhones();renderRows();};
+  $('#handyB').onclick=()=>{
+    sfx('click');
+    if(REM.kanal){
+      remClose();
+      setupPlayers.forEach(p=>{if(p.handy){p.handy=false;p.phone=null;p.cpu=true;}});
+    }else{remOpen();}
+    renderRows();
+  };
   renderRows();
   $('#plist').addEventListener('input',e=>{if(e.target.dataset.i!==undefined) setupPlayers[+e.target.dataset.i].name=e.target.value;});
   $('#plist').addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b) return;
     if(b.dataset.x!==undefined){setupPlayers.splice(+b.dataset.x,1);renderRows();return;}
-    if(b.dataset.c!==undefined){setupPlayers[+b.dataset.i].cpu=b.dataset.c==='1';renderRows();}
+    if(b.dataset.c!==undefined){
+      const row=setupPlayers[+b.dataset.i],c=b.dataset.c;
+      row.cpu=c==='1';row.handy=c==='2';if(c!=='2') row.phone=null;
+      if(c==='2') assignPhones();
+      renderRows();
+    }
   });
   $('#addP').onclick=()=>{if(setupPlayers.length<6){setupPlayers.push({name:['Kiwi','Brösel','Rakete','Moppel','Fussel','Krümel'][setupPlayers.length]||'Gast',cpu:true});renderRows();}};
   $('#tempo').onclick=e=>{const b=e.target.closest('button');if(!b) return;G.tempo=b.dataset.t;$('#tempo').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));};
@@ -1143,7 +1308,10 @@ function showSetup(){
     sfx('click');
     G.P1=Math.max(0,parseInt($('#p1').value)||0);G.P2=Math.max(0,parseInt($('#p2').value)||0);G.inc=$('#inc').checked?1:0;
     G.speed=TEMPO[G.tempo];
-    G.players=setupPlayers.map((p,i)=>({name:(p.name||'').trim()||`Spieler ${i+1}`,cpu:p.cpu}));
+    G.players=setupPlayers.map((p,i)=>{
+      const handy=!!(p.handy&&p.phone&&REM.phones.has(p.phone)); // ein Handy-Platz ohne Handy spielt der Computer
+      return {name:(p.name||'').trim()||`Spieler ${i+1}`,cpu:!!p.cpu||(!!p.handy&&!handy),remote:handy?p.phone:null};
+    });
     startGame();
   };
 }

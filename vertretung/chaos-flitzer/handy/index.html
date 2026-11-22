@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Chaos-Flitzer – Handy</title>
+    <meta name="description" content="Handy-Steuerung für Chaos-Flitzer 3000: Entscheidungen treffen, während das Spiel am Beamer läuft" />
+    <link rel="icon" href="../../../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../lernen/schriften/schriften.css" />
+    <script>
+      /* hell/dunkel wie auf der übrigen Plattform, sonst nach dem Gerät */
+      try {
+        var d = localStorage.getItem('lehrraum-design')
+        if (d === 'hell') document.documentElement.setAttribute('data-theme', 'light')
+        else if (d === 'dunkel') document.documentElement.setAttribute('data-theme', 'dark')
+      } catch (e) {}
+    </script>
+    <style>
+      :root {
+        --ink: #2b1b3d;
+        --paper: #fff3dc;
+        --card: #fffaf0;
+        --text: #2b1b3d;
+        --muted: #6b5880;
+        --mag: #e0457b;
+        --mus: #f4b728;
+        --tur: #0f7b76;
+        --bg: #a8dcd6;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --ink: #0f0a18;
+          --paper: #2b1f40;
+          --card: #362850;
+          --text: #fff1d6;
+          --muted: #cbb8e6;
+          --bg: #1d1532;
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme='dark'] {
+        --ink: #0f0a18;
+        --paper: #2b1f40;
+        --card: #362850;
+        --text: #fff1d6;
+        --muted: #cbb8e6;
+        --bg: #1d1532;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+      body {
+        min-height: 100dvh;
+        padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px calc(env(safe-area-inset-bottom, 0px) + 16px);
+        font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-size: 17px;
+        color: var(--text);
+        background: var(--bg);
+      }
+      h1,
+      h2,
+      .btn,
+      .titel {
+        font-family: 'Bricolage Grotesque', 'Arial Rounded MT Bold', sans-serif;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+      }
+      main {
+        width: min(560px, 100%);
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .kopf {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .marke {
+        font-size: 19px;
+        background: var(--mus);
+        color: #2b1b3d;
+        border: 3px solid var(--ink);
+        border-radius: 14px;
+        padding: 3px 10px 2px;
+        box-shadow: 0 4px 0 var(--ink);
+        transform: rotate(-2deg);
+        font-family: 'Bricolage Grotesque', sans-serif;
+        font-weight: 800;
+      }
+      .platz {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--card);
+        border: 3px solid var(--ink);
+        border-radius: 999px;
+        padding: 3px 12px 3px 6px;
+        font-weight: 700;
+        box-shadow: 0 3px 0 var(--ink);
+      }
+      .platz[hidden] {
+        display: none;
+      }
+      .dot {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid var(--ink);
+        background: var(--mag);
+      }
+      .karte {
+        background: var(--card);
+        border: 3px solid var(--ink);
+        border-radius: 22px;
+        box-shadow: 0 6px 0 var(--ink);
+        padding: 16px;
+      }
+      .karte h2 {
+        margin: 0 0 8px;
+        font-size: 22px;
+      }
+      .karte p {
+        margin: 0 0 10px;
+        line-height: 1.45;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .status {
+        font-size: 19px;
+        font-weight: 700;
+      }
+      .feld {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-weight: 700;
+      }
+      input[type='text'] {
+        font: inherit;
+        font-size: 18px;
+        padding: 12px 14px;
+        border: 3px solid var(--ink);
+        border-radius: 14px;
+        background: var(--paper);
+        color: var(--text);
+      }
+      .btn {
+        border: 3px solid var(--ink);
+        border-radius: 14px;
+        background: var(--tur);
+        color: #fff;
+        font-size: 19px;
+        padding: 14px 16px 13px;
+        box-shadow: 0 4px 0 var(--ink);
+        line-height: 1.15;
+        cursor: pointer;
+        text-align: center;
+        min-height: 56px;
+      }
+      .btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 var(--ink);
+      }
+      .btn.alt {
+        background: var(--mag);
+      }
+      .btn.warm {
+        background: var(--mus);
+        color: #2b1b3d;
+      }
+      .btn.ghost {
+        background: var(--card);
+        color: var(--text);
+      }
+      .btn[disabled] {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+      .optionen {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .raster {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .lauefer {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        border: 3px solid var(--ink);
+        border-radius: 16px;
+        background: var(--card);
+        color: var(--text);
+        box-shadow: 0 4px 0 var(--ink);
+        padding: 0;
+        overflow: hidden;
+        font: inherit;
+        cursor: pointer;
+      }
+      .lauefer .oben {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        background: var(--rc);
+        border-bottom: 3px solid var(--ink);
+      }
+      .lauefer .e {
+        font-size: 26px;
+        line-height: 1;
+      }
+      .lauefer .n {
+        font-family: 'Bricolage Grotesque', sans-serif;
+        font-weight: 800;
+        font-size: 16px;
+        color: #2b1b3d;
+        line-height: 1.05;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 2px 6px;
+        border-radius: 8px;
+      }
+      .lauefer .t {
+        font-size: 13px;
+        line-height: 1.35;
+        padding: 8px 10px 10px;
+      }
+      .lauefer.gewaehlt {
+        border-color: var(--mag);
+        box-shadow: 0 6px 0 var(--mag);
+        transform: translateY(-3px);
+      }
+      .lauefer.gewaehlt::after {
+        content: '✓';
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--mag);
+        color: #fff;
+        border: 2px solid var(--ink);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+      }
+      .fehler {
+        color: #b3261e;
+        font-weight: 700;
+      }
+      :root[data-theme='dark'] .fehler {
+        color: #ff9a92;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) .fehler {
+          color: #ff9a92;
+        }
+      }
+      [hidden] {
+        display: none !important;
+      }
+      a {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="kopf">
+        <span class="marke">Chaos-Flitzer</span>
+        <span class="platz" id="platz" hidden><i class="dot" id="platz-punkt"></i><span id="platz-name"></span></span>
+      </div>
+
+      <!-- Raum fehlt oder ist ungültig -->
+      <section class="karte" id="ungueltig" hidden>
+        <h2>Raum nicht gefunden</h2>
+        <p>Scanne den QR-Code am Beamer noch einmal oder gib den Raumcode ein.</p>
+        <form id="code-form" class="feld">
+          <label class="feld">Raumcode <input id="code-feld" type="text" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="z. B. K7P2QX" /></label>
+          <button class="btn" type="submit">Beitreten</button>
+        </form>
+      </section>
+
+      <!-- Name -->
+      <section class="karte" id="name-karte" hidden>
+        <h2>Wie heißt du?</h2>
+        <p class="muted">Ein Spitzname reicht. Er erscheint nur im Spiel am Beamer.</p>
+        <form id="name-form" class="feld">
+          <input id="name-feld" type="text" maxlength="16" autocomplete="off" aria-label="Spitzname" />
+          <button class="btn" type="submit">Mitspielen</button>
+        </form>
+      </section>
+
+      <!-- Spiel -->
+      <section class="karte" id="spiel" hidden>
+        <p class="status" id="status" role="status" aria-live="polite">Verbinde …</p>
+        <p class="muted" id="verbindung"></p>
+        <div id="frage" hidden></div>
+      </section>
+    </main>
+
+    <script src="../../../spielen/echtzeit.js"></script>
+    <script src="../../../spielen/raum.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const R = window.Spielraum
+        const $ = (id) => document.getElementById(id)
+        const params = new URLSearchParams(location.search)
+        let code = (params.get('raum') || '').toUpperCase()
+        const meineId = R.meineId()
+        let kanal = null
+        let hostDa = false
+        let offeneFrage = null // { qid, ... }
+        let beantwortet = new Set()
+
+        const zeige = (id) => ['ungueltig', 'name-karte', 'spiel'].forEach((x) => ($(x).hidden = x !== id))
+        const setzeStatus = (text) => {
+          $('status').textContent = text
+        }
+
+        function start() {
+          if (!R.istCode(code)) return zeige('ungueltig')
+          if (!R.meinName()) {
+            zeige('name-karte')
+            return $('name-feld').focus()
+          }
+          verbinden()
+        }
+
+        $('code-form').addEventListener('submit', (e) => {
+          e.preventDefault()
+          const c = $('code-feld').value.trim().toUpperCase()
+          if (!R.istCode(c)) return
+          code = c
+          history.replaceState(null, '', '?raum=' + code)
+          start()
+        })
+        $('name-feld').value = R.meinName()
+        $('name-form').addEventListener('submit', (e) => {
+          e.preventDefault()
+          if (!R.bereinige($('name-feld').value)) return $('name-feld').focus()
+          R.setzeName($('name-feld').value.slice(0, 16))
+          start()
+        })
+
+        function verbinden() {
+          zeige('spiel')
+          const ich = { id: meineId, name: R.meinName().slice(0, 16), rolle: 'spieler' }
+          kanal = window.Echtzeit.oeffnen('chaosflitzer-' + code, {
+            schluessel: meineId,
+            beiNachricht: nachricht,
+            beiAnwesenheit: (liste) => {
+              hostDa = liste.some((x) => x && x.rolle === 'host')
+              anzeigeVerbindung()
+            },
+            beiStatus: (s) => {
+              if (s === 'verbunden') {
+                kanal.verfolge(ich)
+                kanal.sende('sync', { von: meineId })
+              }
+              anzeigeVerbindung(s)
+            },
+          })
+          kanal.verfolge(ich)
+          setzeStatus('Verbinde …')
+          window.addEventListener('pagehide', () => kanal && kanal.schliessen())
+        }
+
+        let letzterStatus = 'verbindet'
+        function anzeigeVerbindung(s) {
+          if (s) letzterStatus = s
+          const v = $('verbindung')
+          if (letzterStatus !== 'verbunden') {
+            v.textContent = letzterStatus === 'verbindet' ? 'Verbinde …' : 'Verbindung weg – es wird erneut versucht …'
+          } else if (!hostDa) {
+            v.textContent = 'Das Spiel am Beamer ist gerade nicht erreichbar. Raumcode: ' + code
+          } else v.textContent = 'Verbunden. Raumcode: ' + code
+        }
+
+        function nachricht(ereignis, d) {
+          if (!d || typeof d !== 'object') return
+          if (ereignis === 'platz' && d.an === meineId) {
+            $('platz').hidden = false
+            $('platz-punkt').style.background = typeof d.farbe === 'string' && /^#[0-9a-f]{3,8}$/i.test(d.farbe) ? d.farbe : ''
+            $('platz-name').textContent = R.bereinige(d.name)
+          } else if (ereignis === 'status' && (d.an === meineId || (!d.an && !offeneFrage))) {
+            setzeStatus(String(d.text || '').slice(0, 200))
+            if (d.an === meineId) schliesseFrage()
+          } else if (ereignis === 'frage' && d.an === meineId) {
+            zeigeFrage(d)
+          }
+        }
+
+        function schliesseFrage() {
+          offeneFrage = null
+          $('frage').hidden = true
+          $('frage').textContent = ''
+        }
+
+        function sende(qid, wahl) {
+          beantwortet.add(qid)
+          kanal.sende('antwort', { qid, von: meineId, wahl })
+          schliesseFrage()
+          setzeStatus('Gesendet. Weiter geht es am Beamer …')
+        }
+
+        const kurz = (s, n) => String(s || '').slice(0, n)
+
+        function zeigeFrage(d) {
+          if (beantwortet.has(d.qid) || (offeneFrage && offeneFrage.qid === d.qid)) return
+          offeneFrage = { qid: d.qid }
+          const box = $('frage')
+          box.textContent = ''
+          box.hidden = false
+          setzeStatus(kurz(d.titel, 160))
+          if (d.art === 'wahl' && Array.isArray(d.optionen)) {
+            const o = document.createElement('div')
+            o.className = 'optionen'
+            d.optionen.slice(0, 12).forEach((op, i) => {
+              const b = document.createElement('button')
+              b.type = 'button'
+              b.className = 'btn' + (op.k === 'alt' ? ' alt' : op.k === 'warm' ? ' warm' : op.k === 'ghost' ? ' ghost' : '')
+              b.textContent = kurz(op.l, 80)
+              b.addEventListener('click', () => sende(d.qid, i))
+              o.append(b)
+            })
+            box.append(o)
+          } else if (d.art === 'karten' && Array.isArray(d.karten)) {
+            const anzahl = Math.max(1, Math.min(2, Number(d.anzahl) || 1))
+            const gewaehlt = []
+            const raster = document.createElement('div')
+            raster.className = 'raster'
+            const ok = document.createElement('button')
+            ok.type = 'button'
+            ok.className = 'btn'
+            ok.disabled = true
+            const text = () => (ok.textContent = gewaehlt.length === anzahl ? 'Wählen' : anzahl === 1 ? 'Tippe einen Läufer an' : `Noch ${anzahl - gewaehlt.length} antippen`)
+            text()
+            d.karten.slice(0, 24).forEach((k) => {
+              const b = document.createElement('button')
+              b.type = 'button'
+              b.className = 'lauefer'
+              b.style.setProperty('--rc', /^#[0-9a-f]{3,8}$/i.test(k.c) ? k.c : '#ddd')
+              const oben = document.createElement('span')
+              oben.className = 'oben'
+              const e = document.createElement('span')
+              e.className = 'e'
+              e.textContent = kurz(k.e, 8)
+              const n = document.createElement('span')
+              n.className = 'n'
+              n.textContent = kurz(k.n, 40)
+              oben.append(e, n)
+              const t = document.createElement('span')
+              t.className = 't'
+              t.textContent = kurz(k.t, 400)
+              b.append(oben, t)
+              b.addEventListener('click', () => {
+                const i = gewaehlt.indexOf(k.id)
+                if (i >= 0) {
+                  gewaehlt.splice(i, 1)
+                  b.classList.remove('gewaehlt')
+                } else {
+                  if (gewaehlt.length >= anzahl) {
+                    const alt = gewaehlt.shift()
+                    const el = raster.querySelector(`[data-id="${alt}"]`)
+                    if (el) el.classList.remove('gewaehlt')
+                  }
+                  gewaehlt.push(k.id)
+                  b.classList.add('gewaehlt')
+                }
+                ok.disabled = gewaehlt.length !== anzahl
+                text()
+              })
+              b.dataset.id = k.id
+              raster.append(b)
+            })
+            ok.addEventListener('click', () => gewaehlt.length === anzahl && sende(d.qid, gewaehlt.slice()))
+            box.append(raster, ok)
+          }
+        }
+
+        start()
+      })()
+    </script>
+  </body>
+</html>
