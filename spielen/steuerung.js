@@ -3,6 +3,7 @@
  * Browser: window.Spielsteuerung(ziel, optionen) → { modus, stufe, ich, status(text, art), neuBeschriften }
  *
  *   optionen.farben    ['Rot', 'Gelb']  Namen von Spieler 1 (beginnt) und Spieler 2
+ *   optionen.spiel     Ordner des Spiels (z. B. 'schach'): „Online“ öffnet die Lobby mit diesem Spiel
  *   optionen.neu()     Neues Spiel (liest modus/stufe/ich aus dem Rückgabewert)
  *   optionen.zurueck() Letzten Zug zurücknehmen (im Rechnermodus: die letzten beiden)
  *   optionen.online    { gegner, seite, lobby, aufgeben() } – Online-Partie: keine Auswahl, dafür „Aufgeben“ und „Zur Lobby“
@@ -85,7 +86,12 @@
       })
     }
 
-    const art = segmente('Spielart', [['lokal', 'Zu zweit'], ['rechner', 'Gegen Rechner']], z.modus, (w) => {
+    const art = segmente('Spielart', [['lokal', 'Zu zweit'], ['rechner', 'Gegen Rechner'], ['online', 'Online']], z.modus, (w) => {
+      if (w === 'online') {
+        // Online spielt man in der Lobby der Klasse; das gewählte Spiel ist dort schon vorgewählt
+        location.href = '../lobby/' + (o.spiel ? '?spiel=' + encodeURIComponent(o.spiel) : '')
+        return
+      }
       z.modus = w
       stufe.gruppe.hidden = seite.gruppe.hidden = w !== 'rechner'
       o.neu()

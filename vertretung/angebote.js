@@ -6,10 +6,17 @@
  *   gruppe   'knobeln' | 'spiele'
  *   logo     Name aus gemeinsam/symbole.js (zeigt gemeinsam/<name>-logo.svg)
  *   marken   kleine Hinweise unter dem Titel
+ *   liste    false = nicht in der Liste der Seite, nur über die Suche der Startseite auffindbar
  */
 window.VERTRETUNG_GRUPPEN = [
   { id: 'knobeln', name: 'Knobeln', text: 'Rätsel zum Alleinlösen – jedes ist neu und genau eine Lösung.' },
-  { id: 'spiele', name: 'Spiele für zwei', text: 'Zu zweit am Gerät, gegen den Rechner oder online in der Klasse.' },
+  {
+    id: 'spiele',
+    name: 'Spiele für zwei',
+    text: 'Zu zweit am Gerät, gegen den Rechner oder online in der Klasse.',
+    // Knopf an der Gruppe: Online ist eine Art zu spielen, kein eigenes Spiel
+    aktion: { text: 'Online mit der Klasse spielen', adresse: 'spielen/lobby/' },
+  },
 ]
 
 window.VERTRETUNG = [
@@ -62,11 +69,12 @@ window.VERTRETUNG = [
     marken: ['2 Personen', 'gegen Rechner', 'online'],
   },
   {
-    titel: 'Spielraum',
+    titel: 'Spielraum (online spielen)',
     text: 'Die Klasse spielt gegeneinander: Raum mit Code oder QR-Code anlegen, Spiele anbieten und einsteigen.',
     adresse: 'spielen/lobby/',
     gruppe: 'spiele',
     logo: 'spielraum',
     marken: ['ganze Klasse', 'online'],
+    liste: false,
   },
 ]

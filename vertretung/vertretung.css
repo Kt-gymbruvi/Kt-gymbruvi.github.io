@@ -29,3 +29,34 @@
     height: 2.75rem;
   }
 }
+
+/* Kopf einer Gruppe in der Liste: Titel links, Knopf der Gruppe rechts */
+.gruppenkopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+.gruppenkopf .liste-titel {
+  margin-bottom: 0.4rem;
+}
+.gruppenkopf.nur-knopf {
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+.gruppenkopf .gruppen-aktion {
+  margin: 0 0 0.4rem;
+  text-decoration: none;
+}
+.gruppenkopf.nur-knopf .gruppen-aktion {
+  margin-bottom: 0;
+}
+@media (max-width: 52rem) {
+  /* Am Handy ohne QR-Knopf, dafür der Knopf der Gruppe in voller Breite */
+  .gruppenkopf .gruppen-aktion {
+    flex: 1 1 100%;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+}

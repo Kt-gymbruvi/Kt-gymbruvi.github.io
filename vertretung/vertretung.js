@@ -5,7 +5,8 @@
   'use strict'
 
   const GRUPPEN = window.VERTRETUNG_GRUPPEN || []
-  const ANGEBOTE = window.VERTRETUNG || []
+  // In der Liste stehen nur Angebote ohne „liste: false“ (der Spielraum ist eine Spielart und steht als Knopf an der Gruppe)
+  const ANGEBOTE = (window.VERTRETUNG || []).filter((a) => a.liste !== false)
   const $ = (id) => document.getElementById(id)
   const sym = (n) => window.LehrraumSymbol && window.LehrraumSymbol(n)
 
@@ -98,7 +99,17 @@
     GRUPPEN.forEach((g) => {
       const imG = liste.filter((a) => a.gruppe === g.id)
       if (!imG.length) return
-      if (!art) box.append(el('h3', 'liste-titel', g.name))
+      // Kopf der Gruppe: Titel (bei „Alle“) und – falls vorhanden – der Knopf der Gruppe
+      if (!art || g.aktion) {
+        const kopf = el('div', 'gruppenkopf' + (art ? ' nur-knopf' : ''))
+        if (!art) kopf.append(el('h3', 'liste-titel', g.name))
+        if (g.aktion) {
+          const a = el('a', 'knopf zweit klein gruppen-aktion', g.aktion.text + ' ›')
+          a.href = '../' + g.aktion.adresse
+          kopf.append(a)
+        }
+        box.append(kopf)
+      }
       const ul = el('ul', 'liste-gruppe')
       imG.forEach((a) => ul.append(zeile(a)))
       box.append(ul)

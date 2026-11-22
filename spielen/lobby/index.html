@@ -105,6 +105,15 @@
         height: 1.2rem;
         accent-color: var(--akzent);
       }
+      .vorwahl {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem 1rem;
+        margin-bottom: 1rem;
+        font-weight: var(--gewicht-betont);
+      }
       .raum-grid {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 20rem;
@@ -165,6 +174,10 @@
       <!-- 3. Im Raum -->
       <div id="raum" class="raum-grid" hidden>
         <div>
+          <section class="werkzeug-karte vorwahl" id="vorwahl" hidden>
+            <p id="vorwahl-text" style="margin: 0"></p>
+            <button type="button" class="knopf zweit klein" id="vorwahl-weg">Anderes Spiel wählen</button>
+          </section>
           <section class="werkzeug-karte">
             <h2 style="margin-top: 0">Spiel anbieten</h2>
             <div class="anbieten" id="anbieten"></div>
@@ -222,6 +235,9 @@
         let raum = null
         let wartetAuf = null // { partie } – ich habe bei einem Angebot angefragt
         let gestartet = false
+        // Aus einem Spiel mit „Online“ gekommen: dieses Spiel ist vorgewählt (?spiel=schach)
+        let vorSpiel = R.SPIELE[params.get('spiel')] ? params.get('spiel') : null
+        const adresseMitSpiel = (c) => '?raum=' + c + (vorSpiel ? '&spiel=' + vorSpiel : '')
 
         const zeige = (welches) => {
           ;['start', 'name', 'raum'].forEach((id) => ($(id).hidden = id !== welches))
@@ -257,7 +273,7 @@
           } catch {
             /* egal */
           }
-          history.replaceState(null, '', '?raum=' + code)
+          history.replaceState(null, '', adresseMitSpiel(code))
           ansicht()
         })
         $('code-form').addEventListener('submit', (e) => {
@@ -269,7 +285,7 @@
             return
           }
           code = c
-          history.replaceState(null, '', '?raum=' + code)
+          history.replaceState(null, '', adresseMitSpiel(code))
           ansicht()
         })
         $('name-feld').value = R.meinName()
@@ -390,6 +406,9 @@
           // Spiel anbieten
           const an = $('anbieten')
           an.textContent = ''
+          // Vorwahl: Hinweis und das gewählte Spiel zuerst und kräftig
+          $('vorwahl').hidden = !vorSpiel || !erlaubt.includes(vorSpiel)
+          if (vorSpiel) $('vorwahl-text').textContent = 'Du möchtest online spielen: ' + R.SPIELE[vorSpiel] + '. Biete es an oder steige bei einem Angebot ein.'
           const meins = raum.ich.angebot
           if (meins) {
             const t = document.createElement('span')
@@ -401,10 +420,11 @@
             b.addEventListener('click', () => raum.setze({ angebot: null }))
             an.append(t, b)
           } else {
-            erlaubt.forEach((s) => {
+            const reihenfolge = vorSpiel && erlaubt.includes(vorSpiel) ? [vorSpiel, ...erlaubt.filter((x) => x !== vorSpiel)] : erlaubt
+            reihenfolge.forEach((s) => {
               const b = document.createElement('button')
               b.type = 'button'
-              b.className = 'knopf'
+              b.className = 'knopf' + (vorSpiel && s !== vorSpiel && erlaubt.includes(vorSpiel) ? ' zweit' : '')
               b.textContent = R.SPIELE[s]
               b.disabled = !!wartetAuf
               b.addEventListener('click', () => {
@@ -475,6 +495,11 @@
           }
         }
 
+        $('vorwahl-weg').addEventListener('click', () => {
+          vorSpiel = null
+          history.replaceState(null, '', adresseMitSpiel(code))
+          zeichnen()
+        })
         $('link-kopieren').addEventListener('click', async () => {
           try {
             await navigator.clipboard.writeText(adresse())
