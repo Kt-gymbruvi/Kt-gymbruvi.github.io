@@ -91,6 +91,12 @@
         pointer-events: none;
         transition: fill 0.15s;
       }
+      #brett.sechseck .zahl {
+        font-size: 19px;
+      }
+      #brett.sechseck .kante-flaeche {
+        stroke-width: 28px; /* die Kanten sind kürzer, am Handy sonst schwer zu treffen */
+      }
       .zahl.fertig {
         fill: var(--linie-stark);
       }
@@ -168,7 +174,12 @@
 
         <div class="seite">
           <section class="werkzeug-karte">
-            <h2>Schwierigkeit</h2>
+            <h2>Form</h2>
+            <div class="segmente voll" role="group" aria-label="Form">
+              <button type="button" data-form="quadrat" aria-pressed="true">Quadrate</button>
+              <button type="button" data-form="sechseck" aria-pressed="false">Sechsecke</button>
+            </div>
+            <h2 style="margin-top: 0.9rem">Schwierigkeit</h2>
             <div class="segmente voll" role="group" aria-label="Schwierigkeit">
               <button type="button" data-stufe="leicht" aria-pressed="true">Leicht</button>
               <button type="button" data-stufe="mittel" aria-pressed="false">Mittel</button>
@@ -211,18 +222,27 @@
       ;(function () {
         'use strict'
         const SVG = 'http://www.w3.org/2000/svg'
-        const FELD = 44 // Seitenlänge eines Feldes in der Zeichnung
+        const MASS = { quadrat: 44, sechseck: 32 } // Kantenlänge in der Zeichnung
         const RAND = 18
         const STUFEN = {
-          leicht: { B: 5, H: 5, behalten: 0.7, text: '5 × 5 Felder, viele Zahlen' },
-          mittel: { B: 7, H: 7, behalten: 0.5, text: '7 × 7 Felder' },
-          schwer: { B: 10, H: 10, behalten: 0, text: '10 × 10 Felder, so wenige Zahlen wie möglich' },
+          quadrat: {
+            leicht: { B: 5, H: 5, behalten: 0.7, text: '5 × 5 Quadrate, viele Zahlen' },
+            mittel: { B: 7, H: 7, behalten: 0.5, text: '7 × 7 Quadrate' },
+            schwer: { B: 10, H: 10, behalten: 0, text: '10 × 10 Quadrate, so wenige Zahlen wie möglich' },
+          },
+          sechseck: {
+            leicht: { B: 4, H: 4, behalten: 0.7, text: '4 × 4 Sechsecke, viele Zahlen' },
+            mittel: { B: 6, H: 6, behalten: 0.5, text: '6 × 6 Sechsecke' },
+            schwer: { B: 8, H: 8, behalten: 0, text: '8 × 8 Sechsecke, so wenige Zahlen wie möglich' },
+          },
         }
         const $ = (id) => document.getElementById(id)
         const brett = $('brett')
         const meldung = $('meldung')
 
         let stufe = 'leicht'
+        let form = 'quadrat'
+        let ursprung = [0, 0] // kleinste Koordinate des Gitters (für die Zeichnung)
         let raetsel = null
         let g = null
         let zustand = [] // je Kante: 0 leer, 1 Linie, 2 Kreuz
@@ -241,43 +261,40 @@
           return e
         }
 
-        function kantenGeometrie(k) {
-          const { B, nw } = g
-          if (k < nw) {
-            const z = Math.floor(k / B)
-            const s = k % B
-            return [RAND + s * FELD, RAND + z * FELD, RAND + (s + 1) * FELD, RAND + z * FELD]
-          }
-          const r = k - nw
-          const z = Math.floor(r / (B + 1))
-          const s = r % (B + 1)
-          return [RAND + s * FELD, RAND + z * FELD, RAND + s * FELD, RAND + (z + 1) * FELD]
-        }
+        const maß = () => MASS[g.form]
+        const px = (p) => [RAND + (p[0] - ursprung[0]) * maß(), RAND + (p[1] - ursprung[1]) * maß()]
 
         function zeichnen() {
-          const { B, H } = raetsel
           brett.replaceChildren()
-          brett.setAttribute('viewBox', `0 0 ${B * FELD + 2 * RAND} ${H * FELD + 2 * RAND}`)
+          brett.classList.toggle('sechseck', g.form === 'sechseck')
+          const xs = g.punkte.map((p) => p[0])
+          const ys = g.punkte.map((p) => p[1])
+          ursprung = [Math.min(...xs), Math.min(...ys)]
+          const breite = (Math.max(...xs) - ursprung[0]) * maß() + 2 * RAND
+          const hoehe = (Math.max(...ys) - ursprung[1]) * maß() + 2 * RAND
+          brett.setAttribute('viewBox', `0 0 ${breite} ${hoehe}`)
           elemente.kanten = []
           elemente.zahlen = []
-          for (let f = 0; f < B * H; f++) {
-            const z = Math.floor(f / B)
-            const s = f % B
-            const t = el('text', { x: RAND + s * FELD + FELD / 2, y: RAND + z * FELD + FELD / 2 + 1, class: 'zahl' })
+          for (let f = 0; f < g.felder; f++) {
+            const [x, y] = px(g.feldMitte[f])
+            const t = el('text', { x, y: y + 1, class: 'zahl' })
             t.textContent = raetsel.hinweise[f] >= 0 ? raetsel.hinweise[f] : ''
             brett.append(t)
             elemente.zahlen.push(t)
           }
           for (let k = 0; k < g.nk; k++) {
-            const [x1, y1, x2, y2] = kantenGeometrie(k)
+            const [x1, y1] = px(g.punkte[g.kantenEcken[k][0]])
+            const [x2, y2] = px(g.punkte[g.kantenEcken[k][1]])
             const gruppe = el('g', { class: 'kante' })
             gruppe.append(el('line', { x1, y1, x2, y2, class: 'kante-sicht' }))
             const mx = (x1 + x2) / 2
             const my = (y1 + y2) / 2
             gruppe.append(el('path', { d: `M${mx - 4} ${my - 4}l8 8m0 -8l-8 8`, class: 'kreuz', fill: 'none' }))
             // Trefferfläche: die Kante etwas verkürzt, damit sich Nachbarn an den Ecken nicht überdecken
-            const dx = Math.sign(x2 - x1) * 9
-            const dy = Math.sign(y2 - y1) * 9
+            const laenge = Math.hypot(x2 - x1, y2 - y1)
+            const kuerzen = Math.min(9, laenge * 0.22)
+            const dx = ((x2 - x1) / laenge) * kuerzen
+            const dy = ((y2 - y1) / laenge) * kuerzen
             const flaeche = el('line', { x1: x1 + dx, y1: y1 + dy, x2: x2 - dx, y2: y2 - dy, class: 'kante-flaeche' })
             flaeche.addEventListener('click', () => umschalten(k))
             flaeche.addEventListener('contextmenu', (e) => {
@@ -288,10 +305,9 @@
             brett.append(gruppe)
             elemente.kanten.push(gruppe)
           }
-          for (let z = 0; z <= H; z++) {
-            for (let s = 0; s <= B; s++) {
-              brett.append(el('circle', { cx: RAND + s * FELD, cy: RAND + z * FELD, r: 3.2, class: 'punkt' }))
-            }
+          for (const p of g.punkte) {
+            const [cx, cy] = px(p)
+            brett.append(el('circle', { cx, cy, r: 3.2, class: 'punkt' }))
           }
           aktualisieren()
         }
@@ -305,7 +321,6 @@
         }
 
         function aktualisieren() {
-          const { B, H } = raetsel
           for (let k = 0; k < g.nk; k++) {
             const e = elemente.kanten[k]
             const z = zeigeLoesung ? (raetsel.loesung[k] ? 1 : 0) : zustand[k]
@@ -314,7 +329,7 @@
             e.classList.toggle('aus', z === 2)
             e.classList.toggle('fehl', fehlerKanten.has(k))
           }
-          for (let f = 0; f < B * H; f++) {
+          for (let f = 0; f < g.felder; f++) {
             const n = raetsel.hinweise[f]
             const t = elemente.zahlen[f]
             if (n < 0) continue
@@ -357,12 +372,12 @@
         }
 
         function neu() {
-          const s = STUFEN[stufe]
+          const s = STUFEN[form][stufe]
           setzeMeldung('Rätsel wird erzeugt …')
           setTimeout(() => {
             raetsel = null
-            for (let i = 0; i < 5 && !raetsel; i++) raetsel = window.Slitherlink.erzeugen(s.B, s.H, s.behalten)
-            g = window.Slitherlink.gitter(s.B, s.H)
+            for (let i = 0; i < 5 && !raetsel; i++) raetsel = window.Slitherlink.erzeugen(s.B, s.H, s.behalten, undefined, form)
+            g = form === 'sechseck' ? window.Slitherlink.sechseckGitter(s.B, s.H) : window.Slitherlink.gitter(s.B, s.H)
             $('loesung').textContent = 'Lösung'
             zustand = new Array(g.nk).fill(0)
             verlauf = []
@@ -428,12 +443,21 @@
           b.addEventListener('click', () => {
             stufe = b.dataset.stufe
             document.querySelectorAll('[data-stufe]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
-            $('stufen-text').textContent = STUFEN[stufe].text
+            $('stufen-text').textContent = STUFEN[form][stufe].text
             $('loesung').textContent = 'Lösung'
             neu()
           })
         })
-        $('stufen-text').textContent = STUFEN[stufe].text
+        document.querySelectorAll('[data-form]').forEach((b) => {
+          b.addEventListener('click', () => {
+            form = b.dataset.form
+            document.querySelectorAll('[data-form]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+            $('stufen-text').textContent = STUFEN[form][stufe].text
+            $('loesung').textContent = 'Lösung'
+            neu()
+          })
+        })
+        $('stufen-text').textContent = STUFEN[form][stufe].text
         neu()
       })()
     </script>
