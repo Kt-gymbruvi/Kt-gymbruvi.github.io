@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spiele</title>
+    <meta name="description" content="Brettspiele für zwei: Vier gewinnt, Mühle, Schach" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <script src="../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../werkzeuge/werkzeug.css" />
+    <style>
+      body {
+        min-height: 100dvh;
+      }
+      .einleitung {
+        max-width: 42rem;
+        margin: 0 0 1.5rem;
+        color: var(--text-2);
+      }
+      h2.gruppe {
+        margin: 1.75rem 0 0.75rem;
+        font-size: 1.1rem;
+      }
+      .angebote {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        gap: 0.75rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .angebot {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        height: 100%;
+        padding: 1rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche);
+        box-shadow: var(--schatten-klein);
+        color: var(--text);
+        text-decoration: none;
+        transition: box-shadow var(--sanft), transform var(--sanft);
+      }
+      @media (hover: hover) {
+        .angebot:hover {
+          box-shadow: var(--schatten);
+          transform: translateY(-2px);
+        }
+      }
+      .angebot:active {
+        transform: scale(0.98);
+      }
+      .angebot-symbol {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        margin-bottom: 0.4rem;
+        border-radius: 0.7rem;
+        background: var(--unterrichten-hell);
+        color: var(--unterrichten);
+      }
+      .angebot-symbol .symbol {
+        width: 1.35rem;
+        height: 1.35rem;
+      }
+      .angebot-titel {
+        font-size: 1.0625rem;
+        font-weight: var(--gewicht-betont);
+      }
+      .angebot-text {
+        color: var(--text-2);
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../vertretung/">Vertretung</a>
+      <h1>Spiele</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <p class="einleitung">
+        Brettspiele für zwei: am selben Gerät, gegen den Rechner (drei Stufen) – und bald auch gegeneinander an zwei Handys. Alles läuft im Browser, nichts wird gespeichert.
+      </p>
+      <ul class="angebote">
+        <li>
+          <a class="angebot" href="vier-gewinnt/">
+            <span class="angebot-symbol" data-symbol="raetsel"></span>
+            <span class="angebot-titel">Vier gewinnt</span>
+            <span class="angebot-text">Vier Steine in einer Reihe: waagerecht, senkrecht oder schräg.</span>
+          </a>
+        </li>
+        <li>
+          <a class="angebot" href="muehle/">
+            <span class="angebot-symbol" data-symbol="raetsel"></span>
+            <span class="angebot-titel">Mühle</span>
+            <span class="angebot-text">Setzen, ziehen, springen – Mühlen bilden und Steine nehmen.</span>
+          </a>
+        </li>
+        <li>
+          <a class="angebot" href="schach/">
+            <span class="angebot-symbol" data-symbol="raetsel"></span>
+            <span class="angebot-titel">Schach</span>
+            <span class="angebot-text">Mit allen Regeln: Rochade, en passant, Umwandlung, Matt und Patt.</span>
+          </a>
+        </li>
+      </ul>
+    </main>
+
+    <script src="../gemeinsam/symbole.js"></script>
+    <script src="../werkzeuge/werkzeug.js"></script>
+    <script>
+      document.querySelectorAll('[data-symbol]').forEach((e) => {
+        const s = window.LehrraumSymbol && window.LehrraumSymbol(e.dataset.symbol)
+        if (s) e.append(s)
+      })
+    </script>
+  </body>
+</html>

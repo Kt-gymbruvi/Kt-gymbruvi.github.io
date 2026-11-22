@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vier gewinnt</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <style>
+      #brett {
+        width: 100%;
+        max-width: min(40rem, calc(100dvh - 10rem));
+        height: auto;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .rahmen {
+        fill: var(--unterrichten);
+      }
+      .loch {
+        fill: var(--flaeche);
+      }
+      .stein.s1 {
+        fill: var(--signal-rot);
+      }
+      .stein.s2 {
+        fill: var(--signal-gelb);
+      }
+      .stein {
+        stroke: rgb(0 0 0 / 0.25);
+        stroke-width: 2px;
+      }
+      .stein.neu {
+        animation: fallen 0.35s cubic-bezier(0.5, 0, 0.9, 0.5);
+      }
+      @keyframes fallen {
+        from {
+          transform: translateY(var(--hoehe, -300px));
+        }
+      }
+      .stein.sieg {
+        stroke: var(--text);
+        stroke-width: 5px;
+      }
+      .spalte-treffer {
+        fill: transparent;
+        cursor: pointer;
+      }
+      @media (hover: hover) {
+        .spalte-treffer:hover {
+          fill: rgb(255 255 255 / 0.12);
+        }
+      }
+      .punkt1,
+      .punkt2 {
+        display: inline-block;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        border: 1px solid rgb(0 0 0 / 0.25);
+      }
+      .punkt1 {
+        background: var(--signal-rot);
+      }
+      .punkt2 {
+        background: var(--signal-gelb);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Spiele</a>
+      <h1>Vier gewinnt</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spiel">
+        <div class="brett-flaeche"><svg id="brett" role="img" aria-label="Spielfeld Vier gewinnt"></svg></div>
+        <div class="seite">
+          <div id="steuerung"></div>
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Abwechselnd wirft jeder einen Stein in eine Spalte. Er fällt ganz nach unten.</li>
+              <li>Wer zuerst vier Steine in einer Reihe hat – waagerecht, senkrecht oder schräg – gewinnt.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../steuerung.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const SVG = 'http://www.w3.org/2000/svg'
+        const G = 60
+        const { B, H } = window.VierGewinnt
+        const brett = document.getElementById('brett')
+        const FARBEN = ['Rot', 'Gelb']
+        let s = null
+        let verlauf = []
+        let gesperrt = false // Rechner denkt
+        let lauf = 0
+
+        const steuerung = window.Spielsteuerung(document.getElementById('steuerung'), {
+          farben: FARBEN,
+          neu,
+          zurueck() {
+            if (gesperrt || verlauf.length < 1) return
+            // gegen den Rechner: eigenen letzten Zug zurücknehmen (also bis wieder der Mensch dran ist)
+            do {
+              s = verlauf.pop()
+            } while (steuerung.modus === 'rechner' && verlauf.length && s.amZug !== steuerung.ich)
+            zeichnen(false)
+            rechnerDran()
+          },
+        })
+
+        function el(name, a) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(a || {}).forEach((k) => e.setAttribute(k, a[k]))
+          return e
+        }
+
+        function mensch() {
+          return steuerung.modus === 'lokal' || s.amZug === steuerung.ich
+        }
+
+        function zeichnen(animiere) {
+          brett.replaceChildren()
+          brett.setAttribute('viewBox', `0 0 ${B * G} ${H * G + 8}`)
+          const steine = el('g')
+          const sieg = new Set(s.ende ? s.ende.linie : [])
+          for (let f = 0; f < B * H; f++) {
+            const z = Math.floor(f / B)
+            const c = f % B
+            if (!s.brett[f]) continue
+            const k = el('circle', { cx: c * G + G / 2, cy: z * G + G / 2 + 4, r: G / 2 - 6, class: 'stein s' + s.brett[f] })
+            if (animiere && s.letzter === f) {
+              k.classList.add('neu')
+              k.style.setProperty('--hoehe', -(z * G + G) + 'px')
+            }
+            if (sieg.has(f)) k.classList.add('sieg')
+            steine.append(k)
+          }
+          brett.append(steine)
+          // Rahmen mit Löchern (Maske), liegt über den Steinen
+          const maske = el('mask', { id: 'loecher' })
+          maske.append(el('rect', { x: 0, y: 0, width: B * G, height: H * G + 8, fill: 'white' }))
+          for (let f = 0; f < B * H; f++) {
+            maske.append(el('circle', { cx: (f % B) * G + G / 2, cy: Math.floor(f / B) * G + G / 2 + 4, r: G / 2 - 6, fill: 'black' }))
+          }
+          brett.append(maske)
+          brett.append(el('rect', { x: 0, y: 0, width: B * G, height: H * G + 8, rx: 10, class: 'rahmen', mask: 'url(#loecher)' }))
+          for (let c = 0; c < B; c++) {
+            const t = el('rect', { x: c * G, y: 0, width: G, height: H * G + 8, class: 'spalte-treffer' })
+            t.addEventListener('click', () => zug(c))
+            brett.append(t)
+          }
+          statusText()
+        }
+
+        function statusText() {
+          if (s.ende) {
+            if (!s.ende.sieger) return steuerung.status('Unentschieden!', '')
+            const text = steuerung.modus === 'rechner' ? (s.ende.sieger === steuerung.ich ? 'Du hast gewonnen!' : 'Der Rechner hat gewonnen.') : FARBEN[s.ende.sieger - 1] + ' gewinnt!'
+            return steuerung.status(text, steuerung.modus === 'rechner' && s.ende.sieger !== steuerung.ich ? 'schlecht' : 'gut')
+          }
+          const text = steuerung.modus === 'rechner' ? (mensch() ? 'Du bist dran.' : 'Der Rechner denkt …') : FARBEN[s.amZug - 1] + ' ist am Zug.'
+          steuerung.status(text)
+        }
+
+        function zug(c) {
+          if (gesperrt || s.ende || !mensch()) return
+          const n = window.VierGewinnt.ziehe(s, c)
+          if (!n) return
+          verlauf.push(s)
+          s = n
+          zeichnen(true)
+          rechnerDran()
+        }
+
+        function rechnerDran() {
+          if (steuerung.modus !== 'rechner' || s.ende || mensch()) return
+          gesperrt = true
+          const meinLauf = lauf
+          setTimeout(() => {
+            if (meinLauf !== lauf) return
+            const c = window.VierGewinnt.rechnerZug(s, steuerung.stufe)
+            verlauf.push(s)
+            s = window.VierGewinnt.ziehe(s, c)
+            gesperrt = false
+            zeichnen(true)
+          }, 450)
+        }
+
+        function neu() {
+          lauf++
+          gesperrt = false
+          s = window.VierGewinnt.neu()
+          verlauf = []
+          zeichnen(false)
+          rechnerDran()
+        }
+        neu()
+      })()
+    </script>
+  </body>
+</html>

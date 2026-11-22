@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Schach</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <style>
+      #brett {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+        width: 100%;
+        max-width: min(40rem, calc(100dvh - 10rem));
+        aspect-ratio: 1;
+        border: 2px solid var(--linie-stark);
+        border-radius: 6px;
+        overflow: hidden;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .sq {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Apple Symbols', 'DejaVu Sans', sans-serif;
+        font-size: clamp(1.4rem, 8vw, 3.4rem);
+        line-height: 1;
+        cursor: pointer;
+        container-type: inline-size;
+      }
+      .sq.hell {
+        background: color-mix(in srgb, var(--tafel) 10%, var(--flaeche));
+      }
+      .sq.dunkel {
+        background: color-mix(in srgb, var(--tafel) 48%, var(--flaeche));
+      }
+      .sq .figur {
+        font-size: 78cqw;
+        line-height: 1;
+        pointer-events: none;
+      }
+      .sq .figur.w {
+        color: #fff;
+        text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 3px #000, 0 1px 3px rgb(0 0 0 / 0.6);
+      }
+      .sq .figur.b {
+        color: #1b1b1b;
+        text-shadow: 0 0 2px rgb(255 255 255 / 0.55);
+      }
+      .sq.gewaehlt {
+        outline: 4px solid var(--lernen);
+        outline-offset: -4px;
+      }
+      .sq.letzter::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--lernen);
+        opacity: 0.3;
+      }
+      .sq.schach {
+        background: radial-gradient(circle, var(--fehler) 0%, var(--fehler) 30%, transparent 75%), var(--flaeche);
+      }
+      .sq .ziel {
+        position: absolute;
+        width: 30%;
+        height: 30%;
+        border-radius: 50%;
+        background: var(--lernen);
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .sq .ziel.schlag {
+        width: 90%;
+        height: 90%;
+        background: transparent;
+        border: 4px solid var(--lernen);
+      }
+      .sq .koordinate {
+        position: absolute;
+        font-family: var(--schrift);
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--text-2);
+        pointer-events: none;
+      }
+      .sq .koordinate.zeile {
+        top: 2px;
+        left: 3px;
+      }
+      .sq .koordinate.spalte {
+        right: 3px;
+        bottom: 1px;
+      }
+      dialog {
+        padding: 1.25rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche);
+        color: var(--text);
+        box-shadow: var(--schatten-hoch);
+      }
+      dialog::backdrop {
+        background: var(--abdunkeln);
+      }
+      dialog h2 {
+        margin: 0 0 0.75rem;
+        font-size: 1.1rem;
+      }
+      .umwandlung {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .umwandlung button {
+        width: 4rem;
+        height: 4rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Apple Symbols', 'DejaVu Sans', sans-serif;
+        font-size: 2.4rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Spiele</a>
+      <h1>Schach</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spiel">
+        <div class="brett-flaeche"><div id="brett" role="grid" aria-label="Schachbrett"></div></div>
+        <div class="seite">
+          <div id="steuerung"></div>
+          <section class="werkzeug-karte">
+            <h2>Brett</h2>
+            <div class="knopf-reihe">
+              <button id="drehen" type="button" class="knopf zweit">Brett drehen</button>
+            </div>
+            <p id="hinweis" class="hinweis" style="margin: 0.75rem 0 0"></p>
+          </section>
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Tippe eine Figur an, dann ein markiertes Feld. Punkte zeigen erlaubte Züge, Ringe zeigen, was geschlagen werden kann.</li>
+              <li>Alle Regeln gelten: Rochade, „en passant“, Umwandlung, Schach, Matt und Patt.</li>
+              <li>Remis gibt es bei Patt, dreimaliger Wiederholung, 50 Zügen ohne Schlag oder zu wenig Material.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <dialog id="umwandlung" aria-labelledby="umw-titel">
+      <h2 id="umw-titel">Der Bauer wird …</h2>
+      <div class="umwandlung" id="umw-knoepfe"></div>
+    </dialog>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../steuerung.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const S = window.Schach
+        const GLYPH = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟︎' }
+        const brett = document.getElementById('brett')
+        const FARBEN = ['Weiß', 'Schwarz']
+        const GRUND = { schachmatt: 'Schachmatt', patt: 'Patt – Unentschieden', wiederholung: 'Dreimal dieselbe Stellung – Unentschieden', '50-zuege': '50 Züge ohne Schlag – Unentschieden', material: 'Zu wenig Material – Unentschieden' }
+        let s = null
+        let verlauf = []
+        let sel = -1
+        let unten = 'w'
+        let gedreht = false
+        let gesperrt = false
+        let lauf = 0
+
+        const steuerung = window.Spielsteuerung(document.getElementById('steuerung'), {
+          farben: FARBEN,
+          neu,
+          zurueck() {
+            if (gesperrt || !verlauf.length) return
+            do {
+              s = verlauf.pop()
+            } while (steuerung.modus === 'rechner' && verlauf.length && seite(s.amZug) !== steuerung.ich)
+            sel = -1
+            zeichnen()
+            rechnerDran()
+          },
+        })
+        // Spieler 1 = Weiß, Spieler 2 = Schwarz
+        const seite = (f) => (f === 'w' ? 1 : 2)
+        const mensch = () => steuerung.modus === 'lokal' || seite(s.amZug) === steuerung.ich
+
+        function ausrichtung() {
+          if (steuerung.modus === 'rechner') return steuerung.ich === 1 ? 'w' : 'b'
+          return gedreht ? 'b' : 'w'
+        }
+
+        function zeichnen() {
+          unten = ausrichtung()
+          brett.textContent = ''
+          const l = s.ende ? [] : S.zuege(s)
+          const ziele = new Map()
+          if (sel >= 0) l.filter((z) => z.von === sel).forEach((z) => ziele.set(z.nach, s.b[z.nach] || (z.nach === s.ep && s.b[sel].toUpperCase() === 'P') ? 'schlag' : 'zug'))
+          const koenig = s.imSchach ? s.b.indexOf(s.amZug === 'w' ? 'K' : 'k') : -1
+          for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+              const i = unten === 'w' ? r * 8 + c : (7 - r) * 8 + (7 - c)
+              const b = document.createElement('button')
+              b.type = 'button'
+              b.className = 'sq ' + (((i >> 3) + (i & 7)) % 2 === 0 ? 'hell' : 'dunkel')
+              const p = s.b[i]
+              b.setAttribute('aria-label', S.feldName(i) + (p ? ' ' + p : ''))
+              if (i === sel) b.classList.add('gewaehlt')
+              if (s.letzter && (s.letzter.von === i || s.letzter.nach === i)) b.classList.add('letzter')
+              if (i === koenig) b.classList.add('schach')
+              if (c === 0) {
+                const k = document.createElement('span')
+                k.className = 'koordinate zeile'
+                k.textContent = String(8 - (i >> 3))
+                b.append(k)
+              }
+              if (r === 7) {
+                const k = document.createElement('span')
+                k.className = 'koordinate spalte'
+                k.textContent = 'abcdefgh'[i & 7]
+                b.append(k)
+              }
+              if (p) {
+                const f = document.createElement('span')
+                f.className = 'figur ' + S.farbe(p)
+                f.textContent = GLYPH[p.toUpperCase()]
+                b.append(f)
+              }
+              if (ziele.has(i)) {
+                const z = document.createElement('span')
+                z.className = 'ziel' + (ziele.get(i) === 'schlag' ? ' schlag' : '')
+                b.append(z)
+              }
+              b.addEventListener('click', () => klick(i))
+              brett.append(b)
+            }
+          }
+          status()
+        }
+
+        function status() {
+          if (s.ende) {
+            const g = GRUND[s.ende.grund]
+            if (!s.ende.sieger) return steuerung.status(g)
+            const w = s.ende.sieger
+            const text = steuerung.modus === 'rechner' ? (seite(w) === steuerung.ich ? 'Schachmatt – du hast gewonnen!' : 'Schachmatt – der Rechner gewinnt.') : 'Schachmatt – ' + FARBEN[seite(w) - 1] + ' gewinnt!'
+            return steuerung.status(text, steuerung.modus === 'rechner' && seite(w) !== steuerung.ich ? 'schlecht' : 'gut')
+          }
+          const zusatz = s.imSchach ? ' Schach!' : ''
+          if (steuerung.modus === 'rechner') return steuerung.status((mensch() ? 'Du bist dran.' : 'Der Rechner denkt …') + zusatz)
+          steuerung.status(FARBEN[seite(s.amZug) - 1] + ' ist am Zug.' + zusatz)
+        }
+
+        function ausfuehren(z) {
+          const n = S.ziehe(s, z)
+          if (!n) return
+          verlauf.push(s)
+          s = n
+          sel = -1
+          zeichnen()
+          rechnerDran()
+        }
+
+        function klick(i) {
+          if (gesperrt || s.ende || !mensch()) return
+          const l = S.zuege(s)
+          if (sel >= 0) {
+            const passend = l.filter((z) => z.von === sel && z.nach === i)
+            if (passend.length === 1) return ausfuehren(passend[0])
+            if (passend.length > 1) return umwandeln(passend)
+          }
+          if (s.b[i] && S.farbe(s.b[i]) === s.amZug && l.some((z) => z.von === i)) sel = sel === i ? -1 : i
+          else sel = -1
+          zeichnen()
+        }
+
+        function umwandeln(zuege) {
+          const d = document.getElementById('umwandlung')
+          const k = document.getElementById('umw-knoepfe')
+          k.textContent = ''
+          for (const q of ['Q', 'R', 'B', 'N']) {
+            const b = document.createElement('button')
+            b.type = 'button'
+            b.textContent = GLYPH[q]
+            b.setAttribute('aria-label', { Q: 'Dame', R: 'Turm', B: 'Läufer', N: 'Springer' }[q])
+            b.addEventListener('click', () => {
+              d.close()
+              ausfuehren(zuege.find((z) => z.promo === q))
+            })
+            k.append(b)
+          }
+          d.showModal()
+        }
+
+        function rechnerDran() {
+          if (steuerung.modus !== 'rechner' || s.ende || mensch()) return
+          gesperrt = true
+          const meinLauf = lauf
+          setTimeout(() => {
+            if (meinLauf !== lauf) return
+            const z = S.rechnerZug(s, steuerung.stufe)
+            verlauf.push(s)
+            s = S.ziehe(s, z)
+            gesperrt = false
+            zeichnen()
+          }, 350)
+        }
+
+        document.getElementById('drehen').addEventListener('click', () => {
+          gedreht = !gedreht
+          zeichnen()
+        })
+
+        function neu() {
+          lauf++
+          gesperrt = false
+          s = S.neu()
+          verlauf = []
+          sel = -1
+          zeichnen()
+          document.getElementById('hinweis').textContent = steuerung.modus === 'rechner' ? 'Das Brett steht so, dass deine Figuren unten sind.' : 'Mit „Brett drehen“ siehst du es aus Sicht von Schwarz.'
+          rechnerDran()
+        }
+        neu()
+      })()
+    </script>
+  </body>
+</html>

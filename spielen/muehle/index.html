@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mühle</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <style>
+      #brett {
+        width: 100%;
+        max-width: min(40rem, calc(100dvh - 10rem));
+        height: auto;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .linie {
+        stroke: var(--linie-stark);
+        stroke-width: 3px;
+        fill: none;
+        stroke-linecap: round;
+      }
+      .ort {
+        fill: var(--linie-stark);
+      }
+      .stein {
+        stroke: var(--text);
+        stroke-width: 3px;
+      }
+      .stein.s1 {
+        fill: var(--text);
+      }
+      .stein.s2 {
+        fill: var(--flaeche);
+      }
+      .stein.vorschau {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+      .stein.gewaehlt {
+        stroke: var(--lernen);
+        stroke-width: 6px;
+      }
+      .stein.nimm {
+        stroke: var(--fehler);
+        stroke-width: 6px;
+        animation: puls 0.9s ease-in-out infinite alternate;
+      }
+      @keyframes puls {
+        to {
+          opacity: 0.55;
+        }
+      }
+      .ziel {
+        fill: var(--lernen);
+        opacity: 0.55;
+      }
+      .letzter {
+        fill: none;
+        stroke: var(--lernen);
+        stroke-width: 3px;
+        stroke-dasharray: 5 4;
+      }
+      .treffer {
+        fill: transparent;
+        cursor: pointer;
+      }
+      .vorrat {
+        display: flex;
+        gap: 0.15rem;
+        flex-wrap: wrap;
+      }
+      .vorrat i {
+        width: 0.9rem;
+        height: 0.9rem;
+        border-radius: 50%;
+        border: 2px solid var(--text);
+      }
+      .vorrat.v1 i {
+        background: var(--text);
+      }
+      .vorrat.v2 i {
+        background: var(--flaeche);
+      }
+      .spielerzeile {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+        padding: 0.5rem 0.7rem;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        font-size: 0.9rem;
+      }
+      .spielerzeile.dran {
+        outline: 2px solid var(--lernen);
+      }
+      .spielerzeile + .spielerzeile {
+        margin-top: 0.4rem;
+      }
+      .spielerzeile b {
+        font-weight: var(--gewicht-betont);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Spiele</a>
+      <h1>Mühle</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spiel">
+        <div class="brett-flaeche"><svg id="brett" viewBox="0 0 360 360" role="img" aria-label="Spielfeld Mühle"></svg></div>
+        <div class="seite">
+          <div id="steuerung"></div>
+          <section class="werkzeug-karte">
+            <h2>Spielstand</h2>
+            <div id="spieler"></div>
+          </section>
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li><b>Setzen:</b> Jeder setzt abwechselnd seine neun Steine auf Punkte.</li>
+              <li><b>Ziehen:</b> Danach schiebt man einen Stein auf einen freien, benachbarten Punkt.</li>
+              <li>Drei Steine in einer Linie sind eine <b>Mühle</b>: Dann nimmst du einen Stein des Gegners weg (nicht aus einer Mühle, wenn es anders geht).</li>
+              <li>Wer nur noch drei Steine hat, darf <b>springen</b>. Wer nur noch zwei hat oder nicht ziehen kann, verliert.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../steuerung.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const SVG = 'http://www.w3.org/2000/svg'
+        const M = window.Muehle
+        const RASTER = 50
+        const RAND = 30
+        const FARBEN = ['Dunkel', 'Hell']
+        const brett = document.getElementById('brett')
+        let s = null
+        let verlauf = []
+        let gewaehlt = -1 // gewählter eigener Stein (Ziehen)
+        let wartetAufNimm = null // { von, nach, optionen: [Punkte] }
+        let gesperrt = false
+        let lauf = 0
+
+        const steuerung = window.Spielsteuerung(document.getElementById('steuerung'), {
+          farben: FARBEN,
+          neu,
+          zurueck() {
+            if (gesperrt || !verlauf.length) return
+            do {
+              s = verlauf.pop()
+            } while (steuerung.modus === 'rechner' && verlauf.length && s.amZug !== steuerung.ich)
+            gewaehlt = -1
+            wartetAufNimm = null
+            zeichnen()
+            rechnerDran()
+          },
+        })
+
+        const el = (name, a) => {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(a || {}).forEach((k) => e.setAttribute(k, a[k]))
+          return e
+        }
+        const ort = (i) => ({ x: RAND + M.ORT[i][0] * RASTER, y: RAND + M.ORT[i][1] * RASTER })
+        const mensch = () => steuerung.modus === 'lokal' || s.amZug === steuerung.ich
+
+        function zielPunkte() {
+          if (wartetAufNimm) return []
+          const l = M.zuege(s)
+          if (s.vorrat[s.amZug] > 0) return l.filter((z) => z.von < 0).map((z) => z.nach)
+          if (gewaehlt >= 0) return l.filter((z) => z.von === gewaehlt).map((z) => z.nach)
+          return []
+        }
+
+        function zeichnen() {
+          brett.replaceChildren()
+          // Linien
+          for (let r = 0; r < 3; r++) {
+            const a = RAND + r * RASTER
+            const b = RAND + (6 - r) * RASTER
+            brett.append(el('rect', { x: a, y: a, width: b - a, height: b - a, class: 'linie' }))
+          }
+          for (const [x1, y1, x2, y2] of [[3, 0, 3, 2], [3, 4, 3, 6], [0, 3, 2, 3], [4, 3, 6, 3]]) {
+            brett.append(el('line', { x1: RAND + x1 * RASTER, y1: RAND + y1 * RASTER, x2: RAND + x2 * RASTER, y2: RAND + y2 * RASTER, class: 'linie' }))
+          }
+          const ziele = new Set(s.ende ? [] : zielPunkte())
+          const nimm = new Set(wartetAufNimm ? wartetAufNimm.optionen : [])
+          for (let i = 0; i < 24; i++) {
+            const { x, y } = ort(i)
+            brett.append(el('circle', { cx: x, cy: y, r: 5, class: 'ort' }))
+            if (ziele.has(i)) brett.append(el('circle', { cx: x, cy: y, r: 11, class: 'ziel' }))
+            if (s.p[i]) {
+              const k = el('circle', { cx: x, cy: y, r: 16, class: 'stein s' + s.p[i] })
+              if (i === gewaehlt) k.classList.add('gewaehlt')
+              if (nimm.has(i)) k.classList.add('nimm')
+              brett.append(k)
+            }
+          }
+          if (wartetAufNimm) {
+            const v = ort(wartetAufNimm.nach)
+            const k = el('circle', { cx: v.x, cy: v.y, r: 16, class: 'stein vorschau s' + s.amZug })
+            brett.append(k)
+          }
+          if (s.letzter) {
+            const l = s.letzter
+            const p = ort(l.nach)
+            brett.append(el('circle', { cx: p.x, cy: p.y, r: 21, class: 'letzter' }))
+          }
+          for (let i = 0; i < 24; i++) {
+            const { x, y } = ort(i)
+            const t = el('circle', { cx: x, cy: y, r: 22, class: 'treffer' })
+            t.addEventListener('click', () => klick(i))
+            brett.append(t)
+          }
+          anzeige()
+        }
+
+        function anzeige() {
+          const z = document.getElementById('spieler')
+          z.textContent = ''
+          for (const w of [1, 2]) {
+            const d = document.createElement('div')
+            d.className = 'spielerzeile' + (!s.ende && s.amZug === w ? ' dran' : '')
+            const kopf = document.createElement('b')
+            const ichText = steuerung.modus === 'rechner' ? (w === steuerung.ich ? ' (du)' : ' (Rechner)') : ''
+            kopf.textContent = FARBEN[w - 1] + ichText
+            const info = document.createElement('span')
+            const aufBrett = s.brett[w]
+            const phase = s.vorrat[w] > 0 ? 'setzt' : aufBrett === 3 ? 'springt' : 'zieht'
+            info.textContent = `${aufBrett} auf dem Brett · ${s.vorrat[w]} zu setzen · ${phase}`
+            const v = document.createElement('div')
+            v.className = 'vorrat v' + w
+            for (let i = 0; i < s.vorrat[w]; i++) v.append(document.createElement('i'))
+            d.append(kopf, info, v)
+            z.append(d)
+          }
+          if (s.ende) {
+            if (!s.ende.sieger) return steuerung.status('Unentschieden!')
+            const text = steuerung.modus === 'rechner' ? (s.ende.sieger === steuerung.ich ? 'Du hast gewonnen!' : 'Der Rechner hat gewonnen.') : FARBEN[s.ende.sieger - 1] + ' gewinnt!'
+            return steuerung.status(text, steuerung.modus === 'rechner' && s.ende.sieger !== steuerung.ich ? 'schlecht' : 'gut')
+          }
+          if (!mensch()) return steuerung.status('Der Rechner denkt …')
+          const wer = steuerung.modus === 'rechner' ? 'Du' : FARBEN[s.amZug - 1]
+          if (wartetAufNimm) return steuerung.status(wer + ': Mühle! Nimm einen gegnerischen Stein.')
+          steuerung.status(wer + (steuerung.modus === 'rechner' ? ' bist' : ' ist') + (s.vorrat[s.amZug] > 0 ? ' dran: Stein setzen.' : ' dran: Stein ziehen.'))
+        }
+
+        function ausfuehren(z) {
+          const n = M.ziehe(s, z)
+          if (!n) return false
+          verlauf.push(s)
+          s = n
+          gewaehlt = -1
+          wartetAufNimm = null
+          zeichnen()
+          rechnerDran()
+          return true
+        }
+
+        function klick(i) {
+          if (gesperrt || s.ende || !mensch()) return
+          const l = M.zuege(s)
+          if (wartetAufNimm) {
+            if (wartetAufNimm.optionen.includes(i)) ausfuehren({ von: wartetAufNimm.von, nach: wartetAufNimm.nach, nimm: i })
+            else {
+              wartetAufNimm = null // woanders getippt: Auswahl zurücknehmen
+              zeichnen()
+            }
+            return
+          }
+          const setzen = s.vorrat[s.amZug] > 0
+          if (!setzen && s.p[i] === s.amZug) {
+            gewaehlt = gewaehlt === i ? -1 : i
+            return zeichnen()
+          }
+          const von = setzen ? -1 : gewaehlt
+          if (!setzen && gewaehlt < 0) return
+          const passende = l.filter((z) => z.von === von && z.nach === i)
+          if (!passende.length) return
+          if (passende[0].nimm < 0) return void ausfuehren(passende[0])
+          wartetAufNimm = { von, nach: i, optionen: passende.map((z) => z.nimm) }
+          // Stein vorläufig an den Zielpunkt zeigen
+          zeichnen()
+        }
+
+        function rechnerDran() {
+          if (steuerung.modus !== 'rechner' || s.ende || mensch()) return
+          gesperrt = true
+          const meinLauf = lauf
+          setTimeout(() => {
+            if (meinLauf !== lauf) return
+            const z = M.rechnerZug(s, steuerung.stufe)
+            verlauf.push(s)
+            s = M.ziehe(s, z)
+            gesperrt = false
+            zeichnen()
+          }, 500)
+        }
+
+        function neu() {
+          lauf++
+          gesperrt = false
+          s = M.neu()
+          verlauf = []
+          gewaehlt = -1
+          wartetAufNimm = null
+          zeichnen()
+          rechnerDran()
+        }
+        neu()
+      })()
+    </script>
+  </body>
+</html>
