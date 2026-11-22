@@ -8,8 +8,8 @@
    (z. B. #lehrkraft) fragen window.LehrkraftAngemeldet.
 
    Wichtig: Das ist ein Sichtschutz, kein Zugriffsschutz. Die Texte stehen weiter im Quelltext der öffentlichen Seite.
-   Geprüft wird nur, ob eine Sitzung im Gerät liegt (Ablaufzeit egal, Quizzo und Tafel erneuern sie selbst);
-   hier wird nichts gesendet. */
+   Geprüft wird, ob eine noch gültige Sitzung im Gerät liegt (gleiche Regel wie auf der Startseite); hier wird nichts
+   gesendet. Quizzo und Tafel erneuern die Sitzung beim Öffnen. */
 ;(function () {
   'use strict'
   const GEMEINSAM = 'sb-ifdqfndsvgiyvxvxtoga-auth-token' // Startseite, Quizzo, Klassenfunk, Tafel
@@ -18,7 +18,9 @@
   function hatSitzung(speicher, schluessel) {
     try {
       const s = JSON.parse(speicher.getItem(schluessel) || 'null')
-      return !!(s && s.access_token && s.refresh_token)
+      // wie lernen/datenbank.js (Startseite): nur eine noch gültige Sitzung zählt, sonst zeigte die Startseite
+      // „Anmelden“, die Angebote aber die Lehrkraft-Hinweise
+      return !!(s && s.access_token && (s.expires_at || 0) * 1000 > Date.now())
     } catch {
       return false
     }

@@ -97,7 +97,7 @@ Grundlage: `docs/PROJECT_AUDIT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.m
 - Erwartungshorizonte, Hinweise „Für Lehrkräfte“ und Lehrkraft-Ansichten erscheinen nur, wenn auf dem Gerät eine Lehrkraft angemeldet ist (gemeinsame Supabase-Sitzung oder Anmeldung der Lernübersicht). Entscheidung der Lehrkraft nach dem Audit.
 - Umsetzung ohne Umbau der Artefakte: `lernen/lehrkraft.js` (im `<head>`, setzt `html.lehrkraft-an` und `window.LehrkraftAngemeldet`), `lernstil.css` blendet `.teacher` und `[data-lehrkraft]` aus. Eigene Lehrkraft-Ansichten (`#lehrkraft` in Fallakten und Lebensmittel sortieren, Inselwelt, Bosskampf) fragen `window.LehrkraftAngemeldet`.
 - Nur Sichtschutz: Die Texte bleiben im Quelltext der öffentlichen Seite. Echter Schutz hieße, sie in die Datenbank (RLS) zu verlegen – derzeit nicht nötig, weil es keine Prüfungslösungen sind.
-- Geprüft wird nur, ob eine Sitzung im Gerät liegt (nicht ihre Ablaufzeit), damit die Hinweise nicht verschwinden, nur weil seit einer Stunde keine App die Sitzung erneuert hat.
+- Geprüft wird, ob eine noch gültige Sitzung im Gerät liegt (gleiche Regel wie die Startseite; zuerst ohne Ablaufprüfung gebaut, dann angeglichen, weil Gäste mit abgelaufener Sitzung die Hinweise sahen).
 - Musterlösungen zu Übungsaufgaben bleiben sichtbar (Selbstkontrolle der Schüler).
 - Neue Angebote: Lehrkraft-Inhalte als `<details class="teacher">` oder mit `data-lehrkraft` auszeichnen; `stil.mjs` setzt `lehrkraft.js` ein.
 
