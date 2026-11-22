@@ -182,6 +182,20 @@ window.WERKZEUGE = [
   {
     bereich: 'Vertretung',
     symbol: 'raetsel',
+    titel: 'Sudoku',
+    text: 'Zahlenrätsel in drei Stufen, jedes neu und eindeutig lösbar – mit Notizen und Tipp.',
+    adresse: 'vertretung/sudoku/',
+  },
+  {
+    bereich: 'Vertretung',
+    symbol: 'raetsel',
+    titel: 'Brettspiele',
+    text: 'Vier gewinnt, Mühle und Schach – zu zweit am Gerät oder gegen den Rechner.',
+    adresse: 'spielen/',
+  },
+  {
+    bereich: 'Vertretung',
+    symbol: 'raetsel',
     titel: 'Slitherlink',
     text: 'Aus Zahlen eine geschlossene Linie legen – drei Stufen, jedes Rätsel neu und eindeutig lösbar.',
     adresse: 'vertretung/slitherlink/',
