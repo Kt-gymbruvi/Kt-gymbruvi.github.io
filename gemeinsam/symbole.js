@@ -62,6 +62,7 @@
     notenbuch: 'notenbuch', sonne: 'modus-hell', mond: 'modus-dunkel', blatt: 'blatt', laufen: 'laufen',
     vertretung: 'vertretung', sudoku: 'sudoku', slitherlink: 'slitherlink', einstein: 'einstein',
     viergewinnt: 'vier-gewinnt', muehle: 'muehle', schach: 'schach', spielraum: 'spielraum',
+    chaosflitzer: 'chaos-flitzer',
   }
 
   /** Erzeugt ein dekoratives Symbol. Die Größe kommt aus dem CSS (.symbol), die Farbe aus der Textfarbe. */

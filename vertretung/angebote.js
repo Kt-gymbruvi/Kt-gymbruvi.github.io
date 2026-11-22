@@ -12,8 +12,8 @@ window.VERTRETUNG_GRUPPEN = [
   { id: 'knobeln', name: 'Knobeln', text: 'Rätsel zum Alleinlösen – jedes ist neu und genau eine Lösung.' },
   {
     id: 'spiele',
-    name: 'Spiele für zwei',
-    text: 'Zu zweit am Gerät, gegen den Rechner oder online in der Klasse.',
+    name: 'Spiele',
+    text: 'Brett- und Würfelspiele: zu zweit, gegen den Rechner oder online in der Klasse.',
     // Knopf an der Gruppe: Online ist eine Art zu spielen, kein eigenes Spiel
     aktion: {
       text: 'Online mit der Klasse spielen',
@@ -48,6 +48,14 @@ window.VERTRETUNG = [
     gruppe: 'knobeln',
     logo: 'einstein',
     marken: ['1 Person', '3 Stufen', '3 Themen'],
+  },
+  {
+    titel: 'Chaos-Flitzer 3000',
+    text: 'Würfeln, flitzen, gemein sein: Das Rennspiel mit 36 verrückten Läufern, jeder mit einer Fähigkeit, die die Regeln bricht.',
+    adresse: 'vertretung/chaos-flitzer/',
+    gruppe: 'spiele',
+    logo: 'chaosflitzer',
+    marken: ['2 bis 6 Personen', 'mit Computerspielern', '4 Rennen'],
   },
   {
     titel: 'Vier gewinnt',
