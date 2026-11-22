@@ -899,7 +899,7 @@ async function startGame(){
     const n=G.players.length;
     G.per=n===2?8:4;G.perRace=n===2?2:1;
     G.players.forEach(p=>{p.team=[];p.used=new Set();p.score=0;p.firsts=0;});
-    REM.inGame=true;REM.onChange=null;
+    REM.inGame=true;REM.onChange=null;lobbyAngebot();
     G.players.forEach((pl,i)=>{if(pl.remote) remSend('platz',{an:pl.remote,name:pl.name,farbe:PCOL[i]});});
     remStatus('Das Spiel startet …');
     G.winners=[];G.race=0;G.log=[];G.nextStart=Math.floor(Math.random()*n);
@@ -1146,6 +1146,7 @@ function remOpen(){
 function remClose(){
   if(REM.kanal) REM.kanal.schliessen();
   REM.kanal=null;REM.code=null;REM.phones=new Map();REM.pending=null;REM.inGame=false;
+  if(LOBBY) LOBBY.setze({angebot:null,spielt:null});
   REM.gone.forEach(t=>clearTimeout(t));REM.gone.clear();
 }
 function remPresence(liste){
@@ -1161,6 +1162,7 @@ function remPresence(liste){
     });
   }
   if(REM.onChange) REM.onChange();
+  if(!REM.inGame) lobbyAngebot();
 }
 function remMsg(ev,d){
   if(!d||typeof d!=='object') return;
@@ -1206,6 +1208,24 @@ function remTakeover(i,grund){
   if(REM.pending&&REM.pending.p===i){const res=REM.pending.res;REM.pending=null;res(null);}
 }
 
+/* ---------- Gastgeber in der Lobby der Klasse ----------
+   Aufruf aus dem Spielraum: ?lobby=<Raumcode der Lobby>&host=1. Dann bleibt dieses Gerät in der Lobby (Anwesenheit) und zeigt dort
+   „Anna sucht Mitspieler: Chaos-Flitzer“ mit der Zahl der Handys; wer in der Lobby einsteigt, öffnet die Handy-Seite dieses Spiels.
+   Läuft das Spiel, steht es unter „Laufende Spiele“. */
+const LOBBY_CODE=(qs.get('lobby')||'').toUpperCase();
+const HOST_MODE=qs.get('host')==='1'&&!!window.Spielraum&&window.Spielraum.istCode(LOBBY_CODE);
+let LOBBY=null;
+function lobbyOpen(){
+  if(LOBBY||!HOST_MODE) return;
+  LOBBY=window.Spielraum.betreten(LOBBY_CODE,{name:window.Spielraum.meinName()||'Gastgeber'});
+  window.addEventListener('pagehide',()=>{if(LOBBY) LOBBY.verlassen();});
+}
+function lobbyAngebot(){
+  if(!LOBBY) return;
+  if(REM.kanal&&!REM.inGame) LOBBY.setze({spielt:null,angebot:{partie:REM.code,spiel:'chaos-flitzer',code:REM.code,belegt:REM.phones.size}});
+  else if(REM.kanal&&REM.inGame) LOBBY.setze({angebot:null,spielt:{partie:REM.code,spiel:'chaos-flitzer',gegner:`${G.players.length} Spieler`}});
+}
+
 /* ---------- screens ---------- */
 function screen(html,cls=''){
   const s=$('#screen');
@@ -1218,6 +1238,8 @@ function hideScreen(){$('#screen').hidden=true;$('#screen').innerHTML='';}
 let setupPlayers=null;
 function showSetup(){
   REM.inGame=false;
+  if(HOST_MODE&&!REM.kanal&&!REM.userClosed){remOpen();lobbyOpen();}
+  lobbyAngebot();
   $('#top').hidden=true;$('#panel').hidden=true;
   clearFigs();attract();
   if(!setupPlayers) setupPlayers=[{name:'Du',cpu:false},{name:'Kiwi',cpu:true},{name:'Brösel',cpu:true},{name:'Rakete',cpu:true}];
@@ -1233,7 +1255,7 @@ function showSetup(){
     renderHandy();
     $('#modeNote').textContent=n===2?'Zu zweit schickt jeder pro Rennen zwei Läufer ins Rennen (8 Läufer pro Team).':`Jeder stellt ein Team aus 4 Läufern zusammen und schickt pro Rennen einen davon los.`;
   };
-  screen(`<a class="back" href="../">‹ Zurück zur Vertretung</a><h1 class="title" aria-label="Chaos-Flitzer 3000"><span aria-hidden="true">Chaos-Flitzer<br><span>3000</span></span></h1>
+  screen(`${HOST_MODE?`<a class="back" href="../../spielen/lobby/?raum=${LOBBY_CODE}">‹ Zurück zur Lobby</a>`:'<a class="back" href="../">‹ Zurück zur Vertretung</a>'}<h1 class="title" aria-label="Chaos-Flitzer 3000"><span aria-hidden="true">Chaos-Flitzer<br><span>3000</span></span></h1>
     <p class="lead">Würfeln, flitzen, gemein sein. Stellt euch ein Team aus verrückten Läufern zusammen, jeder mit einer Fähigkeit, die die Regeln bricht. Vier Rennen, die meisten Punkte gewinnen.</p>
     <div id="plist"></div>
     <div class="prow"><button class="btn ghost" id="addP">+ Spieler</button><button class="btn ghost" id="handyB">📱 Mit Handys spielen</button><span class="fine" id="modeNote"></span></div>
@@ -1282,9 +1304,9 @@ function showSetup(){
   $('#handyB').onclick=()=>{
     sfx('click');
     if(REM.kanal){
-      remClose();
+      remClose();REM.userClosed=true;
       setupPlayers.forEach(p=>{if(p.handy){p.handy=false;p.phone=null;p.cpu=true;}});
-    }else{remOpen();}
+    }else{REM.userClosed=false;remOpen();lobbyOpen();lobbyAngebot();}
     renderRows();
   };
   renderRows();

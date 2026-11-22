@@ -309,6 +309,7 @@
       </section>
 
       <!-- Spiel -->
+      <p><a id="zurueck" href="#" hidden>‹ Zurück zur Lobby</a></p>
       <section class="karte" id="spiel" hidden>
         <p class="status" id="status" role="status" aria-live="polite">Verbinde …</p>
         <p class="muted" id="verbindung"></p>
@@ -334,6 +335,12 @@
         const zeige = (id) => ['ungueltig', 'name-karte', 'spiel'].forEach((x) => ($(x).hidden = x !== id))
         const setzeStatus = (text) => {
           $('status').textContent = text
+        }
+
+        const lobby = (params.get('lobby') || '').toUpperCase()
+        if (R.istCode(lobby)) {
+          $('zurueck').hidden = false
+          $('zurueck').href = '../../../spielen/lobby/?raum=' + lobby
         }
 
         function start() {

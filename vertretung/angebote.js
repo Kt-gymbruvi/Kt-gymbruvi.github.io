@@ -55,7 +55,7 @@ window.VERTRETUNG = [
     adresse: 'vertretung/chaos-flitzer/',
     gruppe: 'spiele',
     logo: 'chaosflitzer',
-    marken: ['2 bis 6 Personen', 'Handys können beitreten', 'mit Computerspielern'],
+    marken: ['2 bis 6 Personen', 'Handys treten bei', 'online in der Klasse'],
   },
   {
     titel: 'Vier gewinnt',

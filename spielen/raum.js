@@ -4,7 +4,8 @@
  *
  * Anwesenheit (je Person):
  *   { id, name, rolle: 'leitung' | 'spieler', spiele?: [..erlaubte Spiele..] (Leitung),
- *     angebot?: { partie, spiel }, spielt?: { partie, spiel, gegner } }
+ *     angebot?: { partie, spiel, code?, belegt? }, spielt?: { partie, spiel, gegner } }
+ *   Chaos-Flitzer: angebot.code = Raumcode des Spiels (Kanal chaosflitzer-<code>), angebot.belegt = Zahl der Handys
  *
  * Nachrichten:
  *   beitritt  { partie, von, name }                       jemand will bei einem Angebot mitspielen
@@ -22,6 +23,8 @@
     'vier-gewinnt': 'Vier gewinnt',
     muehle: 'Mühle',
     schach: 'Schach',
+    // Gruppenspiel: Der Anbieter führt es auf seinem Gerät (Beamer/Laptop), die anderen spielen mit dem Handy (vertretung/chaos-flitzer/)
+    'chaos-flitzer': 'Chaos-Flitzer 3000',
   }
 
   function zufallText(n) {

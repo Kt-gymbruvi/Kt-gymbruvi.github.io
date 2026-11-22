@@ -182,6 +182,9 @@
             <h2 style="margin-top: 0">Spiel anbieten</h2>
             <div class="anbieten" id="anbieten"></div>
             <p class="hinweis" id="anbieten-hinweis" style="margin: 0.75rem 0 0"></p>
+            <p class="hinweis" id="chaos-hinweis" style="margin: 0.5rem 0 0" hidden>
+              <b>Chaos-Flitzer 3000</b> läuft auf deinem Gerät (am besten Beamer oder Laptop), du kannst auch allein anfangen. Die anderen steigen unter „Angebote“ ein und spielen mit dem Handy, bis zu sechs Personen.
+            </p>
           </section>
           <section class="werkzeug-karte" style="margin-top: 1rem">
             <h2 style="margin-top: 0">Angebote</h2>
@@ -429,12 +432,20 @@
               b.disabled = !!wartetAuf
               b.addEventListener('click', () => {
                 meldung('')
+                if (s === 'chaos-flitzer') {
+                  // Gruppenspiel: läuft auf diesem Gerät, die Lobby wird dort weitergeführt (Angebot, freie Plätze)
+                  gestartet = true
+                  raum.verlassen()
+                  location.href = '../../vertretung/chaos-flitzer/?lobby=' + code + '&host=1'
+                  return
+                }
                 raum.setze({ angebot: { partie: R.zufallText(8), spiel: s } })
               })
               an.append(b)
             })
             if (!erlaubt.length) an.textContent = 'Die Leitung hat gerade kein Spiel freigegeben.'
           }
+          $('chaos-hinweis').hidden = !erlaubt.includes('chaos-flitzer') || !!meins
           $('anbieten-hinweis').textContent = meins || wartetAuf ? '' : 'Wähle ein Spiel. Deine Mitschüler sehen es dann unter „Angebote“ und können einsteigen.'
 
           // Angebote anderer
@@ -453,7 +464,10 @@
             li.className = 'zeile'
             const t = document.createElement('span')
             t.className = 'text'
-            t.textContent = R.bereinige(p.name) + ' sucht ' + R.SPIELE[p.angebot.spiel]
+            const gruppe = p.angebot.spiel === 'chaos-flitzer'
+            t.textContent = gruppe
+              ? R.bereinige(p.name) + ' sucht Mitspieler: ' + R.SPIELE[p.angebot.spiel] + ' (' + Math.min(6, Number(p.angebot.belegt) || 0) + ' Handys dabei, bis zu 6 Plätze)'
+              : R.bereinige(p.name) + ' sucht ' + R.SPIELE[p.angebot.spiel]
             const b = document.createElement('button')
             b.type = 'button'
             b.className = 'knopf klein'
@@ -461,7 +475,15 @@
             b.textContent = wartet ? 'Warte …' : 'Mitspielen'
             b.disabled = !!wartetAuf || !!raum.ich.angebot
             b.title = raum.ich.angebot ? 'Zieh zuerst dein eigenes Angebot zurück.' : ''
+            if (gruppe && !R.istCode(p.angebot.code)) b.disabled = true
             b.addEventListener('click', () => {
+              if (gruppe) {
+                // Chaos-Flitzer: das eigene Handy wird zur Steuerung des Spiels des Anbieters
+                gestartet = true
+                raum.verlassen()
+                location.href = '../../vertretung/chaos-flitzer/handy/?raum=' + p.angebot.code + '&lobby=' + code
+                return
+              }
               wartetAuf = { partie: p.angebot.partie }
               raum.sende('beitritt', { partie: p.angebot.partie, von: raum.id, name: raum.ich.name })
               zeichnen()
@@ -483,7 +505,10 @@
               li.className = 'zeile'
               const t = document.createElement('span')
               t.className = 'text'
-              t.textContent = R.bereinige(p.name) + ' gegen ' + R.bereinige(p.spielt.gegner) + ' – ' + R.SPIELE[p.spielt.spiel]
+              t.textContent =
+                p.spielt.spiel === 'chaos-flitzer'
+                  ? R.bereinige(p.name) + ' spielt ' + R.SPIELE[p.spielt.spiel] + ' (' + R.bereinige(p.spielt.gegner) + ')'
+                  : R.bereinige(p.name) + ' gegen ' + R.bereinige(p.spielt.gegner) + ' – ' + R.SPIELE[p.spielt.spiel]
               li.append(t)
               lauf.append(li)
             })
