@@ -89,6 +89,23 @@
     return li
   }
 
+  // Großer Knopf an der Gruppe: Logo, Titel, ein Satz und Pfeil – eine Spielart, kein eigenes Spiel
+  function onlineKnopf(aktion) {
+    const a = el('a', 'online-knopf')
+    a.href = '../' + aktion.adresse
+    const logo = el('span', 'online-logo')
+    const s = sym(aktion.logo)
+    if (s) logo.append(s)
+    const text = el('span', 'online-text')
+    text.append(el('strong', null, aktion.text), el('small', null, aktion.info))
+    const pfeil = el('span', 'online-pfeil')
+    const p = sym('weiter')
+    if (p) pfeil.append(p)
+    else pfeil.textContent = '›'
+    a.append(logo, text, pfeil)
+    return a
+  }
+
   function karten() {
     const suche = $('suche').value.trim().toLocaleLowerCase('de')
     const liste = ANGEBOTE.filter((a) => (!art || a.gruppe === art) && suchtreffer(a, suche))
@@ -99,17 +116,9 @@
     GRUPPEN.forEach((g) => {
       const imG = liste.filter((a) => a.gruppe === g.id)
       if (!imG.length) return
-      // Kopf der Gruppe: Titel (bei „Alle“) und – falls vorhanden – der Knopf der Gruppe
-      if (!art || g.aktion) {
-        const kopf = el('div', 'gruppenkopf' + (art ? ' nur-knopf' : ''))
-        if (!art) kopf.append(el('h3', 'liste-titel', g.name))
-        if (g.aktion) {
-          const a = el('a', 'knopf zweit klein gruppen-aktion', g.aktion.text + ' ›')
-          a.href = '../' + g.aktion.adresse
-          kopf.append(a)
-        }
-        box.append(kopf)
-      }
+      // Titel der Gruppe (bei „Alle“) und – falls vorhanden – der große Online-Knopf der Gruppe
+      if (!art) box.append(el('h3', 'liste-titel', g.name))
+      if (g.aktion) box.append(onlineKnopf(g.aktion))
       const ul = el('ul', 'liste-gruppe')
       imG.forEach((a) => ul.append(zeile(a)))
       box.append(ul)

@@ -3,6 +3,10 @@
 Stand: 21.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`). Zweig `sofort-paket` (Fehler aus dem Audit vom 21.11.2026) wartet auf Zustimmung. Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
+## Großer Online-Knopf (22.11.2026, Zweig `online-knopf`, nicht veröffentlicht)
+- Der Knopf „Online mit der Klasse spielen“ an der Gruppe „Spiele für zwei“ ist jetzt ein breiter Knopf in der Hauptfarbe (`.online-knopf`) mit Logo, Titel, einem Satz und Pfeil; er steht über der Spieleliste (bei „Alle“ unter dem Gruppentitel). Logo `gemeinsam/spielraum-logo.svg` neu gezeichnet: zwei Bauern (grün und orange) unter einem Funksymbol. Texte und Adresse in `vertretung/angebote.js` (`aktion`). Am Handy ohne Pfeil.
+- Geprüft: Desktop und Handy im Browser, `darstellung.mjs` (hell/dunkel, 375 und 768 px) ohne Befund. Ungeprüft: echte Geräte.
+
 ## Spielraum als Spielart statt eigener Karte (22.11.2026, Zweig `spielraum-umplatziert`, nicht veröffentlicht)
 - Der Spielraum steht nicht mehr als Karte neben den Spielen (er ist eine Art zu spielen, kein Spiel). In `vertretung/angebote.js` hat er `liste: false` (nur über die Suche der Startseite auffindbar, „Spielraum (online spielen)“).
 - Neu: Knopf „Online mit der Klasse spielen ›“ an der Gruppe „Spiele für zwei“ (`aktion` der Gruppe, `vertretung.js`/`vertretung.css`); in jedem Spiel die dritte Spielart „Online“ (`spielen/steuerung.js`, Option `spiel`), die die Lobby mit `?spiel=<ordner>` öffnet; die Lobby zeigt dann „Du möchtest online spielen: Schach …“, das Spiel zuerst und kräftig, „Anderes Spiel wählen“ hebt die Vorwahl auf. Der QR-Code des Raums enthält keine Vorwahl.

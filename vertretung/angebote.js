@@ -15,7 +15,12 @@ window.VERTRETUNG_GRUPPEN = [
     name: 'Spiele für zwei',
     text: 'Zu zweit am Gerät, gegen den Rechner oder online in der Klasse.',
     // Knopf an der Gruppe: Online ist eine Art zu spielen, kein eigenes Spiel
-    aktion: { text: 'Online mit der Klasse spielen', adresse: 'spielen/lobby/' },
+    aktion: {
+      text: 'Online mit der Klasse spielen',
+      info: 'Raum anlegen, Code oder QR-Code teilen, Spiele anbieten und einsteigen',
+      adresse: 'spielen/lobby/',
+      logo: 'spielraum',
+    },
   },
 ]
 

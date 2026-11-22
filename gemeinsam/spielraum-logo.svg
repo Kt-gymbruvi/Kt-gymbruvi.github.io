@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Spielraum">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Online mit der Klasse spielen">
   <defs>
     <clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath>
     <g id="bauer">
@@ -10,9 +10,14 @@
   </defs>
   <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
   <g clip-path="url(#c)">
-    <path d="M150 112C190 70 240 70 256 98M362 112C322 70 272 70 256 98" fill="none" stroke="#ff8a14" stroke-width="18" stroke-linecap="round" opacity="0.85"/>
-    <g transform="translate(12 118) scale(0.62)" fill="#0f5c47" stroke="#ffffff" stroke-width="14" stroke-linejoin="round"><use href="#bauer"/></g>
-    <g transform="translate(184 118) scale(0.62)" fill="#ff8a14" stroke="#ffffff" stroke-width="14" stroke-linejoin="round"><use href="#bauer"/></g>
-    <rect x="84" y="412" width="344" height="18" rx="9" fill="#0f5c47" opacity="0.25"/>
+    <g fill="none" stroke="#ff8a14" stroke-width="20" stroke-linecap="round">
+      <path d="M221 133A50 50 0 0 1 291 133"/>
+      <path d="M192 103A90 90 0 0 1 320 103"/>
+      <path d="M163 73A130 130 0 0 1 349 73"/>
+    </g>
+    <circle cx="256" cy="170" r="14" fill="#ff8a14"/>
+    <g transform="translate(14 152) scale(0.62)" fill="#0f5c47" stroke="#ffffff" stroke-width="14" stroke-linejoin="round"><use href="#bauer"/></g>
+    <g transform="translate(182 152) scale(0.62)" fill="#ff8a14" stroke="#ffffff" stroke-width="14" stroke-linejoin="round"><use href="#bauer"/></g>
+    <rect x="84" y="420" width="344" height="18" rx="9" fill="#0f5c47" opacity="0.25"/>
   </g>
 </svg>

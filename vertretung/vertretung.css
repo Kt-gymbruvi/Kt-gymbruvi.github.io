@@ -30,33 +30,84 @@
   }
 }
 
-/* Kopf einer Gruppe in der Liste: Titel links, Knopf der Gruppe rechts */
-.gruppenkopf {
+/* Großer Online-Knopf an der Gruppe „Spiele für zwei“: Hauptfarbe, Logo, Titel und Satz */
+.online-knopf {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.4rem 1rem;
-}
-.gruppenkopf .liste-titel {
-  margin-bottom: 0.4rem;
-}
-.gruppenkopf.nur-knopf {
-  justify-content: flex-end;
-  margin-bottom: 0.5rem;
-}
-.gruppenkopf .gruppen-aktion {
-  margin: 0 0 0.4rem;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.85rem 1.1rem 0.85rem 0.85rem;
+  border-radius: var(--radius-gross);
+  background: var(--akzent);
+  color: var(--akzent-text);
+  box-shadow: var(--schatten);
   text-decoration: none;
+  transition: background-color var(--schnell), transform var(--schnell), box-shadow var(--schnell);
 }
-.gruppenkopf.nur-knopf .gruppen-aktion {
-  margin-bottom: 0;
+@media (hover: hover) {
+  .online-knopf:hover {
+    background: var(--akzent-schwebe);
+    box-shadow: var(--schatten-hoch);
+  }
+}
+.online-knopf:active {
+  transform: scale(0.99);
+}
+.online-knopf:focus-visible {
+  outline: 3px solid var(--fokus);
+  outline-offset: 3px;
+}
+.online-logo {
+  flex: none;
+  display: block;
+  width: 3.75rem;
+  height: 3.75rem;
+}
+.online-logo .symbol {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 24%;
+}
+.online-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.online-text strong {
+  font-size: 1.15rem;
+  font-weight: var(--gewicht-betont);
+  line-height: 1.2;
+}
+.online-text small {
+  font-size: 0.9rem;
+  line-height: 1.35;
+  opacity: 0.9;
+}
+.online-pfeil {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.18);
+}
+.online-pfeil .symbol {
+  width: 1.4rem;
+  height: 1.4rem;
 }
 @media (max-width: 52rem) {
-  /* Am Handy ohne QR-Knopf, dafür der Knopf der Gruppe in voller Breite */
-  .gruppenkopf .gruppen-aktion {
-    flex: 1 1 100%;
-    justify-content: center;
-    min-height: 2.75rem;
+  .online-logo {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+  .online-text strong {
+    font-size: 1.05rem;
+  }
+  .online-pfeil {
+    display: none;
   }
 }
