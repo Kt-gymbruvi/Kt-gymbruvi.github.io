@@ -3,6 +3,14 @@
 Stand: 21.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`). Zweig `sofort-paket` (Fehler aus dem Audit vom 21.11.2026) wartet auf Zustimmung. Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
+## Bereich „Vertretung“ (22.11.2026, nicht veröffentlicht)
+- Neue Kachel und Seitenleisten-Punkt „Vertretung“ (neben „Lernangebote“, öffentlich); die Kachelreihe bleibt eine Zeile, die Kacheln werden dafür schmaler. Neues Symbol `raetsel` in `gemeinsam/symbole.js`.
+- `vertretung/index.html`: Übersicht mit Knobelspielen und Hilfsmitteln für die Stunde (Timer, Gruppen, Lautstärkeampel). Weitere Angebote dort als Karte ergänzen und in `js/inhalte.js` → `WERKZEUGE` (Bereich „Vertretung“) eintragen.
+- `vertretung/slitherlink/`: Kern `kern.js` (Löser mit Eindeutigkeitsprüfung, Erzeuger, im Browser und in Node lauffähig), drei Stufen (5×5, 7×7, 10×10). Jedes Rätsel wird beim Aufruf neu erzeugt und hat genau eine Lösung (Löser gegen vollständiges Durchprobieren auf 3×3 geprüft: 300 Fälle, 0 Abweichungen). Prüfen, Rückgängig, Lösung zeigen, Zeit.
+- `vertretung/logikraetsel/`: Einstein-Rätsel mit Kern `kern.js` (Erzeuger mit Eindeutigkeitsprüfung) und Themen/Formulierungen `themen.js` (Straße, Sportfest, Klassenfahrt). Stufen 3×3, 4×4, 5×5. Neue Themen: in `themen.js` ergänzen (mindestens sechs Werte je Kategorie).
+- Geprüft: `pruefen.mjs` und `darstellung.mjs` ohne Befund, Spiele mit Skript bis zur Gewinnmeldung durchgespielt (alle Stufen). Nicht geprüft: echtes Handy/iPad, Kachelreihe mit Anmeldung (sechs Kacheln).
+- Weitere Ideen (nicht gebaut): Bingo- und Wortgitter-Generator, Stundenablauf-Anzeige für Vertretungslehrkräfte, Rollenverteilung, Bewegungs- und Entspannungskarten, Quiz-Pakete in Quizzo.
+
 ## Audit und Sofort-Paket (21.11.2026, Zweig `sofort-paket`, nicht veröffentlicht)
 Ganzheitliches Audit (Startseite, Lernangebote, Werkzeuge, Einstieg Quizzo/Klassenfunk; live und im Code). Behoben auf dem Zweig:
 - `lernen/lernstil.css` gab Überschriften eine feste dunkle Farbe – in Angeboten mit dunklem Kopf (Phasenanalyse, Mystery Fischsterben, Turnierplaner, Akrobatik) war der Titel unlesbar (Kontrast 1,5:1). Jetzt erben Überschriften die Farbe. Außerdem: Schrittnummern im Versuchsplaner (Grün auf Grün), Turnier-Auswahl im Turnierplaner (weiß auf weiß), „Jungen/Mädchen“ im Leichtathletik-Rechner (Rot auf Grün), AFB-Marken in Artbildung.

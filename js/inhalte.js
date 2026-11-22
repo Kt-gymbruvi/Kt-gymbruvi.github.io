@@ -40,6 +40,7 @@ window.NAVIGATION = [
   { titel: 'Quizzo', symbol: 'pokal', bild: 'gemeinsam/quizzo-symbol.png', adresse: PLATTFORM + '/Quizzo/' },
   { titel: 'Klassenfunk', symbol: 'megafon', bild: 'gemeinsam/klassenfunk-symbol.png', adresse: PLATTFORM + '/Klassenfunk/' },
   { titel: 'Lernangebote', symbol: 'lernen', bild: 'gemeinsam/lernen-logo.svg', adresse: 'lernen/' },
+  { titel: 'Vertretung', symbol: 'raetsel', adresse: 'vertretung/' },
   { titel: 'Interaktive Tafel', symbol: 'bildschirm', bild: 'gemeinsam/tafel-logo.svg', adresse: PLATTFORM + '/Lehrraum/#/tafel', nur: 'lehrkraft' },
   { titel: 'Tafel (Gast)', symbol: 'bildschirm', bild: 'gemeinsam/tafel-logo.svg', adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1', nur: 'gast' }, // ohne Anmeldung, nichts wird gespeichert
   { titel: 'Materialien', symbol: 'bibliothek', adresse: '#material-bereich', nur: 'material' }, // erscheint nur, wenn es Materialien gibt
@@ -99,6 +100,14 @@ window.LINKS = [
     text: 'Materialien und Lernpfade',
     textGast: 'Simulationen, Erklärungen und Übungen – nach Fach und Jahrgang',
     adresse: 'lernen/',
+  },
+  {
+    symbol: 'raetsel',
+    farbe: 'unterrichten',
+    titel: 'Vertretung',
+    text: 'Rätsel und Spiele für Vertretungsstunden',
+    textGast: 'Slitherlink, Einstein-Rätsel und mehr zum Knobeln',
+    adresse: 'vertretung/',
   },
   {
     symbol: 'bildschirm',
@@ -169,6 +178,20 @@ window.WERKZEUGE = [
     titel: 'QR-Code erstellen',
     text: 'Aus einem Link einen QR-Code machen – groß für den Beamer oder als Bild zum Ausdrucken.',
     adresse: 'werkzeuge/qr-code/',
+  },
+  {
+    bereich: 'Vertretung',
+    symbol: 'raetsel',
+    titel: 'Slitherlink',
+    text: 'Aus Zahlen eine geschlossene Linie legen – drei Stufen, jedes Rätsel neu und eindeutig lösbar.',
+    adresse: 'vertretung/slitherlink/',
+  },
+  {
+    bereich: 'Vertretung',
+    symbol: 'raetsel',
+    titel: 'Einstein-Rätsel',
+    text: 'Wer wohnt wo? Logikrätsel mit Hinweisen, drei Stufen, jedes Rätsel neu.',
+    adresse: 'vertretung/logikraetsel/',
   },
 ]
 

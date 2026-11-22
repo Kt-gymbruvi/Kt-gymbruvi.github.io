@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Slitherlink</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <style>
+      body {
+        min-height: 100dvh;
+      }
+      .spiel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 17rem;
+        gap: 1.25rem;
+        align-items: start;
+      }
+      .brett {
+        display: flex;
+        justify-content: center;
+        padding: 0.75rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche);
+        box-shadow: var(--schatten-klein);
+      }
+      #brett {
+        width: 100%;
+        max-width: min(46rem, calc(100dvh - 9rem));
+        height: auto;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .seite {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .seite h2 {
+        margin: 0 0 0.5rem;
+        font-size: 1rem;
+      }
+      .segmente.voll {
+        display: flex;
+        width: 100%;
+      }
+      .segmente.voll button {
+        padding: 0.25rem 0.5rem;
+      }
+      .seite .knopf-reihe .knopf {
+        flex: 1 1 auto;
+      }
+      #zeit {
+        font-size: 2rem;
+        font-weight: 300;
+        font-variant-numeric: tabular-nums;
+      }
+      #meldung {
+        min-height: 1.5rem;
+        margin: 0;
+        font-weight: var(--gewicht-betont);
+      }
+      #meldung.gut {
+        color: var(--bibliothek);
+      }
+      #meldung.schlecht {
+        color: var(--fehler);
+      }
+      .regeln {
+        margin: 0;
+        padding-left: 1.1rem;
+        color: var(--text-2);
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+      /* Zeichnung */
+      .punkt {
+        fill: var(--text-2);
+      }
+      .zahl {
+        fill: var(--text);
+        font-size: 22px;
+        font-weight: 500;
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+        transition: fill 0.15s;
+      }
+      .zahl.fertig {
+        fill: var(--linie-stark);
+      }
+      .zahl.zuviel {
+        fill: var(--fehler);
+      }
+      .zahl.fehler {
+        fill: var(--fehler);
+        font-weight: 700;
+      }
+      .kante-flaeche {
+        fill: none;
+        stroke: transparent;
+        stroke-width: 22px;
+        stroke-linecap: round;
+        cursor: pointer;
+      }
+      .kante-sicht {
+        fill: none;
+        stroke: transparent;
+        stroke-width: 5px;
+        stroke-linecap: round;
+        pointer-events: none;
+      }
+      .kante.an .kante-sicht {
+        stroke: var(--tafel);
+      }
+      .kante.loesung .kante-sicht {
+        stroke: var(--lernen);
+      }
+      .kante.fehl .kante-sicht {
+        stroke: var(--fehler);
+      }
+      .kante .kreuz {
+        display: none;
+        stroke: var(--linie-stark);
+        stroke-width: 2px;
+        stroke-linecap: round;
+        pointer-events: none;
+      }
+      .kante.aus .kreuz {
+        display: block;
+      }
+      @media (hover: hover) {
+        .kante:not(.an):hover .kante-sicht {
+          stroke: var(--akzent-hell);
+        }
+      }
+      .geschafft #brett {
+        animation: gewonnen 0.6s ease;
+      }
+      @keyframes gewonnen {
+        50% {
+          transform: scale(1.015);
+        }
+      }
+      @media (max-width: 52rem) {
+        .spiel {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        #brett {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Vertretung</a>
+      <h1>Slitherlink</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spiel">
+        <div class="brett"><svg id="brett" role="img" aria-label="Slitherlink-Spielfeld"></svg></div>
+
+        <div class="seite">
+          <section class="werkzeug-karte">
+            <h2>Schwierigkeit</h2>
+            <div class="segmente voll" role="group" aria-label="Schwierigkeit">
+              <button type="button" data-stufe="leicht" aria-pressed="true">Leicht</button>
+              <button type="button" data-stufe="mittel" aria-pressed="false">Mittel</button>
+              <button type="button" data-stufe="schwer" aria-pressed="false">Schwer</button>
+            </div>
+            <p id="stufen-text" class="hinweis" style="margin: 0.5rem 0 0"></p>
+          </section>
+
+          <section class="werkzeug-karte">
+            <div id="zeit" role="timer" aria-live="off">0:00</div>
+            <p id="meldung" role="status" aria-live="polite"></p>
+            <div class="knopf-reihe">
+              <button id="neu" type="button" class="knopf">Neues Rätsel</button>
+              <button id="zurueck" type="button" class="knopf zweit">Rückgängig</button>
+            </div>
+            <div class="knopf-reihe" style="margin-top: 0.5rem">
+              <button id="pruefen" type="button" class="knopf zweit">Prüfen</button>
+              <button id="leeren" type="button" class="knopf zweit">Leeren</button>
+              <button id="loesung" type="button" class="knopf zweit">Lösung</button>
+            </div>
+          </section>
+
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Verbinde die Punkte zu <strong>einer</strong> geschlossenen Linie ohne Abzweigung und ohne Kreuzung.</li>
+              <li>Eine Zahl sagt, an wie vielen ihrer vier Seiten die Linie entlangläuft.</li>
+              <li>Felder ohne Zahl sind frei.</li>
+              <li>Tippen: Linie, nochmal tippen: Kreuz (hier verläuft keine Linie), nochmal: leer.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="kern.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const SVG = 'http://www.w3.org/2000/svg'
+        const FELD = 44 // Seitenlänge eines Feldes in der Zeichnung
+        const RAND = 18
+        const STUFEN = {
+          leicht: { B: 5, H: 5, behalten: 0.7, text: '5 × 5 Felder, viele Zahlen' },
+          mittel: { B: 7, H: 7, behalten: 0.5, text: '7 × 7 Felder' },
+          schwer: { B: 10, H: 10, behalten: 0, text: '10 × 10 Felder, so wenige Zahlen wie möglich' },
+        }
+        const $ = (id) => document.getElementById(id)
+        const brett = $('brett')
+        const meldung = $('meldung')
+
+        let stufe = 'leicht'
+        let raetsel = null
+        let g = null
+        let zustand = [] // je Kante: 0 leer, 1 Linie, 2 Kreuz
+        let verlauf = []
+        let start = 0
+        let uhr = 0
+        let fertig = false
+        let zeigeLoesung = false
+        let fehlerKanten = new Set()
+        let fehlerFelder = new Set()
+        const elemente = { kanten: [], zahlen: [] }
+
+        function el(name, attribute) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(attribute || {}).forEach((k) => e.setAttribute(k, attribute[k]))
+          return e
+        }
+
+        function kantenGeometrie(k) {
+          const { B, nw } = g
+          if (k < nw) {
+            const z = Math.floor(k / B)
+            const s = k % B
+            return [RAND + s * FELD, RAND + z * FELD, RAND + (s + 1) * FELD, RAND + z * FELD]
+          }
+          const r = k - nw
+          const z = Math.floor(r / (B + 1))
+          const s = r % (B + 1)
+          return [RAND + s * FELD, RAND + z * FELD, RAND + s * FELD, RAND + (z + 1) * FELD]
+        }
+
+        function zeichnen() {
+          const { B, H } = raetsel
+          brett.replaceChildren()
+          brett.setAttribute('viewBox', `0 0 ${B * FELD + 2 * RAND} ${H * FELD + 2 * RAND}`)
+          elemente.kanten = []
+          elemente.zahlen = []
+          for (let f = 0; f < B * H; f++) {
+            const z = Math.floor(f / B)
+            const s = f % B
+            const t = el('text', { x: RAND + s * FELD + FELD / 2, y: RAND + z * FELD + FELD / 2 + 1, class: 'zahl' })
+            t.textContent = raetsel.hinweise[f] >= 0 ? raetsel.hinweise[f] : ''
+            brett.append(t)
+            elemente.zahlen.push(t)
+          }
+          for (let k = 0; k < g.nk; k++) {
+            const [x1, y1, x2, y2] = kantenGeometrie(k)
+            const gruppe = el('g', { class: 'kante' })
+            gruppe.append(el('line', { x1, y1, x2, y2, class: 'kante-sicht' }))
+            const mx = (x1 + x2) / 2
+            const my = (y1 + y2) / 2
+            gruppe.append(el('path', { d: `M${mx - 4} ${my - 4}l8 8m0 -8l-8 8`, class: 'kreuz', fill: 'none' }))
+            // Trefferfläche: die Kante etwas verkürzt, damit sich Nachbarn an den Ecken nicht überdecken
+            const dx = Math.sign(x2 - x1) * 9
+            const dy = Math.sign(y2 - y1) * 9
+            const flaeche = el('line', { x1: x1 + dx, y1: y1 + dy, x2: x2 - dx, y2: y2 - dy, class: 'kante-flaeche' })
+            flaeche.addEventListener('click', () => umschalten(k))
+            flaeche.addEventListener('contextmenu', (e) => {
+              e.preventDefault()
+              umschalten(k, true)
+            })
+            gruppe.append(flaeche)
+            brett.append(gruppe)
+            elemente.kanten.push(gruppe)
+          }
+          for (let z = 0; z <= H; z++) {
+            for (let s = 0; s <= B; s++) {
+              brett.append(el('circle', { cx: RAND + s * FELD, cy: RAND + z * FELD, r: 3.2, class: 'punkt' }))
+            }
+          }
+          aktualisieren()
+        }
+
+        function linienZahl(f) {
+          let n = 0
+          g.feldKanten[f].forEach((k) => {
+            if (zustand[k] === 1) n++
+          })
+          return n
+        }
+
+        function aktualisieren() {
+          const { B, H } = raetsel
+          for (let k = 0; k < g.nk; k++) {
+            const e = elemente.kanten[k]
+            const z = zeigeLoesung ? (raetsel.loesung[k] ? 1 : 0) : zustand[k]
+            e.classList.toggle('an', z === 1 && !zeigeLoesung)
+            e.classList.toggle('loesung', zeigeLoesung && z === 1)
+            e.classList.toggle('aus', z === 2)
+            e.classList.toggle('fehl', fehlerKanten.has(k))
+          }
+          for (let f = 0; f < B * H; f++) {
+            const n = raetsel.hinweise[f]
+            const t = elemente.zahlen[f]
+            if (n < 0) continue
+            const hat = linienZahl(f)
+            t.classList.toggle('fertig', !zeigeLoesung && hat === n)
+            t.classList.toggle('zuviel', !zeigeLoesung && hat > n)
+            t.classList.toggle('fehler', fehlerFelder.has(f))
+          }
+        }
+
+        function setzeMeldung(text, art) {
+          meldung.textContent = text || ''
+          meldung.className = art || ''
+        }
+
+        function umschalten(k, rechts) {
+          if (fertig || zeigeLoesung) return
+          verlauf.push(zustand.slice())
+          const alt = zustand[k]
+          zustand[k] = rechts ? (alt === 2 ? 0 : 2) : (alt + 1) % 3
+          fehlerKanten.clear()
+          fehlerFelder.clear()
+          setzeMeldung('')
+          aktualisieren()
+          pruefeGeloest()
+        }
+
+        function pruefeGeloest() {
+          const linien = zustand.map((z) => (z === 1 ? 1 : 0))
+          if (!window.Slitherlink.geloest(g, linien, raetsel.hinweise)) return
+          fertig = true
+          clearInterval(uhr)
+          document.querySelector('.spiel').classList.add('geschafft')
+          setzeMeldung('Geschafft in ' + zeitText() + '!', 'gut')
+        }
+
+        function zeitText() {
+          const s = Math.floor((Date.now() - start) / 1000)
+          return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
+        }
+
+        function neu() {
+          const s = STUFEN[stufe]
+          setzeMeldung('Rätsel wird erzeugt …')
+          setTimeout(() => {
+            raetsel = null
+            for (let i = 0; i < 5 && !raetsel; i++) raetsel = window.Slitherlink.erzeugen(s.B, s.H, s.behalten)
+            g = window.Slitherlink.gitter(s.B, s.H)
+            $('loesung').textContent = 'Lösung'
+            zustand = new Array(g.nk).fill(0)
+            verlauf = []
+            fertig = false
+            zeigeLoesung = false
+            fehlerKanten.clear()
+            fehlerFelder.clear()
+            document.querySelector('.spiel').classList.remove('geschafft')
+            zeichnen()
+            setzeMeldung('')
+            start = Date.now()
+            clearInterval(uhr)
+            uhr = setInterval(() => {
+              if (!fertig) $('zeit').textContent = zeitText()
+            }, 500)
+            $('zeit').textContent = '0:00'
+          }, 20)
+        }
+
+        $('neu').addEventListener('click', neu)
+        $('zurueck').addEventListener('click', () => {
+          if (fertig || zeigeLoesung || !verlauf.length) return
+          zustand = verlauf.pop()
+          fehlerKanten.clear()
+          fehlerFelder.clear()
+          setzeMeldung('')
+          aktualisieren()
+        })
+        $('leeren').addEventListener('click', () => {
+          if (fertig || zeigeLoesung) return
+          verlauf.push(zustand.slice())
+          zustand.fill(0)
+          fehlerKanten.clear()
+          fehlerFelder.clear()
+          setzeMeldung('')
+          aktualisieren()
+        })
+        $('pruefen').addEventListener('click', () => {
+          if (fertig || zeigeLoesung) return
+          fehlerKanten.clear()
+          fehlerFelder.clear()
+          // falsche Linien: Linien, die in der (einzigen) Lösung fehlen
+          for (let k = 0; k < g.nk; k++) if (zustand[k] === 1 && !raetsel.loesung[k]) fehlerKanten.add(k)
+          for (let f = 0; f < raetsel.hinweise.length; f++) {
+            if (raetsel.hinweise[f] >= 0 && linienZahl(f) > raetsel.hinweise[f]) fehlerFelder.add(f)
+          }
+          aktualisieren()
+          setzeMeldung(
+            fehlerKanten.size ? fehlerKanten.size + (fehlerKanten.size === 1 ? ' Linie ist falsch (rot).' : ' Linien sind falsch (rot).') : 'Bisher alles richtig – weiter so!',
+            fehlerKanten.size ? 'schlecht' : 'gut'
+          )
+        })
+        $('loesung').addEventListener('click', () => {
+          if (fertig) return
+          zeigeLoesung = !zeigeLoesung
+          fehlerKanten.clear()
+          fehlerFelder.clear()
+          $('loesung').textContent = zeigeLoesung ? 'Zurück zum Spiel' : 'Lösung'
+          setzeMeldung(zeigeLoesung ? 'So sieht die Lösung aus.' : '')
+          aktualisieren()
+        })
+        document.querySelectorAll('[data-stufe]').forEach((b) => {
+          b.addEventListener('click', () => {
+            stufe = b.dataset.stufe
+            document.querySelectorAll('[data-stufe]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+            $('stufen-text').textContent = STUFEN[stufe].text
+            $('loesung').textContent = 'Lösung'
+            neu()
+          })
+        })
+        $('stufen-text').textContent = STUFEN[stufe].text
+        neu()
+      })()
+    </script>
+  </body>
+</html>

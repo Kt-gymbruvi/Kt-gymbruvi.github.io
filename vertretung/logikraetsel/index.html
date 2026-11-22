@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Einstein-Rätsel</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <style>
+      body {
+        min-height: 100dvh;
+      }
+      .spiel {
+        display: grid;
+        grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+        gap: 1.25rem;
+        align-items: start;
+      }
+      .spiel > * {
+        min-width: 0;
+      }
+      .karte-titel {
+        margin: 0 0 0.6rem;
+        font-size: 1rem;
+      }
+      #einleitung {
+        margin: 0 0 0.75rem;
+        color: var(--text-2);
+      }
+      #hinweise {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: h;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      #hinweise li {
+        counter-increment: h;
+      }
+      #hinweise button {
+        display: flex;
+        gap: 0.6rem;
+        width: 100%;
+        padding: 0.5rem 0.7rem;
+        border: 0;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.97rem;
+        line-height: 1.4;
+        text-align: left;
+        cursor: pointer;
+      }
+      #hinweise button::before {
+        content: counter(h) '.';
+        flex: none;
+        min-width: 1.6rem;
+        color: var(--text-2);
+        font-variant-numeric: tabular-nums;
+      }
+      #hinweise button[aria-pressed='true'] {
+        color: var(--linie-stark);
+        text-decoration: line-through;
+      }
+      .tafel {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0.3rem;
+        table-layout: fixed;
+      }
+      th {
+        padding: 0.2rem;
+        font-size: 0.85rem;
+        font-weight: var(--gewicht-betont);
+        color: var(--text-2);
+      }
+      th.zeile {
+        width: 5.2rem;
+        text-align: left;
+      }
+      tr.titelzeile {
+        display: none;
+      }
+      td button {
+        width: 100%;
+        min-height: 3.4rem;
+        padding: 0.3rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius);
+        background: var(--flaeche);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.9rem;
+        font-weight: 500;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+        hyphens: auto;
+        cursor: pointer;
+        transition: background-color var(--schnell), border-color var(--schnell);
+      }
+      td button:hover {
+        background: var(--flaeche-2);
+      }
+      td button.leer {
+        color: var(--linie-stark);
+        font-weight: 400;
+      }
+      td button.falsch {
+        border-color: var(--fehler);
+        background: color-mix(in srgb, var(--fehler) 14%, var(--flaeche));
+      }
+      td button.richtig {
+        border-color: var(--bibliothek);
+      }
+      td button .notiz {
+        display: block;
+        margin-top: 0.15rem;
+        color: var(--text-2);
+        font-size: 0.7rem;
+        font-weight: 400;
+      }
+      #meldung {
+        min-height: 1.5rem;
+        margin: 0.75rem 0 0;
+        font-weight: var(--gewicht-betont);
+      }
+      #meldung.gut {
+        color: var(--bibliothek);
+      }
+      #meldung.schlecht {
+        color: var(--fehler);
+      }
+      .segmente.voll {
+        display: flex;
+        width: 100%;
+      }
+      .segmente.voll button {
+        padding: 0.25rem 0.5rem;
+      }
+      /* Auswahlfenster */
+      dialog {
+        width: min(26rem, 100% - 2rem);
+        padding: 1.25rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche);
+        color: var(--text);
+        box-shadow: var(--schatten-hoch);
+      }
+      dialog::backdrop {
+        background: var(--abdunkeln);
+      }
+      dialog h2 {
+        margin: 0 0 0.75rem;
+        font-size: 1.1rem;
+      }
+      .auswahl {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .wert {
+        display: flex;
+        gap: 0.35rem;
+      }
+      .wert button {
+        min-height: 2.75rem;
+        border: 0;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+      }
+      .wert .setzen {
+        flex: 1;
+        padding: 0 0.9rem;
+        text-align: left;
+        font-weight: 500;
+      }
+      .wert .setzen[aria-pressed='true'] {
+        background: var(--akzent);
+        color: var(--akzent-text);
+      }
+      .wert .streichen {
+        width: 2.75rem;
+        font-size: 1.1rem;
+      }
+      .wert.gestrichen .setzen {
+        color: var(--linie-stark);
+        text-decoration: line-through;
+      }
+      .wert.gestrichen .streichen {
+        background: var(--lernen-hell);
+        color: var(--lernen);
+      }
+      .wert.vergeben .setzen {
+        color: var(--text-2);
+      }
+      @media (max-width: 52rem) {
+        .spiel {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        th.zeile,
+        tr:first-child > th:first-child,
+        th .ort {
+          display: none;
+        }
+        tr.titelzeile {
+          display: table-row;
+        }
+        tr.titelzeile th {
+          padding: 0.5rem 0.1rem 0;
+          text-align: left;
+        }
+        td button {
+          min-height: 3rem;
+          padding: 0.2rem;
+          font-size: 0.68rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Vertretung</a>
+      <h1>Einstein-Rätsel</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spiel">
+        <section class="werkzeug-karte" aria-labelledby="h-titel">
+          <h2 class="karte-titel" id="h-titel">Hinweise</h2>
+          <p id="einleitung"></p>
+          <ol id="hinweise"></ol>
+          <p class="hinweis" style="margin-top: 0.75rem">Tippe einen Hinweis an, um ihn abzuhaken.</p>
+        </section>
+
+        <div>
+          <section class="werkzeug-karte" style="margin-bottom: 1rem">
+            <div class="segmente voll" role="group" aria-label="Schwierigkeit">
+              <button type="button" data-stufe="leicht" aria-pressed="true">Leicht</button>
+              <button type="button" data-stufe="mittel" aria-pressed="false">Mittel</button>
+              <button type="button" data-stufe="schwer" aria-pressed="false">Schwer</button>
+            </div>
+            <p id="stufen-text" class="hinweis" style="margin: 0.5rem 0 0"></p>
+          </section>
+
+          <section class="werkzeug-karte">
+            <h2 class="karte-titel" id="thema-titel"></h2>
+            <div class="tafel"><table id="tafel"></table></div>
+            <p id="meldung" role="status" aria-live="polite"></p>
+            <div class="knopf-reihe" style="margin-top: 0.75rem">
+              <button id="neu" type="button" class="knopf">Neues Rätsel</button>
+              <button id="pruefen" type="button" class="knopf zweit">Prüfen</button>
+              <button id="leeren" type="button" class="knopf zweit">Leeren</button>
+              <button id="loesung" type="button" class="knopf zweit">Lösung</button>
+            </div>
+            <p class="hinweis" style="margin-top: 0.75rem">
+              Tippe ein Feld an und wähle, wer oder was dort hingehört. Mit dem × streichst du etwas als Notiz aus, ohne es festzulegen. Jede Eigenschaft
+              kommt in jedem Haus genau einmal vor.
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <dialog id="auswahl" aria-labelledby="auswahl-titel">
+      <h2 id="auswahl-titel"></h2>
+      <div class="auswahl" id="auswahl-liste"></div>
+      <div class="knopf-reihe" style="margin-top: 1rem">
+        <button type="button" class="knopf zweit" id="auswahl-leeren">Feld leeren</button>
+        <button type="button" class="knopf" id="auswahl-zu">Fertig</button>
+      </div>
+    </dialog>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="kern.js"></script>
+    <script src="themen.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const $ = (id) => document.getElementById(id)
+        const STUFEN = {
+          leicht: { n: 3, k: 3, text: '3 Häuser, 3 Eigenschaften' },
+          mittel: { n: 4, k: 4, text: '4 Häuser, 4 Eigenschaften' },
+          schwer: { n: 5, k: 5, text: '5 Häuser, 5 Eigenschaften – das klassische Einstein-Rätsel' },
+        }
+        const { THEMEN, satz } = window.EinsteinThemen
+        let stufe = 'leicht'
+        let r = null // { n, k, loesung, hinweise, thema, kats: [{name, werte}] }
+        let brett = [] // [c][haus] = Wertnummer oder -1
+        let notizen = [] // [c][haus] = Set von Wertnummern
+        let falsch = new Set()
+        let zeigeLoesung = false
+        let fertig = false
+        let offen = null // { c, h }
+
+        function zufall(feld) {
+          return feld[Math.floor(Math.random() * feld.length)]
+        }
+        function mischen(feld) {
+          for (let i = feld.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[feld[i], feld[j]] = [feld[j], feld[i]]
+          }
+          return feld
+        }
+
+        function neu() {
+          const s = STUFEN[stufe]
+          $('meldung').textContent = 'Rätsel wird erzeugt …'
+          $('meldung').className = ''
+          setTimeout(() => {
+            const thema = zufall(THEMEN)
+            let puzzle = null
+            for (let i = 0; i < 5 && !puzzle; i++) puzzle = window.Einstein.erzeugen(s.n, s.k)
+            // Kategorien: „Name“ immer, dazu zufällige weitere
+            const weitere = mischen(thema.kategorien.slice(1)).slice(0, s.k - 1)
+            const kats = [thema.kategorien[0], ...weitere].map((kat) => ({ name: kat.name, werte: mischen(kat.werte.slice()).slice(0, s.n) }))
+            r = { ...puzzle, thema, kats }
+            brett = Array.from({ length: s.k }, () => new Array(s.n).fill(-1))
+            notizen = Array.from({ length: s.k }, () => Array.from({ length: s.n }, () => new Set()))
+            falsch = new Set()
+            zeigeLoesung = false
+            fertig = false
+            $('loesung').textContent = 'Lösung'
+            $('meldung').textContent = ''
+            zeichnen()
+          }, 20)
+        }
+
+        function wert(c, i) {
+          return r.kats[c].werte[i]
+        }
+
+        // Wert, der laut Lösung in Haus h der Kategorie c steht
+        function richtigerWert(c, h) {
+          return r.loesung[c].indexOf(h)
+        }
+
+        function zeichnen() {
+          $('einleitung').textContent = r.thema.einleitung(r.n)
+          $('thema-titel').textContent = r.thema.titel
+          const liste = $('hinweise')
+          liste.textContent = ''
+          r.hinweise.forEach((h) => {
+            const li = document.createElement('li')
+            const b = document.createElement('button')
+            b.type = 'button'
+            b.setAttribute('aria-pressed', 'false')
+            b.textContent = satz(h, wert, r.thema, r.n)
+            b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')))
+            li.append(b)
+            liste.append(li)
+          })
+          tafelZeichnen()
+        }
+
+        function tafelZeichnen() {
+          const t = $('tafel')
+          t.textContent = ''
+          const kopf = document.createElement('tr')
+          kopf.append(document.createElement('th'))
+          for (let h = 0; h < r.n; h++) {
+            const th = document.createElement('th')
+            th.scope = 'col'
+            const ort = document.createElement('span')
+            ort.className = 'ort'
+            ort.textContent = r.thema.ort + ' '
+            th.append(ort, String(h + 1))
+            kopf.append(th)
+          }
+          t.append(kopf)
+          r.kats.forEach((kat, c) => {
+            // Handy: Name der Kategorie als eigene Zeile über den Feldern (spart die Spalte links)
+            const titel = document.createElement('tr')
+            titel.className = 'titelzeile'
+            const tt = document.createElement('th')
+            tt.colSpan = r.n
+            tt.textContent = kat.name
+            titel.append(tt)
+            t.append(titel)
+            const tr = document.createElement('tr')
+            const th = document.createElement('th')
+            th.scope = 'row'
+            th.className = 'zeile'
+            th.textContent = kat.name
+            tr.append(th)
+            for (let h = 0; h < r.n; h++) {
+              const td = document.createElement('td')
+              const b = document.createElement('button')
+              b.type = 'button'
+              const w = zeigeLoesung ? richtigerWert(c, h) : brett[c][h]
+              b.className = w < 0 ? 'leer' : ''
+              b.textContent = w < 0 ? '·' : kat.werte[w].anzeige
+              b.setAttribute('aria-label', kat.name + ', ' + r.thema.ort + ' ' + (h + 1) + (w < 0 ? ': leer' : ': ' + kat.werte[w].anzeige))
+              if (w < 0 && notizen[c][h].size) {
+                const n = document.createElement('span')
+                n.className = 'notiz'
+                n.textContent = '− ' + notizen[c][h].size
+                b.append(n)
+              }
+              if (falsch.has(c + ',' + h)) b.classList.add('falsch')
+              if (zeigeLoesung) b.classList.add('richtig')
+              b.addEventListener('click', () => oeffnen(c, h))
+              td.append(b)
+              tr.append(td)
+            }
+            t.append(tr)
+          })
+        }
+
+        function oeffnen(c, h) {
+          if (fertig || zeigeLoesung) return
+          offen = { c, h }
+          $('auswahl-titel').textContent = r.kats[c].name + ' – ' + r.thema.ort + ' ' + (h + 1)
+          auswahlZeichnen()
+          $('auswahl').showModal()
+        }
+
+        function auswahlZeichnen() {
+          const { c, h } = offen
+          const liste = $('auswahl-liste')
+          liste.textContent = ''
+          r.kats[c].werte.forEach((w, i) => {
+            const zeile = document.createElement('div')
+            zeile.className = 'wert'
+            const woanders = brett[c].indexOf(i) >= 0 && brett[c].indexOf(i) !== h
+            if (notizen[c][h].has(i)) zeile.classList.add('gestrichen')
+            if (woanders) zeile.classList.add('vergeben')
+            const setzen = document.createElement('button')
+            setzen.type = 'button'
+            setzen.className = 'setzen'
+            setzen.setAttribute('aria-pressed', String(brett[c][h] === i))
+            setzen.textContent = w.anzeige + (woanders ? '  (steht in ' + r.thema.ort + ' ' + (brett[c].indexOf(i) + 1) + ')' : '')
+            setzen.addEventListener('click', () => {
+              // ein Wert steht höchstens einmal je Kategorie: von woanders wegnehmen
+              const alt = brett[c].indexOf(i)
+              if (alt >= 0) brett[c][alt] = -1
+              brett[c][h] = i
+              notizen[c][h].delete(i)
+              schliessen()
+            })
+            const streichen = document.createElement('button')
+            streichen.type = 'button'
+            streichen.className = 'streichen'
+            streichen.textContent = '×'
+            streichen.setAttribute('aria-label', w.anzeige + ' als Notiz streichen')
+            streichen.addEventListener('click', () => {
+              if (notizen[c][h].has(i)) notizen[c][h].delete(i)
+              else notizen[c][h].add(i)
+              auswahlZeichnen()
+            })
+            zeile.append(setzen, streichen)
+            liste.append(zeile)
+          })
+        }
+
+        function schliessen() {
+          $('auswahl').close()
+          offen = null
+          falsch = new Set()
+          $('meldung').textContent = ''
+          tafelZeichnen()
+          pruefeGeloest()
+        }
+
+        function pruefeGeloest() {
+          for (let c = 0; c < r.k; c++) for (let h = 0; h < r.n; h++) if (brett[c][h] < 0) return
+          const ok = brett.every((zeile, c) => zeile.every((w, h) => r.loesung[c][w] === h))
+          if (ok) {
+            fertig = true
+            $('meldung').textContent = 'Geschafft! Alles stimmt.'
+            $('meldung').className = 'gut'
+          } else {
+            $('meldung').textContent = 'Alles ausgefüllt, aber noch nicht ganz richtig. Tippe auf „Prüfen“.'
+            $('meldung').className = 'schlecht'
+          }
+        }
+
+        $('auswahl-zu').addEventListener('click', schliessen)
+        $('auswahl').addEventListener('close', () => (offen = null))
+        $('auswahl-leeren').addEventListener('click', () => {
+          brett[offen.c][offen.h] = -1
+          schliessen()
+        })
+        $('neu').addEventListener('click', neu)
+        $('leeren').addEventListener('click', () => {
+          if (fertig || zeigeLoesung) return
+          brett = brett.map((z) => z.map(() => -1))
+          notizen = notizen.map((z) => z.map(() => new Set()))
+          falsch = new Set()
+          $('meldung').textContent = ''
+          tafelZeichnen()
+        })
+        $('pruefen').addEventListener('click', () => {
+          if (fertig || zeigeLoesung) return
+          falsch = new Set()
+          let gefuellt = 0
+          for (let c = 0; c < r.k; c++) {
+            for (let h = 0; h < r.n; h++) {
+              if (brett[c][h] < 0) continue
+              gefuellt++
+              if (r.loesung[c][brett[c][h]] !== h) falsch.add(c + ',' + h)
+            }
+          }
+          tafelZeichnen()
+          if (!gefuellt) {
+            $('meldung').textContent = 'Noch nichts eingetragen.'
+            $('meldung').className = ''
+          } else if (falsch.size) {
+            $('meldung').textContent = falsch.size + (falsch.size === 1 ? ' Feld ist falsch (rot).' : ' Felder sind falsch (rot).')
+            $('meldung').className = 'schlecht'
+          } else {
+            $('meldung').textContent = 'Bisher alles richtig – weiter so!'
+            $('meldung').className = 'gut'
+          }
+        })
+        $('loesung').addEventListener('click', () => {
+          if (fertig) return
+          zeigeLoesung = !zeigeLoesung
+          falsch = new Set()
+          $('loesung').textContent = zeigeLoesung ? 'Zurück zum Spiel' : 'Lösung'
+          $('meldung').textContent = zeigeLoesung ? 'So sieht die Lösung aus.' : ''
+          $('meldung').className = ''
+          tafelZeichnen()
+        })
+        document.querySelectorAll('[data-stufe]').forEach((b) => {
+          b.addEventListener('click', () => {
+            stufe = b.dataset.stufe
+            document.querySelectorAll('[data-stufe]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+            $('stufen-text').textContent = STUFEN[stufe].text
+            neu()
+          })
+        })
+        $('stufen-text').textContent = STUFEN[stufe].text
+        neu()
+      })()
+    </script>
+  </body>
+</html>
