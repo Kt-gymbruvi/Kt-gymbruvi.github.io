@@ -17,7 +17,7 @@ window.VERTRETUNG_GRUPPEN = [
     // Knopf an der Gruppe: Online ist eine Art zu spielen, kein eigenes Spiel
     aktion: {
       text: 'Online mit der Klasse spielen',
-      info: 'Raum anlegen, Code oder QR-Code teilen, Spiele anbieten und einsteigen',
+      info: 'Lobby am Smartboard öffnen – die Klasse kommt per Handy, bietet Spiele an und steigt ein',
       adresse: 'spielen/lobby/',
       logo: 'spielraum',
     },
@@ -50,6 +50,14 @@ window.VERTRETUNG = [
     marken: ['1 Person', '3 Stufen', '3 Themen'],
   },
   {
+    titel: 'Murdoku',
+    text: 'Kriminalrätsel: Wer stand wo? Aus den Hinweisen die Plätze finden – und den Mörder, der mit dem Opfer allein war.',
+    adresse: 'vertretung/murdoku/',
+    gruppe: 'knobeln',
+    logo: 'murdoku',
+    marken: ['1 Person', '3 Stufen', 'Notizen und Tipp'],
+  },
+  {
     titel: 'Chaos-Flitzer 3000',
     text: 'Würfeln, flitzen, gemein sein: Das Rennspiel mit 36 verrückten Läufern. Am Beamer laufen, die Schüler entscheiden per Handy.',
     adresse: 'vertretung/chaos-flitzer/',
@@ -79,6 +87,22 @@ window.VERTRETUNG = [
     adresse: 'spielen/schach/',
     gruppe: 'spiele',
     logo: 'schach',
+    marken: ['2 Personen', 'gegen Rechner', 'online'],
+  },
+  {
+    titel: 'Flip 7',
+    text: 'Karten ziehen oder aufhören: Wer 7 verschiedene Zahlen sammelt, bekommt den Bonus – doppelte Zahl heißt Bust. Am Beamer laufen, die Schüler spielen per Handy.',
+    adresse: 'vertretung/flip-7/',
+    gruppe: 'spiele',
+    logo: 'flip7',
+    marken: ['2 bis 6 Personen', 'Handys treten bei', 'online in der Klasse'],
+  },
+  {
+    titel: 'Schiffe versenken',
+    text: 'Flotte verstecken und die Schiffe des Gegners aufspüren – gegen den Rechner, zu zweit an einem Gerät oder online gegen eine Mitschülerin oder einen Mitschüler.',
+    adresse: 'vertretung/schiffe-versenken/',
+    gruppe: 'spiele',
+    logo: 'schiffe',
     marken: ['2 Personen', 'gegen Rechner', 'online'],
   },
   {

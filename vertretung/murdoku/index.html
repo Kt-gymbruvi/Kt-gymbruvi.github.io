@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Murdoku</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../../spielen/spiel.css" />
+    <style>
+      /* Personenfarben (aus den Gestaltungswerten; Buchstabe und Ring, nicht nur Farbe) */
+      .p0 { --pc: var(--signal-rot); }
+      .p1 { --pc: var(--unterrichten); }
+      .p2 { --pc: var(--interaktion); }
+      .p3 { --pc: var(--lernen); }
+      .p4 { --pc: var(--bibliothek); }
+      .p5 { --pc: var(--signal-gelb); }
+      .p6 { --pc: var(--text-2); }
+      /* Raumfarben */
+      .r0 { --rc: var(--tafel-hell); }
+      .r1 { --rc: var(--unterrichten-hell); }
+      .r2 { --rc: var(--interaktion-hell); }
+      .r3 { --rc: var(--lernen-hell); }
+      .r4 { --rc: var(--bibliothek-hell); }
+      .r5 { --rc: var(--linie); }
+
+      #haus {
+        display: grid;
+        width: 100%;
+        max-width: min(36rem, calc(100dvh - 15rem));
+        aspect-ratio: 1;
+        border: 3px solid var(--text);
+        border-radius: 4px;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .z {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+        border: 0;
+        border-right: 1px solid var(--linie-stark);
+        border-bottom: 1px solid var(--linie-stark);
+        border-radius: 0;
+        background: var(--rc);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+        container-type: inline-size;
+      }
+      .z.rr { border-right: 3px solid var(--text); }
+      .z.rb { border-bottom: 3px solid var(--text); }
+      .z.gesperrt { cursor: default; }
+      .z.gewaehlt { outline: 3px solid var(--fokus); outline-offset: -3px; z-index: 1; }
+      .z.doppelt { box-shadow: inset 0 0 0 3px var(--fehler); }
+      .z.mark { box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--pc) 70%, transparent); }
+      .raumname {
+        position: absolute;
+        top: 2px;
+        left: 3px;
+        right: 2px;
+        overflow: hidden;
+        color: var(--text-2);
+        font-size: clamp(0.5rem, 14cqw, 0.7rem);
+        font-weight: 600;
+        line-height: 1.1;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      .person {
+        display: grid;
+        place-items: center;
+        width: 70%;
+        aspect-ratio: 1;
+        margin-top: 8%;
+        border: 3px solid var(--pc);
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--pc) 38%, var(--flaeche));
+        color: var(--text);
+        font-size: 42cqw;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .person.falsch { border-color: var(--fehler); border-style: dashed; }
+      .person.moerder { box-shadow: 0 0 0 3px var(--fehler); }
+      .z .symbol-moebel { width: 52%; height: 52%; margin-top: 8%; color: var(--text); }
+      .z .symbol-moebel.opfer { color: var(--fehler); }
+      .notizen {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 90%;
+        height: 78%;
+        margin-top: 14%;
+        font-size: 22cqw;
+        font-weight: 700;
+        line-height: 1;
+        place-items: center;
+      }
+      .notizen span { color: color-mix(in srgb, var(--pc) 75%, var(--text)); }
+      .legende {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.9rem;
+        margin: 0.75rem 0 0;
+        padding: 0;
+        color: var(--text-2);
+        font-size: 0.85rem;
+        list-style: none;
+      }
+      .legende li { display: inline-flex; align-items: center; gap: 0.35rem; }
+      .legende .farbe {
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 1.5px solid var(--text);
+        border-radius: 0.2rem;
+        background: var(--rc);
+      }
+      .legende svg { width: 1.1rem; height: 1.1rem; color: var(--text); }
+      .legende svg.opfer { color: var(--fehler); }
+      .brett-spalte { display: flex; flex-direction: column; align-items: center; width: 100%; }
+      .brett-spalte .legende { justify-content: center; }
+
+      .leute {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(5.4rem, 1fr));
+        gap: 0.4rem;
+      }
+      .leute button {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 2.75rem;
+        padding: 0.2rem 0.5rem;
+        border: 2px solid transparent;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-align: left;
+        cursor: pointer;
+      }
+      .leute button[aria-pressed='true'] { border-color: var(--pc); background: var(--flaeche); }
+      .leute button.gesetzt { opacity: 0.72; }
+      .leute .person { flex: none; width: 1.8rem; margin: 0; border-width: 2px; font-size: 0.95rem; }
+      .leute .haken { margin-left: auto; color: var(--bibliothek); font-weight: 700; }
+
+      .hinweise { margin: 0; padding: 0; list-style: none; }
+      .hinweise li + li { margin-top: 0.15rem; }
+      .hinweise button {
+        display: block;
+        width: 100%;
+        padding: 0.4rem 0.6rem;
+        border: 0;
+        border-radius: var(--radius);
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+        font-size: 0.95rem;
+        line-height: 1.35;
+        text-align: left;
+        cursor: pointer;
+      }
+      .hinweise button:hover { background: var(--schwebe); }
+      .hinweise button[aria-pressed='true'] { color: var(--text-2); text-decoration: line-through; }
+      .hinweise button.verletzt { box-shadow: inset 0 0 0 2px var(--fehler); text-decoration: none; }
+      #zeit { font-size: 2rem; font-weight: 300; font-variant-numeric: tabular-nums; }
+      .kasten-knoepfe { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+      .kasten-knoepfe .knopf { flex: 1 1 6rem; }
+      .fall { margin: 0 0 0.6rem; font-size: 0.95rem; line-height: 1.4; }
+      @media (max-width: 52rem) {
+        #haus { max-width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Vertretung</a>
+      <h1>Murdoku</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/murdoku-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Murdoku</p>
+          <p class="spielkopf-text">Ein Kriminalrätsel: Wer stand wo – und wer war mit dem Opfer allein?</p>
+        </div>
+      </div>
+      <div class="spiel">
+        <div class="brett-spalte">
+          <div class="brett-flaeche" style="width: 100%"><div id="haus" role="grid" aria-label="Haus mit Räumen"></div></div>
+          <ul class="legende" id="legende" aria-label="Legende"></ul>
+        </div>
+        <div class="seite">
+          <section class="werkzeug-karte">
+            <h2>Schwierigkeit</h2>
+            <div class="segmente voll" role="group" aria-label="Schwierigkeit">
+              <button type="button" data-stufe="leicht" aria-pressed="false">Leicht</button>
+              <button type="button" data-stufe="mittel" aria-pressed="true">Mittel</button>
+              <button type="button" data-stufe="schwer" aria-pressed="false">Schwer</button>
+            </div>
+          </section>
+
+          <section class="werkzeug-karte">
+            <div id="zeit" role="timer" aria-live="off">0:00</div>
+            <p id="fall" class="fall"></p>
+            <p id="meldung" class="status" role="status" aria-live="polite"></p>
+            <h2>Verdächtige</h2>
+            <div class="leute" id="leute"></div>
+            <div class="kasten-knoepfe">
+              <button id="notiz" type="button" class="knopf zweit" aria-pressed="false">Notizen</button>
+              <button id="zurueck" type="button" class="knopf zweit">Rückgängig</button>
+            </div>
+            <div class="kasten-knoepfe">
+              <button id="pruefen" type="button" class="knopf zweit">Prüfen</button>
+              <button id="tipp" type="button" class="knopf zweit">Tipp</button>
+              <button id="loesung" type="button" class="knopf zweit">Lösung</button>
+            </div>
+            <div class="kasten-knoepfe">
+              <button id="neu" type="button" class="knopf">Neuer Fall</button>
+            </div>
+          </section>
+
+          <section class="werkzeug-karte">
+            <h2>Hinweise</h2>
+            <ul class="hinweise" id="hinweise"></ul>
+          </section>
+
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Jede Person steht auf genau einem Feld. In jeder Zeile und jeder Spalte steht genau eine Person.</li>
+              <li>Auf Möbeln und beim Opfer steht niemand. Die Hinweise sagen, wer wo stand.</li>
+              <li>Person wählen, dann Feld antippen. Mit „Notizen“ merkst du dir mögliche Felder. Hinweise antippen = abhaken.</li>
+              <li>Der Mörder ist die Person, die im Raum des Opfers steht – und dort allein ist.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="kern.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const M = window.Murdoku
+        const $ = (id) => document.getElementById(id)
+        const SVG = 'http://www.w3.org/2000/svg'
+
+        // Möbelsymbole (eigene Linienzeichnungen)
+        const ZEICHNUNG = {
+          sofa: '<rect x="3" y="10" width="18" height="7" rx="2"/><path d="M5 10V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2M6 17v2M18 17v2"/>',
+          tisch: '<ellipse cx="12" cy="9" rx="8" ry="3"/><path d="M12 12v8M8 20h8"/>',
+          pflanze: '<path d="M12 21v-9M12 13C8 13 6 10 6 6c4 0 6 3 6 7zM12 15c3 0 5-2 5-5-3 0-5 2-5 5zM8 21h8"/>',
+          kamin: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 18c-3 0-4-2-3-4 1-1 2-2 2-4 3 1 5 4 4 7-.5 1-1.5 1-3 1z"/>',
+          regal: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 9h16M4 15h16M8 6h3M13 12h3M8 18h4"/>',
+          bett: '<path d="M3 19V7M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-8v6"/><circle cx="6.5" cy="11.5" r="1.5"/>',
+          opfer: '<circle cx="12" cy="12" r="9"/><path d="M8 8l8 8M16 8l-8 8"/>',
+        }
+        function symbol(id, klasse) {
+          const s = document.createElementNS(SVG, 'svg')
+          s.setAttribute('viewBox', '0 0 24 24')
+          s.setAttribute('fill', 'none')
+          s.setAttribute('stroke', 'currentColor')
+          s.setAttribute('stroke-width', '1.8')
+          s.setAttribute('stroke-linecap', 'round')
+          s.setAttribute('stroke-linejoin', 'round')
+          s.setAttribute('aria-hidden', 'true')
+          if (klasse) s.setAttribute('class', klasse)
+          s.innerHTML = ZEICHNUNG[id]
+          return s
+        }
+        const el = (name, klasse, text) => {
+          const e = document.createElement(name)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+
+        let stufe = 'mittel'
+        let R = null
+        let pos = [] // Zelle je Person (-1 = nicht gesetzt)
+        let notizen = [] // je Zelle: Menge von Personen
+        let sel = -1 // gewählte Person
+        let notizModus = false
+        let verlauf = []
+        let erledigt = new Set()
+        let falsch = new Set()
+        let verletzt = new Set()
+        let zeigeLoesung = false
+        let fertig = false
+        let start = 0
+        let uhr = 0
+        let felder = []
+
+        const haus = $('haus')
+
+        function setzeMeldung(text, art) {
+          $('meldung').textContent = text || ''
+          $('meldung').className = 'status' + (art ? ' ' + art : '')
+        }
+        function zeitText() {
+          const s = Math.floor((Date.now() - start) / 1000)
+          return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
+        }
+
+        function aufbauen() {
+          const n = R.n
+          haus.textContent = ''
+          haus.style.gridTemplateColumns = `repeat(${n}, 1fr)`
+          haus.style.gridTemplateRows = `repeat(${n}, 1fr)`
+          felder = []
+          const moebelAn = new Map(R.moebel.map((m) => [m.zelle, m]))
+          const gezeigt = new Set()
+          for (let z = 0; z < n * n; z++) {
+            const b = document.createElement('button')
+            b.type = 'button'
+            const r = Math.floor(z / n)
+            const c = z % n
+            b.className = 'z r' + R.raum[z]
+            if (c === n - 1 || R.raum[z + 1] !== R.raum[z]) b.classList.add('rr')
+            if (r === n - 1 || R.raum[z + n] !== R.raum[z]) b.classList.add('rb')
+            if (c === n - 1) b.style.borderRightWidth = '0'
+            if (r === n - 1) b.style.borderBottomWidth = '0'
+            const m = moebelAn.get(z)
+            if (m || z === R.opfer) {
+              b.classList.add('gesperrt')
+              b.setAttribute('aria-label', 'Zeile ' + (r + 1) + ', Spalte ' + (c + 1) + ': ' + (m ? m.name : 'Opfer'))
+              b.append(symbol(m ? m.id : 'opfer', 'symbol-moebel' + (m ? '' : ' opfer')))
+            } else {
+              b.addEventListener('click', () => feldTippen(z))
+            }
+            // Raumname im ersten Feld (oben links) des Raums
+            if (!gezeigt.has(R.raum[z])) {
+              gezeigt.add(R.raum[z])
+              b.prepend(el('span', 'raumname', R.raumNamen[R.raum[z]].name))
+            }
+            haus.append(b)
+            felder.push({ b, m })
+          }
+          // Legende
+          const leg = $('legende')
+          leg.textContent = ''
+          R.raumNamen.forEach((rn, i) => {
+            const li = el('li')
+            const f = el('span', 'farbe r' + i)
+            f.setAttribute('aria-hidden', 'true')
+            li.append(f, rn.name)
+            leg.append(li)
+          })
+          R.moebel.forEach((mb) => {
+            const li = el('li')
+            li.append(symbol(mb.id), mb.name)
+            leg.append(li)
+          })
+          const lo = el('li')
+          lo.append(symbol('opfer', 'opfer'), 'Opfer')
+          leg.append(lo)
+          // Verdächtige
+          const leute = $('leute')
+          leute.textContent = ''
+          R.personen.forEach((name, s) => {
+            const b = el('button')
+            b.type = 'button'
+            b.className = 'p' + s
+            b.append(el('span', 'person', name[0]), el('span', null, name), el('span', 'haken'))
+            b.addEventListener('click', () => {
+              sel = sel === s ? -1 : s
+              zeichnen()
+            })
+            leute.append(b)
+          })
+          // Hinweise
+          const liste = $('hinweise')
+          liste.textContent = ''
+          R.hinweise.forEach((h, i) => {
+            const li = el('li')
+            const b = el('button', null, h.text)
+            b.type = 'button'
+            b.setAttribute('aria-pressed', 'false')
+            b.addEventListener('click', () => {
+              if (erledigt.has(i)) erledigt.delete(i)
+              else erledigt.add(i)
+              zeichnen()
+            })
+            li.append(b)
+            liste.append(li)
+          })
+          $('fall').textContent = 'Das Opfer liegt ' + R.raumNamen[R.raum[R.opfer]].in + '. Wer war mit ihm allein?'
+        }
+
+        const aktuell = () => (zeigeLoesung ? R.loesung : pos)
+
+        function zeichnen() {
+          const n = R.n
+          const p = aktuell()
+          const pr = M.pruefen(R, pos)
+          const dop = zeigeLoesung ? new Set() : pr.doppelt
+          for (let z = 0; z < n * n; z++) {
+            const { b, m } = felder[z]
+            if (m || z === R.opfer) continue
+            const vorher = b.querySelector('.person, .notizen')
+            if (vorher) vorher.remove()
+            b.classList.toggle('doppelt', dop.has(z))
+            b.classList.remove('mark', 'gewaehlt')
+            for (let s = 0; s < 7; s++) b.classList.remove('p' + s)
+            const s = p.indexOf(z)
+            if (s >= 0) {
+              const d = el('span', 'person p' + s, R.personen[s][0])
+              if (falsch.has(s) && !zeigeLoesung) d.classList.add('falsch')
+              if (fertig && s === R.moerder) d.classList.add('moerder')
+              b.append(d)
+              b.setAttribute('aria-label', 'Zeile ' + (Math.floor(z / n) + 1) + ', Spalte ' + ((z % n) + 1) + ': ' + R.personen[s])
+              if (s === sel) b.classList.add('gewaehlt')
+            } else {
+              const no = !zeigeLoesung && notizen[z].size ? [...notizen[z]].sort() : []
+              if (no.length) {
+                const g = el('div', 'notizen')
+                no.forEach((q) => g.append(el('span', 'p' + q, R.personen[q][0])))
+                b.append(g)
+              }
+              if (sel >= 0 && no.includes(sel)) {
+                b.classList.add('mark', 'p' + sel)
+              }
+              b.setAttribute('aria-label', 'Zeile ' + (Math.floor(z / n) + 1) + ', Spalte ' + ((z % n) + 1) + ': leer')
+            }
+          }
+          // Verdächtige
+          ;[...$('leute').children].forEach((b, s) => {
+            b.setAttribute('aria-pressed', String(s === sel))
+            b.classList.toggle('gesetzt', p[s] >= 0)
+            b.querySelector('.haken').textContent = p[s] >= 0 ? '✓' : ''
+          })
+          // Hinweise
+          ;[...$('hinweise').children].forEach((li, i) => {
+            const b = li.firstChild
+            b.setAttribute('aria-pressed', String(erledigt.has(i)))
+            b.classList.toggle('verletzt', verletzt.has(i))
+          })
+        }
+
+        function sichern() {
+          verlauf.push({ pos: pos.slice(), notizen: notizen.map((q) => new Set(q)) })
+          if (verlauf.length > 200) verlauf.shift()
+        }
+
+        function feldTippen(z) {
+          if (fertig || zeigeLoesung) return
+          if (sel < 0) {
+            setzeMeldung('Wähle zuerst eine Person aus.')
+            return
+          }
+          const n = R.n
+          setzeMeldung('')
+          falsch.clear()
+          verletzt.clear()
+          sichern()
+          if (notizModus) {
+            if (pos.includes(z)) {
+              verlauf.pop()
+              return
+            }
+            if (notizen[z].has(sel)) notizen[z].delete(sel)
+            else notizen[z].add(sel)
+          } else if (pos[sel] === z) {
+            pos[sel] = -1
+          } else {
+            const andere = pos.indexOf(z)
+            if (andere >= 0) pos[andere] = -1
+            pos[sel] = z
+            // Notizen aufräumen: Zelle leer, diese Person nirgends mehr möglich, Zeile und Spalte der Person gesperrt
+            notizen[z].clear()
+            notizen.forEach((q) => q.delete(sel))
+            for (let k = 0; k < n; k++) {
+              notizen[Math.floor(z / n) * n + k].clear()
+              notizen[k * n + (z % n)].clear()
+            }
+            // nächste noch nicht gesetzte Person wählen
+            const naechste = R.personen.map((_, i) => (sel + 1 + i) % R.n).find((i) => pos[i] < 0)
+            if (naechste != null) sel = naechste
+          }
+          zeichnen()
+          pruefeFertig()
+        }
+
+        function pruefeFertig() {
+          if (!M.pruefen(R, pos).fertig) return
+          fertig = true
+          clearInterval(uhr)
+          sel = -1
+          zeichnen()
+          const raumName = R.raumNamen[R.raum[R.opfer]].in
+          setzeMeldung('Gelöst in ' + zeitText() + '! ' + R.personen[R.moerder] + ' war ' + raumName + ' mit dem Opfer allein – der Mörder.', 'gut')
+        }
+
+        function neu() {
+          setzeMeldung('Fall wird erzeugt …')
+          setTimeout(() => {
+            R = M.erzeugen(stufe)
+            pos = new Array(R.n).fill(-1)
+            notizen = Array.from({ length: R.n * R.n }, () => new Set())
+            verlauf = []
+            erledigt = new Set()
+            falsch = new Set()
+            verletzt = new Set()
+            sel = 0
+            fertig = false
+            zeigeLoesung = false
+            $('loesung').textContent = 'Lösung'
+            aufbauen()
+            setzeMeldung('')
+            zeichnen()
+            start = Date.now()
+            clearInterval(uhr)
+            $('zeit').textContent = '0:00'
+            uhr = setInterval(() => {
+              if (!fertig) $('zeit').textContent = zeitText()
+            }, 500)
+          }, 20)
+        }
+
+        $('neu').addEventListener('click', neu)
+        $('notiz').addEventListener('click', () => {
+          notizModus = !notizModus
+          $('notiz').setAttribute('aria-pressed', String(notizModus))
+        })
+        $('zurueck').addEventListener('click', () => {
+          if (fertig || zeigeLoesung || !verlauf.length) return
+          const v = verlauf.pop()
+          pos = v.pos
+          notizen = v.notizen
+          falsch.clear()
+          verletzt.clear()
+          setzeMeldung('')
+          zeichnen()
+        })
+        $('pruefen').addEventListener('click', () => {
+          if (fertig || zeigeLoesung) return
+          const pr = M.pruefen(R, pos)
+          falsch = new Set(pr.falsch)
+          verletzt = new Set(pr.verletzt.map((h) => R.hinweise.indexOf(h)))
+          zeichnen()
+          const k = pr.falsch.length
+          setzeMeldung(
+            k ? (k === 1 ? 'Eine Person steht falsch (gestrichelt).' : k + ' Personen stehen falsch (gestrichelt).') : 'Bisher alles richtig – weiter so!',
+            k ? 'schlecht' : 'gut',
+          )
+        })
+        $('tipp').addEventListener('click', () => {
+          if (fertig || zeigeLoesung) return
+          let s = sel >= 0 && pos[sel] !== R.loesung[sel] ? sel : -1
+          if (s < 0) {
+            const offen = R.personen.map((_, i) => i).filter((i) => pos[i] !== R.loesung[i])
+            if (!offen.length) return
+            s = offen[Math.floor(Math.random() * offen.length)]
+          }
+          sichern()
+          const z = R.loesung[s]
+          const andere = pos.indexOf(z)
+          if (andere >= 0) pos[andere] = -1
+          pos[s] = z
+          notizen[z].clear()
+          falsch.clear()
+          verletzt.clear()
+          setzeMeldung('Tipp: ' + R.personen[s] + ' stand hier.')
+          zeichnen()
+          pruefeFertig()
+        })
+        $('loesung').addEventListener('click', () => {
+          if (fertig) return
+          zeigeLoesung = !zeigeLoesung
+          falsch.clear()
+          verletzt.clear()
+          $('loesung').textContent = zeigeLoesung ? 'Zurück zum Spiel' : 'Lösung'
+          setzeMeldung(zeigeLoesung ? 'So sieht die Lösung aus: ' + R.personen[R.moerder] + ' ist der Mörder.' : '')
+          zeichnen()
+        })
+        document.querySelectorAll('[data-stufe]').forEach((b) => {
+          b.addEventListener('click', () => {
+            stufe = b.dataset.stufe
+            document.querySelectorAll('[data-stufe]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+            neu()
+          })
+        })
+        // Tastatur: Ziffer wählt die Person, N schaltet Notizen um
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey || e.metaKey || e.altKey || !R) return
+          if (/^[1-7]$/.test(e.key) && +e.key <= R.n) {
+            sel = +e.key - 1
+            zeichnen()
+          } else if (e.key.toLowerCase() === 'n') $('notiz').click()
+          else if (e.key === 'Escape') {
+            sel = -1
+            zeichnen()
+          }
+        })
+        neu()
+      })()
+    </script>
+  </body>
+</html>

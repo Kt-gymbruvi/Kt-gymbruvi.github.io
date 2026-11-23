@@ -28,6 +28,10 @@
     schach: 'Schach',
     // Gruppenspiel: Der Anbieter führt es auf seinem Gerät (Beamer/Laptop), die anderen spielen mit dem Handy (vertretung/chaos-flitzer/)
     'chaos-flitzer': 'Chaos-Flitzer 3000',
+    // Gruppenspiel wie Chaos-Flitzer: läuft auf dem Gerät des Anbieters, die anderen spielen mit dem Handy (vertretung/flip-7/handy/)
+    'flip-7': 'Flip 7',
+    // Zu zweit mit verdeckter Flotte: jedes Gerät kennt nur die eigene Flotte und beantwortet die Schüsse des Gegners (vertretung/schiffe-versenken/)
+    'schiffe-versenken': 'Schiffe versenken',
     // Gruppenspiele (spielen/gruppe.js): Der Anbieter sammelt Mitspieler und startet; sein Gerät führt das Spiel
     'wuerfelglueck': 'Würfelglück',
     'farbenjagd': 'Farbenjagd',

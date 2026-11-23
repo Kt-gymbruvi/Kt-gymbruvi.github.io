@@ -62,7 +62,7 @@
     notenbuch: 'notenbuch', sonne: 'modus-hell', mond: 'modus-dunkel', blatt: 'blatt', laufen: 'laufen',
     vertretung: 'vertretung', sudoku: 'sudoku', slitherlink: 'slitherlink', einstein: 'einstein',
     viergewinnt: 'vier-gewinnt', muehle: 'muehle', schach: 'schach', spielraum: 'spielraum',
-    chaosflitzer: 'chaos-flitzer',
+    chaosflitzer: 'chaos-flitzer', murdoku: 'murdoku', flip7: 'flip-7', schiffe: 'schiffe-versenken',
     wuerfelglueck: 'wuerfelglueck', farbenjagd: 'farbenjagd', eckeanecke: 'ecke-an-ecke', grenzland: 'grenzland',
     inselhandel: 'inselhandel', schienennetz: 'schienennetz', kachelland: 'kachelland',
   }

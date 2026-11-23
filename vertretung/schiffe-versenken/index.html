@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Schiffe versenken</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../../spielen/spiel.css" />
+    <style>
+      .buehne h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+      .felder { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.62fr); gap: 1rem; align-items: start; }
+      .felder.einzeln { grid-template-columns: minmax(0, 1fr); }
+      .feld-karte { padding: 0.9rem; }
+      .gewaesser {
+        display: grid;
+        grid-template-columns: 1.1rem repeat(10, minmax(0, 1fr));
+        width: 100%;
+        max-width: min(34rem, calc(100dvh - 13rem));
+        margin: 0 auto;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+      .felder.einzeln .gewaesser { max-width: min(34rem, calc(100dvh - 15rem)); }
+      .klein .gewaesser { max-width: 24rem; }
+      .gewaesser .kopf { display: grid; place-items: center; color: var(--text-2); font-size: clamp(0.55rem, 1.6vw, 0.8rem); font-weight: 600; }
+      .f {
+        position: relative;
+        aspect-ratio: 1;
+        min-width: 0;
+        padding: 0;
+        border: 1px solid color-mix(in srgb, var(--unterrichten) 30%, var(--flaeche));
+        border-radius: 0;
+        background: color-mix(in srgb, var(--unterrichten-hell) 85%, var(--flaeche));
+        font: inherit;
+        cursor: pointer;
+      }
+      .f[disabled], .f.gesperrt { cursor: default; }
+      .f::before, .f::after { content: ''; position: absolute; inset: 0; margin: auto; }
+      .f.schiff { background: color-mix(in srgb, var(--text) 78%, var(--flaeche)); border-color: var(--flaeche); }
+      .f.rest { background: color-mix(in srgb, var(--text) 38%, var(--flaeche)); border-color: var(--flaeche); }
+      .f.wasser::after { width: 24%; height: 24%; border-radius: 50%; background: var(--text-2); }
+      .f.sicher::after { width: 16%; height: 16%; border-radius: 50%; background: var(--text-2); opacity: 0.4; }
+      .f.treffer::before, .f.treffer::after { width: 74%; height: 14%; border-radius: 3px; background: var(--signal-rot); }
+      .f.treffer::before { transform: rotate(45deg); }
+      .f.treffer::after { transform: rotate(-45deg); }
+      .f.treffer:not(.schiff) { background: color-mix(in srgb, var(--signal-rot) 22%, var(--flaeche)); }
+      .f.versenkt { background: color-mix(in srgb, var(--text) 78%, var(--flaeche)); border-color: var(--flaeche); }
+      .f.vor-ok { background: color-mix(in srgb, var(--bibliothek) 55%, var(--flaeche)); }
+      .f.vor-nein { background: color-mix(in srgb, var(--fehler) 45%, var(--flaeche)); }
+      .f.neu { animation: einschlag 0.45s var(--sanft); }
+      @keyframes einschlag { from { transform: scale(1.5); z-index: 2; } }
+      @media (hover: hover) {
+        .f.ziel:hover { background: color-mix(in srgb, var(--fokus) 35%, var(--flaeche)); }
+      }
+
+      .flotte { display: grid; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+      .flotte button {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        width: 100%;
+        min-height: 2.6rem;
+        padding: 0.25rem 0.6rem;
+        border: 2px solid transparent;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.9rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .flotte button[aria-pressed='true'] { border-color: var(--fokus); }
+      .flotte button.gelegt { opacity: 0.55; }
+      .flotte .teile { display: flex; gap: 2px; }
+      .flotte .teile i { display: block; width: 0.9rem; height: 0.9rem; border-radius: 3px; background: color-mix(in srgb, var(--text) 78%, var(--flaeche)); }
+      .flotte .haken { margin-left: auto; color: var(--bibliothek); font-weight: 700; }
+      .flotte.stand button { cursor: default; min-height: 2.1rem; }
+      .flotte.stand li.versenkt { text-decoration: line-through; opacity: 0.55; }
+      .flotte.stand li { display: flex; align-items: center; gap: 0.6rem; min-height: 2.1rem; padding: 0.15rem 0.6rem; border-radius: var(--radius); background: var(--flaeche-2); font-size: 0.9rem; }
+      .meldung { min-height: 2.6rem; margin: 0 0 0.75rem; font-size: 1.05rem; font-weight: var(--gewicht-betont); }
+      .meldung.gut { color: var(--bibliothek); }
+      .meldung.schlecht { color: var(--fehler); }
+      .optionen { display: grid; gap: 0.9rem; margin: 0.75rem 0 1rem; }
+      .optionen h3 { margin: 0 0 0.3rem; font-size: 0.85rem; color: var(--text-2); font-weight: 600; }
+      .optionen label { display: flex; align-items: center; gap: 0.5rem; margin: 0.25rem 0; font-size: 0.95rem; }
+      .optionen .segmente { display: flex; width: 100%; }
+      .optionen .segmente button { flex: 1 1 0; min-width: 0; padding: 0.35rem 0.5rem; white-space: normal; }
+      .vorhang { display: grid; place-items: center; gap: 1rem; min-height: 16rem; text-align: center; }
+      .vorhang p { margin: 0; }
+      .vorhang .gross { font-size: 1.5rem; font-weight: var(--gewicht-titel); }
+      .knoepfe { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+      .knoepfe .knopf { flex: 1 1 7rem; }
+      @media (max-width: 52rem) {
+        .felder { grid-template-columns: minmax(0, 1fr); }
+        .gewaesser { max-width: 100%; }
+        .felder.einzeln .gewaesser, .klein .gewaesser { max-width: 100%; }
+        .klein .gewaesser { max-width: 22rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Vertretung</a>
+      <h1>Schiffe versenken</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/schiffe-versenken-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Schiffe versenken</p>
+          <p class="spielkopf-text">Flotte verstecken, Felder raten, alle gegnerischen Schiffe versenken.</p>
+        </div>
+      </div>
+      <div class="buehne" id="buehne" aria-live="polite"></div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../../spielen/echtzeit.js"></script>
+    <script src="../../spielen/raum.js"></script>
+    <script src="../../spielen/online-spiel.js"></script>
+    <script src="kern.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const S = window.Schiffe
+        const N = S.N
+        const $ = (id) => document.getElementById(id)
+        const el = (name, klasse, text) => {
+          const e = document.createElement(name)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        const pause = (ms) => new Promise((r) => setTimeout(r, ms))
+
+        // Einstellungen nur im Speicher dieser Seite
+        const einst = { modus: 'rechner', stufe: 'mittel', beruehren: false, nochmal: false }
+        let gen = 0 // erhöht sich bei Neustart: laufende Abläufe brechen ab
+        let bretter = [null, null]
+        let warte = false // darf der Mensch gerade schießen?
+        let letzterSchuss = -1
+
+        const stand = (text, art) => {
+          const m = el('p', 'meldung' + (art ? ' ' + art : ''), text || '')
+          m.setAttribute('role', 'status')
+          return m
+        }
+
+        // ---------- Feld zeichnen ----------
+        /** Baut ein 10×10-Feld. Gibt { wurzel, zellen } zurück; `bei(z)` wird bei Klick/Tipp gerufen. */
+        function gewaesser(label, bei) {
+          const g = el('div', 'gewaesser')
+          g.setAttribute('role', 'grid')
+          g.setAttribute('aria-label', label)
+          g.append(el('span', 'kopf'))
+          for (let c = 0; c < N; c++) g.append(el('span', 'kopf', S.SPALTEN[c]))
+          const zellen = []
+          for (let r = 0; r < N; r++) {
+            g.append(el('span', 'kopf', String(r + 1)))
+            for (let c = 0; c < N; c++) {
+              const z = r * N + c
+              const b = el('button', 'f')
+              b.type = 'button'
+              b.setAttribute('aria-label', S.feldName(z))
+              if (bei) b.addEventListener('click', () => bei(z))
+              g.append(b)
+              zellen.push(b)
+            }
+          }
+          return { wurzel: g, zellen }
+        }
+
+        const beschreibe = (z, text) => S.feldName(z) + ': ' + text
+
+        /** Eigenes Feld: Schiffe sichtbar, Schüsse des Gegners. */
+        function faerbeEigen(zellen, brett) {
+          zellen.forEach((b, z) => {
+            const id = brett.belegung[z]
+            b.className = 'f'
+            let text = 'Wasser'
+            if (id >= 0) {
+              b.classList.add('schiff')
+              text = 'Schiff'
+            }
+            if (brett.schuss[z] === 1) {
+              b.classList.add('wasser')
+              text = 'Wasser, beschossen'
+            } else if (brett.schuss[z] === 2) {
+              b.classList.add('treffer')
+              text = S.versenkt(brett.schiffe[id]) ? 'Schiff versenkt' : 'Treffer'
+            }
+            if (z === letzterSchuss) b.classList.add('neu')
+            b.setAttribute('aria-label', beschreibe(z, text))
+            b.disabled = true
+          })
+        }
+
+        /** Angriffsfeld: nur, was der Schütze weiß. `offen` zeigt am Ende auch die übrigen Schiffe. */
+        function faerbeAngriff(zellen, brett, offen, aktiv) {
+          zellen.forEach((b, z) => {
+            b.className = 'f'
+            let text = 'unbekannt'
+            const id = brett.belegung[z]
+            if (brett.schuss[z] === 1) {
+              b.classList.add('wasser')
+              text = 'Wasser'
+            } else if (brett.schuss[z] === 2) {
+              b.classList.add('treffer')
+              text = 'Treffer'
+              if (id >= 0 && S.versenkt(brett.schiffe[id])) {
+                b.classList.add('versenkt')
+                text = 'versenktes Schiff'
+              }
+            } else if (brett.sicher[z]) {
+              b.classList.add('sicher', 'gesperrt')
+              text = 'sicher Wasser'
+            } else if (offen && id >= 0) {
+              b.classList.add('rest')
+              text = 'Schiff, nicht getroffen'
+            } else if (aktiv) {
+              b.classList.add('ziel')
+            }
+            if (z === letzterSchuss) b.classList.add('neu')
+            b.setAttribute('aria-label', beschreibe(z, text))
+          })
+        }
+
+        function flottenStand(brett) {
+          const ul = el('ul', 'flotte stand')
+          for (const s of brett.schiffe.slice().sort((a, b) => b.laenge - a.laenge)) {
+            const li = el('li', S.versenkt(s) ? 'versenkt' : '')
+            const t = el('span', 'teile')
+            for (let k = 0; k < s.laenge; k++) t.append(el('i'))
+            li.append(t, el('span', null, S.NAMEN[s.laenge] + (S.versenkt(s) ? ' – versenkt' : '')))
+            ul.append(li)
+          }
+          return ul
+        }
+
+        const buehne = () => {
+          const b = $('buehne')
+          b.textContent = ''
+          return b
+        }
+
+        // ---------- Menü ----------
+        function menue() {
+          gen++
+          warte = false
+          letzterSchuss = -1
+          const b = buehne()
+          const k = el('section', 'werkzeug-karte')
+          k.append(el('h2', null, 'Neues Spiel'))
+          const o = el('div', 'optionen')
+
+          const g1 = el('div')
+          g1.append(el('h3', null, 'Spielart'))
+          const seg1 = el('div', 'segmente voll')
+          const stufenBox = el('div')
+          const arten = [['rechner', 'Gegen den Rechner'], ['zwei', 'Zu zweit am Gerät']]
+          arten.forEach(([w, t]) => {
+            const bt = el('button', null, t)
+            bt.type = 'button'
+            bt.setAttribute('aria-pressed', String(einst.modus === w))
+            bt.addEventListener('click', () => {
+              einst.modus = w
+              ;[...seg1.children].forEach((x) => x.setAttribute('aria-pressed', String(x === bt)))
+              stufenBox.hidden = w !== 'rechner'
+            })
+            seg1.append(bt)
+          })
+          g1.append(seg1)
+
+          stufenBox.append(el('h3', null, 'Stärke des Rechners'))
+          const seg2 = el('div', 'segmente voll')
+          ;[['leicht', 'Leicht'], ['mittel', 'Mittel'], ['schwer', 'Schwer']].forEach(([w, t]) => {
+            const bt = el('button', null, t)
+            bt.type = 'button'
+            bt.setAttribute('aria-pressed', String(einst.stufe === w))
+            bt.addEventListener('click', () => {
+              einst.stufe = w
+              ;[...seg2.children].forEach((x) => x.setAttribute('aria-pressed', String(x === bt)))
+            })
+            seg2.append(bt)
+          })
+          stufenBox.append(seg2)
+          stufenBox.hidden = einst.modus !== 'rechner'
+
+          const g3 = el('div')
+          g3.append(el('h3', null, 'Regeln'))
+          const regel = (text, schluessel) => {
+            const l = el('label')
+            const c = el('input')
+            c.type = 'checkbox'
+            c.checked = einst[schluessel]
+            c.addEventListener('change', () => (einst[schluessel] = c.checked))
+            l.append(c, text)
+            return l
+          }
+          g3.append(regel('Schiffe dürfen sich berühren (sonst bleibt zwischen ihnen immer ein Feld Wasser)', 'beruehren'), regel('Wer trifft, darf noch einmal schießen', 'nochmal'))
+          o.append(g1, stufenBox, g3)
+
+          const los = el('button', 'knopf gross', 'Flotte aufstellen')
+          los.type = 'button'
+          los.addEventListener('click', () => aufstellen(0))
+          const onlineKnopf = el('a', 'knopf zweit', 'Online mit der Klasse spielen')
+          onlineKnopf.href = '../../spielen/lobby/?spiel=schiffe-versenken'
+          const reiheMenue = el('div', 'knoepfe')
+          reiheMenue.append(los, onlineKnopf)
+          k.append(o, reiheMenue)
+          k.append(el('p', 'hinweis', 'Flotte: 1 Schlachtschiff (5 Felder), 2 Kreuzer (4), 3 Zerstörer (3), 4 U-Boote (2) auf einem Feld von 10 × 10.'))
+          b.append(k)
+        }
+
+        // ---------- Aufstellen ----------
+        function aufstellen(p) {
+          const g = ++gen
+          const wer = einst.modus === 'zwei' ? 'Spieler ' + (p + 1) : 'Du'
+          const plan = { zellen: S.FLOTTE.map(() => null), belegung: new Array(N * N).fill(-1), auswahl: 0, waagerecht: true }
+          const b = buehne()
+          const wrap = el('div', 'spiel')
+          const links = el('div', 'brett-flaeche')
+          const feld = gewaesser('Deine Flotte aufstellen', (z) => tippen(z))
+          links.append(feld.wurzel)
+          const seite = el('div', 'seite')
+          const karte = el('section', 'werkzeug-karte')
+          karte.append(el('h2', null, wer === 'Du' ? 'Stelle deine Flotte auf' : wer + ': Flotte aufstellen'))
+          const meldung = stand('Wähle ein Schiff und tippe das Feld, wo es beginnt.')
+          karte.append(meldung)
+          const liste = el('ul', 'flotte')
+          const knoepfe = S.FLOTTE.map((l, id) => {
+            const li = el('li')
+            const bt = el('button')
+            bt.type = 'button'
+            const t = el('span', 'teile')
+            for (let k = 0; k < l; k++) t.append(el('i'))
+            bt.append(t, el('span', null, S.NAMEN[l] + ' (' + l + ')'), el('span', 'haken'))
+            bt.addEventListener('click', () => {
+              if (plan.zellen[id]) {
+                nehmen(id)
+              } else plan.auswahl = id
+              zeichnen()
+            })
+            li.append(bt)
+            liste.append(li)
+            return bt
+          })
+          karte.append(liste)
+          const reihe = el('div', 'knoepfe')
+          const drehen = el('button', 'knopf zweit', 'Drehen: waagerecht')
+          drehen.type = 'button'
+          const zufall = el('button', 'knopf zweit', 'Zufällig')
+          zufall.type = 'button'
+          const leeren = el('button', 'knopf zweit', 'Leeren')
+          leeren.type = 'button'
+          reihe.append(drehen, zufall, leeren)
+          const fertig = el('button', 'knopf gross', on ? 'Bereit – Flotte steht' : p === 0 && einst.modus === 'zwei' ? 'Fertig – weitergeben' : einst.modus === 'zwei' ? 'Fertig – Spiel beginnt' : 'Los geht’s')
+          fertig.type = 'button'
+          fertig.style.marginTop = '0.75rem'
+          fertig.style.width = '100%'
+          karte.append(reihe, fertig)
+          const hinweis = el('p', 'hinweis', 'Ein gelegtes Schiff antippen nimmt es wieder auf. Taste R dreht.')
+          hinweis.style.marginTop = '0.75rem'
+          karte.append(hinweis)
+          seite.append(karte)
+          wrap.append(links, seite)
+          b.append(wrap)
+
+          function setzeMeldung(t, art) {
+            meldung.textContent = t
+            meldung.className = 'meldung' + (art ? ' ' + art : '')
+          }
+          function nehmen(id) {
+            for (const z of plan.zellen[id]) plan.belegung[z] = -1
+            plan.zellen[id] = null
+            plan.auswahl = id
+          }
+          function naechste() {
+            const id = S.FLOTTE.findIndex((_, i) => !plan.zellen[i])
+            plan.auswahl = id
+          }
+          function tippen(z) {
+            const vorhanden = plan.belegung[z]
+            if (vorhanden >= 0) {
+              nehmen(vorhanden)
+              setzeMeldung('Schiff aufgenommen.')
+              zeichnen()
+              return
+            }
+            if (plan.auswahl < 0) {
+              setzeMeldung('Alle Schiffe liegen. Tippe auf „Los geht’s“ oder nimm ein Schiff auf.')
+              return
+            }
+            const id = plan.auswahl
+            const zs = S.zellen(z, S.FLOTTE[id], plan.waagerecht)
+            if (!zs || !S.platzFrei(plan.belegung, zs, einst.beruehren)) {
+              setzeMeldung(zs ? 'Dort passt es nicht – zu nah an einem anderen Schiff.' : 'Dort passt es nicht – das Schiff ragt über den Rand.', 'schlecht')
+              return
+            }
+            plan.zellen[id] = zs
+            zs.forEach((c) => (plan.belegung[c] = id))
+            naechste()
+            setzeMeldung(plan.auswahl < 0 ? 'Alle Schiffe liegen!' : 'Gut. Nächstes Schiff.', plan.auswahl < 0 ? 'gut' : '')
+            zeichnen()
+          }
+          function vorschau(z) {
+            feld.zellen.forEach((c) => c.classList.remove('vor-ok', 'vor-nein'))
+            if (z < 0 || plan.auswahl < 0 || plan.belegung[z] >= 0) return
+            const l = S.FLOTTE[plan.auswahl]
+            const zs = S.zellen(z, l, plan.waagerecht)
+            const ok = !!zs && S.platzFrei(plan.belegung, zs, einst.beruehren)
+            // auch über den Rand hinaus gezeigt (rot), soweit Felder da sind
+            const ziele = []
+            for (let k = 0; k < l; k++) {
+              const r = Math.floor(z / N) + (plan.waagerecht ? 0 : k)
+              const c = (z % N) + (plan.waagerecht ? k : 0)
+              if (r < N && c < N) ziele.push(r * N + c)
+            }
+            ziele.forEach((c) => feld.zellen[c].classList.add(ok ? 'vor-ok' : 'vor-nein'))
+          }
+          function zeichnen() {
+            feld.zellen.forEach((c, z) => {
+              c.className = 'f' + (plan.belegung[z] >= 0 ? ' schiff' : '')
+              c.setAttribute('aria-label', S.feldName(z) + (plan.belegung[z] >= 0 ? ': Schiff' : ''))
+            })
+            knoepfe.forEach((bt, id) => {
+              bt.setAttribute('aria-pressed', String(plan.auswahl === id))
+              bt.classList.toggle('gelegt', !!plan.zellen[id])
+              bt.querySelector('.haken').textContent = plan.zellen[id] ? '✓' : ''
+            })
+            fertig.disabled = plan.zellen.some((x) => !x)
+            drehen.textContent = 'Drehen: ' + (plan.waagerecht ? 'waagerecht' : 'senkrecht')
+          }
+          feld.zellen.forEach((c, z) => {
+            c.addEventListener('mouseenter', () => vorschau(z))
+            c.addEventListener('mouseleave', () => vorschau(-1))
+          })
+          drehen.addEventListener('click', () => {
+            plan.waagerecht = !plan.waagerecht
+            zeichnen()
+          })
+          const taste = (e) => {
+            if (g !== gen) return document.removeEventListener('keydown', taste)
+            if (e.key.toLowerCase() === 'r' && !e.ctrlKey && !e.metaKey) drehen.click()
+          }
+          document.addEventListener('keydown', taste)
+          zufall.addEventListener('click', () => {
+            const f = S.zufallsFlotte(Math.random, einst.beruehren)
+            plan.belegung.fill(-1)
+            f.forEach((s) => {
+              plan.zellen[s.id] = s.zellen
+              s.zellen.forEach((c) => (plan.belegung[c] = s.id))
+            })
+            plan.auswahl = -1
+            setzeMeldung('Flotte zufällig gelegt. Du kannst Schiffe antippen und neu legen.', 'gut')
+            zeichnen()
+          })
+          leeren.addEventListener('click', () => {
+            plan.zellen.fill(null)
+            plan.belegung.fill(-1)
+            plan.auswahl = 0
+            setzeMeldung('Wähle ein Schiff und tippe das Feld, wo es beginnt.')
+            zeichnen()
+          })
+          fertig.addEventListener('click', () => {
+            if (plan.zellen.some((x) => !x)) return
+            if (on) return onlineBereit(S.FLOTTE.map((l, id) => ({ id, laenge: l, zellen: plan.zellen[id] })))
+            bretter[p] = S.neuesBrett(S.FLOTTE.map((l, id) => ({ id, laenge: l, zellen: plan.zellen[id] })))
+            if (einst.modus === 'rechner') {
+              bretter[1] = S.neuesBrett(S.zufallsFlotte(Math.random, einst.beruehren))
+              spiel(0, 'Du beginnst. Tippe ein Feld im gegnerischen Gewässer an.', true)
+            } else if (p === 0) {
+              vorhang('Gerät an Spieler 2 weitergeben', 'Spieler 2 stellt jetzt die Flotte auf. Spieler 1 schaut bitte weg.', 'Ich bin Spieler 2', () => aufstellen(1))
+            } else {
+              vorhang('Gerät an Spieler 1 weitergeben', 'Beide Flotten stehen. Spieler 1 beginnt.', 'Ich bin Spieler 1', () => spiel(0, 'Du beginnst. Tippe ein Feld an.', true))
+            }
+          })
+          setzeMeldung('Wähle ein Schiff und tippe das Feld, wo es beginnt.')
+          zeichnen()
+        }
+
+        // ---------- Sichtschutz beim Weitergeben ----------
+        function vorhang(titel, text, knopf, weiter) {
+          gen++
+          const b = buehne()
+          const k = el('section', 'werkzeug-karte vorhang')
+          const mitte = el('div')
+          mitte.append(el('p', 'gross', titel), el('p', 'hinweis', text))
+          const bt = el('button', 'knopf gross', knopf)
+          bt.type = 'button'
+          bt.addEventListener('click', weiter)
+          mitte.append(bt)
+          k.append(mitte)
+          b.append(k)
+          bt.focus({ preventScroll: true })
+        }
+
+        // ---------- Spiel ----------
+        const ergebnisText = (r) => (r.art === 'wasser' ? 'Wasser.' : r.art === 'treffer' ? 'Treffer!' : S.NAMEN[r.schiff.laenge] + ' versenkt!')
+
+        /** Zeigt die Lage aus Sicht von Spieler p. `klick`: darf geschossen werden? `weiter`: { text, bei } beendet den Zug. */
+        function spiel(p, text, klick, o) {
+          o = o || {}
+          warte = !!klick
+          const g = gen
+          const gegner = o.gegner || bretter[1 - p]
+          const eigen = o.eigen || bretter[p]
+          const b = buehne()
+          const felder = el('div', 'felder')
+          const ka = el('section', 'werkzeug-karte feld-karte')
+          ka.append(el('h2', null, einst.modus === 'zwei' ? 'Gewässer von Spieler ' + (2 - p) : 'Gegnerische Gewässer'))
+          const ang = gewaesser('Gegnerische Gewässer', klick ? (z) => (o.schiess ? o.schiess(z) : schiesse(p, z)) : null)
+          faerbeAngriff(ang.zellen, gegner, !!o.offen, !!klick)
+          if (!klick) ang.zellen.forEach((c) => (c.disabled = true))
+          ka.append(ang.wurzel)
+          const ke = el('section', 'werkzeug-karte feld-karte klein')
+          ke.append(el('h2', null, einst.modus === 'zwei' ? 'Flotte von Spieler ' + (p + 1) : 'Deine Flotte'))
+          const own = gewaesser('Deine Flotte')
+          faerbeEigen(own.zellen, eigen)
+          ke.append(own.wurzel)
+          felder.append(ka, ke)
+          const seite = el('div', 'seite')
+          const st = el('section', 'werkzeug-karte')
+          st.append(stand(text, o.art))
+          if (o.weiter) {
+            const bt = el('button', 'knopf gross', o.weiter.text)
+            bt.type = 'button'
+            bt.style.width = '100%'
+            bt.addEventListener('click', o.weiter.bei)
+            st.append(bt)
+            bt.focus({ preventScroll: true })
+          }
+          const flotte = el('div')
+          flotte.append(el('h2', null, 'Gegnerische Flotte'), flottenStand(gegner))
+          flotte.style.marginTop = '0.9rem'
+          st.append(flotte)
+          const grundText = on ? 'Aufgeben' : 'Spiel abbrechen'
+          const neu = el(on && o.ende ? 'a' : 'button', 'knopf zweit klein', on && o.ende ? 'Zur Lobby' : o.ende ? 'Neues Spiel' : grundText)
+          if (on && o.ende) neu.href = on.online.lobby
+          else neu.type = 'button'
+          neu.style.marginTop = '0.9rem'
+          let nachfrage = false
+          if (!(on && o.ende))
+            neu.addEventListener('click', () => {
+              if (nachfrage || o.ende) return on ? onlineAufgeben() : menue()
+              nachfrage = true
+              neu.textContent = 'Wirklich ' + (on ? 'aufgeben?' : 'abbrechen?')
+              setTimeout(() => {
+                nachfrage = false
+                neu.textContent = grundText
+              }, 3000)
+            })
+          st.append(neu)
+          seite.append(st)
+          const wrap = el('div', 'spiel')
+          wrap.append(felder, seite)
+          b.append(wrap)
+          return g
+        }
+
+        function schiesse(p, z) {
+          if (!warte) return
+          const gegner = bretter[1 - p]
+          if (gegner.sicher[z]) {
+            spiel(p, 'Dort kann kein Schiff liegen – Nachbarfeld eines versenkten Schiffs.', true, { art: 'schlecht' })
+            return
+          }
+          if (gegner.schuss[z]) return
+          warte = false
+          const g = gen
+          letzterSchuss = z
+          const r = S.schiessen(gegner, z, einst.beruehren)
+          const text = S.feldName(z) + ': ' + ergebnisText(r)
+          if (r.fertig) return ende(p, text)
+          const nochmal = einst.nochmal && r.art !== 'wasser'
+          const art = r.art === 'wasser' ? '' : 'gut'
+          if (nochmal) return spiel(p, text + ' Du darfst noch einmal!', true, { art })
+          if (einst.modus === 'rechner') {
+            spiel(p, text, false, { art })
+            pause(1100).then(() => g === gen && rechnerZug(g, text))
+          } else {
+            spiel(p, text, false, {
+              art,
+              weiter: {
+                text: 'Fertig – Gerät weitergeben',
+                bei: () => vorhang('Gerät an Spieler ' + (2 - p) + ' weitergeben', 'Spieler ' + (p + 1) + ' schaut bitte weg.', 'Ich bin Spieler ' + (2 - p), () => spiel(1 - p, 'Du bist dran. Tippe ein Feld an.', true)),
+              },
+            })
+          }
+        }
+
+        async function rechnerZug(g, vorher) {
+          const mein = bretter[0]
+          let text = ''
+          for (;;) {
+            if (g !== gen) return
+            const z = S.schuss(einst.stufe, S.wissen(mein))
+            letzterSchuss = z
+            const r = S.schiessen(mein, z, einst.beruehren)
+            text = 'Rechner schießt auf ' + S.feldName(z) + ': ' + ergebnisText(r)
+            if (r.fertig) return ende(1, text)
+            const nochmal = einst.nochmal && r.art !== 'wasser'
+            spiel(0, text, false, { art: r.art === 'wasser' ? '' : 'schlecht' })
+            await pause(1000)
+            if (g !== gen) return
+            if (!nochmal) break
+          }
+          letzterSchuss = -1
+          spiel(0, text + ' Du bist dran.', true)
+        }
+
+        function ende(sieger, text) {
+          gen++
+          warte = false
+          const rechnerGewinnt = einst.modus === 'rechner' && sieger === 1
+          const wer = einst.modus === 'zwei' ? 'Spieler ' + (sieger + 1) + ' gewinnt!' : rechnerGewinnt ? 'Der Rechner hat gewonnen.' : 'Du hast gewonnen!'
+          // Aus Sicht des Siegers (im Rechnerspiel immer aus Sicht des Menschen); alle Schiffe aufdecken
+          const sicht = einst.modus === 'rechner' ? 0 : sieger
+          spiel(sicht, text + ' Alle Schiffe sind versenkt – ' + wer, false, { offen: true, ende: true, art: rechnerGewinnt ? 'schlecht' : 'gut' })
+        }
+
+
+        // ---------- Online mit der Klasse (aus der Lobby geöffnet) ----------
+        // Jedes Gerät kennt nur die eigene Flotte. Ein Schuss geht als Zug { t: 's', z, v } an den Gegner, der ihn auf seiner Flotte
+        // auswertet und als Zug { t: 'a', z, v, art, schiff, fertig } zurückmeldet („schiff“ nur bei versenkt: Länge und Felder).
+        // Ohne „Treffer = nochmal“ und ohne sich berührende Schiffe; Aufstellen und „bereit“ laufen außerhalb der Zugliste.
+        let on = null
+
+        function onlineStart(online, seite, gegnerName, partie) {
+          einst.modus = 'online'
+          einst.beruehren = false
+          einst.nochmal = false
+          on = {
+            online,
+            seite,
+            gegner: gegnerName,
+            partie,
+            meinBrett: null,
+            bereitIch: false,
+            bereitGegner: false,
+            laeuft: false,
+            dran: 1,
+            wartet: false, // mein Schuss ist unterwegs
+            wiss: { schuss: new Array(N * N).fill(0), sicher: new Array(N * N).fill(false), versenkt: [] },
+            ende: null, // 'gewonnen' | 'verloren' | 'aufgabe-gegner' | 'aufgabe-ich'
+            gegnerDa: true,
+            letzteMeldung: '',
+            art: '',
+            timer: 0,
+          }
+          // Flotte nach dem Neuladen wiederherstellen
+          try {
+            const f = JSON.parse(sessionStorage.getItem('schiffe-' + partie) || 'null')
+            if (Array.isArray(f) && f.length === S.FLOTTE.length) {
+              on.meinBrett = S.neuesBrett(f)
+              on.bereitIch = true
+            }
+          } catch {
+            /* ohne Speicher: neu aufstellen */
+          }
+        }
+
+        const onlineZeichnen = () => {
+          if (!on) return
+          if (!on.laeuft) return on.bereitIch ? onlineWarten() : null
+          onlineSpiel()
+        }
+
+        function wissBrett() {
+          const b = { schiffe: S.FLOTTE.map((l, id) => ({ id, laenge: l, zellen: [], treffer: 0 })), belegung: new Array(N * N).fill(-1), schuss: on.wiss.schuss, sicher: on.wiss.sicher }
+          for (const v of on.wiss.versenkt) {
+            const sh = b.schiffe.find((x) => x.laenge === v.laenge && !x.treffer)
+            if (!sh) continue
+            sh.treffer = sh.laenge
+            sh.zellen = v.zellen
+            v.zellen.forEach((z) => (b.belegung[z] = sh.id))
+          }
+          return b
+        }
+
+        function onlineBereitSenden() {
+          on.online.raum.sende('schiffe-bereit', { partie: on.partie, von: on.online.raum.id })
+        }
+
+        function onlineBereit(flotte) {
+          try {
+            sessionStorage.setItem('schiffe-' + on.partie, JSON.stringify(flotte))
+          } catch {
+            /* nur ohne Neuladen nutzbar */
+          }
+          on.meinBrett = S.neuesBrett(flotte)
+          on.bereitIch = true
+          onlineBereitSenden()
+          // bis der Gegner bereit ist, wiederholen (falls seine Seite gerade neu lädt)
+          clearInterval(on.timer)
+          on.timer = setInterval(() => {
+            if (on.bereitGegner || on.ende) return clearInterval(on.timer)
+            onlineBereitSenden()
+          }, 3000)
+          pruefeStart()
+          onlineZeichnen()
+        }
+
+        function pruefeStart() {
+          if (on.bereitIch && on.bereitGegner && !on.laeuft) {
+            on.laeuft = true
+            on.letzteMeldung = on.dran === on.seite ? 'Alle Flotten stehen. Du beginnst – tippe ein Feld an.' : on.gegner + ' beginnt …'
+            onlineZeichnen()
+          }
+        }
+
+        function onlineWarten() {
+          const b = buehne()
+          const k = el('section', 'werkzeug-karte vorhang')
+          const mitte = el('div')
+          mitte.append(el('p', 'gross', 'Deine Flotte steht.'), el('p', 'hinweis', 'Warte, bis ' + on.gegner + ' fertig aufgestellt hat …'))
+          const eigen = gewaesser('Deine Flotte')
+          faerbeEigen(eigen.zellen, on.meinBrett)
+          eigen.wurzel.style.maxWidth = '18rem'
+          mitte.append(eigen.wurzel)
+          const l = el('a', 'knopf zweit', 'Zur Lobby')
+          l.href = on.online.lobby
+          mitte.append(l)
+          k.append(mitte)
+          b.append(k)
+        }
+
+        function onlineSpiel() {
+          const meinZug = on.laeuft && !on.ende && on.dran === on.seite && !on.wartet
+          let text = on.letzteMeldung
+          if (!on.gegnerDa && !on.ende) text += ' (' + on.gegner + ' ist gerade nicht verbunden.)'
+          spiel(on.seite, text, meinZug, { gegner: wissBrett(), eigen: on.meinBrett, schiess: onlineSchiessen, art: on.art, ende: !!on.ende })
+        }
+
+        function onlineSchiessen(z) {
+          if (!on || on.ende || on.dran !== on.seite || on.wartet) return
+          if (on.wiss.sicher[z]) {
+            on.letzteMeldung = 'Dort kann kein Schiff liegen – Nachbarfeld eines versenkten Schiffs.'
+            on.art = 'schlecht'
+            return onlineZeichnen()
+          }
+          if (on.wiss.schuss[z]) return
+          on.wartet = true
+          letzterSchuss = z
+          on.letzteMeldung = S.feldName(z) + ': Schuss abgegeben – warte auf ' + on.gegner + ' …'
+          on.art = ''
+          on.online.sendeZug({ t: 's', z, v: on.seite })
+          onlineZeichnen()
+        }
+
+        function onlineEnde(wie) {
+          on.ende = wie
+          on.wartet = false
+          clearInterval(on.timer)
+          on.online.fertig()
+          const t = {
+            gewonnen: 'Alle Schiffe versenkt – du hast gewonnen!',
+            verloren: 'Alle deine Schiffe sind versenkt – ' + on.gegner + ' hat gewonnen.',
+            'aufgabe-gegner': on.gegner + ' hat aufgegeben – du hast gewonnen!',
+            'aufgabe-ich': 'Du hast aufgegeben.',
+          }[wie]
+          on.letzteMeldung = (wie === 'gewonnen' || wie === 'verloren' ? on.letzteMeldung + ' ' : '') + t
+          on.art = wie === 'gewonnen' || wie === 'aufgabe-gegner' ? 'gut' : 'schlecht'
+          onlineZeichnen()
+        }
+
+        function onlineAufgeben() {
+          if (!on || on.ende) return
+          on.online.gibAuf()
+          onlineEnde('aufgabe-ich')
+        }
+
+        const antwortText = (art, schiff) => (art === 'wasser' ? 'Wasser.' : art === 'treffer' ? 'Treffer!' : S.NAMEN[schiff.laenge] + ' versenkt!')
+
+        /** Ein Zug aus der Liste (Gegner live, beim Neuladen auch eigene). */
+        function onlineZug(zug) {
+          if (!on || !zug || typeof zug !== 'object') return
+          const ich = zug.v === on.seite
+          if (zug.t === 's' && Number.isInteger(zug.z) && zug.z >= 0 && zug.z < N * N) {
+            if (ich) {
+              // eigener Schuss beim Nachholen: Antwort steht noch aus
+              on.wartet = true
+              on.dran = on.seite
+              return onlineZeichnen()
+            }
+            if (!on.meinBrett) return
+            const r = S.schiessen(on.meinBrett, zug.z, false)
+            if (!r) return
+            letzterSchuss = zug.z
+            on.online.sendeZug({
+              t: 'a',
+              z: zug.z,
+              v: on.seite,
+              art: r.art,
+              schiff: r.art === 'versenkt' ? { laenge: r.schiff.laenge, zellen: r.schiff.zellen.slice() } : null,
+              fertig: !!r.fertig,
+            })
+            on.laeuft = true
+            on.dran = on.seite
+            on.wartet = false
+            on.letzteMeldung = on.gegner + ' schießt auf ' + S.feldName(zug.z) + ': ' + antwortText(r.art, r.schiff) + (r.fertig ? '' : ' Du bist dran.')
+            on.art = r.art === 'wasser' ? '' : 'schlecht'
+            if (r.fertig) return onlineEnde('verloren')
+            return onlineZeichnen()
+          }
+          if (zug.t === 'a' && Number.isInteger(zug.z) && zug.z >= 0 && zug.z < N * N && ['wasser', 'treffer', 'versenkt'].includes(zug.art)) {
+            on.laeuft = true
+            if (ich) {
+              on.dran = on.seite
+              return // eigene Antwort beim Nachholen: wurde neu erzeugt
+            }
+            const w = on.wiss
+            w.schuss[zug.z] = zug.art === 'wasser' ? 1 : 2
+            if (zug.art === 'versenkt' && zug.schiff && Array.isArray(zug.schiff.zellen)) {
+              const zs = zug.schiff.zellen.filter((c) => Number.isInteger(c) && c >= 0 && c < N * N)
+              w.versenkt.push({ laenge: zug.schiff.laenge, zellen: zs })
+              for (const c of zs) for (const nb of S.nachbarn8(c)) if (!w.schuss[nb]) w.sicher[nb] = true
+            }
+            on.wartet = false
+            on.dran = zug.v // wer antwortet, schießt als Nächster
+            letzterSchuss = zug.z
+            on.letzteMeldung = S.feldName(zug.z) + ': ' + antwortText(zug.art, zug.schiff) + (zug.fertig ? '' : ' ' + on.gegner + ' ist dran.')
+            on.art = zug.art === 'wasser' ? '' : 'gut'
+            if (zug.fertig) return onlineEnde('gewonnen')
+            return onlineZeichnen()
+          }
+        }
+
+        function onlineAnmelden() {
+          const params = new URLSearchParams(location.search)
+          if (!params.get('partie')) return false
+          const seite = Number(params.get('seite'))
+          const online = window.OnlineSpiel.start({
+            beiZug: (zug) => onlineZug(zug),
+            beiAufgabe: () => on && !on.ende && onlineEnde('aufgabe-gegner'),
+            beiGegner: (da) => {
+              if (!on) return
+              on.gegnerDa = da
+              if (on.laeuft && !on.ende) onlineZeichnen()
+            },
+          })
+          if (!online) return false
+          onlineStart(online, seite, online.gegner, online.partie)
+          // Der Gegner meldet „bereit“ (auch erneut nach dem Neuladen); ein Neuladen des Gegners fragt mit „sync“
+          online.raum.auf('schiffe-bereit', (d) => {
+            if (!on || d.partie !== on.partie || d.von === online.raum.id) return
+            const neu = !on.bereitGegner
+            on.bereitGegner = true
+            if (on.bereitIch && neu) onlineBereitSenden()
+            pruefeStart()
+          })
+          online.raum.auf('sync', (d) => {
+            if (on && d.partie === on.partie && d.von !== online.raum.id && on.bereitIch && !on.bereitGegner) onlineBereitSenden()
+          })
+          if (on.bereitIch) {
+            onlineBereitSenden()
+            onlineZeichnen()
+          } else {
+            aufstellen(0)
+          }
+          return true
+        }
+
+        if (!onlineAnmelden()) menue()
+      })()
+    </script>
+  </body>
+</html>
