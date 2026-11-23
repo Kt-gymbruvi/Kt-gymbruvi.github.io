@@ -181,3 +181,35 @@
   --bibliothek: #a6dba2;
   --bibliothek-hell: #1c4320;
 }
+
+/* Farben der Gruppenspiele (spielen/gruppe.js und die Spiele dort) – in beiden Modi gleich, wie die Signalfarben.
+   Spielerfarben: Figuren, Steine, Kartenfarben. Felder: Landschaften und Plättchen. */
+:root {
+  --spieler-1: #e0352b; /* Rot */
+  --spieler-2: #1f62d6; /* Blau */
+  --spieler-3: #f2b705; /* Gelb */
+  --spieler-4: #2a9a48; /* Grün */
+  --spieler-5: #8a45c8; /* Lila */
+  --spieler-6: #ee7a10; /* Orange */
+  --spieler-rand: rgb(0 0 0 / 0.45); /* Umriss um Figuren */
+  --spieler-hell: #ffffff; /* Schrift auf Spielerfarben */
+  --spieler-dunkel: #1b1b1b; /* Schrift auf Gelb */
+  --karte-grau: #8d969e; /* graue Strecke, Karten ohne Farbe */
+  --karte-joker: #2f3438; /* Joker-/Wechselkarten */
+
+  --feld-wald: #2f7d3a;
+  --feld-lehm: #c0623a;
+  --feld-weide: #9fd067;
+  --feld-korn: #ecc94b;
+  --feld-erz: #8b95a1;
+  --feld-wueste: #e6d3a3;
+  --feld-meer: #3d86c6;
+  --feld-zahl: #fbf6e9; /* Zahlenchips */
+  --feld-text: #1b1b1b;
+
+  --kachel-wiese: #8cbf63;
+  --kachel-weg: #f5efdf;
+  --kachel-stadt: #c98b4c;
+  --kachel-kapelle: #b34a3c;
+  --kachel-linie: #45643a;
+}

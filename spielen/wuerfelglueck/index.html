@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Würfelglück</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <link rel="stylesheet" href="../gruppe.css" />
+    <style>
+      #wuerfel {
+        max-width: 30rem;
+        margin: 0 auto;
+      }
+      .wuerfel-flaeche {
+        fill: var(--flaeche);
+        stroke: var(--linie-stark);
+        stroke-width: 2;
+      }
+      .wuerfel-auge {
+        fill: var(--text);
+      }
+      .gehalten .wuerfel-flaeche {
+        stroke: var(--fokus);
+        stroke-width: 5;
+      }
+      .wuerfel-wahl {
+        cursor: pointer;
+      }
+      .wuerfel-text {
+        margin: 0;
+        color: var(--text-2);
+        font-size: 0.95rem;
+        text-align: center;
+      }
+      .block-huelle {
+        overflow-x: auto;
+        border-radius: var(--radius);
+      }
+      .block {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .block th,
+      .block td {
+        padding: 0.25rem 0.4rem;
+        border-bottom: 1px solid var(--haarlinie);
+        text-align: center;
+        white-space: nowrap;
+      }
+      .block th:first-child,
+      .block td:first-child {
+        text-align: left;
+      }
+      .block thead th {
+        max-width: 6rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .block .summe td {
+        font-weight: var(--gewicht-betont);
+        background: var(--flaeche-2);
+      }
+      .block .spalte-dran {
+        background: var(--schwebe);
+      }
+      .block button {
+        min-width: 2.4rem;
+        min-height: 2rem;
+        padding: 0 0.4rem;
+        border: 1px dashed var(--linie-stark);
+        border-radius: 0.5rem;
+        background: transparent;
+        color: var(--text-2);
+        font: inherit;
+        cursor: pointer;
+      }
+      .block button:hover {
+        border-style: solid;
+        color: var(--text);
+        background: var(--flaeche);
+      }
+      .block button.null {
+        opacity: 0.6;
+      }
+      .block .neu {
+        color: var(--akzent);
+        font-weight: var(--gewicht-betont);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
+      <h1>Würfelglück</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/wuerfelglueck-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Würfelglück</p>
+          <p class="spielkopf-text">Fünf Würfel, drei Würfe, dreizehn Felder.</p>
+        </div>
+      </div>
+      <div class="gruppenspiel">
+        <div class="brett-flaeche" id="flaeche"></div>
+        <div class="seite" id="seite">
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Wer dran ist, würfelt bis zu dreimal. Würfel, die man antippt, bleiben liegen.</li>
+              <li>Danach trägt man das Ergebnis in ein freies Feld ein – auch mit 0 Punkten, wenn nichts passt.</li>
+              <li>Oben zählen nur die gewählten Augen (z. B. drei Vierer = 12). Ab 63 Punkten oben gibt es 35 Punkte dazu.</li>
+              <li>Dreier-/Viererpasch: Summe aller Würfel. Full House (3 + 2 gleiche): 25. Kleine Straße (4 in Folge): 30. Große Straße (5 in Folge): 40. Fünfling (5 gleiche): 50. Chance: Summe.</li>
+              <li>Nach 13 Runden gewinnt, wer die meisten Punkte hat.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../gruppe-hilfe.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../gruppe.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const W = window.Wuerfelglueck
+        const SVG = 'http://www.w3.org/2000/svg'
+        const AUGEN = {
+          1: [[2, 2]],
+          2: [[1, 1], [3, 3]],
+          3: [[1, 1], [2, 2], [3, 3]],
+          4: [[1, 1], [3, 1], [1, 3], [3, 3]],
+          5: [[1, 1], [3, 1], [2, 2], [1, 3], [3, 3]],
+          6: [[1, 1], [3, 1], [1, 2], [3, 2], [1, 3], [3, 3]],
+        }
+        let halten = [false, false, false, false, false]
+        let merk = ''
+
+        function s(name, attr) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(attr || {}).forEach((k) => e.setAttribute(k, attr[k]))
+          return e
+        }
+        function el(tag, klasse, text) {
+          const e = document.createElement(tag)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+
+        function zeichne(z, a) {
+          const schluessel = z.dran + ':' + z.wurf + ':' + z.runde
+          if (schluessel !== merk) {
+            merk = schluessel
+            halten = [false, false, false, false, false]
+          }
+          const waehlbar = a.darf && z.wurf > 0 && z.wurf < 3
+
+          // Würfel
+          const svg = s('svg', { id: 'wuerfel', viewBox: '0 0 500 110', role: 'img', 'aria-label': 'Würfel: ' + (z.wurf ? z.wuerfel.join(', ') : 'noch nicht geworfen') })
+          z.wuerfel.forEach((w, i) => {
+            const g = s('g', { transform: 'translate(' + (10 + i * 98) + ',' + (halten[i] ? 4 : 14) + ')' })
+            if (halten[i]) g.classList.add('gehalten')
+            g.append(s('rect', { x: 0, y: 0, width: 86, height: 86, rx: 16, class: 'wuerfel-flaeche' }))
+            if (z.wurf > 0) AUGEN[w].forEach(([x, y]) => g.append(s('circle', { cx: x * 21.5, cy: y * 21.5, r: 8, class: 'wuerfel-auge' })))
+            if (waehlbar) {
+              g.classList.add('wuerfel-wahl')
+              g.setAttribute('role', 'button')
+              g.setAttribute('aria-label', 'Würfel ' + (i + 1) + ': ' + w + (halten[i] ? ', wird behalten' : ''))
+              g.addEventListener('click', () => {
+                halten[i] = !halten[i]
+                a.neu()
+              })
+            }
+            svg.append(g)
+          })
+          a.brett.append(svg)
+          a.brett.append(
+            el(
+              'p',
+              'wuerfel-text',
+              z.ende
+                ? 'Spiel vorbei.'
+                : z.wurf === 0
+                  ? a.name(z.dran) + ' würfelt gleich zum ersten Mal.'
+                  : 'Wurf ' + z.wurf + ' von 3' + (waehlbar ? ' – tippe die Würfel an, die liegen bleiben sollen.' : z.wurf === 3 && a.darf ? ' – trage jetzt ein Feld ein.' : '.'),
+            ),
+          )
+
+          // Punkteblock
+          const huelle = el('div', 'block-huelle')
+          const t = el('table', 'block')
+          const kopf = el('tr')
+          kopf.append(el('th', null, ''))
+          z.spieler.forEach((sp, i) => {
+            const th = el('th', i === z.dran && !z.ende ? 'spalte-dran' : '', sp.name)
+            th.title = sp.name
+            th.style.borderBottom = '3px solid ' + a.farbe(i)
+            kopf.append(th)
+          })
+          const thead = el('thead')
+          thead.append(kopf)
+          t.append(thead)
+          const tb = el('tbody')
+          const zeile = (titel, werte, klasse) => {
+            const tr = el('tr', klasse || '')
+            tr.append(el('td', null, titel))
+            werte.forEach((x, i) => {
+              const td = el('td', i === z.dran && !z.ende ? 'spalte-dran' : '')
+              if (x instanceof Node) td.append(x)
+              else td.textContent = x
+              tr.append(td)
+            })
+            tb.append(tr)
+          }
+          const kannEintragen = a.darf && z.wurf > 0
+          W.FELDER.forEach((name, f) => {
+            zeile(
+              name,
+              z.spieler.map((_, i) => {
+                const x = z.blatt[i][f]
+                if (x !== null) return String(x)
+                if (i === z.dran && kannEintragen) {
+                  const p = W.wert(z.wuerfel, f)
+                  const b = el('button', p ? '' : 'null', String(p))
+                  b.type = 'button'
+                  b.setAttribute('aria-label', name + ' eintragen: ' + p + ' Punkte')
+                  b.addEventListener('click', () => {
+                    if (p === 0 && !confirm(name + ' mit 0 Punkten eintragen?')) return
+                    a.sende({ t: 'eintragen', feld: f })
+                  })
+                  return b
+                }
+                return ''
+              }),
+            )
+            if (f === 5) {
+              zeile('Summe oben', z.blatt.map((b) => String(W.oben(b)) + ' / 63'), 'summe')
+              zeile('Bonus', z.blatt.map((b) => String(W.bonus(b))), 'summe')
+            }
+          })
+          zeile('Gesamt', z.blatt.map((b) => String(W.gesamt(b))), 'summe')
+          t.append(tb)
+          huelle.append(t)
+          a.brett.append(huelle)
+
+          // Knopf
+          if (!z.ende) {
+            const b = el('button', 'knopf gross', z.wurf === 0 ? 'Würfeln' : z.wurf < 3 ? 'Nochmal würfeln (' + (z.wurf + 1) + '. Wurf)' : 'Keine Würfe mehr')
+            b.type = 'button'
+            b.disabled = !a.darf || z.wurf >= 3 || (z.wurf > 0 && halten.every(Boolean))
+            b.addEventListener('click', () => a.sende({ t: 'wurf', halten: halten.slice() }))
+            a.aktionen.append(b)
+          }
+        }
+
+        window.Gruppenspiel({
+          regeln: W,
+          flaeche: document.getElementById('flaeche'),
+          seite: document.getElementById('seite'),
+          zeichne,
+          kiPause: 650,
+        })
+      })()
+    </script>
+  </body>
+</html>

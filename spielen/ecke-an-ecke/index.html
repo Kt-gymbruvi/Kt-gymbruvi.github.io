@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ecke an Ecke</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <link rel="stylesheet" href="../gruppe.css" />
+    <style>
+      #feld {
+        max-width: min(40rem, calc(100dvh - 12rem));
+        margin: 0 auto;
+      }
+      .leer {
+        fill: var(--flaeche-2);
+        stroke: var(--flaeche);
+        stroke-width: 1;
+      }
+      .belegt {
+        stroke: var(--spieler-rand);
+        stroke-width: 0.8;
+      }
+      .start {
+        fill: none;
+        stroke-width: 2.5;
+      }
+      .ansatz {
+        fill: var(--text-2);
+        opacity: 0.55;
+        pointer-events: none;
+      }
+      .vorschau rect {
+        stroke: var(--text);
+        stroke-width: 1.6;
+        opacity: 0.8;
+        pointer-events: none;
+      }
+      .vorschau.falsch rect {
+        stroke: var(--fehler);
+        stroke-dasharray: 3 2;
+        opacity: 0.45;
+      }
+      .ablage {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        justify-content: center;
+      }
+      .stein-knopf {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.4rem;
+        height: 3.4rem;
+        padding: 0.25rem;
+        border: 2px solid transparent;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        cursor: pointer;
+      }
+      .stein-knopf:disabled {
+        cursor: default;
+        opacity: 0.6;
+      }
+      .stein-knopf[aria-pressed='true'] {
+        border-color: var(--fokus);
+        background: var(--flaeche);
+      }
+      .stein-knopf svg rect {
+        stroke: var(--spieler-rand);
+        stroke-width: 0.15;
+      }
+      .ablage-titel {
+        margin: 0;
+        font-weight: var(--gewicht-betont);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
+      <h1>Ecke an Ecke</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/ecke-an-ecke-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Ecke an Ecke</p>
+          <p class="spielkopf-text">Eigene Steine dürfen sich nur an den Ecken berühren.</p>
+        </div>
+      </div>
+      <div class="gruppenspiel">
+        <div class="brett-flaeche" id="flaeche"></div>
+        <div class="seite" id="seite">
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Jeder hat 21 Steine aus 1 bis 5 Quadraten. Zu zweit ist das Brett 14 × 14 Felder groß, sonst 20 × 20.</li>
+              <li>Der erste Stein muss das eigene Startfeld (Ring) bedecken.</li>
+              <li>Jeder weitere Stein berührt einen eigenen Stein an einer Ecke – aber nie an einer Kante. Fremde Steine darf man überall berühren.</li>
+              <li>Stein wählen, drehen oder spiegeln, aufs Brett tippen (Vorschau), nochmal tippen oder „Legen“. Die Punkte zeigen, wo es weitergehen kann.</li>
+              <li>Wer nicht mehr legen kann, ist fertig. Am Ende zählt jedes gelegte Feld einen Punkt, alle Steine gelegt: 15 dazu.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../gruppe-hilfe.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../gruppe.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const E = window.EckeAnEcke
+        const SVG = 'http://www.w3.org/2000/svg'
+        const G = 20
+        let wahl = null // { s, o }
+        let pos = null // { x, y } linke obere Ecke der Lage
+        let merk = ''
+
+        function s(name, attr) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(attr || {}).forEach((k) => e.setAttribute(k, attr[k]))
+          return e
+        }
+        function el(tag, klasse, text) {
+          const e = document.createElement(tag)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        const masse = (form) => [Math.max(...form.map((p) => p[0])) + 1, Math.max(...form.map((p) => p[1])) + 1]
+
+        function zeichne(z, a) {
+          const schluessel = z.dran + ':' + z.log.length
+          if (schluessel !== merk) {
+            merk = schluessel
+            wahl = null
+            pos = null
+          }
+          if (wahl && (a.ich == null || !z.uebrig[a.ich][wahl.s])) wahl = null
+          const n = z.n
+          const svg = s('svg', { id: 'feld', viewBox: '0 0 ' + n * G + ' ' + n * G, role: 'img', 'aria-label': 'Spielbrett ' + n + ' mal ' + n })
+          for (let y = 0; y < n; y++)
+            for (let x = 0; x < n; x++) {
+              const f = z.brett[y * n + x]
+              const r = s('rect', { x: x * G, y: y * G, width: G, height: G, class: f === -1 ? 'leer' : 'belegt' })
+              if (f !== -1) r.style.fill = a.farbe(f)
+              svg.append(r)
+            }
+          z.spieler.forEach((_, i) => {
+            const [sx, sy] = E.startfeld(z, i)
+            if (z.brett[sy * n + sx] !== -1) return
+            const c = s('circle', { cx: sx * G + G / 2, cy: sy * G + G / 2, r: G / 2 - 3, class: 'start' })
+            c.style.stroke = a.farbe(i)
+            svg.append(c)
+          })
+          if (a.darf) E.ansatzpunkte(z, a.ich).forEach(([x, y]) => svg.append(s('circle', { cx: x * G + G / 2, cy: y * G + G / 2, r: 2.5, class: 'ansatz' })))
+          const vorschau = s('g', { class: 'vorschau' })
+          svg.append(vorschau)
+          const legen = el('button', 'knopf', 'Legen')
+          legen.type = 'button'
+
+          function zeigeVorschau() {
+            vorschau.replaceChildren()
+            const ok = wahl && pos && E.gueltig(z, a.ich, wahl.s, wahl.o, pos.x, pos.y)
+            legen.disabled = !ok
+            if (!wahl || !pos) return
+            vorschau.setAttribute('class', 'vorschau' + (ok ? '' : ' falsch'))
+            E.FORMEN[wahl.s][wahl.o].forEach(([fx, fy]) => {
+              const r = s('rect', { x: (fx + pos.x) * G + 1, y: (fy + pos.y) * G + 1, width: G - 2, height: G - 2 })
+              r.style.fill = a.farbe(a.ich)
+              vorschau.append(r)
+            })
+          }
+          function zelle(ev) {
+            const p = svg.createSVGPoint()
+            p.x = ev.clientX
+            p.y = ev.clientY
+            const q = p.matrixTransform(svg.getScreenCTM().inverse())
+            return [Math.floor(q.x / G), Math.floor(q.y / G)]
+          }
+          function ankerBei(cx, cy) {
+            const [w, h] = masse(E.FORMEN[wahl.s][wahl.o])
+            return { x: cx - Math.floor((w - 1) / 2), y: cy - Math.floor((h - 1) / 2) }
+          }
+          const lege = () => wahl && pos && E.gueltig(z, a.ich, wahl.s, wahl.o, pos.x, pos.y) && a.sende({ t: 'lege', s: wahl.s, o: wahl.o, x: pos.x, y: pos.y })
+          if (a.darf) {
+            svg.style.cursor = 'pointer'
+            svg.addEventListener('pointermove', (ev) => {
+              if (!wahl || ev.pointerType !== 'mouse') return
+              const [cx, cy] = zelle(ev)
+              const neu = ankerBei(cx, cy)
+              if (!pos || neu.x !== pos.x || neu.y !== pos.y) {
+                pos = neu
+                zeigeVorschau()
+              }
+            })
+            svg.addEventListener('click', (ev) => {
+              if (!wahl) return
+              const [cx, cy] = zelle(ev)
+              const neu = ankerBei(cx, cy)
+              if (pos && neu.x === pos.x && neu.y === pos.y && (ev.pointerType === 'mouse' || E.gueltig(z, a.ich, wahl.s, wahl.o, pos.x, pos.y))) return lege()
+              pos = neu
+              zeigeVorschau()
+            })
+          }
+          a.brett.append(svg)
+          zeigeVorschau()
+
+          // Eigene Steine
+          if (a.ich != null) {
+            a.brett.append(el('p', 'ablage-titel', a.darf ? 'Wähle einen Stein:' : (a.online ? 'Deine' : a.name(a.ich) + 's') + ' Steine'))
+            const ablage = el('div', 'ablage')
+            z.uebrig[a.ich].forEach((u, st) => {
+              if (!u) return
+              const o = wahl && wahl.s === st ? wahl.o : 0
+              const form = E.FORMEN[st][o]
+              const [w, h] = masse(form)
+              const b = el('button', 'stein-knopf')
+              b.type = 'button'
+              b.disabled = !a.darf
+              b.setAttribute('aria-pressed', String(!!(wahl && wahl.s === st)))
+              b.setAttribute('aria-label', 'Stein mit ' + form.length + (form.length === 1 ? ' Feld' : ' Feldern'))
+              const m = Math.max(w, h, 3)
+              const bild = s('svg', { viewBox: -(m - w) / 2 + ' ' + -(m - h) / 2 + ' ' + m + ' ' + m, width: '100%', height: '100%' })
+              form.forEach(([x, y]) => {
+                const r = s('rect', { x: x + 0.05, y: y + 0.05, width: 0.9, height: 0.9, rx: 0.12 })
+                r.style.fill = a.farbe(a.ich)
+                bild.append(r)
+              })
+              b.append(bild)
+              b.addEventListener('click', () => {
+                wahl = wahl && wahl.s === st ? null : { s: st, o: 0 }
+                a.neu()
+              })
+              ablage.append(b)
+            })
+            a.brett.append(ablage)
+          }
+
+          if (a.darf) {
+            if (!wahl) a.aktionen.append(el('p', 'hinweis', 'Wähle unter dem Brett einen Stein.'))
+            else {
+              const reihe = el('div', 'knopf-reihe')
+              const dreh = el('button', 'knopf zweit', '↻ Drehen')
+              dreh.type = 'button'
+              dreh.addEventListener('click', () => {
+                wahl.o = E.wandle(wahl.s, wahl.o, 'dreh')
+                a.neu()
+              })
+              const spiegel = el('button', 'knopf zweit', '⇋ Spiegeln')
+              spiegel.type = 'button'
+              spiegel.addEventListener('click', () => {
+                wahl.o = E.wandle(wahl.s, wahl.o, 'spiegel')
+                a.neu()
+              })
+              legen.addEventListener('click', lege)
+              reihe.append(dreh, spiegel, legen)
+              a.aktionen.append(reihe, el('p', 'hinweis', 'Tippe aufs Brett, um den Stein zu setzen (Taste R dreht, F spiegelt).'))
+            }
+          }
+        }
+
+        document.addEventListener('keydown', (e) => {
+          if (!wahl || (e.target.closest && e.target.closest('input, textarea'))) return
+          if (e.key === 'r' || e.key === 'f') {
+            wahl.o = E.wandle(wahl.s, wahl.o, e.key === 'r' ? 'dreh' : 'spiegel')
+            spiel.neuZeichnen()
+          }
+        })
+
+        const spiel = window.Gruppenspiel({
+          regeln: E,
+          flaeche: document.getElementById('flaeche'),
+          seite: document.getElementById('seite'),
+          zeichne,
+          kiPause: 700,
+        })
+      })()
+    </script>
+  </body>
+</html>

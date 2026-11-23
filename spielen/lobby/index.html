@@ -123,6 +123,21 @@
       .raum-grid > * {
         min-width: 0;
       }
+      .gruppen-angebot {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        width: 100%;
+      }
+      .gruppen-angebot select {
+        min-height: 2.75rem;
+        padding: 0.4rem 0.8rem;
+        border: 0;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+      }
       @media (max-width: 52rem) {
         .raum-grid {
           grid-template-columns: minmax(0, 1fr);
@@ -182,6 +197,9 @@
             <h2 style="margin-top: 0">Spiel anbieten</h2>
             <div class="anbieten" id="anbieten"></div>
             <p class="hinweis" id="anbieten-hinweis" style="margin: 0.75rem 0 0"></p>
+            <p class="hinweis" id="gruppe-hinweis" style="margin: 0.5rem 0 0" hidden>
+              <b>Spiele für mehrere</b> (Würfelglück, Farbenjagd, Ecke an Ecke, Grenzland, Inselhandel, Schienennetz, Kachelland): Wer anbietet, sammelt Mitspieler und startet dann. Freie Plätze kann der Computer übernehmen. Jeder spielt auf dem eigenen Gerät.
+            </p>
             <p class="hinweis" id="chaos-hinweis" style="margin: 0.5rem 0 0" hidden>
               <b>Chaos-Flitzer 3000</b> läuft auf deinem Gerät (am besten Beamer oder Laptop), du kannst auch allein anfangen. Die anderen steigen unter „Angebote“ ein und spielen mit dem Handy, bis zu sechs Personen.
             </p>
@@ -336,13 +354,29 @@
             v.className = s === 'verbunden' ? '' : 'aus'
             v.textContent = s === 'verbunden' ? 'Verbunden.' : s === 'verbindet' ? 'Verbinde …' : 'Verbindung weg – versuche es erneut …'
           })
-          raum.auf('anwesenheit', zeichnen)
+          raum.auf('anwesenheit', (liste) => {
+            const a = raum.ich.angebot
+            if (a && a.gruppe) {
+              // Eingestiegene, die den Raum verlassen haben, aus dem eigenen Angebot nehmen
+              const da = new Set(liste.map((x) => x.id))
+              const mit = a.mit.filter((m) => da.has(m.id))
+              if (mit.length !== a.mit.length) return raum.setze({ angebot: Object.assign({}, a, { mit }) })
+            }
+            zeichnen()
+          })
 
           // Jemand will bei meinem Angebot mitspielen
           raum.auf('beitritt', (d) => {
             const a = raum.ich.angebot
             if (gestartet || !a || a.partie !== d.partie || typeof d.von !== 'string' || d.von === raum.id) return
             if (!raum.anwesend().some((x) => x.id === d.von)) return
+            if (a.gruppe) {
+              // Gruppenspiel: Platz geben, solange noch einer frei ist (gestartet wird später von Hand)
+              const max = R.GRUPPE[a.spiel][1]
+              if (a.mit.some((m) => m.id === d.von) || a.mit.length + 1 + a.ki >= max) return
+              raum.setze({ angebot: Object.assign({}, a, { mit: a.mit.concat({ id: d.von, name: R.bereinige(d.name) || 'Gast' }) }) })
+              return
+            }
             const fremd = { id: d.von, name: R.bereinige(d.name) || 'Gast' }
             const ich = { id: raum.id, name: raum.ich.name }
             const ichZuerst = Math.random() < 0.5
@@ -352,8 +386,33 @@
             raum.setze({ angebot: null })
             losSpielen(a.partie, a.spiel, spieler)
           })
+          // Gruppenspiel: Anfrage wiederholen, bis ein Platz bestätigt ist (die erste kann vor der Anwesenheit ankommen)
+          setInterval(() => {
+            if (!wartetAuf || !wartetAuf.gruppe || gestartet) return
+            const bei = raum.anwesend().find((p) => p.angebot && p.angebot.partie === wartetAuf.partie)
+            if (bei && !(Array.isArray(bei.angebot.mit) && bei.angebot.mit.some((m) => m.id === raum.id))) raum.sende('beitritt', { partie: wartetAuf.partie, von: raum.id, name: raum.ich.name })
+          }, 2000)
+          raum.auf('austritt', (d) => {
+            const a = raum.ich.angebot
+            if (!a || !a.gruppe || a.partie !== d.partie) return
+            if (a.mit.some((m) => m.id === d.von)) raum.setze({ angebot: Object.assign({}, a, { mit: a.mit.filter((m) => m.id !== d.von) }) })
+          })
+          // Start eines Gruppenspiels
+          raum.auf('start', (d) => {
+            if (!R.GRUPPE[d.spiel] || !Array.isArray(d.spieler) || gestartet || typeof d.host !== 'string') return
+            if (d.spieler.some((s) => s && s.id === raum.id)) {
+              gestartet = true
+              raum.verlassen()
+              location.href = '../' + d.spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(d.partie) + '&host=' + encodeURIComponent(d.host)
+            } else if (wartetAuf && wartetAuf.partie === d.partie) {
+              wartetAuf = null
+              meldung('Dieses Spiel hat ohne dich angefangen.')
+              zeichnen()
+            }
+          })
           // Start einer Partie, bei der ich mitspiele (oder: ein Angebot ist vergeben)
           raum.auf('start', (d) => {
+            if (R.GRUPPE[d.spiel]) return
             if (!Array.isArray(d.spieler) || d.spieler.length !== 2 || !R.SPIELE[d.spiel]) return
             if (gestartet) return
             if (d.spieler.some((s) => s && s.id === raum.id)) {
@@ -379,6 +438,70 @@
           raum.verlassen()
           location.href =
             '../' + spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(partie) + '&seite=' + seite + '&gegner=' + encodeURIComponent(gegnerPerson.name) + '&gid=' + encodeURIComponent(gegnerPerson.id)
+        }
+
+        // Eigenes Angebot eines Gruppenspiels: Eingestiegene, Computerspieler, Starten
+        function gruppenAngebot(an, a) {
+          const [min, max] = R.GRUPPE[a.spiel]
+          const box = document.createElement('div')
+          box.className = 'gruppen-angebot'
+          const t = document.createElement('p')
+          t.style.margin = '0'
+          const namen = a.mit.map((m) => R.bereinige(m.name))
+          t.textContent = 'Du bietest „' + R.SPIELE[a.spiel] + '“ an (' + min + ' bis ' + max + ' Personen). ' + (namen.length ? 'Dabei: ' + namen.join(', ') + '.' : 'Noch ist niemand eingestiegen.')
+          const reihe = document.createElement('div')
+          reihe.className = 'formular-zeile'
+          const l = document.createElement('label')
+          l.className = 'feld'
+          l.textContent = 'Computerspieler dazu'
+          const wahl = document.createElement('select')
+          for (let n = 0; n <= max - 1 - a.mit.length; n++) {
+            const op = document.createElement('option')
+            op.value = String(n)
+            op.textContent = String(n)
+            op.selected = n === a.ki
+            wahl.append(op)
+          }
+          wahl.addEventListener('change', () => raum.setze({ angebot: Object.assign({}, a, { ki: Number(wahl.value) }) }))
+          l.append(wahl)
+          reihe.append(l)
+          const gesamt = 1 + a.mit.length + a.ki
+          const los = document.createElement('button')
+          los.type = 'button'
+          los.className = 'knopf'
+          los.textContent = 'Starten (' + gesamt + (gesamt === 1 ? ' Person)' : ' Personen)')
+          los.disabled = gesamt < min || gesamt > max
+          los.title = gesamt < min ? 'Es fehlen noch Mitspieler (oder Computerspieler).' : ''
+          los.addEventListener('click', () => {
+            const menschen = [{ id: raum.id, name: raum.ich.name }].concat(a.mit.map((m) => ({ id: m.id, name: R.bereinige(m.name) || 'Gast' })))
+            for (let i = menschen.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1))
+              ;[menschen[i], menschen[j]] = [menschen[j], menschen[i]]
+            }
+            const spieler = menschen.concat(Array.from({ length: a.ki }, (_, i) => ({ ki: true, name: 'Computer ' + (i + 1) })))
+            try {
+              sessionStorage.setItem('gruppenstart-' + a.partie, JSON.stringify({ spieler }))
+            } catch {
+              /* ohne Speicher kann die Spielleitung die Partie nicht anlegen */
+            }
+            gestartet = true
+            raum.sende('start', { partie: a.partie, spiel: a.spiel, spieler, host: raum.id })
+            raum.setze({ angebot: null })
+            setTimeout(() => {
+              raum.verlassen()
+              location.href = '../' + a.spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(a.partie) + '&host=' + encodeURIComponent(raum.id)
+            }, 300)
+          })
+          const weg = document.createElement('button')
+          weg.type = 'button'
+          weg.className = 'knopf zweit'
+          weg.textContent = 'Angebot zurückziehen'
+          weg.addEventListener('click', () => raum.setze({ angebot: null }))
+          const knoepfe = document.createElement('div')
+          knoepfe.className = 'knopf-reihe'
+          knoepfe.append(los, weg)
+          box.append(t, reihe, knoepfe)
+          an.append(box)
         }
 
         function zeichnen() {
@@ -413,7 +536,9 @@
           $('vorwahl').hidden = !vorSpiel || !erlaubt.includes(vorSpiel)
           if (vorSpiel) $('vorwahl-text').textContent = 'Du möchtest online spielen: ' + R.SPIELE[vorSpiel] + '. Biete es an oder steige bei einem Angebot ein.'
           const meins = raum.ich.angebot
-          if (meins) {
+          if (meins && meins.gruppe) {
+            gruppenAngebot(an, meins)
+          } else if (meins) {
             const t = document.createElement('span')
             t.textContent = 'Du bietest „' + R.SPIELE[meins.spiel] + '“ an. Sobald jemand einsteigt, geht es los.'
             const b = document.createElement('button')
@@ -424,7 +549,26 @@
             an.append(t, b)
           } else {
             const reihenfolge = vorSpiel && erlaubt.includes(vorSpiel) ? [vorSpiel, ...erlaubt.filter((x) => x !== vorSpiel)] : erlaubt
-            reihenfolge.forEach((s) => {
+            if (wartetAuf && wartetAuf.gruppe) {
+              const bei = liste.find((p) => p.angebot && p.angebot.partie === wartetAuf.partie)
+              const drin = bei && Array.isArray(bei.angebot.mit) && bei.angebot.mit.some((m) => m.id === raum.id)
+              if (drin) wartetAuf.dabei = true
+              const t = document.createElement('span')
+              t.textContent = drin
+                ? 'Du bist dabei: ' + R.SPIELE[bei.angebot.spiel] + ' bei ' + R.bereinige(bei.name) + '. Warte, bis es losgeht.'
+                : 'Frage nach einem Platz …'
+              const b = document.createElement('button')
+              b.type = 'button'
+              b.className = 'knopf zweit'
+              b.textContent = 'Aussteigen'
+              b.addEventListener('click', () => {
+                raum.sende('austritt', { partie: wartetAuf.partie, von: raum.id })
+                wartetAuf = null
+                zeichnen()
+              })
+              an.append(t, b)
+            }
+            if (!wartetAuf) reihenfolge.forEach((s) => {
               const b = document.createElement('button')
               b.type = 'button'
               b.className = 'knopf' + (vorSpiel && s !== vorSpiel && erlaubt.includes(vorSpiel) ? ' zweit' : '')
@@ -439,6 +583,7 @@
                   location.href = '../../vertretung/chaos-flitzer/?lobby=' + code + '&host=1'
                   return
                 }
+                if (R.GRUPPE[s]) return raum.setze({ angebot: { partie: R.zufallText(8), spiel: s, gruppe: true, mit: [], ki: 0 } })
                 raum.setze({ angebot: { partie: R.zufallText(8), spiel: s } })
               })
               an.append(b)
@@ -446,13 +591,32 @@
             if (!erlaubt.length) an.textContent = 'Die Leitung hat gerade kein Spiel freigegeben.'
           }
           $('chaos-hinweis').hidden = !erlaubt.includes('chaos-flitzer') || !!meins
+          $('gruppe-hinweis').hidden = !erlaubt.some((s) => R.GRUPPE[s]) || !!meins || !!wartetAuf
           $('anbieten-hinweis').textContent = meins || wartetAuf ? '' : 'Wähle ein Spiel. Deine Mitschüler sehen es dann unter „Angebote“ und können einsteigen.'
 
           // Angebote anderer
           const ang = $('angebote')
           ang.textContent = ''
           const offen = liste.filter((p) => p.id !== raum.id && p.angebot && R.SPIELE[p.angebot.spiel])
-          if (wartetAuf && !offen.some((p) => p.angebot.partie === wartetAuf.partie)) wartetAuf = null
+          if (wartetAuf && !offen.some((p) => p.angebot.partie === wartetAuf.partie)) {
+            // Ausweg, falls die Startnachricht verloren ging: Läuft meine Partie schon, steige ich ein.
+            const lauf = wartetAuf.dabei && !gestartet && liste.find((p) => p.spielt && p.spielt.partie === wartetAuf.partie && R.GRUPPE[p.spielt.spiel])
+            if (lauf) {
+              const host = /^[A-Z0-9]{4,16}$/i.test(lauf.spielt.host || '') ? lauf.spielt.host : lauf.id
+              gestartet = true
+              raum.verlassen()
+              location.href = '../' + lauf.spielt.spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(wartetAuf.partie) + '&host=' + encodeURIComponent(host)
+              return
+            }
+            if (wartetAuf.dabei) {
+              wartetAuf.weg = wartetAuf.weg || Date.now()
+              if (Date.now() - wartetAuf.weg > 20000) wartetAuf = null
+              else if (!wartetAuf.uhr) wartetAuf.uhr = setTimeout(() => {
+                if (wartetAuf) wartetAuf.uhr = null
+                zeichnen()
+              }, 2000)
+            } else wartetAuf = null
+          }
           if (!offen.length) {
             const li = document.createElement('li')
             li.className = 'leer'
@@ -465,9 +629,14 @@
             const t = document.createElement('span')
             t.className = 'text'
             const gruppe = p.angebot.spiel === 'chaos-flitzer'
+            const mehrere = !!R.GRUPPE[p.angebot.spiel]
+            const belegt = mehrere ? 1 + (Array.isArray(p.angebot.mit) ? p.angebot.mit.length : 0) + (Number(p.angebot.ki) || 0) : 0
+            const voll = mehrere && belegt >= R.GRUPPE[p.angebot.spiel][1]
             t.textContent = gruppe
               ? R.bereinige(p.name) + ' sucht Mitspieler: ' + R.SPIELE[p.angebot.spiel] + ' (' + Math.min(6, Number(p.angebot.belegt) || 0) + ' Handys dabei, bis zu 6 Plätze)'
-              : R.bereinige(p.name) + ' sucht ' + R.SPIELE[p.angebot.spiel]
+              : mehrere
+                ? R.bereinige(p.name) + ' sucht Mitspieler: ' + R.SPIELE[p.angebot.spiel] + ' (' + belegt + ' von ' + R.GRUPPE[p.angebot.spiel][1] + ' Plätzen belegt)'
+                : R.bereinige(p.name) + ' sucht ' + R.SPIELE[p.angebot.spiel]
             const b = document.createElement('button')
             b.type = 'button'
             b.className = 'knopf klein'
@@ -476,6 +645,10 @@
             b.disabled = !!wartetAuf || !!raum.ich.angebot
             b.title = raum.ich.angebot ? 'Zieh zuerst dein eigenes Angebot zurück.' : ''
             if (gruppe && !R.istCode(p.angebot.code)) b.disabled = true
+            if (voll && !wartet) {
+              b.disabled = true
+              b.textContent = 'Voll'
+            }
             b.addEventListener('click', () => {
               if (gruppe) {
                 // Chaos-Flitzer: das eigene Handy wird zur Steuerung des Spiels des Anbieters
@@ -484,7 +657,7 @@
                 location.href = '../../vertretung/chaos-flitzer/handy/?raum=' + p.angebot.code + '&lobby=' + code
                 return
               }
-              wartetAuf = { partie: p.angebot.partie }
+              wartetAuf = { partie: p.angebot.partie, gruppe: mehrere }
               raum.sende('beitritt', { partie: p.angebot.partie, von: raum.id, name: raum.ich.name })
               zeichnen()
             })
@@ -505,8 +678,9 @@
               li.className = 'zeile'
               const t = document.createElement('span')
               t.className = 'text'
-              t.textContent =
-                p.spielt.spiel === 'chaos-flitzer'
+              t.textContent = R.GRUPPE[p.spielt.spiel]
+                ? R.SPIELE[p.spielt.spiel] + ': ' + R.bereinige(p.name) + ' mit ' + String(p.spielt.gegner || '').replace(/[\u0000-\u001f\u007f<>]/g, '').slice(0, 80)
+                : p.spielt.spiel === 'chaos-flitzer'
                   ? R.bereinige(p.name) + ' spielt ' + R.SPIELE[p.spielt.spiel] + ' (' + R.bereinige(p.spielt.gegner) + ')'
                   : R.bereinige(p.name) + ' gegen ' + R.bereinige(p.spielt.gegner) + ' – ' + R.SPIELE[p.spielt.spiel]
               li.append(t)

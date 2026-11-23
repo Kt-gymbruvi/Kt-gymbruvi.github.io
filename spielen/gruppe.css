@@ -1,0 +1,218 @@
+/* Gruppenspiele (spielen/gruppe.js): Spielbrett links, Spieler und Knöpfe rechts; am Handy untereinander.
+   Braucht gemeinsam/tokens.css, gemeinsam/grundlage.css, werkzeuge/werkzeug.css und spielen/spiel.css. */
+.gruppenspiel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 19rem;
+  gap: 1.25rem;
+  align-items: start;
+}
+.gruppenspiel > * {
+  min-width: 0;
+}
+.gruppenspiel .brett-flaeche {
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 12rem;
+}
+.gruppe-brett {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.gruppe-brett svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+@media (max-width: 52rem) {
+  .gruppenspiel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Spielerliste */
+.gruppe-spieler {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+.gruppe-spieler li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: var(--flaeche-2);
+}
+.gruppe-spieler li.dran {
+  border-color: var(--akzent);
+}
+.gruppe-spieler li.sieger {
+  border-color: var(--fokus);
+  font-weight: var(--gewicht-betont);
+}
+.gruppe-punkt {
+  flex: none;
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--spieler-rand);
+  border-radius: 50%;
+}
+.gruppe-punkt.gross {
+  width: 3rem;
+  height: 3rem;
+}
+.gruppe-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.gruppe-klein {
+  color: var(--text-2);
+  font-size: 0.8rem;
+}
+.gruppe-pkt {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--gewicht-betont);
+}
+.gruppe-aktionen:empty {
+  display: none;
+}
+.gruppe-aktionen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+.gruppe-aktionen .knopf-reihe {
+  margin: 0;
+}
+.gruppe-hinweis:empty {
+  display: none;
+}
+.gruppe-hinweis {
+  color: var(--fehler);
+}
+.gruppe-log h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+.gruppe-log ol {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-2);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+/* Einrichten */
+.gruppe-einrichten {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 0.5rem;
+}
+.gruppe-einrichten h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.gruppe-einrichten .gruppe h2 {
+  font-size: 1rem;
+}
+.gruppe-plaetze {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.gruppe-platz {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.gruppe-platz input {
+  flex: 1 1 8rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.8rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--flaeche-2);
+  color: var(--text);
+  font: inherit;
+}
+.gruppe-platz .gruppe-art {
+  flex: 0 1 13rem;
+}
+.gruppe-platz .gruppe-art .segmente {
+  margin: 0;
+}
+
+/* Abdeckung beim Weitergeben */
+.gruppe-abdeckung {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+.gruppe-abdeckung-titel {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: var(--gewicht-titel);
+}
+.gruppe-warten {
+  margin: 2rem auto;
+  color: var(--text-2);
+  text-align: center;
+}
+
+/* Bausteine für die Spiele: Handkarten, Mengen, kleine Knöpfe */
+.hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+.mengen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.menge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--flaeche-2);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.menge i {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 1px solid var(--spieler-rand);
+  border-radius: 0.2rem;
+}
+.knopf.gewaehlt {
+  outline: 3px solid var(--fokus);
+  outline-offset: 2px;
+}
+.treffer {
+  cursor: pointer;
+}
