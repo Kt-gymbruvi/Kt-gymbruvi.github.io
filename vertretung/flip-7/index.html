@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
     <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
     <link rel="stylesheet" href="../../spielen/spiel.css" />
+    <link rel="stylesheet" href="karten.css" />
     <style>
       #aktion { margin-bottom: 1rem; }
       #aktion h2 { margin: 0 0 0.5rem; font-size: 1.15rem; }
@@ -60,45 +61,6 @@
       .marke.bust { background: color-mix(in srgb, var(--fehler) 22%, var(--flaeche)); color: var(--fehler); }
       .marke.sicher { background: color-mix(in srgb, var(--bibliothek) 22%, var(--flaeche)); color: var(--bibliothek); }
       .rundenpunkte { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-      .hand { display: flex; flex-wrap: wrap; gap: 0.35rem; min-height: 4.4rem; margin-top: 0.55rem; }
-      .karte {
-        display: grid;
-        place-items: center;
-        flex: none;
-        width: 2.9rem;
-        height: 4.1rem;
-        padding: 0.15rem;
-        border: 2px solid var(--linie-stark);
-        border-radius: 0.55rem;
-        background: var(--k, var(--flaeche));
-        color: var(--text);
-        font-size: 1.45rem;
-        font-weight: 700;
-        line-height: 1;
-        text-align: center;
-        box-shadow: var(--schatten-klein);
-      }
-      .karte.neu { animation: karte-auf 0.4s var(--sanft); }
-      @keyframes karte-auf { from { transform: translateY(-14px) scale(0.85) rotate(-6deg); opacity: 0; } }
-      .wa { --k: var(--tafel-hell); }
-      .wb { --k: var(--unterrichten-hell); }
-      .wc { --k: var(--interaktion-hell); }
-      .wd { --k: var(--lernen-hell); }
-      .we { --k: var(--bibliothek-hell); }
-      .karte.bonus { --k: var(--akzent-hell); border-color: var(--tuerkis); }
-      .karte.aktion {
-        border-color: var(--akzent);
-        background: var(--akzent);
-        color: var(--akzent-text);
-        font-size: 0.62rem;
-        line-height: 1.15;
-        letter-spacing: 0.01em;
-        text-transform: uppercase;
-      }
-      .karte.bustk { border: 2px dashed var(--fehler); color: var(--fehler); }
-      .karte.gross { width: 3.6rem; height: 5.1rem; font-size: 1.8rem; }
-      .karte.gross.aktion { font-size: 0.72rem; }
-      .leer-hand { align-self: center; color: var(--text-2); font-size: 0.9rem; }
 
       .stand-zeile { display: flex; justify-content: space-between; margin: 0.2rem 0; font-size: 0.95rem; }
       .stand-zeile b { font-variant-numeric: tabular-nums; }
@@ -115,6 +77,12 @@
       .ziele { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
       .ziele .knopf { flex: 1 1 9rem; flex-direction: column; gap: 0; min-height: 3.5rem; }
       .ziele .knopf small { font-size: 0.8rem; font-weight: 400; opacity: 0.85; }
+      .hbox { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin: 0.5rem 0 0.75rem; padding: 0.9rem; border: 1px solid var(--haarlinie); border-radius: var(--radius); background: var(--flaeche-2); }
+      .hqr { flex: none; width: 8.5rem; height: 8.5rem; padding: 0.4rem; border-radius: var(--radius); background: #fff; /* QR-Codes brauchen hellen Grund */ }
+      .hqr svg { display: block; width: 100%; height: 100%; }
+      .hcode { font-size: 2rem; font-weight: 300; letter-spacing: 0.08em; }
+      .hnamen { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem; }
+      .hnamen span { padding: 0.1rem 0.65rem; border-radius: 99px; background: var(--flaeche); font-size: 0.85rem; font-weight: 600; }
       .frage-karte { display: flex; align-items: center; gap: 0.75rem; }
 
       @media (max-width: 40rem) {
@@ -170,6 +138,9 @@
 
     <script src="../../gemeinsam/symbole.js"></script>
     <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../../js/qrcode.min.js"></script>
+    <script src="../../spielen/echtzeit.js"></script>
+    <script src="../../spielen/raum.js"></script>
     <script src="kern.js"></script>
     <script>
       ;(function () {
@@ -187,9 +158,9 @@
         // Einstellungen nur im Speicher dieser Seite (keine Namen auf dem Gerät speichern)
         const einst = {
           spieler: [
-            { name: 'Spieler 1', art: 'mensch', stufe: 'stark' },
-            { name: 'Rechner 1', art: 'rechner', stufe: 'stark' },
-            { name: 'Rechner 2', art: 'rechner', stufe: 'leicht' },
+            { name: 'Spieler 1', art: 'mensch', stufe: 'stark', phone: null },
+            { name: 'Rechner 1', art: 'rechner', stufe: 'stark', phone: null },
+            { name: 'Rechner 2', art: 'rechner', stufe: 'leicht', phone: null },
           ],
           ziel: 200,
           gefahr: true,
@@ -204,6 +175,198 @@
             const t = einst.schnell ? ms / 4 : ms
             setTimeout(r, t)
           })
+
+        // ---------- Handys als Mitspieler (Gastgeber) ----------
+        // Das Spiel läuft nur auf diesem Gerät (Beamer/Laptop). Handys treten über einen Raum bei (Echtzeit-Kanal „flip7-<Code>“, nichts
+        // wird gespeichert), sehen den Tisch und bekommen nur die Entscheidungen ihres Platzes gestellt: Frage → Antwort.
+        // Fällt ein Handy aus, spielt der Computer weiter. Aufruf aus der Lobby: ?lobby=<Raumcode>&host=1.
+        const qs = new URLSearchParams(location.search)
+        const LOBBY_CODE = (qs.get('lobby') || '').toUpperCase()
+        const HOST_MODE = qs.get('host') === '1' && !!window.Spielraum && window.Spielraum.istCode(LOBBY_CODE)
+        const REM = { kanal: null, code: null, phones: new Map(), qid: 0, pending: null, gone: new Map(), inGame: false, userClosed: false, seatPhone: [], ende: null, onChange: null }
+        let LOBBY = null
+        const handyAdresse = () => new URL('handy/?raum=' + REM.code, location.href).href
+
+        function remSend(ev, d) {
+          if (REM.kanal) REM.kanal.sende(ev, d)
+        }
+        function remOpen() {
+          if (REM.kanal || !window.Echtzeit || !window.Spielraum) return
+          REM.code = window.Spielraum.neuerCode()
+          REM.phones = new Map()
+          REM.kanal = window.Echtzeit.oeffnen('flip7-' + REM.code, { schluessel: window.Spielraum.meineId(), beiNachricht: remMsg, beiAnwesenheit: remPresence })
+          REM.kanal.verfolge({ id: window.Spielraum.meineId(), rolle: 'host' })
+        }
+        function remClose() {
+          if (REM.kanal) REM.kanal.schliessen()
+          REM.kanal = null
+          REM.code = null
+          REM.phones = new Map()
+          REM.pending = null
+          REM.inGame = false
+          if (LOBBY) LOBBY.setze({ angebot: null, spielt: null })
+          REM.gone.forEach((t) => clearTimeout(t))
+          REM.gone.clear()
+        }
+        function lobbyOpen() {
+          if (LOBBY || !HOST_MODE) return
+          LOBBY = window.Spielraum.betreten(LOBBY_CODE, { name: window.Spielraum.meinName() || 'Gastgeber' })
+          window.addEventListener('pagehide', () => LOBBY && LOBBY.verlassen())
+        }
+        function lobbyAngebot() {
+          if (!LOBBY || !REM.kanal) return
+          if (!REM.inGame) LOBBY.setze({ spielt: null, angebot: { partie: REM.code, spiel: 'flip-7', code: REM.code, belegt: REM.phones.size } })
+          else LOBBY.setze({ angebot: null, spielt: { partie: REM.code, spiel: 'flip-7', gegner: (sp ? sp.spieler.length : 0) + ' Spieler' } })
+        }
+
+        function remPresence(liste) {
+          const neu = new Map()
+          liste.forEach((x) => {
+            if (x && x.rolle === 'spieler' && typeof x.id === 'string') neu.set(x.id, { id: x.id, name: window.Spielraum.bereinige(x.name) || 'Gast' })
+          })
+          REM.phones = neu
+          if (REM.inGame && sp) {
+            // Plätze, deren Handy fehlt: nach 20 Sekunden übernimmt der Computer
+            REM.seatPhone.forEach((id, i) => {
+              if (!id) return
+              if (neu.has(id)) {
+                clearTimeout(REM.gone.get(id))
+                REM.gone.delete(id)
+              } else if (!REM.gone.has(id)) REM.gone.set(id, setTimeout(() => remTakeover(i, 'Handy nicht mehr verbunden'), 20000))
+            })
+          }
+          if (REM.onChange) REM.onChange()
+          if (!REM.inGame) lobbyAngebot()
+        }
+
+        function remMsg(ev, d) {
+          if (!d || typeof d !== 'object') return
+          if (ev === 'antwort') {
+            const q = REM.pending
+            if (!q || d.qid !== q.qid || d.von !== REM.seatPhone[q.seat]) return // nur vom richtigen Handy
+            let wahl = null
+            if (q.typ === 'zug') {
+              if (d.wahl === 'nimm' || d.wahl === 'bleib') wahl = d.wahl
+            } else if (Number.isInteger(d.wahl) && q.optionen.includes(d.wahl)) wahl = d.wahl
+            if (wahl === null) return
+            REM.pending = null
+            q.res(wahl)
+          } else if (ev === 'sync' && typeof d.von === 'string') {
+            zustandSenden()
+          }
+        }
+
+        // Frage an das Handy eines Platzes; ohne verbundenes Handy übernimmt der Computer
+        function frageHandy(i, typ, extra, fallback) {
+          const id = REM.seatPhone[i]
+          if (!id || !REM.phones.has(id)) {
+            remTakeover(i, 'Handy nicht verbunden')
+            return Promise.resolve(fallback())
+          }
+          return new Promise((res) => {
+            REM.pending = { qid: ++REM.qid, seat: i, typ, optionen: (extra && extra.optionen) || [], extra: extra || {}, res, fallback }
+            warteHandy(i)
+            zustandSenden()
+          })
+        }
+        function warteHandy(i) {
+          const me = sp.spieler[i]
+          const a = aktion(me.name + ' entscheidet am Handy …')
+          a.append(el('p', 'hinweis', 'Das Spiel geht weiter, sobald die Antwort da ist.'))
+          const b = el('button', 'knopf zweit', 'Computer übernimmt für ' + me.name)
+          b.type = 'button'
+          b.addEventListener('click', () => remTakeover(i, null))
+          a.append(b)
+        }
+        function remTakeover(i, grund) {
+          if (!sp) return
+          const me = sp.spieler[i]
+          if (!me || me.art !== 'handy') return
+          const id = REM.seatPhone[i]
+          me.art = 'rechner'
+          me.stufe = 'stark'
+          REM.seatPhone[i] = null
+          clearTimeout(REM.gone.get(id))
+          REM.gone.delete(id)
+          sp.protokoll.push({ text: me.name + ' wird vom Computer übernommen' + (grund ? ' (' + grund + ')' : '') + '.', art: 'info' })
+          remSend('status', { an: id, text: 'Der Computer spielt jetzt für dich.' })
+          if (REM.pending && REM.pending.seat === i) {
+            const q = REM.pending
+            REM.pending = null
+            q.res(q.fallback())
+          }
+          render()
+        }
+
+        const slim = (k) => ({ t: k.t, w: k.w, a: k.a })
+        /** Alles, was Handys vom Tisch sehen dürfen (alle Karten liegen offen). */
+        function zustandDaten() {
+          if (!sp) return { phase: 'start', spieler: [] }
+          const q = REM.pending
+          return {
+            phase: REM.ende ? 'rundenende' : 'spiel',
+            runde: sp.runde,
+            ziel: sp.ziel,
+            stapel: sp.stapel.length,
+            am: sp.am,
+            spieler: sp.spieler.map((s, i) => {
+              const h = s.hand
+              return {
+                n: s.name,
+                a: s.art,
+                ph: REM.seatPhone[i] || null,
+                g: s.gesamt,
+                st: h.status,
+                p: F.rundenpunkte(h),
+                f7: h.flip7,
+                z: h.zahlen.map((k) => k.w).sort((x, y) => x - y),
+                b: h.plus.map((k) => k.w),
+                m: !!h.mal,
+                c: !!h.chance,
+                x: h.bustKarte ? h.bustKarte.w : null,
+              }
+            }),
+            log: sp.protokoll.slice(-6).map((x) => x.text),
+            frage: q
+              ? {
+                  qid: q.qid,
+                  an: REM.seatPhone[q.seat],
+                  seat: q.seat,
+                  typ: q.typ,
+                  karte: q.extra.karte ? slim(q.extra.karte) : null,
+                  optionen: q.typ === 'ziel' ? q.optionen.map((j) => ({ i: j, n: sp.spieler[j].name, p: F.rundenpunkte(sp.spieler[j].hand), g: sp.spieler[j].gesamt })) : [],
+                  gefahr: q.typ === 'zug' && einst.gefahr ? Math.round(F.bustChance(sp, sp.spieler[q.seat].hand) * 100) : null,
+                  leer: q.typ === 'zug' ? F.istLeer(sp.spieler[q.seat].hand) : false,
+                }
+              : null,
+            ende: REM.ende,
+          }
+        }
+        function zustandSenden() {
+          if (REM.kanal) remSend('zustand', zustandDaten())
+        }
+
+        // Handys den Plätzen zuordnen (Plätze mit Art „Handy“; in der Lobby-Fassung entstehen neue Plätze automatisch)
+        function assignPhones() {
+          einst.spieler.forEach((s) => {
+            if (s.phone && !REM.phones.has(s.phone)) s.phone = null
+          })
+          for (const [id, ph] of REM.phones) {
+            if (einst.spieler.some((s) => s.phone === id)) continue
+            let seat = einst.spieler.find((s) => s.art === 'handy' && !s.phone)
+            if (!seat && HOST_MODE && einst.spieler.length < 6) {
+              seat = { name: '', art: 'handy', stufe: 'stark', phone: null }
+              einst.spieler.push(seat)
+            }
+            if (!seat) continue
+            seat.phone = id
+            seat.name = ph.name
+            remSend('platz', { an: id, name: ph.name })
+          }
+          einst.spieler.forEach((s) => {
+            if (s.art === 'handy' && s.phone && REM.phones.has(s.phone)) s.name = REM.phones.get(s.phone).name
+          })
+        }
 
         // ---------- Karten und Tisch ----------
         function kartenEl(k, klasse) {
@@ -261,7 +424,7 @@
             if (h.status !== 'aktiv') karte.classList.add('draussen')
             if (h.status === 'bust') karte.classList.add('bust')
             const kopf = el('div', 'sp-kopf')
-            kopf.append(el('span', 'sp-name', s.name + (s.art === 'rechner' ? ' (Rechner)' : '')), el('span', 'sp-gesamt', 'Gesamt ' + s.gesamt))
+            kopf.append(el('span', 'sp-name', s.name + (s.art === 'rechner' ? ' (Rechner)' : s.art === 'handy' ? ' (Handy)' : '')), el('span', 'sp-gesamt', 'Gesamt ' + s.gesamt))
             const zeile = el('div', 'sp-zeile')
             zeile.append(statusMarke(i), el('span', 'rundenpunkte', h.status === 'bust' ? '0' : String(F.rundenpunkte(h))))
             const hand = el('div', 'hand')
@@ -306,9 +469,21 @@
         function einrichten() {
           gen++
           sp = null
+          REM.inGame = false
+          REM.pending = null
+          REM.ende = null
+          REM.seatPhone = []
           $('spiel').hidden = true
+          // In der Lobby-Fassung öffnet sich der Handy-Raum von selbst
+          if (HOST_MODE && !REM.kanal && !REM.userClosed) {
+            remOpen()
+            lobbyOpen()
+            einst.spieler = [{ name: '', art: 'handy', stufe: 'stark', phone: null }, { name: '', art: 'handy', stufe: 'stark', phone: null }]
+          }
+          lobbyAngebot()
           const a = aktion('Neue Runde einrichten')
           const zeilen = el('div', 'zeilen')
+          const handyBox = el('div')
           const zeichneZeilen = () => {
             zeilen.textContent = ''
             einst.spieler.forEach((s, i) => {
@@ -319,20 +494,32 @@
               name.maxLength = 20
               name.setAttribute('aria-label', 'Name von Platz ' + (i + 1))
               name.addEventListener('input', () => (s.name = name.value))
+              if (s.art === 'handy') {
+                name.readOnly = true
+                name.placeholder = s.phone ? '' : 'wartet auf ein Handy …'
+              }
               const art = el('select')
               art.setAttribute('aria-label', 'Art von Platz ' + (i + 1))
-              for (const [w, t] of [['mensch', 'Mensch'], ['rechner-leicht', 'Rechner (leicht)'], ['rechner-stark', 'Rechner (stark)']]) {
+              const arten = [['mensch', 'Mensch (hier am Gerät)']]
+              if (REM.kanal) arten.push(['handy', 'Handy'])
+              arten.push(['rechner-leicht', 'Rechner (leicht)'], ['rechner-stark', 'Rechner (stark)'])
+              for (const [w, t] of arten) {
                 const o = el('option', null, t)
                 o.value = w
                 art.append(o)
               }
-              art.value = s.art === 'mensch' ? 'mensch' : 'rechner-' + s.stufe
+              art.value = s.art === 'mensch' ? 'mensch' : s.art === 'handy' ? 'handy' : 'rechner-' + s.stufe
               art.addEventListener('change', () => {
                 if (art.value === 'mensch') s.art = 'mensch'
+                else if (art.value === 'handy') s.art = 'handy'
                 else {
                   s.art = 'rechner'
                   s.stufe = art.value.slice(8)
                 }
+                if (s.art !== 'handy') s.phone = null
+                else s.name = ''
+                assignPhones()
+                zeichneZeilen()
               })
               const weg = el('button', 'knopf zweit', 'Entfernen')
               weg.type = 'button'
@@ -340,18 +527,74 @@
               weg.addEventListener('click', () => {
                 einst.spieler.splice(i, 1)
                 zeichneZeilen()
+                zeichneHandy()
               })
               z.append(name, art, weg)
               zeilen.append(z)
             })
           }
+          const zeichneHandy = () => {
+            handyBox.textContent = ''
+            const knopf = el('button', 'knopf zweit klein', REM.kanal ? 'Handys beenden' : 'Mit Handys spielen')
+            knopf.type = 'button'
+            knopf.addEventListener('click', () => {
+              if (REM.kanal) {
+                remClose()
+                REM.userClosed = true
+                einst.spieler.forEach((x) => {
+                  if (x.art === 'handy') {
+                    x.art = 'rechner'
+                    x.stufe = 'stark'
+                    x.phone = null
+                    x.name = x.name || 'Rechner'
+                  }
+                })
+              } else {
+                REM.userClosed = false
+                remOpen()
+                lobbyOpen()
+                lobbyAngebot()
+              }
+              zeichneZeilen()
+              zeichneHandy()
+            })
+            if (REM.kanal) {
+              const box = el('div', 'hbox')
+              const qr = el('div', 'hqr')
+              qr.setAttribute('role', 'img')
+              qr.setAttribute('aria-label', 'QR-Code zum Beitreten')
+              const info = el('div')
+              info.append(el('div', 'hinweis', 'Raumcode'), el('div', 'hcode', REM.code))
+              const w = el('div', 'hinweis')
+              w.append('Die Schüler scannen den QR-Code oder öffnen ', el('b', null, handyAdresse().replace(/^https?:\/\//, '')))
+              info.append(w)
+              info.append(el('div', 'hinweis', REM.phones.size + (REM.phones.size === 1 ? ' Handy ist' : ' Handys sind') + ' verbunden. Mit „Handy“ bei einem Platz lässt du es mitspielen.'))
+              const namen = el('div', 'hnamen')
+              REM.phones.forEach((x) => namen.append(el('span', null, x.name)))
+              info.append(namen)
+              box.append(qr, info)
+              handyBox.append(box)
+              window.QRCode.toString(handyAdresse(), { type: 'svg', margin: 0, errorCorrectionLevel: 'M' }, (f, svg) => {
+                if (!f) qr.innerHTML = svg // von der QR-Bibliothek erzeugtes SVG
+              })
+            }
+            handyBox.append(knopf)
+          }
+          REM.onChange = () => {
+            if (REM.inGame || sp) return
+            assignPhones()
+            zeichneZeilen()
+            zeichneHandy()
+          }
+          assignPhones()
           zeichneZeilen()
+          zeichneHandy()
           const plus = el('button', 'knopf zweit klein', 'Platz hinzufügen')
           plus.type = 'button'
           plus.addEventListener('click', () => {
             if (einst.spieler.length >= 6) return
             const k = einst.spieler.filter((x) => x.art === 'rechner').length + 1
-            einst.spieler.push({ name: 'Rechner ' + k, art: 'rechner', stufe: 'stark' })
+            einst.spieler.push({ name: 'Rechner ' + k, art: 'rechner', stufe: 'stark', phone: null })
             zeichneZeilen()
             plus.disabled = einst.spieler.length >= 6
           })
@@ -384,9 +627,10 @@
           start.type = 'button'
           start.addEventListener('click', starten)
           a.append(
-            el('p', 'hinweis', '2 bis 6 Plätze. Mehrere Menschen spielen an einem Gerät abwechselnd – alle Karten liegen offen. Namen werden nicht gespeichert.'),
+            el('p', 'hinweis', '2 bis 6 Plätze. Menschen spielen an diesem Gerät abwechselnd oder mit dem Handy – alle Karten liegen offen. Namen werden nicht gespeichert.'),
             zeilen,
             plus,
+            handyBox,
             ez,
             start,
           )
@@ -402,6 +646,7 @@
             zug(s, i) {
               pruefeAbbruch(g)
               const me = s.spieler[i]
+              if (me.art === 'handy') return frageHandy(i, 'zug', {}, () => F.kiZug(s, i)).then((w) => (pruefeAbbruch(g), w))
               if (me.art === 'rechner') {
                 aktion(me.name + ' überlegt …')
                 return pause(900).then(() => {
@@ -440,6 +685,7 @@
             ziel(s, von, karte, optionen) {
               pruefeAbbruch(g)
               const me = s.spieler[von]
+              if (me.art === 'handy') return frageHandy(von, 'ziel', { karte, optionen }, () => F.kiZiel(s, von, karte, optionen)).then((w) => (pruefeAbbruch(g), w))
               if (me.art === 'rechner') {
                 aktion(me.name + ' wählt aus …')
                 return pause(900).then(() => {
@@ -477,8 +723,14 @@
         // ---------- Spielablauf ----------
         async function starten() {
           const g = ++gen
-          const spieler = einst.spieler.map((s, i) => ({ name: (s.name || '').trim() || 'Platz ' + (i + 1), art: s.art, stufe: s.stufe }))
+          // Handy-Plätze ohne Handy spielt der Computer
+          const sitze = einst.spieler.map((s) => (s.art === 'handy' && !(s.phone && REM.phones.has(s.phone)) ? { ...s, art: 'rechner', stufe: 'stark', phone: null } : s))
+          const spieler = sitze.map((s, i) => ({ name: (s.name || '').trim() || (s.art === 'rechner' ? 'Rechner ' : 'Platz ') + (i + 1), art: s.art, stufe: s.stufe }))
+          REM.seatPhone = sitze.map((s) => (s.art === 'handy' ? s.phone : null))
+          REM.inGame = true
+          REM.ende = null
           sp = F.neuesSpiel(spieler, einst.ziel)
+          lobbyAngebot()
           sp.bei = async (text, art) => {
             pruefeAbbruch(g)
             // neu gezogene Karten kurz hervorheben: alle Karten, die vorher nicht da waren
@@ -490,6 +742,7 @@
             neueKarten = new Set([...jetzt].filter((id) => !(sp.gesehen || new Set()).has(id)))
             sp.gesehen = jetzt
             render()
+            zustandSenden()
             await pause(art === 'bust' || art === 'flip7' ? 1500 : art === 'info' ? 500 : 900)
             pruefeAbbruch(g)
           }
@@ -509,6 +762,8 @@
         }
 
         function rundenende(g, r, w) {
+          REM.ende = { punkte: r.punkte, flip7: r.flip7, sieger: w, namen: sp.spieler.map((x) => x.name), gesamt: sp.spieler.map((x) => x.gesamt) }
+          zustandSenden()
           return new Promise((res) => {
             const a = aktion(w != null ? sp.spieler[w].name + ' gewinnt das Spiel!' : 'Runde ' + sp.runde + ' ist zu Ende', r.flip7 ? 'Flip 7! Die Runde endete mit 7 verschiedenen Zahlen.' : '')
             const t = el('table', 'runde')
@@ -528,7 +783,9 @@
             weiter.type = 'button'
             weiter.addEventListener('click', () => {
               if (g !== gen) return
+              REM.ende = null
               if (w != null) einrichten()
+              else zustandSenden()
               res()
             })
             reihe.append(weiter)
@@ -554,6 +811,13 @@
           einrichten()
         })
 
+        if (HOST_MODE) {
+          const rueck = document.querySelector('.werkzeug-kopf a')
+          if (rueck) {
+            rueck.href = '../../spielen/lobby/?raum=' + LOBBY_CODE
+            rueck.textContent = 'Lobby'
+          }
+        }
         einrichten()
       })()
     </script>

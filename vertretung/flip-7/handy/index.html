@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flip 7 – Handy</title>
+    <link rel="icon" href="../../../favicon.svg" type="image/svg+xml" />
+    <script src="../../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../karten.css" />
+    <style>
+      main { max-width: 34rem; margin-inline: auto; }
+      .abstand > * + * { margin-top: 0.9rem; }
+      .werkzeug-karte h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+      .werkzeug-karte p { margin: 0.25rem 0; }
+      .aus { color: var(--fehler); }
+      .gefahr { color: var(--text-2); font-size: 0.95rem; }
+      .gefahr b { color: var(--text); }
+      .knoepfe { display: grid; gap: 0.6rem; margin-top: 0.75rem; }
+      .knoepfe .knopf { min-height: 3.75rem; font-size: 1.2rem; width: 100%; }
+      .knoepfe .knopf small { display: block; font-size: 0.8rem; font-weight: 400; opacity: 0.85; }
+      .eigene-karte.dran { border-color: var(--fokus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fokus) 30%, transparent); }
+      .kopfzeile { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+      .punkte { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .marke { padding: 0.1rem 0.65rem; border-radius: 99px; background: var(--flaeche-2); font-size: 0.8rem; font-weight: 600; }
+      .marke.bust { background: color-mix(in srgb, var(--fehler) 22%, var(--flaeche)); color: var(--fehler); }
+      .marke.sicher { background: color-mix(in srgb, var(--bibliothek) 22%, var(--flaeche)); color: var(--bibliothek); }
+      .marke.zug { background: var(--fokus); color: var(--seite); }
+      .andere { display: grid; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+      .andere li { padding: 0.5rem 0.65rem; border: 1px solid var(--haarlinie); border-radius: var(--radius); background: var(--flaeche-2); }
+      .andere li.am-zug { border-color: var(--fokus); }
+      .andere .zeile { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+      .andere .hand { min-height: 0; margin-top: 0.4rem; }
+      .karte.klein { width: 1.9rem; height: 2.7rem; font-size: 1rem; border-width: 1.5px; border-radius: 0.4rem; }
+      .karte.klein.aktion { font-size: 0.42rem; }
+      .karte.gross { width: 3.6rem; height: 5.1rem; font-size: 1.8rem; }
+      .karte.gross.aktion { font-size: 0.72rem; }
+      .frage-karte { display: flex; align-items: center; gap: 0.75rem; }
+      table.runde { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      table.runde th, table.runde td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--haarlinie); text-align: right; }
+      table.runde th:first-child, table.runde td:first-child { text-align: left; }
+      table.runde tr.sieger td { color: var(--bibliothek); font-weight: 700; }
+      .verlauf { margin: 0; padding: 0; list-style: none; font-size: 0.88rem; line-height: 1.35; }
+      .verlauf li { padding: 0.2rem 0; border-bottom: 1px solid var(--haarlinie); }
+      .feld { display: block; width: 100%; min-height: 3rem; margin: 0.5rem 0; padding: 0.25rem 0.9rem; border: 1px solid var(--haarlinie); border-radius: var(--radius); background: var(--flaeche-2); color: var(--text); font: inherit; font-size: 1.1rem; box-sizing: border-box; }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../" id="zurueck">Vertretung</a>
+      <h1>Flip 7</h1>
+    </header>
+    <main class="werkzeug-inhalt abstand">
+      <section class="werkzeug-karte" id="ungueltig" hidden>
+        <h2>Raumcode eingeben</h2>
+        <p class="hinweis">Den Code zeigt der Beamer. Oder den QR-Code dort scannen.</p>
+        <form id="code-form">
+          <input class="feld" id="code-feld" maxlength="6" autocomplete="off" autocapitalize="characters" aria-label="Raumcode" placeholder="ABC234" />
+          <button class="knopf" type="submit" style="width: 100%">Los</button>
+        </form>
+      </section>
+      <section class="werkzeug-karte" id="name-karte" hidden>
+        <h2>Wie heißt du?</h2>
+        <p class="hinweis">Ein Spitzname reicht. Er wird nur für dieses Spiel angezeigt und nicht gespeichert.</p>
+        <form id="name-form">
+          <input class="feld" id="name-feld" maxlength="16" autocomplete="off" aria-label="Spitzname" />
+          <button class="knopf" type="submit" style="width: 100%">Mitspielen</button>
+        </form>
+      </section>
+
+      <div id="spiel" class="abstand" hidden>
+        <p class="hinweis" id="verbindung" role="status"></p>
+        <section class="werkzeug-karte" id="frage-karte">
+          <h2 id="titel"></h2>
+          <p id="status" role="status" aria-live="polite"></p>
+          <div id="frage"></div>
+        </section>
+        <section class="werkzeug-karte eigene-karte" id="ich-karte" hidden>
+          <div class="kopfzeile"><h2 id="ich-name" style="margin: 0"></h2><span class="punkte" id="ich-punkte"></span></div>
+          <div class="kopfzeile"><span id="ich-marke"></span><span class="hinweis" id="ich-gesamt"></span></div>
+          <div class="hand" id="ich-hand"></div>
+        </section>
+        <section class="werkzeug-karte" id="runde-karte" hidden>
+          <h2 id="runde-titel"></h2>
+          <table class="runde" id="runde-tabelle"></table>
+          <p class="hinweis">Weiter geht es am Beamer.</p>
+        </section>
+        <section class="werkzeug-karte">
+          <h2>Am Tisch</h2>
+          <ul class="andere" id="andere"></ul>
+          <p class="hinweis" id="stapel"></p>
+        </section>
+        <section class="werkzeug-karte">
+          <h2>Verlauf</h2>
+          <ol class="verlauf" id="verlauf"></ol>
+        </section>
+      </div>
+    </main>
+
+    <script src="../../../gemeinsam/symbole.js"></script>
+    <script src="../../../werkzeuge/werkzeug.js"></script>
+    <script src="../../../spielen/echtzeit.js"></script>
+    <script src="../../../spielen/raum.js"></script>
+    <script src="../kern.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const R = window.Spielraum
+        const F = window.Flip7
+        const $ = (id) => document.getElementById(id)
+        const el = (name, klasse, text) => {
+          const e = document.createElement(name)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        const params = new URLSearchParams(location.search)
+        let code = (params.get('raum') || '').toUpperCase()
+        const meineId = R.meineId()
+        let kanal = null
+        let hostDa = false
+        let zustand = null
+        let beantwortet = new Set()
+        let hinweis = ''
+        let letzterStatus = 'verbindet'
+
+        const lobby = (params.get('lobby') || '').toUpperCase()
+        if (R.istCode(lobby)) {
+          $('zurueck').href = '../../../spielen/lobby/?raum=' + lobby
+          $('zurueck').textContent = 'Lobby'
+        }
+        const zeige = (id) => ['ungueltig', 'name-karte', 'spiel'].forEach((x) => ($(x).hidden = x !== id))
+
+        function start() {
+          if (!R.istCode(code)) {
+            zeige('ungueltig')
+            return $('code-feld').focus()
+          }
+          if (!R.meinName()) {
+            zeige('name-karte')
+            return $('name-feld').focus()
+          }
+          verbinden()
+        }
+        $('code-form').addEventListener('submit', (e) => {
+          e.preventDefault()
+          const c = $('code-feld').value.trim().toUpperCase()
+          if (!R.istCode(c)) return
+          code = c
+          history.replaceState(null, '', '?raum=' + code + (R.istCode(lobby) ? '&lobby=' + lobby : ''))
+          start()
+        })
+        $('name-feld').value = R.meinName()
+        $('name-form').addEventListener('submit', (e) => {
+          e.preventDefault()
+          if (!R.bereinige($('name-feld').value)) return $('name-feld').focus()
+          R.setzeName($('name-feld').value.slice(0, 16))
+          start()
+        })
+
+        function verbinden() {
+          zeige('spiel')
+          const ich = { id: meineId, name: R.meinName().slice(0, 16), rolle: 'spieler' }
+          kanal = window.Echtzeit.oeffnen('flip7-' + code, {
+            schluessel: meineId,
+            beiNachricht: nachricht,
+            beiAnwesenheit: (liste) => {
+              hostDa = liste.some((x) => x && x.rolle === 'host')
+              verbindungAnzeigen()
+            },
+            beiStatus: (s) => {
+              if (s === 'verbunden') {
+                kanal.verfolge(ich)
+                kanal.sende('sync', { von: meineId })
+              }
+              letzterStatus = s
+              verbindungAnzeigen()
+            },
+          })
+          kanal.verfolge(ich)
+          window.addEventListener('pagehide', () => kanal && kanal.schliessen())
+          zeichnen()
+        }
+
+        function verbindungAnzeigen() {
+          const v = $('verbindung')
+          v.className = 'hinweis'
+          if (letzterStatus !== 'verbunden') {
+            v.textContent = letzterStatus === 'verbindet' ? 'Verbinde …' : 'Verbindung weg – es wird erneut versucht …'
+            v.classList.add('aus')
+          } else if (!hostDa) {
+            v.textContent = 'Das Spiel am Beamer ist gerade nicht erreichbar. Raumcode: ' + code
+            v.classList.add('aus')
+          } else v.textContent = 'Verbunden. Raumcode: ' + code
+        }
+
+        function nachricht(ereignis, d) {
+          if (!d || typeof d !== 'object') return
+          if (ereignis === 'zustand') {
+            zustand = d
+            zeichnen()
+          } else if (ereignis === 'status' && d.an === meineId) {
+            hinweis = String(d.text || '').slice(0, 200)
+            zeichnen()
+          }
+        }
+
+        // ---------- Karten ----------
+        function karte(typ, w, a, klein) {
+          const d = el('div', 'karte' + (klein ? ' klein' : ''))
+          if (typ === 'z') {
+            d.textContent = String(w)
+            d.classList.add(w <= 2 ? 'wa' : w <= 5 ? 'wb' : w <= 8 ? 'wc' : w <= 10 ? 'wd' : 'we')
+            d.setAttribute('aria-label', 'Zahl ' + w)
+          } else if (typ === 'p' || typ === 'm') {
+            d.textContent = typ === 'm' ? '×2' : '+' + w
+            d.classList.add('bonus')
+          } else {
+            d.textContent = F.AKTIONEN[a]
+            d.classList.add('aktion')
+          }
+          return d
+        }
+        function hand(box, s, klein) {
+          box.textContent = ''
+          for (const w of s.z) box.append(karte('z', w, null, klein))
+          for (const w of s.b) box.append(karte('p', w, null, klein))
+          if (s.m) box.append(karte('m', 0, null, klein))
+          if (s.c) box.append(karte('a', 0, 'chance', klein))
+          if (s.x != null) {
+            const k = karte('z', s.x, null, klein)
+            k.classList.add('bustk')
+            box.append(k)
+          }
+          if (!box.children.length) box.append(el('span', 'hinweis', 'noch keine Karten'))
+        }
+        const STATUS = { aktiv: 'dabei', bleibt: 'bleibt', bust: 'Bust!', eingefroren: 'eingefroren' }
+        function marke(s, dran) {
+          const m = el('span', 'marke', dran && s.st === 'aktiv' ? 'am Zug' : s.f7 ? 'Flip 7!' : STATUS[s.st] || '')
+          if (dran && s.st === 'aktiv') m.classList.add('zug')
+          else if (s.st === 'bust') m.classList.add('bust')
+          else if (s.st === 'bleibt' || s.st === 'eingefroren' || s.f7) m.classList.add('sicher')
+          return m
+        }
+
+        // ---------- Anzeige ----------
+        function antworten(qid, wahl) {
+          beantwortet.add(qid)
+          kanal.sende('antwort', { qid, von: meineId, wahl })
+          zeichnen()
+        }
+
+        function zeichnen() {
+          if (!kanal) return
+          verbindungAnzeigen()
+          const z = zustand
+          const frageBox = $('frage')
+          frageBox.textContent = ''
+          if (!z || !z.spieler || !z.spieler.length) {
+            $('titel').textContent = 'Du bist dabei'
+            $('status').textContent = hinweis || 'Warte, bis das Spiel am Beamer startet.'
+            $('ich-karte').hidden = true
+            $('runde-karte').hidden = true
+            $('andere').textContent = ''
+            $('verlauf').textContent = ''
+            $('stapel').textContent = ''
+            return
+          }
+          const ich = z.spieler.findIndex((s) => s.ph === meineId)
+          const meins = ich >= 0 ? z.spieler[ich] : null
+          const dran = z.am >= 0 ? z.spieler[z.am] : null
+          const f = z.frage && z.frage.an === meineId && !beantwortet.has(z.frage.qid) ? z.frage : null
+
+          // Frage oder Wartetext
+          if (f && f.typ === 'zug') {
+            $('titel').textContent = 'Du bist dran'
+            $('status').textContent = 'Gesichert wären jetzt ' + meins.p + ' Punkte in dieser Runde.'
+            if (f.gefahr != null) {
+              const g = el('p', 'gefahr')
+              g.append('Gefahr beim Ziehen: ', el('b', null, f.gefahr + ' %'), meins.c ? ' (Zweite Chance schützt dich einmal)' : '')
+              frageBox.append(g)
+            }
+            const reihe = el('div', 'knoepfe')
+            const ziehen = el('button', 'knopf', 'Karte ziehen')
+            ziehen.type = 'button'
+            ziehen.addEventListener('click', () => antworten(f.qid, 'nimm'))
+            const bleiben = el('button', 'knopf zweit', 'Bleiben (' + meins.p + ' sichern)')
+            bleiben.type = 'button'
+            bleiben.disabled = f.leer
+            bleiben.addEventListener('click', () => antworten(f.qid, 'bleib'))
+            reihe.append(ziehen, bleiben)
+            frageBox.append(reihe)
+          } else if (f && f.typ === 'ziel' && f.karte) {
+            $('titel').textContent = 'Du hast „' + (f.karte.t === 'a' ? F.AKTIONEN[f.karte.a] : '') + '“ gezogen'
+            $('status').textContent =
+              f.karte.a === 'freeze' ? 'Wen willst du einfrieren? (Die Person sichert ihre Punkte und ist raus.)' : f.karte.a === 'drei' ? 'Wer muss drei Karten ziehen?' : 'Wem schenkst du die Zweite Chance?'
+            const reihe = el('div', 'knoepfe')
+            for (const o of f.optionen) {
+              const b = el('button', 'knopf zweit')
+              b.type = 'button'
+              b.append(o.i === ich ? 'Mich selbst' : o.n)
+              b.append(el('small', null, 'Runde: ' + o.p + ' · Gesamt ' + o.g))
+              b.addEventListener('click', () => antworten(f.qid, o.i))
+              reihe.append(b)
+            }
+            frageBox.append(reihe)
+          } else if (z.phase === 'rundenende') {
+            $('titel').textContent = 'Runde zu Ende'
+            $('status').textContent = ''
+          } else if (!meins) {
+            $('titel').textContent = 'Du schaust zu'
+            $('status').textContent = hinweis || 'Das Spiel läuft schon ohne dich. Beim nächsten Spiel bist du dabei.'
+          } else if (dran && z.am === ich) {
+            $('titel').textContent = 'Du bist gleich dran …'
+            $('status').textContent = ''
+          } else {
+            $('titel').textContent = dran ? dran.n + ' ist dran' : 'Warten …'
+            $('status').textContent = hinweis || (z.phase === 'spiel' ? 'Schau auf den Tisch, du bist bald wieder dran.' : '')
+          }
+
+          // meine Karten
+          $('ich-karte').hidden = !meins
+          if (meins) {
+            $('ich-karte').classList.toggle('dran', !!f)
+            $('ich-name').textContent = meins.n
+            $('ich-punkte').textContent = meins.st === 'bust' ? '0' : String(meins.p)
+            $('ich-gesamt').textContent = 'Gesamt ' + meins.g + ' von ' + z.ziel
+            const m = $('ich-marke')
+            m.textContent = ''
+            m.append(marke(meins, z.am === ich))
+            hand($('ich-hand'), meins, false)
+          }
+
+          // Rundenende
+          const e = z.phase === 'rundenende' && z.ende
+          $('runde-karte').hidden = !e
+          if (e) {
+            $('runde-titel').textContent = e.sieger != null ? e.namen[e.sieger] + ' gewinnt das Spiel!' : 'Runde ' + z.runde + ' ist zu Ende'
+            const t = $('runde-tabelle')
+            t.textContent = ''
+            const kopf = el('tr')
+            for (const x of ['Spieler', 'Runde', 'Gesamt']) kopf.append(el('th', null, x))
+            t.append(kopf)
+            e.namen.forEach((n, i) => {
+              const r = el('tr', e.sieger === i ? 'sieger' : '')
+              r.append(el('td', null, n), el('td', null, '+' + e.punkte[i]), el('td', null, String(e.gesamt[i])))
+              t.append(r)
+            })
+          }
+
+          // die anderen
+          const liste = $('andere')
+          liste.textContent = ''
+          z.spieler.forEach((s, i) => {
+            if (i === ich) return
+            const li = el('li', z.am === i && s.st === 'aktiv' ? 'am-zug' : '')
+            const zeile = el('div', 'zeile')
+            zeile.append(el('b', null, s.n), marke(s, z.am === i), el('span', 'hinweis', 'Runde ' + (s.st === 'bust' ? 0 : s.p) + ' · Gesamt ' + s.g))
+            const h = el('div', 'hand')
+            hand(h, s, true)
+            li.append(zeile, h)
+            liste.append(li)
+          })
+          $('stapel').textContent = 'Runde ' + z.runde + ' · Ziel ' + z.ziel + ' Punkte · ' + z.stapel + ' Karten im Stapel'
+          const v = $('verlauf')
+          v.textContent = ''
+          ;(z.log || []).slice().reverse().forEach((t) => v.append(el('li', null, String(t).slice(0, 200))))
+        }
+
+        start()
+      })()
+    </script>
+  </body>
+</html>

@@ -429,6 +429,7 @@
                 <div id="erlaubt" style="margin-top: 0.5rem"></div>
                 <div class="knopf-reihe" style="margin-top: 0.75rem">
                   <button type="button" class="knopf zweit" id="t-chaos">Chaos-Flitzer hier am Smartboard starten</button>
+                  <button type="button" class="knopf zweit" id="t-flip7">Flip 7 hier am Smartboard starten</button>
                   <button type="button" class="knopf zweit" id="t-link">Link kopieren</button>
                   <button type="button" class="knopf zweit" id="t-schliessen">Lobby schließen</button>
                 </div>
@@ -456,7 +457,7 @@
           <h2 class="abschnitt">Selbst ein Spiel anbieten</h2>
           <div class="kacheln" id="anbieten"></div>
           <p class="hinweis" id="chaos-hinweis" style="margin: 0.75rem 0 0" hidden>
-            <b>Chaos-Flitzer 3000</b> läuft auf deinem Gerät (am besten Beamer oder Laptop), du kannst auch allein anfangen. Die anderen steigen unter „Mitspielen“ ein und spielen mit dem Handy, bis zu sechs Personen.
+            <b>Chaos-Flitzer 3000</b> und <b>Flip 7</b> laufen auf deinem Gerät (am besten Beamer oder Laptop), du kannst auch allein anfangen. Die anderen steigen unter „Mitspielen“ ein und spielen mit dem Handy, bis zu sechs Personen.
           </p>
         </section>
         <section class="werkzeug-karte" style="margin-top: 1rem">
@@ -503,7 +504,13 @@
           muehle: { logo: 'muehle', plaetze: 2 },
           schach: { logo: 'schach', plaetze: 2 },
           'chaos-flitzer': { logo: 'chaosflitzer', plaetze: 6 },
+          'flip-7': { logo: 'flip7', plaetze: 6 },
+          'schiffe-versenken': { logo: 'schiffe', plaetze: 2 },
         }
+        // Gruppenspiele: Ordner mit der Seite des Anbieters (index.html) und der Handy-Seite (handy/index.html)
+        const GRUPPE = { 'chaos-flitzer': '../../vertretung/chaos-flitzer/', 'flip-7': '../../vertretung/flip-7/' }
+        // Spiele zu zweit, die nicht unter spielen/ liegen
+        const ORT = { 'schiffe-versenken': '../../vertretung/schiffe-versenken/' }
         const personen = (s) => (INFO[s] && INFO[s].plaetze > 2 ? '2 bis ' + INFO[s].plaetze + ' Personen' : '2 Personen')
 
         function el(tag, klasse, text) {
@@ -664,7 +671,7 @@
           const gegnerPerson = spieler[seite === 1 ? 1 : 0]
           raum.verlassen()
           location.href =
-            '../' + spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(partie) + '&seite=' + seite + '&gegner=' + encodeURIComponent(gegnerPerson.name) + '&gid=' + encodeURIComponent(gegnerPerson.id)
+            (ORT[spiel] || '../' + spiel + '/') + '?raum=' + code + '&partie=' + encodeURIComponent(partie) + '&seite=' + seite + '&gegner=' + encodeURIComponent(gegnerPerson.name) + '&gid=' + encodeURIComponent(gegnerPerson.id)
         }
 
         // ---------- Gemeinsame Auswertung ----------
@@ -773,6 +780,7 @@
 
           personenChips($('t-personen'), spieler)
           $('t-chaos').hidden = !erlaubt.includes('chaos-flitzer')
+          $('t-flip7').hidden = !erlaubt.includes('flip-7')
         }
 
         // ---------- Handy ----------
@@ -802,11 +810,11 @@
             b.disabled = !!wartetAuf
             b.addEventListener('click', () => {
               meldung('')
-              if (s === 'chaos-flitzer') {
+              if (GRUPPE[s]) {
                 // Gruppenspiel: läuft auf diesem Gerät, die Lobby wird dort weitergeführt (Angebot, freie Plätze)
                 gestartet = true
                 raum.verlassen()
-                location.href = '../../vertretung/chaos-flitzer/?lobby=' + code + '&host=1'
+                location.href = GRUPPE[s] + '?lobby=' + code + '&host=1'
                 return
               }
               raum.setze({ angebot: { partie: R.zufallText(8), spiel: s } })
@@ -814,7 +822,7 @@
             an.append(b)
           })
           if (!erlaubt.length) an.append(el('span', 'leer', 'Gerade ist kein Spiel freigegeben.'))
-          $('chaos-hinweis').hidden = !erlaubt.includes('chaos-flitzer')
+          $('chaos-hinweis').hidden = !erlaubt.some((x) => GRUPPE[x])
 
           // Angebote anderer
           const ang = $('angebote')
@@ -833,10 +841,10 @@
             if (gruppe && !R.istCode(p.angebot.code)) b.disabled = true
             b.addEventListener('click', () => {
               if (gruppe) {
-                // Chaos-Flitzer: das eigene Handy wird zur Steuerung des Spiels des Anbieters
+                // Gruppenspiel (Chaos-Flitzer, Flip 7): das eigene Handy wird zur Steuerung des Spiels des Anbieters
                 gestartet = true
                 raum.verlassen()
-                location.href = '../../vertretung/chaos-flitzer/handy/?raum=' + p.angebot.code + '&lobby=' + code
+                location.href = GRUPPE[p.angebot.spiel] + 'handy/?raum=' + p.angebot.code + '&lobby=' + code
                 return
               }
               wartetAuf = { partie: p.angebot.partie }
@@ -873,6 +881,12 @@
           gestartet = true
           raum.verlassen()
           location.href = '../../vertretung/chaos-flitzer/?lobby=' + code + '&host=1'
+        })
+        $('t-flip7').addEventListener('click', () => {
+          R.setzeName('Smartboard')
+          gestartet = true
+          raum.verlassen()
+          location.href = GRUPPE['flip-7'] + '?lobby=' + code + '&host=1'
         })
         const gehe = () => {
           if (raum) raum.verlassen()

@@ -1,0 +1,40 @@
+/* Karten und Hand von Flip 7 – gemeinsam für den Tisch am Beamer (index.html) und die Handy-Seite (handy/). Braucht gemeinsam/tokens.css. */
+.hand { display: flex; flex-wrap: wrap; gap: 0.35rem; min-height: 4.4rem; margin-top: 0.55rem; }
+.karte {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.9rem;
+  height: 4.1rem;
+  padding: 0.15rem;
+  border: 2px solid var(--linie-stark);
+  border-radius: 0.55rem;
+  background: var(--k, var(--flaeche));
+  color: var(--text);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  box-shadow: var(--schatten-klein);
+}
+.karte.neu { animation: karte-auf 0.4s var(--sanft); }
+@keyframes karte-auf { from { transform: translateY(-14px) scale(0.85) rotate(-6deg); opacity: 0; } }
+.wa { --k: var(--tafel-hell); }
+.wb { --k: var(--unterrichten-hell); }
+.wc { --k: var(--interaktion-hell); }
+.wd { --k: var(--lernen-hell); }
+.we { --k: var(--bibliothek-hell); }
+.karte.bonus { --k: var(--akzent-hell); border-color: var(--tuerkis); }
+.karte.aktion {
+  border-color: var(--akzent);
+  background: var(--akzent);
+  color: var(--akzent-text);
+  font-size: 0.62rem;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.karte.bustk { border: 2px dashed var(--fehler); color: var(--fehler); }
+.karte.gross { width: 3.6rem; height: 5.1rem; font-size: 1.8rem; }
+.karte.gross.aktion { font-size: 0.72rem; }
+.leer-hand { align-self: center; color: var(--text-2); font-size: 0.9rem; }

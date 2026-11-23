@@ -9,10 +9,15 @@
  *   online.sendeZug(z)   eigenen Zug senden (nach dem lokalen Ausführen)
  *   online.gibAuf()      aufgeben
  *   online.fertig()      Partie vorbei: Anzeige „spielt“ in der Lobby beenden
+ *   online.partie        Kennung der Partie
  *   online.lobby         Adresse der Lobby
+ *   online.raum          der Raum (Spielraum.betreten) für eigene Nachrichten, z. B. „bereit“ bei Schiffe versenken
  */
 ;(function () {
   'use strict'
+
+  // Ordner dieser Datei (spielen/): von dort aus liegt die Lobby unter lobby/, egal in welchem Ordner das Spiel liegt
+  const BASIS = (document.currentScript && document.currentScript.src ? document.currentScript.src : location.href).replace(/[^/]*$/, '')
 
   function start(o) {
     const p = new URLSearchParams(location.search)
@@ -57,7 +62,9 @@
       seite,
       gegner,
       code,
-      lobby: '../lobby/?raum=' + code,
+      partie,
+      lobby: BASIS + 'lobby/?raum=' + code,
+      raum, // für Spiele mit verdeckten Angaben: eigene Nachrichten (raum.sende / raum.auf)
       sendeZug: sp.sendeZug,
       gibAuf: sp.gibAuf,
       fertig: () => raum.setze({ spielt: null }),

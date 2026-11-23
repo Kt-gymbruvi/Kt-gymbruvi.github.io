@@ -91,19 +91,19 @@ window.VERTRETUNG = [
   },
   {
     titel: 'Flip 7',
-    text: 'Karten ziehen oder aufhören: Wer 7 verschiedene Zahlen sammelt, bekommt den Bonus – doppelte Zahl heißt Bust.',
+    text: 'Karten ziehen oder aufhören: Wer 7 verschiedene Zahlen sammelt, bekommt den Bonus – doppelte Zahl heißt Bust. Am Beamer laufen, die Schüler spielen per Handy.',
     adresse: 'vertretung/flip-7/',
     gruppe: 'spiele',
     logo: 'flip7',
-    marken: ['2 bis 6 Personen', 'gegen Rechner', 'am Beamer'],
+    marken: ['2 bis 6 Personen', 'Handys treten bei', 'online in der Klasse'],
   },
   {
     titel: 'Schiffe versenken',
-    text: 'Flotte verstecken und die Schiffe des Gegners aufspüren – zu zweit an einem Gerät oder gegen den Rechner.',
+    text: 'Flotte verstecken und die Schiffe des Gegners aufspüren – gegen den Rechner, zu zweit an einem Gerät oder online gegen eine Mitschülerin oder einen Mitschüler.',
     adresse: 'vertretung/schiffe-versenken/',
     gruppe: 'spiele',
     logo: 'schiffe',
-    marken: ['2 Personen', 'gegen Rechner', '3 Stufen'],
+    marken: ['2 Personen', 'gegen Rechner', 'online'],
   },
   {
     titel: 'Spielraum (online spielen)',
