@@ -37,6 +37,9 @@
         font-size: 0.9375rem;
         font-weight: 500;
       }
+      .modi .knopf:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+      }
       .zahl {
         display: flex;
         align-items: center;
@@ -64,6 +67,50 @@
         width: 1.25rem;
         height: 1.25rem;
         accent-color: var(--akzent);
+      }
+
+      /* Klasse wählen (nur angemeldet) und „Heute nicht da“ */
+      .klassenwahl {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--haarlinie);
+      }
+      .klassenwahl[hidden],
+      .fehlen[hidden] {
+        display: none;
+      }
+      .fehlen {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .fehlen > span {
+        font-size: 0.9375rem;
+        font-weight: var(--gewicht-betont);
+      }
+      .fehlen-liste {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+      .fehlen-liste button {
+        min-height: 2.25rem;
+        padding: 0.15rem 0.8rem;
+        border: 0;
+        border-radius: 999px;
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.9375rem;
+        cursor: pointer;
+      }
+      .fehlen-liste button[aria-pressed='true'] {
+        text-decoration: line-through;
+        color: var(--text-2);
+        background: transparent;
+        box-shadow: inset 0 0 0 1px var(--haarlinie);
       }
 
       #ergebnis {
@@ -144,6 +191,103 @@
         text-align: center;
         color: var(--text-2);
       }
+
+      /* Glücksrad: Dunkelgrün und Orange aus dem Logo */
+      .rad-seite {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--rund);
+        background: var(--flaeche);
+        box-shadow: var(--schatten);
+        text-align: center;
+      }
+      #rad {
+        width: min(100%, 34rem);
+        filter: drop-shadow(0 8px 18px rgb(15 92 71 / 0.22));
+      }
+      .rad-bild {
+        display: block;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+      .rad-dreh {
+        transform-origin: 0 0;
+        will-change: transform;
+      }
+      .rad-f0 {
+        fill: var(--navy);
+      }
+      .rad-f1 {
+        fill: var(--tuerkis);
+      }
+      .rad-f2 {
+        fill: var(--navy-hell);
+      }
+      .rad-f3 {
+        fill: var(--tuerkis-hell);
+      }
+      .rad-feld path {
+        stroke: var(--flaeche);
+        stroke-width: 0.8;
+      }
+      .rad-name {
+        font-weight: 700;
+        fill: #fff;
+        pointer-events: none;
+      }
+      .rad-feld:has(.rad-f1) .rad-name,
+      .rad-feld:has(.rad-f3) .rad-name {
+        fill: var(--navy-dunkel);
+      }
+      .rad-feld.verbraucht {
+        opacity: 0.35;
+      }
+      .rad-feld.gewinner path {
+        stroke: var(--text);
+        stroke-width: 2.4;
+      }
+      .rad-rand {
+        fill: none;
+        stroke: var(--flaeche);
+        stroke-width: 3;
+      }
+      .rad-nabe {
+        fill: var(--flaeche);
+        stroke: var(--navy);
+        stroke-width: 2;
+      }
+      .rad-zeiger {
+        fill: var(--fehler);
+        stroke: var(--flaeche);
+        stroke-width: 2;
+        stroke-linejoin: round;
+      }
+      .rad-ergebnis {
+        margin: 0;
+        min-height: 1.2em;
+        color: var(--akzent);
+        font-size: clamp(2rem, 6vw, 4rem);
+        font-weight: var(--gewicht-titel);
+        letter-spacing: var(--abstand-titel);
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+      }
+      .rad-ergebnis.dreht {
+        color: var(--text-2);
+      }
+      .rad-seite .hinweis {
+        margin: 0;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .rad-dreh {
+          transition: none !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -153,19 +297,35 @@
     </header>
     <main class="werkzeug-inhalt raster">
       <section class="einstellungen werkzeug-karte" aria-label="Einstellungen">
+        <!-- Nur mit Anmeldung: Klasse aus „Meine Klassen“ (Lehrraum) wählen -->
+        <div class="klassenwahl" id="klassenwahl" hidden>
+          <label class="feld"
+            >Klasse
+            <select id="klasse">
+              <option value="">Eigene Namen eintragen</option>
+            </select>
+          </label>
+          <p class="hinweis" id="klassen-hinweis" hidden></p>
+          <div class="fehlen" id="fehlen" hidden>
+            <span>Heute nicht da (antippen)</span>
+            <div class="fehlen-liste" id="fehlen-liste" role="group" aria-label="Heute nicht da"></div>
+          </div>
+        </div>
+
         <label class="feld"
           >Namen (einer pro Zeile)
           <textarea id="namen" rows="10" placeholder="Anna&#10;Ben&#10;Can&#10;…" spellcheck="false"></textarea>
           <small id="anzahl">0 Namen</small>
         </label>
-        <label class="merken"><input type="checkbox" id="merken" /> Liste auf diesem Gerät merken</label>
-        <p class="hinweis" style="margin: -0.5rem 0 0">Die Namen werden nirgendwohin gesendet. Ohne Haken sind sie nach dem Schließen weg.</p>
+        <label class="merken" id="merken-feld"><input type="checkbox" id="merken" /> Liste auf diesem Gerät merken</label>
+        <p class="hinweis" id="merken-hinweis" style="margin: -0.5rem 0 0">Die Namen werden nirgendwohin gesendet. Ohne Haken sind sie nach dem Schließen weg.</p>
 
         <div class="modi" role="group" aria-label="Was soll ausgelost werden?">
           <button class="knopf zweit" type="button" data-modus="groesse" aria-pressed="true">Gruppen mit je …</button>
           <button class="knopf zweit" type="button" data-modus="anzahl" aria-pressed="false">Anzahl Gruppen</button>
           <button class="knopf zweit" type="button" data-modus="paare" aria-pressed="false">Paare</button>
           <button class="knopf zweit" type="button" data-modus="ziehen" aria-pressed="false">Eine Person ziehen</button>
+          <button class="knopf zweit" type="button" data-modus="rad" aria-pressed="false">Glücksrad</button>
         </div>
         <label class="zahl" id="zahl-feld"><span id="zahl-text">Personen pro Gruppe</span> <input id="zahl" type="number" min="2" max="30" value="4" inputmode="numeric" /></label>
         <label class="merken" id="ohne-wdh-feld" hidden><input type="checkbox" id="ohne-wdh" checked /> Niemanden zweimal ziehen</label>
@@ -179,14 +339,23 @@
     </main>
 
     <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../gemeinsam/sitzung.js"></script>
+    <script src="../../gemeinsam/klassen.js"></script>
     <script src="../werkzeug.js"></script>
+    <script src="gluecksrad.js"></script>
     <script>
       ;(function () {
         'use strict'
         const $ = (id) => document.getElementById(id)
         const SPEICHER = 'werkzeug-gruppen'
+        const RAD_DAUER = 5200 // ms, bis das Rad stillsteht
         let modus = 'groesse'
-        let gezogen = [] // bereits gezogene Namen (Modus „ziehen“)
+        let gezogen = [] // bereits gezogene Namen (Modi „ziehen“ und „rad“)
+        let klasse = null // gewählte Klasse mit Namen (nur im Speicher dieser Seite)
+        let fehlen = new Set() // Kennungen der heute Fehlenden (nur im Speicher dieser Seite)
+        let laeuft = false
+        let rad = null // { gluecksrad, liste }
+        let radUhr = 0
 
         // Fairer Zufall aus dem Browser (crypto), nicht Math.random
         function zufall(n) {
@@ -205,6 +374,7 @@
           return l
         }
         const namen = () => [...new Set($('namen').value.split('\n').map((n) => n.trim()).filter(Boolean))]
+        const ruhig = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
         // In k Gruppen möglichst gleich groß aufteilen
         function aufteilen(liste, k) {
@@ -220,19 +390,25 @@
           return e
         }
 
+        function leeren() {
+          clearTimeout(radUhr)
+          laeuft = false
+          rad = null
+          $('ergebnis').textContent = ''
+        }
+
         function zeigeGruppen(gruppen, titel) {
-          const ziel = $('ergebnis')
-          ziel.textContent = ''
+          leeren()
           const ul = el('ul', null, 'gruppen')
           gruppen.forEach((g, i) => {
             const li = el('li', null, 'gruppe')
-            li.append(el('h3', `${titel} ${i + 1}`))
+            li.append(el('h3', g.length > 2 && titel === 'Paar' ? 'Dreiergruppe' : `${titel} ${i + 1}`))
             const namenListe = el('ul')
             g.forEach((n) => namenListe.append(el('li', n)))
             li.append(namenListe)
             ul.append(li)
           })
-          ziel.append(ul)
+          $('ergebnis').append(ul)
         }
 
         function ziehen(liste) {
@@ -243,7 +419,7 @@
             pool = liste
           }
           const name = pool[zufall(pool.length)]
-          ziel.textContent = ''
+          leeren()
           const box = el('div', null, 'gezogen wirbeln')
           const anzeige = el('strong', '…')
           box.append(el('span', 'Dran ist:'), anzeige)
@@ -263,15 +439,72 @@
           }, 70)
         }
 
+        // ---------- Glücksrad ----------
+        function zeigeRad(liste) {
+          leeren()
+          const box = el('div', null, 'rad-seite')
+          const radFlaeche = el('div')
+          radFlaeche.id = 'rad'
+          const ergebnis = el('p', 'Dreh das Rad!', 'rad-ergebnis')
+          const hinweis = el('p', null, 'hinweis')
+          box.append(radFlaeche, ergebnis, hinweis)
+          $('ergebnis').append(box)
+          const gluecksrad = window.Gluecksrad.erzeuge(radFlaeche, liste)
+          liste.forEach((n, i) => {
+            if ($('ohne-wdh').checked && gezogen.includes(n)) gluecksrad.verbrauche(i)
+          })
+          rad = { gluecksrad, liste, ergebnis, hinweis, letzter: -1 }
+        }
+
+        function drehen(liste) {
+          // Neues Rad, wenn sich die Namen geändert haben (oder noch keins da ist)
+          if (!rad || rad.liste.length !== liste.length || rad.liste.some((n, i) => n !== liste[i])) zeigeRad(liste)
+          if (laeuft) return
+          let pool = $('ohne-wdh').checked ? liste.filter((n) => !gezogen.includes(n)) : liste
+          let neueRunde = false
+          if (!pool.length) {
+            gezogen = []
+            pool = liste
+            neueRunde = true
+            zeigeRad(liste)
+          }
+          const name = pool[zufall(pool.length)]
+          const feld = liste.indexOf(name)
+          const mitBewegung = !ruhig()
+          laeuft = true
+          $('los').disabled = true
+          // Der vorige Gewinner wird erst jetzt abgeblendet, damit er nach dem Stillstand gut zu sehen bleibt
+          if (rad.letzter >= 0) rad.gluecksrad.verbrauche(rad.letzter)
+          rad.letzter = -1
+          $('rad').scrollIntoView({ block: 'center', behavior: ruhig() ? 'auto' : 'smooth' })
+          rad.ergebnis.textContent = '…'
+          rad.ergebnis.classList.add('dreht')
+          rad.hinweis.textContent = neueRunde ? 'Alle waren dran – neue Runde.' : ''
+          const r = rad
+          r.gluecksrad.drehe(feld, zufall(1000) / 999, 5 + zufall(3), mitBewegung ? RAD_DAUER : 0, () => {
+            laeuft = false
+            $('los').disabled = false
+            r.ergebnis.textContent = name
+            r.ergebnis.classList.remove('dreht')
+            if ($('ohne-wdh').checked) {
+              gezogen.push(name)
+              r.letzter = feld
+              const rest = liste.filter((x) => !gezogen.includes(x)).length
+              r.hinweis.textContent = rest ? `Noch ${rest} nicht gezogen` : 'Alle waren dran – beim nächsten Mal geht es von vorn los.'
+            }
+          })
+        }
+
         function auslosen() {
           const liste = namen()
           if (liste.length < 2) {
-            $('ergebnis').innerHTML = ''
+            leeren()
             $('ergebnis').append(el('p', 'Bitte mindestens zwei Namen eintragen.', 'leer'))
             return
           }
           const z = Math.max(1, Number($('zahl').value) || 1)
           if (modus === 'ziehen') return ziehen(liste)
+          if (modus === 'rad') return drehen(liste)
           const gemischt = mischen(liste)
           if (modus === 'paare') {
             // ungerade Anzahl: eine Dreiergruppe
@@ -285,15 +518,17 @@
         function modusSetzen(m) {
           modus = m
           document.querySelectorAll('[data-modus]').forEach((k) => k.setAttribute('aria-pressed', String(k.dataset.modus === m)))
-          $('zahl-feld').hidden = m === 'paare' || m === 'ziehen'
-          $('ohne-wdh-feld').hidden = m !== 'ziehen'
+          $('zahl-feld').hidden = m === 'paare' || m === 'ziehen' || m === 'rad'
+          $('ohne-wdh-feld').hidden = m !== 'ziehen' && m !== 'rad'
           $('zahl-text').textContent = m === 'anzahl' ? 'Anzahl Gruppen' : 'Personen pro Gruppe'
-          $('los').textContent = m === 'ziehen' ? 'Ziehen' : 'Auslosen'
+          $('los').textContent = m === 'ziehen' ? 'Ziehen' : m === 'rad' ? 'Rad drehen' : m === 'paare' ? 'Paare bilden' : 'Auslosen'
         }
 
         function speichern() {
           const n = namen()
           $('anzahl').textContent = n.length === 1 ? '1 Name' : `${n.length} Namen`
+          // Namen einer Klasse werden nie auf dem Gerät „gemerkt“ – sie liegen ohnehin nur in Lehrraum
+          if (klasse) return
           try {
             if ($('merken').checked) localStorage.setItem(SPEICHER, $('namen').value)
             else localStorage.removeItem(SPEICHER)
@@ -302,10 +537,112 @@
           }
         }
 
+        // ---------- Klasse wählen (nur angemeldet) ----------
+        // Anzeigename wie in der Tafel: Vorname; bei gleichen Vornamen „Anna M.“, reicht das nicht, ganzer Name.
+        function anzeigeNamen(schueler) {
+          const schluessel = (s) => s.toLocaleLowerCase('de')
+          const vorname = (s) => s.vorname || s.nachname
+          const zaehle = (werte) => werte.reduce((m, w) => m.set(schluessel(w), (m.get(schluessel(w)) || 0) + 1), new Map())
+          const vornamen = zaehle(schueler.map(vorname))
+          const kurz = (s) => (s.vorname && s.nachname ? `${s.vorname} ${s.nachname[0]}.` : vorname(s))
+          const kurze = zaehle(schueler.filter((s) => (vornamen.get(schluessel(vorname(s))) || 0) > 1).map(kurz))
+          const ergebnis = new Map()
+          for (const s of schueler) {
+            if ((vornamen.get(schluessel(vorname(s))) || 0) <= 1) ergebnis.set(s.id, vorname(s))
+            else if ((kurze.get(schluessel(kurz(s))) || 0) <= 1) ergebnis.set(s.id, kurz(s))
+            else ergebnis.set(s.id, [s.vorname, s.nachname].filter(Boolean).join(' '))
+          }
+          return ergebnis
+        }
+
+        function namenAusKlasse() {
+          if (!klasse) return
+          const anzeige = klasse.anzeige
+          $('namen').value = klasse.schueler
+            .filter((s) => !fehlen.has(s.id))
+            .map((s) => anzeige.get(s.id))
+            .join('\n')
+          gezogen = []
+          speichern()
+        }
+
+        function fehlendeZeichnen() {
+          const liste = $('fehlen-liste')
+          liste.textContent = ''
+          if (!klasse) return ($('fehlen').hidden = true)
+          $('fehlen').hidden = false
+          klasse.schueler.forEach((s) => {
+            const k = el('button', klasse.anzeige.get(s.id))
+            k.type = 'button'
+            k.setAttribute('aria-pressed', String(fehlen.has(s.id)))
+            k.addEventListener('click', () => {
+              if (fehlen.has(s.id)) fehlen.delete(s.id)
+              else fehlen.add(s.id)
+              k.setAttribute('aria-pressed', String(fehlen.has(s.id)))
+              namenAusKlasse()
+            })
+            liste.append(k)
+          })
+        }
+
+        function klasseWaehlen(k) {
+          fehlen = new Set()
+          if (!k) {
+            // zurück zu eigenen Namen: Liste leeren, damit keine Klassennamen im Feld stehen bleiben
+            if (klasse) $('namen').value = ''
+            klasse = null
+            $('merken-feld').hidden = false
+            $('merken-hinweis').hidden = false
+            fehlendeZeichnen()
+            gezogen = []
+            speichern()
+            return
+          }
+          klasse = { ...k, anzeige: anzeigeNamen(k.schueler) }
+          $('merken-feld').hidden = true
+          $('merken-hinweis').hidden = true
+          fehlendeZeichnen()
+          namenAusKlasse()
+        }
+
+        async function klassenLaden() {
+          const S = window.LehrraumSitzung
+          const sitzung = S && S.lesen()
+          // angemeldet = gültige Sitzung oder eine, die sich erneuern lässt
+          if (!sitzung || !(S.gueltig(sitzung) || sitzung.refresh_token) || !window.LehrraumKlassen) return
+          const alle = await window.LehrraumKlassen.laden({ mitNamen: true })
+          $('klassenwahl').hidden = false
+          const mitNamen = alle.filter((k) => k.schueler && k.schueler.length)
+          const waehler = $('klasse')
+          mitNamen.forEach((k) => {
+            const o = el('option', [k.bezeichnung, k.fach].filter(Boolean).join(' · ') + ` (${k.schueler.length})`)
+            o.value = k.id
+            waehler.append(o)
+          })
+          if (!mitNamen.length) {
+            const hinweis = $('klassen-hinweis')
+            hinweis.hidden = false
+            hinweis.textContent = alle.length
+              ? 'Auf diesem Gerät hat noch keine Klasse Namen. Trage sie in Lehrraum unter „Meine Klassen“ ein.'
+              : 'Auf diesem Gerät sind noch keine Klassen. Lege sie in Lehrraum unter „Meine Klassen“ an.'
+            waehler.disabled = true
+          }
+          waehler.addEventListener('change', () => klasseWaehlen(mitNamen.find((k) => k.id === waehler.value) || null))
+        }
+
         document.querySelectorAll('[data-modus]').forEach((k) => k.addEventListener('click', () => modusSetzen(k.dataset.modus)))
         $('los').addEventListener('click', auslosen)
         $('namen').addEventListener('input', () => {
           gezogen = []
+          // Wer die Liste von Hand ändert, verlässt die Klasse (die Auswahl bleibt sonst irreführend)
+          if (klasse) {
+            klasse = null
+            fehlen = new Set()
+            $('klasse').value = ''
+            $('merken-feld').hidden = false
+            $('merken-hinweis').hidden = false
+            fehlendeZeichnen()
+          }
           speichern()
         })
         $('merken').addEventListener('change', speichern)
@@ -321,6 +658,7 @@
         }
         speichern()
         modusSetzen('groesse')
+        klassenLaden()
       })()
     </script>
   </body>

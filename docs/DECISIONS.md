@@ -2,6 +2,12 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-23 – Gruppen & Zufall: Klassennamen auf der Startseite, Glücksrad
+- **Namen aus dem Gerätespeicher, nur angemeldet.** Die Startseite liest die Namen der Klasse (Vor-/Nachname, keine Noten) direkt aus dem IndexedDB-Lager `klassen` der Lehrraum-App – lokal, nur im Speicher der Seite, nie gesendet, nie in `localStorage`. Das lockert die frühere Regel „nie die Namen lesen“ ausdrücklich nur für dieses Werkzeug (`laden({ mitNamen: true })`); Standard bleibt ohne Namen. Verworfen: Namen vom Server holen (bräuchte Entschlüsselung und das Notenbuch-Passwort), Namen in die Adresse legen (nie).
+- **Ohne Anmeldung unverändert:** Eigene Namen, optional auf dem Gerät gemerkt.
+- **Glücksrad: erst losen, dann drehen.** Der Zufall liegt allein in `crypto`-Auslosung; die Animation läuft nur auf das Ergebnis zu und ist daher nicht manipulierbar oder „verschieblich“. Dieselbe Rechnung in Tafel (`kern/zufall.ts`) und Startseite.
+- **Rad zweimal gebaut (TS in der Tafel, JS hier):** Beide Repos haben keinen gemeinsamen Build; die Rechnung ist klein und in der Tafel getestet.
+
 ## 2026-11-18 – Eine Gestaltung für die ganze Plattform, Vorbild Tafel („wie Apple“)
 - Auf Wunsch der Lehrkraft: möglichst schöne, einheitliche Oberfläche. Tafel und Notenbuch waren schon ruhig im Apple-Stil, Startseite und Lernangebote nicht (andere Schrift, sehr fett, Lernangebote noch dunkel mit Gelb). Quizzo und Klassenfunk bleiben bei ihren eigenen Farben.
 - **Quelle ist `gemeinsam/tokens.css`.** Tafel (`Lehrraum/src/index.css`) und Notenbuch (`index.html`) behalten eine Kopie, weil es eigene Repos mit eigenem Build bzw. eigener Vorschau sind. Entsprechungen: `--seite` = Tafel `--umgebung` = Notenbuch `--bg`; `--flaeche` = `--leiste` / `--surface`; `--schwebe`/`--druecken` = `--leiste-2`/`--leiste-3`; `--haarlinie` = Tafel `--linie`; `--gewaehlt`, `--glas`, `--schatten`, `--schatten-hoch`, `--rund`, `--schnell`, `--fokus`, `--fehler` gleich benannt.

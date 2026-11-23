@@ -34,6 +34,7 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Alles ist öffentlich: keine Schülerdaten, Noten, Prüfungslösungen, keine Scans aus Schulbüchern.
 - Nichts von fremden Servern laden (Schriften, Bibliotheken wie `qrcode.min.js`, `three.min.js` liegen im Repo).
 - Keine KI-Aufrufe, keine API-Schlüssel. Einzige Server-Verbindung: Supabase (Frankfurt) in `lernen/datenbank.js`, nur mit dem öffentlichen publishable-Schlüssel. Die verschlüsselten Tresore (`lr_tresore`) liest die Startseite nur, um das Notenbuch-Passwort zu prüfen – nie im Klartext weiterverwendet.
+- Namen von Klassen: `gemeinsam/klassen.js` liefert sie nur auf ausdrückliche Anfrage (`mitNamen`) und nur „Gruppen & Zufall“ nutzt das (angemeldet, lokal gelesen, nie gesendet, nie in `localStorage`).
 - `localStorage` nur für Einstellungen/Listen auf dem Gerät (`lehrraum-design`); nichts davon an Server schicken. Ausnahme: die Anmeldung der Lehrkraft (Supabase-Sitzung, gemeinsam mit Quizzo, Klassenfunk und der Tafel).
 - Impressum/Datenschutz: `impressum.html` (verweist auf die Schule, enthält Abschnitte zu Quizzo und Klassenfunk).
 
