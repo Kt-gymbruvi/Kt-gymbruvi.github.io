@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flip 7</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../../spielen/spiel.css" />
+    <style>
+      #aktion { margin-bottom: 1rem; }
+      #aktion h2 { margin: 0 0 0.5rem; font-size: 1.15rem; }
+      #aktion p { margin: 0.25rem 0; }
+      .gross-knoepfe { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; }
+      .gross-knoepfe .knopf { flex: 1 1 11rem; min-height: 3.75rem; font-size: 1.2rem; }
+      .gefahr { color: var(--text-2); font-size: 0.95rem; }
+      .gefahr b { color: var(--text); }
+
+      /* Einrichten */
+      .zeilen { display: grid; gap: 0.5rem; margin: 0.5rem 0 0.75rem; }
+      .zeile { display: grid; grid-template-columns: 1fr minmax(8rem, 11rem) auto; gap: 0.5rem; align-items: center; }
+      .zeile input, .zeile select {
+        min-height: 2.75rem;
+        padding: 0.25rem 0.75rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        min-width: 0;
+      }
+      .zeile .knopf { min-height: 2.75rem; padding: 0.25rem 0.9rem; }
+      .einstellungen { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; margin: 0.75rem 0; }
+      .einstellungen .gruppe { margin: 0; }
+      .einstellungen h3 { margin: 0 0 0.25rem; font-size: 0.85rem; color: var(--text-2); font-weight: 600; }
+      .einstellungen label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; }
+
+      /* Tisch */
+      .tisch { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18.5rem), 1fr)); gap: 0.75rem; align-content: start; }
+      .sp {
+        padding: 0.7rem 0.85rem 0.85rem;
+        border: 2px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche);
+        box-shadow: var(--schatten-klein);
+        transition: border-color var(--schnell), box-shadow var(--schnell);
+      }
+      .sp.am-zug { border-color: var(--fokus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fokus) 30%, transparent); }
+      .sp.bust { background: color-mix(in srgb, var(--fehler) 8%, var(--flaeche)); }
+      .sp.draussen:not(.bust) { background: var(--flaeche-2); }
+      .sp-kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+      .sp-name { font-size: 1.05rem; font-weight: var(--gewicht-betont); overflow-wrap: anywhere; }
+      .sp-gesamt { color: var(--text-2); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+      .sp-zeile { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.3rem; flex-wrap: wrap; }
+      .marke { padding: 0.1rem 0.65rem; border-radius: 99px; background: var(--flaeche-2); font-size: 0.8rem; font-weight: 600; }
+      .marke.zug { background: var(--fokus); color: var(--seite); }
+      .marke.bust { background: color-mix(in srgb, var(--fehler) 22%, var(--flaeche)); color: var(--fehler); }
+      .marke.sicher { background: color-mix(in srgb, var(--bibliothek) 22%, var(--flaeche)); color: var(--bibliothek); }
+      .rundenpunkte { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .hand { display: flex; flex-wrap: wrap; gap: 0.35rem; min-height: 4.4rem; margin-top: 0.55rem; }
+      .karte {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 2.9rem;
+        height: 4.1rem;
+        padding: 0.15rem;
+        border: 2px solid var(--linie-stark);
+        border-radius: 0.55rem;
+        background: var(--k, var(--flaeche));
+        color: var(--text);
+        font-size: 1.45rem;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        box-shadow: var(--schatten-klein);
+      }
+      .karte.neu { animation: karte-auf 0.4s var(--sanft); }
+      @keyframes karte-auf { from { transform: translateY(-14px) scale(0.85) rotate(-6deg); opacity: 0; } }
+      .wa { --k: var(--tafel-hell); }
+      .wb { --k: var(--unterrichten-hell); }
+      .wc { --k: var(--interaktion-hell); }
+      .wd { --k: var(--lernen-hell); }
+      .we { --k: var(--bibliothek-hell); }
+      .karte.bonus { --k: var(--akzent-hell); border-color: var(--tuerkis); }
+      .karte.aktion {
+        border-color: var(--akzent);
+        background: var(--akzent);
+        color: var(--akzent-text);
+        font-size: 0.62rem;
+        line-height: 1.15;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+      }
+      .karte.bustk { border: 2px dashed var(--fehler); color: var(--fehler); }
+      .karte.gross { width: 3.6rem; height: 5.1rem; font-size: 1.8rem; }
+      .karte.gross.aktion { font-size: 0.72rem; }
+      .leer-hand { align-self: center; color: var(--text-2); font-size: 0.9rem; }
+
+      .stand-zeile { display: flex; justify-content: space-between; margin: 0.2rem 0; font-size: 0.95rem; }
+      .stand-zeile b { font-variant-numeric: tabular-nums; }
+      .verlauf { height: 12rem; margin: 0; padding: 0; overflow-y: auto; list-style: none; font-size: 0.88rem; line-height: 1.35; }
+      .verlauf li { padding: 0.2rem 0; border-bottom: 1px solid var(--haarlinie); }
+      .verlauf li.bust { color: var(--fehler); font-weight: 600; }
+      .verlauf li.flip7 { color: var(--bibliothek); font-weight: 700; }
+      .verlauf li.chance { color: var(--interaktion); }
+
+      table.runde { width: 100%; margin-top: 0.5rem; border-collapse: collapse; font-size: 1rem; font-variant-numeric: tabular-nums; }
+      table.runde th, table.runde td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--haarlinie); text-align: right; }
+      table.runde th:first-child, table.runde td:first-child { text-align: left; }
+      table.runde tr.sieger td { color: var(--bibliothek); font-weight: 700; }
+      .ziele { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+      .ziele .knopf { flex: 1 1 9rem; flex-direction: column; gap: 0; min-height: 3.5rem; }
+      .ziele .knopf small { font-size: 0.8rem; font-weight: 400; opacity: 0.85; }
+      .frage-karte { display: flex; align-items: center; gap: 0.75rem; }
+
+      @media (max-width: 40rem) {
+        .zeile { grid-template-columns: 1fr auto; }
+        .zeile select { grid-column: 1; }
+        .zeile .knopf { grid-row: 1; grid-column: 2; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../">Vertretung</a>
+      <h1>Flip 7</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/flip-7-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Flip 7</p>
+          <p class="spielkopf-text">Karten ziehen, Glück haben, rechtzeitig aufhören – wer zuerst die Zielpunkte erreicht, gewinnt.</p>
+        </div>
+      </div>
+
+      <section class="werkzeug-karte" id="aktion" aria-live="polite"></section>
+
+      <div class="spiel" id="spiel" hidden>
+        <div class="tisch" id="tisch"></div>
+        <div class="seite">
+          <section class="werkzeug-karte">
+            <h2>Stand</h2>
+            <div id="info"></div>
+            <button id="abbrechen" type="button" class="knopf zweit klein" style="margin-top: 0.6rem">Spiel abbrechen</button>
+          </section>
+          <section class="werkzeug-karte">
+            <h2>Verlauf</h2>
+            <ol class="verlauf" id="verlauf" aria-live="off"></ol>
+          </section>
+        </div>
+      </div>
+
+      <section class="werkzeug-karte" style="margin-top: 1rem">
+        <h2 style="margin: 0 0 0.5rem; font-size: 1rem">So geht's</h2>
+        <ul class="regeln">
+          <li>Wer dran ist, <b>zieht</b> eine Karte oder <b>bleibt</b> und sichert die Punkte der Runde. Alle Karten liegen offen.</li>
+          <li>Zahlenkarten zählen so viel, wie draufsteht. Zieht jemand <b>dieselbe Zahl noch einmal</b>, ist er <b>Bust</b>: 0 Punkte für diese Runde.</li>
+          <li><b>Flip 7:</b> Wer 7 verschiedene Zahlen hat, bekommt 15 Punkte extra, die Runde endet sofort.</li>
+          <li>Bonuskarten: +2 bis +10 werden addiert, ×2 verdoppelt die Zahlenkarten (nicht die Bonuspunkte).</li>
+          <li><b>Einfrieren:</b> Ein Spieler sichert seine Punkte und ist raus. <b>Drei ziehen:</b> Ein Spieler muss drei Karten ziehen. <b>Zweite Chance:</b> Rettet vor einem Bust, dann sind Zweite Chance und doppelte Karte weg.</li>
+          <li>Mit leerer Hand musst du ziehen. Das Spiel endet, wenn nach einer Runde jemand die Zielpunkte erreicht hat und vorn liegt.</li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="kern.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const F = window.Flip7
+        const $ = (id) => document.getElementById(id)
+        const el = (name, klasse, text) => {
+          const e = document.createElement(name)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        class Abbruch extends Error {}
+
+        // Einstellungen nur im Speicher dieser Seite (keine Namen auf dem Gerät speichern)
+        const einst = {
+          spieler: [
+            { name: 'Spieler 1', art: 'mensch', stufe: 'stark' },
+            { name: 'Rechner 1', art: 'rechner', stufe: 'stark' },
+            { name: 'Rechner 2', art: 'rechner', stufe: 'leicht' },
+          ],
+          ziel: 200,
+          gefahr: true,
+          schnell: false,
+        }
+        let sp = null
+        let gen = 0
+        let neueKarten = new Set()
+
+        const pause = (ms) =>
+          new Promise((r) => {
+            const t = einst.schnell ? ms / 4 : ms
+            setTimeout(r, t)
+          })
+
+        // ---------- Karten und Tisch ----------
+        function kartenEl(k, klasse) {
+          const d = el('div', 'karte')
+          if (klasse) d.classList.add(klasse)
+          if (k.t === 'z') {
+            d.textContent = String(k.w)
+            d.classList.add(k.w <= 2 ? 'wa' : k.w <= 5 ? 'wb' : k.w <= 8 ? 'wc' : k.w <= 10 ? 'wd' : 'we')
+            d.setAttribute('aria-label', 'Zahl ' + k.w)
+          } else if (k.t === 'p' || k.t === 'm') {
+            d.textContent = F.kartenName(k)
+            d.classList.add('bonus')
+            d.setAttribute('aria-label', 'Bonus ' + F.kartenName(k))
+          } else {
+            d.textContent = F.kartenName(k)
+            d.classList.add('aktion')
+            d.setAttribute('aria-label', 'Aktion ' + F.kartenName(k))
+          }
+          if (neueKarten.has(k.id)) d.classList.add('neu')
+          return d
+        }
+
+        function statusMarke(i) {
+          const h = sp.spieler[i].hand
+          const m = el('span', 'marke')
+          if (sp.am === i && h.status === 'aktiv') {
+            m.textContent = 'am Zug'
+            m.classList.add('zug')
+          } else if (h.status === 'bust') {
+            m.textContent = 'Bust!'
+            m.classList.add('bust')
+          } else if (h.status === 'bleibt') {
+            m.textContent = 'bleibt'
+            m.classList.add('sicher')
+          } else if (h.status === 'eingefroren') {
+            m.textContent = 'eingefroren'
+            m.classList.add('sicher')
+          } else if (h.flip7) {
+            m.textContent = 'Flip 7!'
+            m.classList.add('sicher')
+          } else {
+            m.textContent = 'dabei'
+          }
+          return m
+        }
+
+        function render() {
+          if (!sp) return
+          const tisch = $('tisch')
+          tisch.textContent = ''
+          sp.spieler.forEach((s, i) => {
+            const h = s.hand
+            const karte = el('section', 'sp')
+            if (sp.am === i && h.status === 'aktiv') karte.classList.add('am-zug')
+            if (h.status !== 'aktiv') karte.classList.add('draussen')
+            if (h.status === 'bust') karte.classList.add('bust')
+            const kopf = el('div', 'sp-kopf')
+            kopf.append(el('span', 'sp-name', s.name + (s.art === 'rechner' ? ' (Rechner)' : '')), el('span', 'sp-gesamt', 'Gesamt ' + s.gesamt))
+            const zeile = el('div', 'sp-zeile')
+            zeile.append(statusMarke(i), el('span', 'rundenpunkte', h.status === 'bust' ? '0' : String(F.rundenpunkte(h))))
+            const hand = el('div', 'hand')
+            const zahlen = h.zahlen.slice().sort((a, b) => a.w - b.w)
+            for (const k of zahlen) hand.append(kartenEl(k))
+            for (const k of h.plus) hand.append(kartenEl(k))
+            if (h.mal) hand.append(kartenEl(h.mal))
+            if (h.chance) hand.append(kartenEl(h.chance))
+            if (h.bustKarte) hand.append(kartenEl(h.bustKarte, 'bustk'))
+            if (!hand.children.length) hand.append(el('span', 'leer-hand', 'noch keine Karten'))
+            karte.append(kopf, zeile, hand)
+            tisch.append(karte)
+          })
+          $('info').textContent = ''
+          const zeilen = [
+            ['Runde', sp.runde],
+            ['Ziel', sp.ziel + ' Punkte'],
+            ['Karten im Stapel', sp.stapel.length],
+            ['Abgelegt', sp.ablage.length],
+          ]
+          for (const [a, b] of zeilen) {
+            const z = el('div', 'stand-zeile')
+            z.append(el('span', null, a), el('b', null, String(b)))
+            $('info').append(z)
+          }
+          const v = $('verlauf')
+          v.textContent = ''
+          for (const p of sp.protokoll.slice(-40)) v.append(el('li', p.art, p.text))
+          v.scrollTop = v.scrollHeight
+          neueKarten = new Set()
+        }
+
+        // ---------- Aktionsfeld ----------
+        function aktion(titel, text) {
+          const a = $('aktion')
+          a.textContent = ''
+          if (titel) a.append(el('h2', null, titel))
+          if (text) a.append(el('p', null, text))
+          return a
+        }
+
+        function einrichten() {
+          gen++
+          sp = null
+          $('spiel').hidden = true
+          const a = aktion('Neue Runde einrichten')
+          const zeilen = el('div', 'zeilen')
+          const zeichneZeilen = () => {
+            zeilen.textContent = ''
+            einst.spieler.forEach((s, i) => {
+              const z = el('div', 'zeile')
+              const name = el('input')
+              name.type = 'text'
+              name.value = s.name
+              name.maxLength = 20
+              name.setAttribute('aria-label', 'Name von Platz ' + (i + 1))
+              name.addEventListener('input', () => (s.name = name.value))
+              const art = el('select')
+              art.setAttribute('aria-label', 'Art von Platz ' + (i + 1))
+              for (const [w, t] of [['mensch', 'Mensch'], ['rechner-leicht', 'Rechner (leicht)'], ['rechner-stark', 'Rechner (stark)']]) {
+                const o = el('option', null, t)
+                o.value = w
+                art.append(o)
+              }
+              art.value = s.art === 'mensch' ? 'mensch' : 'rechner-' + s.stufe
+              art.addEventListener('change', () => {
+                if (art.value === 'mensch') s.art = 'mensch'
+                else {
+                  s.art = 'rechner'
+                  s.stufe = art.value.slice(8)
+                }
+              })
+              const weg = el('button', 'knopf zweit', 'Entfernen')
+              weg.type = 'button'
+              weg.disabled = einst.spieler.length <= 2
+              weg.addEventListener('click', () => {
+                einst.spieler.splice(i, 1)
+                zeichneZeilen()
+              })
+              z.append(name, art, weg)
+              zeilen.append(z)
+            })
+          }
+          zeichneZeilen()
+          const plus = el('button', 'knopf zweit klein', 'Platz hinzufügen')
+          plus.type = 'button'
+          plus.addEventListener('click', () => {
+            if (einst.spieler.length >= 6) return
+            const k = einst.spieler.filter((x) => x.art === 'rechner').length + 1
+            einst.spieler.push({ name: 'Rechner ' + k, art: 'rechner', stufe: 'stark' })
+            zeichneZeilen()
+            plus.disabled = einst.spieler.length >= 6
+          })
+          plus.disabled = einst.spieler.length >= 6
+          const ez = el('div', 'einstellungen')
+          const g1 = el('div', 'gruppe')
+          g1.append(el('h3', null, 'Zielpunkte'))
+          const seg = el('div', 'segmente')
+          seg.setAttribute('role', 'group')
+          seg.setAttribute('aria-label', 'Zielpunkte')
+          for (const z of [100, 150, 200]) {
+            const b = el('button', null, String(z))
+            b.type = 'button'
+            b.setAttribute('aria-pressed', String(einst.ziel === z))
+            b.addEventListener('click', () => {
+              einst.ziel = z
+              ;[...seg.children].forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+            })
+            seg.append(b)
+          }
+          g1.append(seg)
+          const g2 = el('label')
+          const c1 = el('input')
+          c1.type = 'checkbox'
+          c1.checked = einst.gefahr
+          c1.addEventListener('change', () => (einst.gefahr = c1.checked))
+          g2.append(c1, 'Gefahr anzeigen (Wahrscheinlichkeit für Bust)')
+          ez.append(g1, g2)
+          const start = el('button', 'knopf gross', 'Spiel starten')
+          start.type = 'button'
+          start.addEventListener('click', starten)
+          a.append(
+            el('p', 'hinweis', '2 bis 6 Plätze. Mehrere Menschen spielen an einem Gerät abwechselnd – alle Karten liegen offen. Namen werden nicht gespeichert.'),
+            zeilen,
+            plus,
+            ez,
+            start,
+          )
+        }
+
+        // ---------- Entscheider ----------
+        const pruefeAbbruch = (g) => {
+          if (g !== gen) throw new Abbruch()
+        }
+
+        function entscheider(g) {
+          return {
+            zug(s, i) {
+              pruefeAbbruch(g)
+              const me = s.spieler[i]
+              if (me.art === 'rechner') {
+                aktion(me.name + ' überlegt …')
+                return pause(900).then(() => {
+                  pruefeAbbruch(g)
+                  return F.kiZug(s, i)
+                })
+              }
+              return new Promise((res) => {
+                const h = me.hand
+                const a = aktion(me.name + ' ist dran')
+                const punkte = F.rundenpunkte(h)
+                a.append(el('p', null, 'Gesichert wären jetzt ' + punkte + ' Punkte in dieser Runde.'))
+                if (einst.gefahr) {
+                  const p = F.bustChance(s, h)
+                  const w = el('p', 'gefahr')
+                  w.append('Gefahr beim Ziehen: ', el('b', null, Math.round(p * 100) + ' %'), h.chance ? ' (Zweite Chance schützt dich einmal)' : '', ' – Karten im Stapel: ' + s.stapel.length)
+                  a.append(w)
+                }
+                const reihe = el('div', 'gross-knoepfe')
+                const ziehen = el('button', 'knopf', 'Karte ziehen')
+                ziehen.type = 'button'
+                const bleiben = el('button', 'knopf zweit', 'Bleiben (' + punkte + ' sichern)')
+                bleiben.type = 'button'
+                bleiben.disabled = F.istLeer(h)
+                const fertig = (w) => {
+                  ziehen.disabled = bleiben.disabled = true
+                  res(w)
+                }
+                ziehen.addEventListener('click', () => fertig('nimm'))
+                bleiben.addEventListener('click', () => fertig('bleib'))
+                reihe.append(ziehen, bleiben)
+                a.append(reihe)
+                ziehen.focus({ preventScroll: true })
+              })
+            },
+            ziel(s, von, karte, optionen) {
+              pruefeAbbruch(g)
+              const me = s.spieler[von]
+              if (me.art === 'rechner') {
+                aktion(me.name + ' wählt aus …')
+                return pause(900).then(() => {
+                  pruefeAbbruch(g)
+                  return F.kiZiel(s, von, karte, optionen)
+                })
+              }
+              return new Promise((res) => {
+                const text =
+                  karte.a === 'freeze'
+                    ? 'Wen willst du einfrieren? (Die Person sichert ihre Punkte und ist raus.)'
+                    : karte.a === 'drei'
+                      ? 'Wer muss drei Karten ziehen?'
+                      : 'Wem schenkst du die Zweite Chance?'
+                const a = aktion(me.name + ' hat „' + F.kartenName(karte) + '“ gezogen')
+                const reihe = el('div', 'frage-karte')
+                const k = kartenEl(karte, 'gross')
+                k.classList.remove('neu')
+                reihe.append(k, el('p', null, text))
+                a.append(reihe)
+                const ziele = el('div', 'ziele')
+                for (const j of optionen) {
+                  const b = el('button', 'knopf zweit')
+                  b.type = 'button'
+                  b.append(j === von ? 'Mich selbst' : s.spieler[j].name, el('small', null, 'Runde: ' + F.rundenpunkte(s.spieler[j].hand) + ' · Gesamt ' + s.spieler[j].gesamt))
+                  b.addEventListener('click', () => res(j))
+                  ziele.append(b)
+                }
+                a.append(ziele)
+              })
+            },
+          }
+        }
+
+        // ---------- Spielablauf ----------
+        async function starten() {
+          const g = ++gen
+          const spieler = einst.spieler.map((s, i) => ({ name: (s.name || '').trim() || 'Platz ' + (i + 1), art: s.art, stufe: s.stufe }))
+          sp = F.neuesSpiel(spieler, einst.ziel)
+          sp.bei = async (text, art) => {
+            pruefeAbbruch(g)
+            // neu gezogene Karten kurz hervorheben: alle Karten, die vorher nicht da waren
+            const jetzt = new Set()
+            for (const s of sp.spieler) {
+              const h = s.hand
+              for (const k of [...h.zahlen, ...h.plus, h.mal, h.chance, h.bustKarte]) if (k) jetzt.add(k.id)
+            }
+            neueKarten = new Set([...jetzt].filter((id) => !(sp.gesehen || new Set()).has(id)))
+            sp.gesehen = jetzt
+            render()
+            await pause(art === 'bust' || art === 'flip7' ? 1500 : art === 'info' ? 500 : 900)
+            pruefeAbbruch(g)
+          }
+          $('spiel').hidden = false
+          const E = entscheider(g)
+          try {
+            while (true) {
+              const r = await F.runde(sp, E)
+              render()
+              const w = F.sieger(sp)
+              await rundenende(g, r, w)
+              if (w != null) return
+            }
+          } catch (e) {
+            if (!(e instanceof Abbruch)) throw e
+          }
+        }
+
+        function rundenende(g, r, w) {
+          return new Promise((res) => {
+            const a = aktion(w != null ? sp.spieler[w].name + ' gewinnt das Spiel!' : 'Runde ' + sp.runde + ' ist zu Ende', r.flip7 ? 'Flip 7! Die Runde endete mit 7 verschiedenen Zahlen.' : '')
+            const t = el('table', 'runde')
+            const kopf = el('tr')
+            for (const x of ['Spieler', 'Runde', 'Gesamt']) kopf.append(el('th', null, x))
+            t.append(kopf)
+            const hoch = Math.max(...sp.spieler.map((s) => s.gesamt))
+            sp.spieler.forEach((s, i) => {
+              const z = el('tr', w === i ? 'sieger' : '')
+              z.append(el('td', null, s.name), el('td', null, (s.hand.status === 'bust' ? 'Bust · ' : '+') + (s.hand.status === 'bust' ? '0' : r.punkte[i])), el('td', null, String(s.gesamt)))
+              t.append(z)
+            })
+            a.append(t)
+            if (w == null && hoch >= sp.ziel) a.append(el('p', 'hinweis', 'Gleichstand an der Spitze – es wird noch eine Runde gespielt.'))
+            const reihe = el('div', 'gross-knoepfe')
+            const weiter = el('button', 'knopf', w != null ? 'Neues Spiel einrichten' : 'Nächste Runde')
+            weiter.type = 'button'
+            weiter.addEventListener('click', () => {
+              if (g !== gen) return
+              if (w != null) einrichten()
+              res()
+            })
+            reihe.append(weiter)
+            a.append(reihe)
+            weiter.focus({ preventScroll: true })
+          })
+        }
+
+        let abbruchFrage = false
+        $('abbrechen').addEventListener('click', () => {
+          const b = $('abbrechen')
+          if (!abbruchFrage) {
+            abbruchFrage = true
+            b.textContent = 'Wirklich abbrechen?'
+            setTimeout(() => {
+              abbruchFrage = false
+              b.textContent = 'Spiel abbrechen'
+            }, 3000)
+            return
+          }
+          abbruchFrage = false
+          b.textContent = 'Spiel abbrechen'
+          einrichten()
+        })
+
+        einrichten()
+      })()
+    </script>
+  </body>
+</html>

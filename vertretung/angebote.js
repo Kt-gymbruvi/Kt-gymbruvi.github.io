@@ -50,6 +50,14 @@ window.VERTRETUNG = [
     marken: ['1 Person', '3 Stufen', '3 Themen'],
   },
   {
+    titel: 'Murdoku',
+    text: 'Kriminalrätsel: Wer stand wo? Aus den Hinweisen die Plätze finden – und den Mörder, der mit dem Opfer allein war.',
+    adresse: 'vertretung/murdoku/',
+    gruppe: 'knobeln',
+    logo: 'murdoku',
+    marken: ['1 Person', '3 Stufen', 'Notizen und Tipp'],
+  },
+  {
     titel: 'Chaos-Flitzer 3000',
     text: 'Würfeln, flitzen, gemein sein: Das Rennspiel mit 36 verrückten Läufern. Am Beamer laufen, die Schüler entscheiden per Handy.',
     adresse: 'vertretung/chaos-flitzer/',
@@ -80,6 +88,22 @@ window.VERTRETUNG = [
     gruppe: 'spiele',
     logo: 'schach',
     marken: ['2 Personen', 'gegen Rechner', 'online'],
+  },
+  {
+    titel: 'Flip 7',
+    text: 'Karten ziehen oder aufhören: Wer 7 verschiedene Zahlen sammelt, bekommt den Bonus – doppelte Zahl heißt Bust.',
+    adresse: 'vertretung/flip-7/',
+    gruppe: 'spiele',
+    logo: 'flip7',
+    marken: ['2 bis 6 Personen', 'gegen Rechner', 'am Beamer'],
+  },
+  {
+    titel: 'Schiffe versenken',
+    text: 'Flotte verstecken und die Schiffe des Gegners aufspüren – zu zweit an einem Gerät oder gegen den Rechner.',
+    adresse: 'vertretung/schiffe-versenken/',
+    gruppe: 'spiele',
+    logo: 'schiffe',
+    marken: ['2 Personen', 'gegen Rechner', '3 Stufen'],
   },
   {
     titel: 'Spielraum (online spielen)',

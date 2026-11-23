@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Flip 7">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <g transform="rotate(-14 256 256)">
+      <rect x="120" y="92" width="214" height="300" rx="30" fill="#ff8a14"/>
+    </g>
+    <g transform="rotate(10 256 256)">
+      <rect x="170" y="112" width="214" height="300" rx="30" fill="#0f5c47" stroke="#ffffff" stroke-width="8"/>
+      <path d="M216 184H334L276 340" fill="none" stroke="#ffffff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="204" cy="150" r="9" fill="#ff8a14"/>
+      <circle cx="350" cy="374" r="9" fill="#ff8a14"/>
+    </g>
+  </g>
+</svg>
