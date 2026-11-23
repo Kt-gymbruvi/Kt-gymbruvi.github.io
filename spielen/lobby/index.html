@@ -128,6 +128,223 @@
           grid-template-columns: minmax(0, 1fr);
         }
       }
+
+      /* ---------- Spiele-Kacheln, Plätze ---------- */
+      .logo {
+        flex: none;
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: 0.8rem;
+        overflow: hidden;
+      }
+      .logo .symbol {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+      }
+      .plaetze {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35em;
+        margin-top: 0.4em;
+      }
+      .platz {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2em;
+        height: 2em;
+        padding: 0 0.5em;
+        border-radius: 999px;
+        border: 2px dashed var(--haarlinie);
+        color: var(--text-2);
+        font-size: 0.85em;
+      }
+      .platz.voll {
+        border: 2px solid var(--akzent);
+        background: var(--akzent);
+        color: var(--akzent-text);
+        font-weight: var(--gewicht-betont);
+      }
+      .tisch {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche);
+        box-shadow: var(--schatten-klein);
+      }
+      .tisch .text {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .tisch .titel {
+        font-weight: var(--gewicht-betont);
+        font-size: 1.1em;
+      }
+      .tisch .text .klein {
+        color: var(--text-2);
+        font-size: 0.9em;
+      }
+      .tische {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .tische > .leer {
+        padding: 1rem;
+        border: 2px dashed var(--haarlinie);
+        border-radius: var(--radius-gross);
+      }
+      .kacheln {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+        gap: 0.6rem;
+      }
+      .kachel {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        min-height: 6.5rem;
+        padding: 0.8rem;
+        border: 1px solid var(--haarlinie);
+        border-radius: var(--radius-gross);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        text-align: left;
+      }
+      button.kachel {
+        cursor: pointer;
+        transition: transform var(--schnell), background-color var(--schnell);
+      }
+      button.kachel:hover:not(:disabled) {
+        background: var(--akzent-hell);
+      }
+      button.kachel:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+      button.kachel:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .kachel .name {
+        font-weight: var(--gewicht-betont);
+      }
+      .kachel > .klein {
+        color: var(--text-2);
+        font-size: 0.85em;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+      .person {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45em;
+        padding: 0.3em 0.8em;
+        border-radius: 999px;
+        background: var(--flaeche-2);
+        overflow-wrap: anywhere;
+      }
+      .person i {
+        flex: none;
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 50%;
+        background: var(--signal-gruen);
+      }
+      .person.bietet i {
+        background: var(--akzent);
+      }
+      .person.spielt i {
+        background: var(--text-2);
+      }
+      h2.abschnitt {
+        margin: 0 0 0.6rem;
+        font-size: 1.15em;
+      }
+
+      /* ---------- Smartboard: große Schrift für den Beamer ---------- */
+      #tafel {
+        font-size: clamp(1rem, 0.7rem + 0.85vw, 1.7rem);
+      }
+      #tafel .logo {
+        width: 3.2em;
+        height: 3.2em;
+      }
+      .tafel-raster {
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+        gap: 1.25em;
+        align-items: start;
+      }
+      .tafel-raster > * {
+        min-width: 0;
+      }
+      .tafel-spalte {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25em;
+      }
+      .beitritt {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em 1em;
+      }
+      .beitritt > div:last-child {
+        flex: 1 1 10em;
+        min-width: 0;
+      }
+      #t-qr {
+        flex: none;
+        width: 9em;
+        height: 9em;
+        padding: 0.4rem;
+        border-radius: var(--radius);
+        background: #fff; /* QR-Codes brauchen hellen Grund */
+      }
+      #t-qr svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .tafel-code {
+        font-size: 2.1em;
+        font-weight: 300;
+        letter-spacing: 0.08em;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+      }
+      #tafel .hinweis {
+        font-size: 0.9em;
+      }
+      #tafel .tisch .titel {
+        font-size: 1.25em;
+      }
+      #tafel .platz {
+        font-size: 1em;
+      }
+      .steuerung summary {
+        cursor: pointer;
+        font-weight: var(--gewicht-betont);
+      }
+      @media (max-width: 60rem) {
+        .tafel-raster {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
     </style>
   </head>
   <body>
@@ -135,18 +352,19 @@
       <a href="../../vertretung/?art=spiele">Vertretung</a>
       <h1>Spielraum</h1>
     </header>
-    <main class="werkzeug-inhalt">
+    <main class="werkzeug-inhalt" id="inhalt">
       <!-- 1. Noch kein Raum -->
       <div id="start" class="schmal" hidden>
         <section class="werkzeug-karte">
-          <h2 style="margin-top: 0">Spielraum</h2>
-          <p class="hinweis">Hier spielt die Klasse gegeneinander: Einer legt einen Raum an, alle anderen kommen mit dem Code oder dem QR-Code hinein.</p>
+          <h2 style="margin-top: 0">Lobby am Smartboard</h2>
+          <p class="hinweis">Öffne die Lobby auf dem Rechner am Smartboard. Die Klasse kommt mit dem Handy per QR-Code oder Code hinein, bietet Spiele an oder steigt bei einem Angebot ein. Am Smartboard sieht jeder, was gerade los ist.</p>
           <div class="knopf-reihe">
-            <button type="button" class="knopf gross" id="neuer-raum">Neuen Raum anlegen</button>
+            <button type="button" class="knopf gross" id="neuer-raum">Lobby öffnen</button>
           </div>
         </section>
         <section class="werkzeug-karte" style="margin-top: 1rem">
           <h2 style="margin-top: 0">Mit Code beitreten</h2>
+          <p class="hinweis">Für das Handy: Code von der Smartboard-Lobby eingeben.</p>
           <form id="code-form" class="formular-zeile" novalidate>
             <label class="feld">Raumcode
               <input id="code-feld" type="text" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="z. B. K7P2QX" />
@@ -157,11 +375,11 @@
         </section>
       </div>
 
-      <!-- 2. Name wählen -->
+      <!-- 2. Name wählen (Handy) -->
       <div id="name" class="schmal" hidden>
         <section class="werkzeug-karte">
           <h2 style="margin-top: 0">Wie heißt du im Spiel?</h2>
-          <p class="hinweis">Ein Spitzname reicht. Er wird nur im Raum angezeigt und nirgends gespeichert.</p>
+          <p class="hinweis">Ein Spitzname reicht. Er wird nur in der Lobby angezeigt und nirgends gespeichert.</p>
           <form id="name-form" class="formular-zeile" novalidate>
             <label class="feld">Spitzname
               <input id="name-feld" type="text" maxlength="20" autocomplete="off" />
@@ -171,54 +389,91 @@
         </section>
       </div>
 
-      <!-- 3. Im Raum -->
-      <div id="raum" class="raum-grid" hidden>
-        <div>
-          <section class="werkzeug-karte vorwahl" id="vorwahl" hidden>
-            <p id="vorwahl-text" style="margin: 0"></p>
-            <button type="button" class="knopf zweit klein" id="vorwahl-weg">Anderes Spiel wählen</button>
-          </section>
-          <section class="werkzeug-karte">
-            <h2 style="margin-top: 0">Spiel anbieten</h2>
-            <div class="anbieten" id="anbieten"></div>
-            <p class="hinweis" id="anbieten-hinweis" style="margin: 0.75rem 0 0"></p>
-            <p class="hinweis" id="chaos-hinweis" style="margin: 0.5rem 0 0" hidden>
-              <b>Chaos-Flitzer 3000</b> läuft auf deinem Gerät (am besten Beamer oder Laptop), du kannst auch allein anfangen. Die anderen steigen unter „Angebote“ ein und spielen mit dem Handy, bis zu sechs Personen.
-            </p>
-          </section>
-          <section class="werkzeug-karte" style="margin-top: 1rem">
-            <h2 style="margin-top: 0">Angebote</h2>
-            <ul class="liste" id="angebote"></ul>
-          </section>
-          <section class="werkzeug-karte" style="margin-top: 1rem">
-            <h2 style="margin-top: 0">Laufende Spiele</h2>
-            <ul class="liste" id="laufend"></ul>
-          </section>
-          <p id="fehler" role="alert" hidden></p>
-        </div>
-        <div class="seite">
-          <section class="werkzeug-karte">
-            <div class="raumkopf">
-              <div>
-                <div class="hinweis" style="margin: 0">Raumcode</div>
-                <div class="code" id="code"></div>
-                <button type="button" class="knopf zweit klein" id="link-kopieren" style="margin-top: 0.4rem">Link kopieren</button>
-              </div>
-              <div id="qr" aria-label="QR-Code zum Raum" role="img"></div>
-            </div>
-            <p id="verbindung" role="status" style="margin: 0.75rem 0 0"></p>
-          </section>
-          <section class="werkzeug-karte">
-            <h2>Im Raum (<span id="anzahl">0</span>)</h2>
-            <ul class="liste" id="anwesende"></ul>
-          </section>
-          <section class="werkzeug-karte" id="leitung-karte" hidden>
-            <h2>Erlaubte Spiele</h2>
-            <div id="erlaubt"></div>
-          </section>
-          <div class="knopf-reihe">
-            <button type="button" class="knopf zweit" id="verlassen">Raum verlassen</button>
+      <!-- 3a. Smartboard: Übersicht für alle -->
+      <div id="tafel" hidden>
+        <div class="tafel-raster">
+          <div class="tafel-spalte">
+            <section class="werkzeug-karte">
+              <h2 class="abschnitt">Angebote</h2>
+              <ul class="tische" id="t-angebote"></ul>
+            </section>
+            <section class="werkzeug-karte">
+              <h2 class="abschnitt">Laufende Spiele</h2>
+              <ul class="tische" id="t-laufend"></ul>
+            </section>
           </div>
+          <div class="tafel-spalte">
+            <section class="werkzeug-karte">
+              <div class="beitritt">
+                <div id="t-qr" aria-label="QR-Code zur Lobby" role="img"></div>
+                <div>
+                  <div class="hinweis" style="margin: 0">Mitmachen mit dem Handy: QR-Code scannen oder Code eingeben</div>
+                  <div class="tafel-code" id="t-code"></div>
+                  <div class="hinweis" id="t-adresse" style="margin: 0; overflow-wrap: anywhere"></div>
+                </div>
+              </div>
+              <p id="t-verbindung" role="status" class="hinweis" style="margin: 0.75em 0 0"></p>
+            </section>
+            <section class="werkzeug-karte">
+              <h2 class="abschnitt">Das kann man spielen</h2>
+              <div class="kacheln" id="t-spiele"></div>
+              <p class="hinweis" style="margin: 0.75em 0 0">Am Handy ein Spiel anbieten oder bei einem Angebot einsteigen.</p>
+            </section>
+            <section class="werkzeug-karte">
+              <h2 class="abschnitt">In der Lobby (<span id="t-anzahl">0</span>)</h2>
+              <div class="chips" id="t-personen"></div>
+            </section>
+            <section class="werkzeug-karte steuerung">
+              <details>
+                <summary>Einstellungen</summary>
+                <div id="erlaubt" style="margin-top: 0.5rem"></div>
+                <div class="knopf-reihe" style="margin-top: 0.75rem">
+                  <button type="button" class="knopf zweit" id="t-chaos">Chaos-Flitzer hier am Smartboard starten</button>
+                  <button type="button" class="knopf zweit" id="t-link">Link kopieren</button>
+                  <button type="button" class="knopf zweit" id="t-schliessen">Lobby schließen</button>
+                </div>
+              </details>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3b. Handy: anbieten und einsteigen -->
+      <div id="raum" class="schmal" hidden>
+        <section class="werkzeug-karte vorwahl" id="vorwahl" hidden>
+          <p id="vorwahl-text" style="margin: 0"></p>
+          <button type="button" class="knopf zweit klein" id="vorwahl-weg">Anderes Spiel wählen</button>
+        </section>
+        <section class="werkzeug-karte" id="eigenes" hidden style="margin-bottom: 1rem">
+          <p id="eigenes-text" style="margin: 0 0 0.6rem"></p>
+          <button type="button" class="knopf zweit" id="eigenes-weg">Angebot zurückziehen</button>
+        </section>
+        <section class="werkzeug-karte">
+          <h2 class="abschnitt">Mitspielen</h2>
+          <ul class="tische" id="angebote"></ul>
+        </section>
+        <section class="werkzeug-karte" style="margin-top: 1rem" id="anbieten-karte">
+          <h2 class="abschnitt">Selbst ein Spiel anbieten</h2>
+          <div class="kacheln" id="anbieten"></div>
+          <p class="hinweis" id="chaos-hinweis" style="margin: 0.75rem 0 0" hidden>
+            <b>Chaos-Flitzer 3000</b> läuft auf deinem Gerät (am besten Beamer oder Laptop), du kannst auch allein anfangen. Die anderen steigen unter „Mitspielen“ ein und spielen mit dem Handy, bis zu sechs Personen.
+          </p>
+        </section>
+        <section class="werkzeug-karte" style="margin-top: 1rem">
+          <h2 class="abschnitt">Laufende Spiele</h2>
+          <ul class="tische" id="laufend"></ul>
+        </section>
+        <section class="werkzeug-karte" style="margin-top: 1rem">
+          <h2 class="abschnitt">In der Lobby (<span id="anzahl">0</span>)</h2>
+          <div class="chips" id="anwesende"></div>
+          <p style="margin: 0.75rem 0 0">
+            <span class="hinweis">Code </span><b class="code" style="font-size: 1.2rem" id="code"></b>
+            <span id="verbindung" role="status" style="margin-left: 0.5rem"></span>
+          </p>
+        </section>
+        <p id="fehler" role="alert" hidden></p>
+        <div class="knopf-reihe" style="margin-top: 1rem">
+          <button type="button" class="knopf zweit" id="verlassen">Lobby verlassen</button>
         </div>
       </div>
     </main>
@@ -242,11 +497,38 @@
         let vorSpiel = R.SPIELE[params.get('spiel')] ? params.get('spiel') : null
         const adresseMitSpiel = (c) => '?raum=' + c + (vorSpiel ? '&spiel=' + vorSpiel : '')
 
+        // Zu jedem Spiel: Logo (Name aus gemeinsam/symbole.js) und Zahl der Plätze
+        const INFO = {
+          'vier-gewinnt': { logo: 'viergewinnt', plaetze: 2 },
+          muehle: { logo: 'muehle', plaetze: 2 },
+          schach: { logo: 'schach', plaetze: 2 },
+          'chaos-flitzer': { logo: 'chaosflitzer', plaetze: 6 },
+        }
+        const personen = (s) => (INFO[s] && INFO[s].plaetze > 2 ? '2 bis ' + INFO[s].plaetze + ' Personen' : '2 Personen')
+
+        function el(tag, klasse, text) {
+          const e = document.createElement(tag)
+          if (klasse) e.className = klasse
+          if (text !== undefined) e.textContent = text
+          return e
+        }
+        function logo(spiel) {
+          const d = el('span', 'logo')
+          const s = window.LehrraumSymbol && INFO[spiel] ? window.LehrraumSymbol(INFO[spiel].logo) : null
+          if (s) d.append(s)
+          return d
+        }
+        function leer(text) {
+          return el('li', 'leer', text)
+        }
+
         const zeige = (welches) => {
-          ;['start', 'name', 'raum'].forEach((id) => ($(id).hidden = id !== welches))
+          ;['start', 'name', 'raum', 'tafel'].forEach((id) => ($(id).hidden = id !== welches))
+          $('inhalt').style.width = welches === 'tafel' ? 'min(110rem, 100% - 2rem)' : ''
         }
         const leitungsKey = () => 'spielraum-leitung-' + code
-        const istLeitung = () => {
+        // „Leitung“ = dieses Gerät ist das Smartboard (zeigt die Lobby, spielt nicht mit)
+        const istTafel = () => {
           try {
             return sessionStorage.getItem(leitungsKey()) === '1'
           } catch {
@@ -262,7 +544,7 @@
             }
             return zeige('start')
           }
-          if (!R.meinName()) {
+          if (!istTafel() && !R.meinName()) {
             zeige('name')
             return $('name-feld').focus()
           }
@@ -304,20 +586,23 @@
         }
 
         function betreten() {
-          zeige('raum')
+          const tafel = istTafel()
+          zeige(tafel ? 'tafel' : 'raum')
           $('code').textContent = code
-          window.QRCode.toString(adresse(), { type: 'svg', margin: 0, errorCorrectionLevel: 'M' }, (f, svg) => {
-            if (!f) $('qr').innerHTML = svg // von der QR-Bibliothek erzeugtes SVG, keine Eingabe von außen
-          })
-          const leitung = istLeitung()
+          $('t-code').textContent = code
+          $('t-adresse').textContent = adresse().replace(/^https?:\/\//, '')
+          if (tafel) {
+            window.QRCode.toString(adresse(), { type: 'svg', margin: 0, errorCorrectionLevel: 'M' }, (f, svg) => {
+              if (!f) $('t-qr').innerHTML = svg // von der QR-Bibliothek erzeugtes SVG, keine Eingabe von außen
+            })
+          }
           let erlaubteSpiele = Object.keys(R.SPIELE)
-          raum = R.betreten(code, { name: R.meinName(), leitung, spiele: erlaubteSpiele })
-          $('leitung-karte').hidden = !leitung
-          if (leitung) {
+          raum = R.betreten(code, { name: tafel ? 'Smartboard' : R.meinName(), leitung: tafel, spiele: erlaubteSpiele })
+
+          if (tafel) {
             const box = $('erlaubt')
             Object.keys(R.SPIELE).forEach((s) => {
-              const l = document.createElement('label')
-              l.className = 'haken'
+              const l = el('label', 'haken')
               const c = document.createElement('input')
               c.type = 'checkbox'
               c.checked = true
@@ -332,11 +617,12 @@
           }
 
           raum.auf('status', (s) => {
-            const v = $('verbindung')
-            v.className = s === 'verbunden' ? '' : 'aus'
+            const v = $(tafel ? 't-verbindung' : 'verbindung')
+            v.className = (tafel ? 'hinweis ' : '') + (s === 'verbunden' ? '' : 'aus')
             v.textContent = s === 'verbunden' ? 'Verbunden.' : s === 'verbindet' ? 'Verbinde …' : 'Verbindung weg – versuche es erneut …'
           })
           raum.auf('anwesenheit', zeichnen)
+          if (tafel) return // das Smartboard zeigt nur an und spielt nicht mit
 
           // Jemand will bei meinem Angebot mitspielen
           raum.auf('beitritt', (d) => {
@@ -381,96 +667,165 @@
             '../' + spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(partie) + '&seite=' + seite + '&gegner=' + encodeURIComponent(gegnerPerson.name) + '&gid=' + encodeURIComponent(gegnerPerson.id)
         }
 
+        // ---------- Gemeinsame Auswertung ----------
+        function lage() {
+          const liste = raum.anwesend()
+          const spieler = liste.filter((p) => p.rolle !== 'leitung')
+          const angebote = spieler
+            .filter((p) => p.angebot && R.SPIELE[p.angebot.spiel])
+            .sort((a, b) => String(a.angebot.spiel).localeCompare(String(b.angebot.spiel)) || String(a.name).localeCompare(String(b.name), 'de'))
+          const laufend = []
+          const gesehen = new Set()
+          spieler
+            .filter((p) => p.spielt && R.SPIELE[p.spielt.spiel])
+            .forEach((p) => {
+              if (gesehen.has(p.spielt.partie)) return
+              gesehen.add(p.spielt.partie)
+              laufend.push(p)
+            })
+          return { spieler, angebote, laufend, erlaubt: raum.erlaubt() }
+        }
+
+        /** Zeile „Ben sucht Schach“ mit Logo und Plätzen; rechts optional ein Knopf. */
+        function tisch(p, knopf) {
+          const a = p.angebot
+          const gruppe = INFO[a.spiel].plaetze > 2
+          const li = el('li', 'tisch')
+          li.append(logo(a.spiel))
+          const t = el('span', 'text')
+          t.append(el('div', 'titel', R.SPIELE[a.spiel]))
+          t.append(el('div', 'klein', R.bereinige(p.name) + ' sucht Mitspieler' + (gruppe ? ' (am Handy, bis zu ' + INFO[a.spiel].plaetze + ' Personen)' : '')))
+          const pl = el('div', 'plaetze')
+          if (gruppe) {
+            const n = Math.min(INFO[a.spiel].plaetze, Number(a.belegt) || 0)
+            for (let i = 0; i < INFO[a.spiel].plaetze; i++) pl.append(el('span', 'platz' + (i < n ? ' voll' : ''), i < n ? String(i + 1) : '–'))
+          } else {
+            pl.append(el('span', 'platz voll', R.bereinige(p.name)), el('span', 'platz', 'frei'))
+          }
+          t.append(pl)
+          li.append(t)
+          if (knopf) li.append(knopf)
+          return li
+        }
+
+        function laufendZeile(p) {
+          const li = el('li', 'tisch')
+          li.append(logo(p.spielt.spiel))
+          const t = el('span', 'text')
+          t.append(el('div', 'titel', R.SPIELE[p.spielt.spiel]))
+          t.append(
+            el(
+              'div',
+              'klein',
+              INFO[p.spielt.spiel].plaetze > 2 ? R.bereinige(p.name) + ' spielt (' + R.bereinige(p.spielt.gegner) + ')' : R.bereinige(p.name) + ' gegen ' + R.bereinige(p.spielt.gegner)
+            )
+          )
+          li.append(t)
+          return li
+        }
+
+        function personenChips(box, spieler) {
+          box.textContent = ''
+          spieler
+            .slice()
+            .sort((x, y) => String(x.name).localeCompare(String(y.name), 'de'))
+            .forEach((p) => {
+              const c = el('span', 'person ' + (p.spielt ? 'spielt' : p.angebot ? 'bietet' : ''))
+              c.append(document.createElement('i'), document.createTextNode(R.bereinige(p.name) + (p.id === raum.id ? ' (du)' : '') + (p.spielt ? ' · spielt' : p.angebot ? ' · bietet an' : '')))
+              box.append(c)
+            })
+          if (!spieler.length) box.append(el('span', 'leer', 'Noch niemand da.'))
+        }
+
         function zeichnen() {
           if (!raum) return
-          const liste = raum.anwesend()
-          const erlaubt = raum.erlaubt()
-          $('anzahl').textContent = String(liste.length)
+          if (istTafel()) zeichnenTafel()
+          else zeichnenHandy()
+        }
 
-          // Anwesende
-          const a = $('anwesende')
-          a.textContent = ''
-          liste
-            .slice()
-            .sort((x, y) => (x.rolle === 'leitung' ? -1 : 0) - (y.rolle === 'leitung' ? -1 : 0) || String(x.name).localeCompare(String(y.name), 'de'))
-            .forEach((p) => {
-              const li = document.createElement('li')
-              li.className = 'zeile'
-              const t = document.createElement('span')
-              t.className = 'text'
-              t.textContent = R.bereinige(p.name) + (p.id === raum.id ? ' (du)' : '')
-              const k = document.createElement('span')
-              k.className = 'klein'
-              k.textContent = p.rolle === 'leitung' ? 'Leitung' : p.spielt ? 'spielt' : p.angebot ? 'bietet an' : ''
-              li.append(t, k)
-              a.append(li)
-            })
+        // ---------- Smartboard ----------
+        function zeichnenTafel() {
+          const { spieler, angebote, laufend, erlaubt } = lage()
+          $('t-anzahl').textContent = String(spieler.length)
+
+          const ang = $('t-angebote')
+          ang.textContent = ''
+          if (!angebote.length) ang.append(leer('Noch kein Spiel im Angebot. Nimm dein Handy, gehe in die Lobby und tippe auf ein Spiel.'))
+          angebote.forEach((p) => ang.append(tisch(p)))
+
+          const lauf = $('t-laufend')
+          lauf.textContent = ''
+          if (!laufend.length) lauf.append(leer('Noch läuft kein Spiel.'))
+          laufend.forEach((p) => lauf.append(laufendZeile(p)))
+
+          // Was man spielen kann, mit Zahl der Angebote
+          const sp = $('t-spiele')
+          sp.textContent = ''
+          erlaubt.forEach((s) => {
+            const k = el('div', 'kachel')
+            k.append(logo(s))
+            k.append(el('span', 'name', R.SPIELE[s]))
+            const n = angebote.filter((p) => p.angebot.spiel === s).length
+            k.append(el('span', 'klein', personen(s) + (n ? ' · ' + n + (n === 1 ? ' Angebot' : ' Angebote') : '')))
+            sp.append(k)
+          })
+          if (!erlaubt.length) sp.append(el('span', 'leer', 'Es ist gerade kein Spiel freigegeben (unter „Einstellungen“).'))
+
+          personenChips($('t-personen'), spieler)
+          $('t-chaos').hidden = !erlaubt.includes('chaos-flitzer')
+        }
+
+        // ---------- Handy ----------
+        function zeichnenHandy() {
+          const { spieler, angebote, laufend, erlaubt } = lage()
+          $('anzahl').textContent = String(spieler.length)
+          personenChips($('anwesende'), spieler)
+
+          // Vorwahl: Hinweis, das gewählte Spiel steht zuerst und kräftig
+          $('vorwahl').hidden = !vorSpiel || !erlaubt.includes(vorSpiel)
+          if (vorSpiel) $('vorwahl-text').textContent = 'Du möchtest online spielen: ' + R.SPIELE[vorSpiel] + '. Biete es an oder steige bei einem Angebot ein.'
+
+          // Eigenes Angebot
+          const meins = raum.ich.angebot
+          $('eigenes').hidden = !meins
+          if (meins) $('eigenes-text').textContent = 'Du bietest „' + R.SPIELE[meins.spiel] + '“ an. Sobald jemand einsteigt, geht es los.'
+          $('anbieten-karte').hidden = !!meins
 
           // Spiel anbieten
           const an = $('anbieten')
           an.textContent = ''
-          // Vorwahl: Hinweis und das gewählte Spiel zuerst und kräftig
-          $('vorwahl').hidden = !vorSpiel || !erlaubt.includes(vorSpiel)
-          if (vorSpiel) $('vorwahl-text').textContent = 'Du möchtest online spielen: ' + R.SPIELE[vorSpiel] + '. Biete es an oder steige bei einem Angebot ein.'
-          const meins = raum.ich.angebot
-          if (meins) {
-            const t = document.createElement('span')
-            t.textContent = 'Du bietest „' + R.SPIELE[meins.spiel] + '“ an. Sobald jemand einsteigt, geht es los.'
-            const b = document.createElement('button')
+          const reihenfolge = vorSpiel && erlaubt.includes(vorSpiel) ? [vorSpiel, ...erlaubt.filter((x) => x !== vorSpiel)] : erlaubt
+          reihenfolge.forEach((s) => {
+            const b = el('button', 'kachel')
             b.type = 'button'
-            b.className = 'knopf zweit'
-            b.textContent = 'Angebot zurückziehen'
-            b.addEventListener('click', () => raum.setze({ angebot: null }))
-            an.append(t, b)
-          } else {
-            const reihenfolge = vorSpiel && erlaubt.includes(vorSpiel) ? [vorSpiel, ...erlaubt.filter((x) => x !== vorSpiel)] : erlaubt
-            reihenfolge.forEach((s) => {
-              const b = document.createElement('button')
-              b.type = 'button'
-              b.className = 'knopf' + (vorSpiel && s !== vorSpiel && erlaubt.includes(vorSpiel) ? ' zweit' : '')
-              b.textContent = R.SPIELE[s]
-              b.disabled = !!wartetAuf
-              b.addEventListener('click', () => {
-                meldung('')
-                if (s === 'chaos-flitzer') {
-                  // Gruppenspiel: läuft auf diesem Gerät, die Lobby wird dort weitergeführt (Angebot, freie Plätze)
-                  gestartet = true
-                  raum.verlassen()
-                  location.href = '../../vertretung/chaos-flitzer/?lobby=' + code + '&host=1'
-                  return
-                }
-                raum.setze({ angebot: { partie: R.zufallText(8), spiel: s } })
-              })
-              an.append(b)
+            b.append(logo(s), el('span', 'name', R.SPIELE[s]), el('span', 'klein', personen(s)))
+            b.disabled = !!wartetAuf
+            b.addEventListener('click', () => {
+              meldung('')
+              if (s === 'chaos-flitzer') {
+                // Gruppenspiel: läuft auf diesem Gerät, die Lobby wird dort weitergeführt (Angebot, freie Plätze)
+                gestartet = true
+                raum.verlassen()
+                location.href = '../../vertretung/chaos-flitzer/?lobby=' + code + '&host=1'
+                return
+              }
+              raum.setze({ angebot: { partie: R.zufallText(8), spiel: s } })
             })
-            if (!erlaubt.length) an.textContent = 'Die Leitung hat gerade kein Spiel freigegeben.'
-          }
-          $('chaos-hinweis').hidden = !erlaubt.includes('chaos-flitzer') || !!meins
-          $('anbieten-hinweis').textContent = meins || wartetAuf ? '' : 'Wähle ein Spiel. Deine Mitschüler sehen es dann unter „Angebote“ und können einsteigen.'
+            an.append(b)
+          })
+          if (!erlaubt.length) an.append(el('span', 'leer', 'Gerade ist kein Spiel freigegeben.'))
+          $('chaos-hinweis').hidden = !erlaubt.includes('chaos-flitzer')
 
           // Angebote anderer
           const ang = $('angebote')
           ang.textContent = ''
-          const offen = liste.filter((p) => p.id !== raum.id && p.angebot && R.SPIELE[p.angebot.spiel])
+          const offen = angebote.filter((p) => p.id !== raum.id)
           if (wartetAuf && !offen.some((p) => p.angebot.partie === wartetAuf.partie)) wartetAuf = null
-          if (!offen.length) {
-            const li = document.createElement('li')
-            li.className = 'leer'
-            li.textContent = 'Gerade bietet niemand ein Spiel an. Biete selbst eins an!'
-            ang.append(li)
-          }
+          if (!offen.length) ang.append(leer('Gerade bietet niemand ein Spiel an. Biete selbst eins an!'))
           offen.forEach((p) => {
-            const li = document.createElement('li')
-            li.className = 'zeile'
-            const t = document.createElement('span')
-            t.className = 'text'
-            const gruppe = p.angebot.spiel === 'chaos-flitzer'
-            t.textContent = gruppe
-              ? R.bereinige(p.name) + ' sucht Mitspieler: ' + R.SPIELE[p.angebot.spiel] + ' (' + Math.min(6, Number(p.angebot.belegt) || 0) + ' Handys dabei, bis zu 6 Plätze)'
-              : R.bereinige(p.name) + ' sucht ' + R.SPIELE[p.angebot.spiel]
-            const b = document.createElement('button')
+            const gruppe = INFO[p.angebot.spiel].plaetze > 2
+            const b = el('button', 'knopf klein')
             b.type = 'button'
-            b.className = 'knopf klein'
             const wartet = wartetAuf && wartetAuf.partie === p.angebot.partie
             b.textContent = wartet ? 'Warte …' : 'Mitspielen'
             b.disabled = !!wartetAuf || !!raum.ich.angebot
@@ -488,36 +843,14 @@
               raum.sende('beitritt', { partie: p.angebot.partie, von: raum.id, name: raum.ich.name })
               zeichnen()
             })
-            li.append(t, b)
-            ang.append(li)
+            ang.append(tisch(p, b))
           })
 
-          // Laufende Spiele (jede Partie nur einmal)
+          // Laufende Spiele
           const lauf = $('laufend')
           lauf.textContent = ''
-          const gesehen = new Set()
-          liste
-            .filter((p) => p.spielt && R.SPIELE[p.spielt.spiel])
-            .forEach((p) => {
-              if (gesehen.has(p.spielt.partie)) return
-              gesehen.add(p.spielt.partie)
-              const li = document.createElement('li')
-              li.className = 'zeile'
-              const t = document.createElement('span')
-              t.className = 'text'
-              t.textContent =
-                p.spielt.spiel === 'chaos-flitzer'
-                  ? R.bereinige(p.name) + ' spielt ' + R.SPIELE[p.spielt.spiel] + ' (' + R.bereinige(p.spielt.gegner) + ')'
-                  : R.bereinige(p.name) + ' gegen ' + R.bereinige(p.spielt.gegner) + ' – ' + R.SPIELE[p.spielt.spiel]
-              li.append(t)
-              lauf.append(li)
-            })
-          if (!gesehen.size) {
-            const li = document.createElement('li')
-            li.className = 'leer'
-            li.textContent = 'Noch läuft kein Spiel.'
-            lauf.append(li)
-          }
+          if (!laufend.length) lauf.append(leer('Noch läuft kein Spiel.'))
+          laufend.forEach((p) => lauf.append(laufendZeile(p)))
         }
 
         $('vorwahl-weg').addEventListener('click', () => {
@@ -525,18 +858,33 @@
           history.replaceState(null, '', adresseMitSpiel(code))
           zeichnen()
         })
-        $('link-kopieren').addEventListener('click', async () => {
+        $('eigenes-weg').addEventListener('click', () => raum && raum.setze({ angebot: null }))
+        $('t-link').addEventListener('click', async () => {
           try {
             await navigator.clipboard.writeText(adresse())
-            $('link-kopieren').textContent = 'Kopiert'
+            $('t-link').textContent = 'Kopiert'
           } catch {
-            $('link-kopieren').textContent = adresse()
+            $('t-link').textContent = adresse()
           }
         })
-        $('verlassen').addEventListener('click', () => {
-          if (raum) raum.verlassen()
-          location.href = '../../vertretung/?art=spiele'
+        // Das Smartboard führt Chaos-Flitzer selbst aus (läuft dort als Gastgeber, die Handys steigen über die Lobby ein)
+        $('t-chaos').addEventListener('click', () => {
+          R.setzeName('Smartboard')
+          gestartet = true
+          raum.verlassen()
+          location.href = '../../vertretung/chaos-flitzer/?lobby=' + code + '&host=1'
         })
+        const gehe = () => {
+          if (raum) raum.verlassen()
+          try {
+            sessionStorage.removeItem(leitungsKey())
+          } catch {
+            /* egal */
+          }
+          location.href = '../../vertretung/?art=spiele'
+        }
+        $('t-schliessen').addEventListener('click', gehe)
+        $('verlassen').addEventListener('click', gehe)
         window.addEventListener('pagehide', () => raum && !gestartet && raum.verlassen())
 
         ansicht()
