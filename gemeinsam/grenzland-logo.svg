@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Grenzland">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)" stroke="#ffffff" stroke-width="10" stroke-linejoin="round">
+    <polygon points="265.7,150.0 265.7,242.0 186.0,288.0 106.3,242.0 106.3,150.0 186.0,104.0" fill="#0f5c47"/>
+    <polygon points="424.7,150.0 424.7,242.0 345.0,288.0 265.3,242.0 265.3,150.0 345.0,104.0" fill="#ff8a14"/>
+    <polygon points="344.7,288.0 344.7,380.0 265.0,426.0 185.3,380.0 185.3,288.0 265.0,242.0" fill="#06251c"/>
+    <path d="M250 120 V40 M250 44 L320 64 L250 84" fill="#ff8a14" stroke="#ffffff" stroke-width="10"/>
+    <circle cx="186" cy="196" r="34" fill="#ffffff" stroke="none"/>
+    <circle cx="345" cy="196" r="34" fill="#ffffff" stroke="none"/>
+    <circle cx="265" cy="334" r="34" fill="#ffffff" stroke="none"/>
+  </g>
+</svg>

@@ -2,6 +2,11 @@
 
 Neue Entscheidungen oben anfügen: Datum, Entscheidung, Grund, verworfene Alternativen.
 
+## 2026-11-23 – Spiele für mehrere: eigene Spiele statt Nachbauten, Spielleitung auf einem Gerät
+- **Eigene Namen und eigenes Aussehen.** Gewünscht waren bekannte Brett- und Kartenspiele (Kniffel, Uno, Blokus, Risiko, Catan, Zug um Zug, Carcassonne). Gebaut sind eigene Spiele mit ähnlichen Abläufen (Würfelglück, Farbenjagd, Ecke an Ecke, Grenzland, Inselhandel, Schienennetz, Kachelland): Namen, Karten, Bretter und Grafiken der Originale sind geschützt und gehören nicht auf eine öffentliche Seite. Regeln teils vereinfacht (z. B. Inselhandel ohne Entwicklungskarten, nur Bankhandel 4:1; Grenzland mit Rundenzahl, damit es in eine Stunde passt).
+- **Spielleitung beim Anbieter (host-autoritativ).** Bei 2 bis 6 Personen und verdeckten Karten taugt das Zwei-Personen-Verfahren (jeder prüft selbst) nicht. Ein Gerät rechnet, alle anderen schicken nur Wünsche. Verworfen: Stand in der Datenbank (Speicherung, Datenschutz), jeder rechnet selbst (verdeckte Karten wären sichtbar, Abweichungen). Bewusst hingenommen: Wer es darauf anlegt, kann im Browser die Karten der anderen sehen – ein Unterrichtsspiel, kein Wettbewerb.
+- **Regeln getrennt von der Darstellung** (`regeln.js` ohne DOM), damit sie in Node ohne Browser geprüft werden können.
+
 ## 2026-11-23 – Gruppen & Zufall: Klassennamen auf der Startseite, Glücksrad
 - **Namen aus dem Gerätespeicher, nur angemeldet.** Die Startseite liest die Namen der Klasse (Vor-/Nachname, keine Noten) direkt aus dem IndexedDB-Lager `klassen` der Lehrraum-App – lokal, nur im Speicher der Seite, nie gesendet, nie in `localStorage`. Das lockert die frühere Regel „nie die Namen lesen“ ausdrücklich nur für dieses Werkzeug (`laden({ mitNamen: true })`); Standard bleibt ohne Namen. Verworfen: Namen vom Server holen (bräuchte Entschlüsselung und das Notenbuch-Passwort), Namen in die Adresse legen (nie).
 - **Ohne Anmeldung unverändert:** Eigene Namen, optional auf dem Gerät gemerkt.

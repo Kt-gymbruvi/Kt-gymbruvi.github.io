@@ -63,6 +63,8 @@
     vertretung: 'vertretung', sudoku: 'sudoku', slitherlink: 'slitherlink', einstein: 'einstein',
     viergewinnt: 'vier-gewinnt', muehle: 'muehle', schach: 'schach', spielraum: 'spielraum',
     chaosflitzer: 'chaos-flitzer', murdoku: 'murdoku', flip7: 'flip-7', schiffe: 'schiffe-versenken',
+    wuerfelglueck: 'wuerfelglueck', farbenjagd: 'farbenjagd', eckeanecke: 'ecke-an-ecke', grenzland: 'grenzland',
+    inselhandel: 'inselhandel', schienennetz: 'schienennetz', kachelland: 'kachelland',
   }
 
   /** Erzeugt ein dekoratives Symbol. Die Größe kommt aus dem CSS (.symbol), die Farbe aus der Textfarbe. */

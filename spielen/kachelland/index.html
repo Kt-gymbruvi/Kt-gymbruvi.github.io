@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kachelland</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <link rel="stylesheet" href="../gruppe.css" />
+    <style>
+      #land {
+        max-width: 46rem;
+        max-height: calc(100dvh - 9rem);
+        margin: 0 auto;
+      }
+      .wiese {
+        fill: var(--kachel-wiese);
+        stroke: var(--kachel-linie);
+        stroke-width: 1;
+      }
+      .stadt {
+        fill: var(--kachel-stadt);
+        stroke: var(--kachel-linie);
+        stroke-width: 1.2;
+      }
+      .weg-rand {
+        fill: none;
+        stroke: var(--kachel-linie);
+        stroke-width: 9;
+      }
+      .weg {
+        fill: none;
+        stroke: var(--kachel-weg);
+        stroke-width: 6;
+      }
+      .kreuzung {
+        fill: var(--kachel-weg);
+        stroke: var(--kachel-linie);
+        stroke-width: 1.5;
+      }
+      .kapelle {
+        fill: var(--kachel-kapelle);
+        stroke: var(--kachel-linie);
+        stroke-width: 1.2;
+        stroke-linejoin: round;
+      }
+      .figur {
+        stroke: var(--spieler-rand);
+        stroke-width: 1.5;
+      }
+      .frei-platz {
+        fill: var(--flaeche);
+        fill-opacity: 0.35;
+        stroke: var(--fokus);
+        stroke-width: 2.5;
+        stroke-dasharray: 6 4;
+        cursor: pointer;
+      }
+      .letzte {
+        fill: none;
+        stroke: var(--fokus);
+        stroke-width: 3;
+        pointer-events: none;
+      }
+      .ankerpunkt {
+        fill: var(--flaeche);
+        stroke: var(--fokus);
+        stroke-width: 3;
+        cursor: pointer;
+      }
+      .hintergrund {
+        fill: var(--flaeche-2);
+      }
+      .vorschau-kachel {
+        width: 6rem;
+        height: 6rem;
+        flex: none;
+      }
+      .kachel-zeile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
+      <h1>Kachelland</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/kachelland-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Kachelland</p>
+          <p class="spielkopf-text">Plättchen anlegen, Städte und Wege bauen, Figuren setzen.</p>
+        </div>
+      </div>
+      <div class="gruppenspiel">
+        <div class="brett-flaeche" id="flaeche"></div>
+        <div class="seite" id="seite">
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Wer dran ist, legt das gezogene Plättchen an: Jede Kante muss passen – Wiese an Wiese, Weg an Weg, Stadt an Stadt. Drehen geht mit dem Knopf.</li>
+              <li>Danach darf man eine eigene Figur auf das neue Plättchen setzen: auf eine Stadt, einen Weg oder eine Kapelle – aber nur, wenn dort noch keine Figur steht.</li>
+              <li>Fertige Gebiete bringen Punkte und die Figuren zurück: Weg 1 Punkt je Plättchen, Stadt 2 je Plättchen, Kapelle 9 (wenn ringsum alle 8 Felder belegt sind).</li>
+              <li>Stehen in einem Gebiet mehrere Figuren, bekommt die Mehrheit die Punkte (bei Gleichstand alle).</li>
+              <li>Am Ende zählen unfertige Gebiete 1 Punkt je Plättchen. Jeder hat 7 Figuren.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../gruppe-hilfe.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../gruppe.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const K = window.Kachelland
+        const SVG = 'http://www.w3.org/2000/svg'
+        const T = 60
+        const C = [[0, 0], [60, 0], [60, 60], [0, 60]]
+        const M = [[30, 0], [60, 30], [30, 60], [0, 30]]
+        const zieh = (p, t) => [p[0] + (30 - p[0]) * t, p[1] + (30 - p[1]) * t]
+        const pt = (p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)
+        let drehung = 0
+        let merk = ''
+
+        function s(name, attr) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(attr || {}).forEach((k) => e.setAttribute(k, attr[k]))
+          return e
+        }
+        function el(tag, klasse, text) {
+          const e = document.createElement(tag)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        function knopf(text, klasse, bei) {
+          const b = el('button', 'knopf' + (klasse ? ' ' + klasse : ''), text)
+          b.type = 'button'
+          if (bei) b.addEventListener('click', bei)
+          return b
+        }
+
+        function stadtPfad(G) {
+          if (G.length === 4) return 'M0,0H60V60H0Z'
+          const menge = new Set(G)
+          const starts = [0, 1, 2, 3].filter((e) => menge.has(e) && !menge.has((e + 3) % 4))
+          let d = ''
+          starts.forEach((st, i) => {
+            let len = 0
+            while (menge.has((st + len) % 4)) len++
+            if (i === 0) d += 'M' + pt(C[st])
+            for (let k = 1; k <= len; k++) d += ' L' + pt(C[(st + k) % 4])
+            const ende = (st + len) % 4
+            const naechster = starts[(i + 1) % starts.length]
+            let ctrl
+            if (starts.length === 1) ctrl = len === 1 ? zieh(M[st], 0.7) : len === 2 ? zieh(C[(st + 3) % 4], 0.45) : zieh(M[(st + 3) % 4], 0.6)
+            else ctrl = zieh(M[ende], 0.6)
+            d += ' Q' + pt(ctrl) + ' ' + pt(C[naechster])
+          })
+          return d + ' Z'
+        }
+        function anker(teil) {
+          if (teil.art === 'kapelle') return [30, 33]
+          const k = teil.kanten
+          if (teil.art === 'stadt') {
+            if (k.length === 4) return [30, 30]
+            if (k.length === 1) return zieh(M[k[0]], 0.3)
+            const m = k.reduce((a, e) => [a[0] + M[e][0] / k.length, a[1] + M[e][1] / k.length], [0, 0])
+            return zieh(m, 0.25)
+          }
+          if (k.length === 2) return [0.25 * M[k[0]][0] + 15 + 0.25 * M[k[1]][0], 0.25 * M[k[0]][1] + 15 + 0.25 * M[k[1]][1]]
+          return zieh(M[k[0]], 0.42)
+        }
+
+        /** Ein Plättchen als Gruppe (Ursprung oben links). */
+        function kachel(t, r) {
+          const g = s('g')
+          g.append(s('rect', { x: 0, y: 0, width: T, height: T, class: 'wiese' }))
+          const teile = K.teile(t, r)
+          teile.filter((p) => p.art === 'stadt').forEach((p) => g.append(s('path', { d: stadtPfad(p.kanten), class: 'stadt' })))
+          const wege = teile.filter((p) => p.art === 'weg')
+          const einzeln = wege.filter((p) => p.kanten.length === 1).length
+          const kapelle = teile.some((p) => p.art === 'kapelle')
+          const pfade = wege.map((p) => {
+            const k = p.kanten
+            if (k.length === 2) return 'M' + pt(M[k[0]]) + ' Q30,30 ' + pt(M[k[1]])
+            return 'M' + pt(M[k[0]]) + ' L' + pt(einzeln >= 3 || kapelle ? [30, 30] : zieh(M[k[0]], 0.62))
+          })
+          pfade.forEach((d) => g.append(s('path', { d, class: 'weg-rand' })))
+          pfade.forEach((d) => g.append(s('path', { d, class: 'weg' })))
+          if (einzeln >= 3) g.append(s('rect', { x: 24, y: 24, width: 12, height: 12, rx: 2, class: 'kreuzung' }))
+          if (kapelle) g.append(s('path', { d: 'M20,42 V27 L30,17 L40,27 V42 Z', class: 'kapelle' }))
+          return g
+        }
+
+        function zeichne(z, a) {
+          const schluessel = z.dran + ':' + Object.keys(z.brett).length + ':' + z.phase
+          if (schluessel !== merk) {
+            merk = schluessel
+            drehung = 0
+            if (z.kachel) {
+              const p = K.plaetze(z, z.kachel)
+              const erste = [0, 1, 2, 3].find((r) => p.some((q) => q.r === r))
+              drehung = erste == null ? 0 : erste
+            }
+          }
+          const felder = Object.keys(z.brett).map((k) => k.split(',').map(Number))
+          const minX = Math.min(...felder.map((f) => f[0])) - 1
+          const maxX = Math.max(...felder.map((f) => f[0])) + 1
+          const minY = Math.min(...felder.map((f) => f[1])) - 1
+          const maxY = Math.max(...felder.map((f) => f[1])) + 1
+          const B = (maxX - minX + 1) * T
+          const Hh = (maxY - minY + 1) * T
+          const svg = s('svg', { id: 'land', viewBox: '0 0 ' + B + ' ' + Hh, role: 'img', 'aria-label': 'Kachelland mit ' + felder.length + ' Plättchen' })
+          svg.append(s('rect', { x: 0, y: 0, width: B, height: Hh, rx: 10, class: 'hintergrund' }))
+          const pos = (x, y) => [(x - minX) * T, (y - minY) * T]
+          Object.keys(z.brett).forEach((k) => {
+            const [x, y] = k.split(',').map(Number)
+            const g = kachel(z.brett[k].t, z.brett[k].r)
+            const [px, py] = pos(x, y)
+            g.setAttribute('transform', 'translate(' + px + ',' + py + ')')
+            svg.append(g)
+          })
+          // Figuren
+          z.figuren.forEach((f) => {
+            const k = z.brett[f.x + ',' + f.y]
+            const [ax, ay] = anker(K.teile(k.t, k.r)[f.teil])
+            const [px, py] = pos(f.x, f.y)
+            const c = s('path', { d: 'M' + (px + ax - 7) + ',' + (py + ay + 8) + ' Q' + (px + ax) + ',' + (py + ay - 14) + ' ' + (px + ax + 7) + ',' + (py + ay + 8) + ' Z', class: 'figur' })
+            c.style.fill = a.farbe(f.s)
+            const t = s('title')
+            t.textContent = 'Figur von ' + a.name(f.s)
+            c.append(t)
+            svg.append(c)
+            const kopf = s('circle', { cx: px + ax, cy: py + ay - 6, r: 4.5, class: 'figur' })
+            kopf.style.fill = a.farbe(f.s)
+            svg.append(kopf)
+          })
+          // letztes Plättchen
+          const [lx, ly] = pos(z.letzte.x, z.letzte.y)
+          if (Object.keys(z.brett).length > 1) svg.append(s('rect', { x: lx + 1.5, y: ly + 1.5, width: T - 3, height: T - 3, class: 'letzte' }))
+
+          if (a.darf && z.phase === 'legen' && z.kachel) {
+            K.plaetze(z, z.kachel)
+              .filter((q) => q.r === drehung)
+              .forEach((q) => {
+                const [px, py] = pos(q.x, q.y)
+                const r = s('rect', { x: px + 3, y: py + 3, width: T - 6, height: T - 6, rx: 6, class: 'frei-platz' })
+                r.addEventListener('click', () => a.sende({ t: 'lege', x: q.x, y: q.y, r: drehung }))
+                svg.append(r)
+              })
+          }
+          const erlaubteTeile = []
+          if (a.darf && z.phase === 'figur') {
+            const k = z.brett[z.letzte.x + ',' + z.letzte.y]
+            K.teile(k.t, k.r).forEach((teil, ti) => {
+              if (!K.figurErlaubt(z, a.ich, ti)) return
+              erlaubteTeile.push([teil, ti])
+              const [ax, ay] = anker(teil)
+              const c = s('circle', { cx: lx + ax, cy: ly + ay, r: 7, class: 'ankerpunkt' })
+              c.addEventListener('click', () => a.sende({ t: 'figur', teil: ti }))
+              svg.append(c)
+            })
+          }
+          a.brett.append(svg)
+
+          // Seitenleiste
+          a.aktionen.append(el('p', 'hinweis', 'Noch ' + z.stapel.length + ' Plättchen im Stapel.'))
+          if (z.kachel && z.phase === 'legen') {
+            const zeile = el('div', 'kachel-zeile')
+            const v = s('svg', { viewBox: '-2 -2 64 64', class: 'vorschau-kachel', role: 'img', 'aria-label': 'Gezogenes Plättchen' })
+            v.append(kachel(z.kachel, a.darf ? drehung : 0))
+            zeile.append(v)
+            if (a.darf) {
+              const plaetze = K.plaetze(z, z.kachel)
+              const text = el('div')
+              text.append(el('p', null, 'Tippe eine gestrichelte Stelle an.'))
+              text.append(
+                knopf('↻ Drehen', 'zweit', () => {
+                  for (let i = 1; i <= 4; i++) {
+                    const r = (drehung + i) % 4
+                    if (plaetze.some((q) => q.r === r)) {
+                      drehung = r
+                      break
+                    }
+                  }
+                  a.neu()
+                }),
+              )
+              zeile.append(text)
+            } else zeile.append(el('p', null, a.name(z.dran) + ' legt dieses Plättchen.'))
+            a.aktionen.append(zeile)
+          }
+          if (a.darf && z.phase === 'figur') {
+            a.aktionen.append(el('p', null, 'Figur setzen? Tippe einen Kreis auf dem neuen Plättchen an (' + z.vorrat[a.ich] + ' übrig).'))
+            const reihe = el('div', 'knopf-reihe')
+            erlaubteTeile.forEach(([teil, ti]) => reihe.append(knopf(teil.art === 'stadt' ? 'Stadt' : teil.art === 'weg' ? 'Weg' : 'Kapelle', 'zweit klein', () => a.sende({ t: 'figur', teil: ti }))))
+            reihe.append(knopf('Keine Figur', '', () => a.sende({ t: 'figur', teil: -1 })))
+            a.aktionen.append(reihe)
+          }
+        }
+
+        window.Gruppenspiel({
+          regeln: K,
+          flaeche: document.getElementById('flaeche'),
+          seite: document.getElementById('seite'),
+          zeichne,
+          kiPause: 800,
+        })
+      })()
+    </script>
+  </body>
+</html>

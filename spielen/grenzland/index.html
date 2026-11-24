@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grenzland</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <link rel="stylesheet" href="../gruppe.css" />
+    <style>
+      #karte {
+        max-width: 44rem;
+        margin: 0 auto;
+      }
+      .meer {
+        fill: var(--feld-meer);
+        opacity: 0.18;
+      }
+      .feld {
+        stroke: var(--flaeche);
+        stroke-width: 1.5;
+      }
+      .feld.waehlbar {
+        cursor: pointer;
+      }
+      .grenze {
+        stroke: var(--text);
+        stroke-width: 3.5;
+        stroke-linecap: round;
+        pointer-events: none;
+      }
+      .faehre {
+        stroke: var(--text-2);
+        stroke-width: 2;
+        stroke-dasharray: 4 4;
+        fill: none;
+      }
+      .zahl-kreis {
+        fill: var(--flaeche);
+        stroke: var(--spieler-rand);
+        stroke-width: 1;
+        pointer-events: none;
+      }
+      .zahl {
+        fill: var(--text);
+        font-size: 14px;
+        font-weight: 700;
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
+      .kennung {
+        fill: var(--spieler-hell);
+        font-size: 9px;
+        font-weight: 700;
+        text-anchor: middle;
+        pointer-events: none;
+        paint-order: stroke;
+        stroke: var(--spieler-rand);
+        stroke-width: 2px;
+      }
+      .markiert {
+        fill: none;
+        stroke: var(--fokus);
+        stroke-width: 4;
+        pointer-events: none;
+      }
+      .ziel {
+        fill: none;
+        stroke: var(--text);
+        stroke-width: 2.5;
+        stroke-dasharray: 5 3;
+        pointer-events: none;
+      }
+      .legende {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        justify-content: center;
+      }
+      .wuerfelzeile {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
+      <h1>Grenzland</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/grenzland-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Grenzland</p>
+          <p class="spielkopf-text">Truppen verteilen, angreifen, Gebiete halten.</p>
+        </div>
+      </div>
+      <div class="gruppenspiel">
+        <div class="brett-flaeche" id="flaeche"></div>
+        <div class="seite" id="seite">
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Die Felder werden zufällig verteilt. Ein Zug hat drei Teile:</li>
+              <li><b>Verteilen:</b> Man bekommt ein Drittel seiner Felderzahl als Truppen (mindestens 3), für jedes ganz besetzte Gebiet einen Bonus. Eigene Felder antippen setzt je eine Truppe.</li>
+              <li><b>Angreifen:</b> Eigenes Feld mit mindestens 2 Truppen antippen, dann ein Nachbarfeld (gestrichelte Linien sind Fähren). Angreifer würfelt mit bis zu 3, Verteidiger mit bis zu 2 Würfeln; die höchsten Würfel werden verglichen, bei Gleichstand gewinnt der Verteidiger.</li>
+              <li>Ist ein Feld leer, gehört es dem Angreifer und Truppen ziehen nach.</li>
+              <li><b>Verschieben:</b> Einmal Truppen über eigene Felder verschieben, dann ist der Nächste dran.</li>
+              <li>Am Ende gewinnt, wer die meisten Felder hat – oder wer alle besitzt.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../gruppe-hilfe.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../gruppe.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const L = window.Grenzland
+        const SVG = 'http://www.w3.org/2000/svg'
+        const R = 30
+        const W = Math.sqrt(3) * R
+        let auswahl = -1
+        let ziel = -1
+        let letztes = -1
+        let merk = ''
+
+        function s(name, attr) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(attr || {}).forEach((k) => e.setAttribute(k, attr[k]))
+          return e
+        }
+        function el(tag, klasse, text) {
+          const e = document.createElement(tag)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        function knopf(text, klasse, bei) {
+          const b = el('button', 'knopf' + (klasse ? ' ' + klasse : ''), text)
+          b.type = 'button'
+          b.addEventListener('click', bei)
+          return b
+        }
+        const mitte = (f) => [f.c * W + (f.r % 2 ? W / 2 : 0) + W / 2 + 4, f.r * 1.5 * R + R + 4]
+        const ecken = (x, y, r) =>
+          Array.from({ length: 6 }, (_, i) => {
+            const w = (Math.PI / 180) * (60 * i - 30)
+            return (x + r * Math.cos(w)).toFixed(1) + ',' + (y + r * Math.sin(w)).toFixed(1)
+          }).join(' ')
+
+        function zeichne(z, a) {
+          const schluessel = z.dran + ':' + z.phase
+          if (schluessel !== merk) {
+            merk = schluessel
+            auswahl = ziel = -1
+          }
+          const ich = a.ich
+          const meins = (f) => z.besitzer[f] === ich
+          if (auswahl >= 0 && (!meins(auswahl) || z.truppen[auswahl] < 2)) auswahl = ziel = -1
+          // Was ist antippbar?
+          const ziele = new Set()
+          if (a.darf && auswahl >= 0) {
+            if (z.phase === 'angriff') L.NACHBARN[auswahl].filter((n) => !meins(n)).forEach((n) => ziele.add(n))
+            if (z.phase === 'verschieben') L.erreichbar(z, auswahl).forEach((n) => ziele.add(n))
+          }
+          if (ziel >= 0 && !ziele.has(ziel)) ziel = -1
+          const waehlbar = (f) =>
+            a.darf &&
+            ((z.phase === 'verteilen' && meins(f)) ||
+              ((z.phase === 'angriff' || z.phase === 'verschieben') && meins(f) && z.truppen[f] > 1) ||
+              ziele.has(f))
+
+          const breite = 8 * W + W / 2 + 8
+          const hoehe = 6 * 1.5 * R + R / 2 + 8
+          const svg = s('svg', { id: 'karte', viewBox: '0 0 ' + breite.toFixed(0) + ' ' + hoehe.toFixed(0), role: 'img', 'aria-label': 'Karte von Grenzland' })
+          svg.append(s('rect', { x: 0, y: 0, width: breite, height: hoehe, rx: 14, class: 'meer' }))
+          L.FAEHREN.forEach(([[r1, c1], [r2, c2]]) => {
+            const [x1, y1] = mitte({ r: r1, c: c1 })
+            const [x2, y2] = mitte({ r: r2, c: c2 })
+            svg.append(s('line', { x1, y1, x2, y2, class: 'faehre' }))
+          })
+          L.FELDER.forEach((f, i) => {
+            const [x, y] = mitte(f)
+            const p = s('polygon', { points: ecken(x, y, R), class: 'feld' + (waehlbar(i) ? ' waehlbar' : '') })
+            p.style.fill = a.farbe(z.besitzer[i])
+            const titel = s('title')
+            titel.textContent = L.GEBIETE[f.gebiet].name + ': ' + a.name(z.besitzer[i]) + ', ' + z.truppen[i] + ' Truppen'
+            p.append(titel)
+            if (waehlbar(i)) p.addEventListener('click', () => tippe(z, a, i))
+            svg.append(p)
+          })
+          // Gebietsgrenzen
+          L.FELDER.forEach((f, i) =>
+            L.NACHBARN[i].forEach((n) => {
+              if (n < i || L.FELDER[n].gebiet === f.gebiet) return
+              const [x1, y1] = mitte(f)
+              const [x2, y2] = mitte(L.FELDER[n])
+              const d = Math.hypot(x2 - x1, y2 - y1)
+              if (d > W * 1.1) return // Fähre
+              const mx = (x1 + x2) / 2
+              const my = (y1 + y2) / 2
+              const px = (-(y2 - y1) / d) * (R / 2)
+              const py = ((x2 - x1) / d) * (R / 2)
+              svg.append(s('line', { x1: mx + px, y1: my + py, x2: mx - px, y2: my - py, class: 'grenze' }))
+            }),
+          )
+          L.FELDER.forEach((f, i) => {
+            const [x, y] = mitte(f)
+            const k = s('text', { x, y: y - 16, class: 'kennung' })
+            k.textContent = f.gebiet
+            svg.append(k)
+            svg.append(s('circle', { cx: x, cy: y + 3, r: 11, class: 'zahl-kreis' }))
+            const t = s('text', { x, y: y + 3, class: 'zahl' })
+            t.textContent = z.truppen[i]
+            svg.append(t)
+            if (i === auswahl) svg.append(s('polygon', { points: ecken(x, y, R - 3), class: 'markiert' }))
+            else if (i === ziel) svg.append(s('polygon', { points: ecken(x, y, R - 3), class: 'markiert' }))
+            else if (ziele.has(i)) svg.append(s('polygon', { points: ecken(x, y, R - 4), class: 'ziel' }))
+          })
+          a.brett.append(svg)
+
+          // Gebiete
+          const leg = el('div', 'legende')
+          Object.keys(L.GEBIETE).forEach((g) => {
+            const herr = z.spieler.findIndex((_, sp) => L.ZUM_GEBIET[g].every((f) => z.besitzer[f] === sp))
+            const m = el('span', 'menge')
+            const punkt = el('i')
+            punkt.style.background = herr >= 0 ? a.farbe(herr) : 'transparent'
+            m.append(punkt, document.createTextNode(g + ' ' + L.GEBIETE[g].name + ' +' + L.GEBIETE[g].bonus))
+            m.title = herr >= 0 ? 'Ganz besetzt von ' + a.name(herr) : 'Niemand besitzt das ganze Gebiet'
+            leg.append(m)
+          })
+          a.brett.append(leg)
+
+          // Seitenleiste
+          if (z.wuerfe) a.aktionen.append(el('p', 'wuerfelzeile', 'Letzter Wurf – Angriff: ' + z.wuerfe.a.join(' ') + ' · Verteidigung: ' + z.wuerfe.v.join(' ')))
+          if (z.optionen.runden) a.aktionen.append(el('p', 'hinweis', 'Runde ' + Math.min(z.runde, z.optionen.runden) + ' von ' + z.optionen.runden))
+          if (!a.darf) return
+          const reihe = el('div', 'knopf-reihe')
+          if (z.phase === 'verteilen') {
+            a.aktionen.append(el('p', null, 'Verteile noch ' + z.rest + (z.rest === 1 ? ' Truppe' : ' Truppen') + ': Tippe eigene Felder an.'))
+            if (letztes >= 0 && meins(letztes) && z.rest > 1) reihe.append(knopf('Alle ' + z.rest + ' aufs zuletzt getippte Feld', 'zweit', () => a.sende({ t: 'setze', feld: letztes, n: z.rest })))
+          } else if (z.phase === 'angriff') {
+            if (auswahl >= 0 && ziel >= 0) {
+              a.aktionen.append(el('p', null, 'Angriff mit ' + (z.truppen[auswahl] - 1) + ' gegen ' + z.truppen[ziel] + '.'))
+              reihe.append(
+                knopf('Würfeln', '', () => a.sende({ t: 'angriff', von: auswahl, nach: ziel })),
+                knopf('Bis zur Entscheidung', 'zweit', () => a.sende({ t: 'angriff', von: auswahl, nach: ziel, bis: true })),
+              )
+            } else a.aktionen.append(el('p', null, auswahl >= 0 ? 'Jetzt ein Nachbarfeld zum Angreifen antippen.' : 'Angreifen: eigenes Feld mit mindestens 2 Truppen antippen.'))
+            reihe.append(knopf('Angriffe beenden', 'zweit', () => a.sende({ t: 'weiter' })))
+          } else if (z.phase === 'nachruecken') {
+            const min = z.sieg.min
+            const max = z.truppen[z.sieg.von] - 1
+            a.aktionen.append(el('p', null, 'Erobert! Wie viele Truppen ziehen nach?'))
+            ;[...new Set([min, Math.round((min + max) / 2), max])].forEach((n) => reihe.append(knopf(String(n), n === max ? '' : 'zweit', () => a.sende({ t: 'nachruecken', n }))))
+          } else if (z.phase === 'verschieben') {
+            if (auswahl >= 0 && ziel >= 0) {
+              const max = z.truppen[auswahl] - 1
+              a.aktionen.append(el('p', null, 'Wie viele Truppen verschieben?'))
+              ;[...new Set([1, Math.ceil(max / 2), max])].forEach((n) => reihe.append(knopf(String(n), n === max ? '' : 'zweit', () => a.sende({ t: 'verschiebe', von: auswahl, nach: ziel, n }))))
+            } else a.aktionen.append(el('p', null, auswahl >= 0 ? 'Zielfeld antippen (über eigene Felder erreichbar).' : 'Verschieben (freiwillig): eigenes Feld mit mehr als einer Truppe antippen.'))
+            reihe.append(knopf('Zug beenden', 'zweit', () => a.sende({ t: 'ende' })))
+          }
+          a.aktionen.append(reihe)
+        }
+
+        function tippe(z, a, f) {
+          if (z.phase === 'verteilen') {
+            letztes = f
+            a.sende({ t: 'setze', feld: f, n: 1 })
+            return
+          }
+          if (z.besitzer[f] === a.ich && !(z.phase === 'verschieben' && auswahl >= 0 && L.erreichbar(z, auswahl).has(f))) {
+            auswahl = auswahl === f ? -1 : f
+            ziel = -1
+          } else ziel = f
+          a.neu()
+        }
+
+        window.Gruppenspiel({
+          regeln: L,
+          flaeche: document.getElementById('flaeche'),
+          seite: document.getElementById('seite'),
+          zeichne,
+          kiPause: 800,
+        })
+      })()
+    </script>
+  </body>
+</html>

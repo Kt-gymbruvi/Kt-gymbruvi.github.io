@@ -6,6 +6,7 @@
  *   { id, name, rolle: 'leitung' | 'spieler', spiele?: [..erlaubte Spiele..] (Leitung),
  *     angebot?: { partie, spiel, code?, belegt? }, spielt?: { partie, spiel, gegner } }
  *   Chaos-Flitzer: angebot.code = Raumcode des Spiels (Kanal chaosflitzer-<code>), angebot.belegt = Zahl der Handys
+ *   Gruppenspiele: angebot.gruppe = true, angebot.mit = [{ id, name }] (eingestiegen), angebot.ki = Zahl der Computerspieler
  *
  * Nachrichten:
  *   beitritt  { partie, von, name }                       jemand will bei einem Angebot mitspielen
@@ -14,6 +15,8 @@
  *   sync      { partie, von }                              „schick mir alle Züge“
  *   zugliste  { partie, zuege }
  *   aufgabe   { partie, von }
+ *   Gruppenspiele: beitritt wie oben, austritt { partie, von }, start { partie, spiel, spieler: [{ id, name } | { ki: true, name }], host }
+ *                  Danach öffnen alle spielen/<spiel>/?raum=&partie=&host= (Ablauf dort: spielen/gruppe.js)
  */
 ;(function () {
   'use strict'
@@ -29,6 +32,24 @@
     'flip-7': 'Flip 7',
     // Zu zweit mit verdeckter Flotte: jedes Gerät kennt nur die eigene Flotte und beantwortet die Schüsse des Gegners (vertretung/schiffe-versenken/)
     'schiffe-versenken': 'Schiffe versenken',
+    // Gruppenspiele (spielen/gruppe.js): Der Anbieter sammelt Mitspieler und startet; sein Gerät führt das Spiel
+    'wuerfelglueck': 'Würfelglück',
+    'farbenjagd': 'Farbenjagd',
+    'ecke-an-ecke': 'Ecke an Ecke',
+    'grenzland': 'Grenzland',
+    'inselhandel': 'Inselhandel',
+    'schienennetz': 'Schienennetz',
+    'kachelland': 'Kachelland',
+  }
+  // Gruppenspiele: [mindestens, höchstens] Personen (Computerspieler zählen mit)
+  const GRUPPE = {
+    'wuerfelglueck': [2, 6],
+    'farbenjagd': [2, 6],
+    'ecke-an-ecke': [2, 4],
+    'grenzland': [2, 6],
+    'inselhandel': [2, 4],
+    'schienennetz': [2, 5],
+    'kachelland': [2, 5],
   }
 
   function zufallText(n) {
@@ -179,5 +200,5 @@
     }
   }
 
-  window.Spielraum = { SPIELE, neuerCode, istCode, meineId, meinName, setzeName, bereinige, betreten, partie, zufallText }
+  window.Spielraum = { SPIELE, GRUPPE, neuerCode, istCode, meineId, meinName, setzeName, bereinige, betreten, partie, zufallText }
 })()

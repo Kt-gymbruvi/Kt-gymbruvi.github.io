@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inselhandel</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <link rel="stylesheet" href="../gruppe.css" />
+    <style>
+      #insel {
+        max-width: min(42rem, calc(100dvh - 10rem));
+        margin: 0 auto;
+      }
+      .meer {
+        fill: var(--feld-meer);
+      }
+      .land {
+        stroke: var(--feld-zahl);
+        stroke-width: 2;
+      }
+      .land.waehlbar {
+        cursor: pointer;
+        stroke: var(--fokus);
+        stroke-width: 4;
+      }
+      .chip {
+        fill: var(--feld-zahl);
+        stroke: var(--spieler-rand);
+        stroke-width: 1;
+      }
+      .chip-zahl {
+        fill: var(--feld-text);
+        font-size: 13px;
+        font-weight: 700;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+      .chip-zahl.heiss {
+        fill: var(--spieler-1);
+      }
+      .chip-punkt {
+        fill: var(--feld-text);
+      }
+      .nebel {
+        fill: var(--karte-joker);
+        opacity: 0.82;
+        pointer-events: none;
+      }
+      .nebel-text {
+        fill: var(--spieler-hell);
+        font-size: 8px;
+        font-weight: 700;
+        text-anchor: middle;
+        pointer-events: none;
+      }
+      .strasse {
+        stroke-width: 6;
+        stroke-linecap: round;
+      }
+      .strasse-rand {
+        stroke: var(--spieler-rand);
+        stroke-width: 8.5;
+        stroke-linecap: round;
+      }
+      .bau {
+        stroke: var(--spieler-rand);
+        stroke-width: 1.2;
+        stroke-linejoin: round;
+      }
+      .ort {
+        fill: var(--flaeche);
+        stroke: var(--fokus);
+        stroke-width: 2.5;
+        cursor: pointer;
+      }
+      .weg {
+        stroke: var(--flaeche);
+        stroke-width: 5;
+        stroke-dasharray: 4 3;
+        stroke-linecap: round;
+      }
+      .weg-treffer {
+        stroke: transparent;
+        stroke-width: 16;
+        cursor: pointer;
+      }
+      .wurf {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+      }
+      .bauknoepfe {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+      }
+      .bauknoepfe .knopf {
+        justify-content: space-between;
+        width: 100%;
+      }
+      .bauknoepfe small {
+        font-weight: 400;
+        opacity: 0.85;
+      }
+      .hand-titel {
+        margin: 0;
+        font-weight: var(--gewicht-betont);
+        text-align: center;
+      }
+      .mengen.mitte {
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
+      <h1>Inselhandel</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/inselhandel-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Inselhandel</p>
+          <p class="spielkopf-text">Siedeln, bauen, tauschen – wer zuerst genug Punkte hat, gewinnt.</p>
+        </div>
+      </div>
+      <div class="gruppenspiel">
+        <div class="brett-flaeche" id="flaeche"></div>
+        <div class="seite" id="seite">
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Zu Beginn setzt jeder zwei Siedlungen mit je einer Straße (erst der Reihe nach, dann rückwärts). Für die zweite Siedlung gibt es die Rohstoffe der Nachbarfelder.</li>
+              <li>Wer dran ist, würfelt. Jedes Feld mit dieser Zahl bringt allen, die daran eine Siedlung haben, einen Rohstoff (Stadt: zwei).</li>
+              <li>Bei einer 7 verliert jeder mit mehr als 7 Karten die Hälfte. Der Nebel zieht weiter: Sein Feld bringt nichts, und man nimmt einem Nachbarn eine Karte weg.</li>
+              <li>Bauen: Straße (Holz, Lehm), Siedlung (Holz, Lehm, Wolle, Korn) an eigener Straße und mit einer freien Ecke Abstand, Stadt aus Siedlung (2 Korn, 3 Erz). Tauschen mit der Bank: 4 gleiche gegen 1.</li>
+              <li>Punkte: Siedlung 1, Stadt 2, längste Straße (ab 5) 2.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../gruppe-hilfe.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../gruppe.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const I = window.Inselhandel
+        const SVG = 'http://www.w3.org/2000/svg'
+        const FARBE = { holz: 'var(--feld-wald)', lehm: 'var(--feld-lehm)', wolle: 'var(--feld-weide)', korn: 'var(--feld-korn)', erz: 'var(--feld-erz)', wueste: 'var(--feld-wueste)' }
+        let bau = null // 'strasse' | 'siedlung' | 'stadt'
+        let geben = null // Tausch: was abgeben
+        let nebelFeld = -1
+        let merk = ''
+
+        function s(name, attr) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(attr || {}).forEach((k) => e.setAttribute(k, attr[k]))
+          return e
+        }
+        function el(tag, klasse, text) {
+          const e = document.createElement(tag)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        function knopf(text, klasse, bei) {
+          const b = el('button', 'knopf' + (klasse ? ' ' + klasse : ''), text)
+          b.type = 'button'
+          if (bei) b.addEventListener('click', bei)
+          return b
+        }
+        const kostenText = (k) => Object.keys(k).map((r) => (k[r] > 1 ? k[r] + ' ' : '') + I.NAMEN[r]).join(', ')
+
+        function zeichne(z, a) {
+          const schluessel = z.dran + ':' + z.phase + ':' + (z.start ? z.start.pos + ':' + z.start.ecke : '')
+          if (schluessel !== merk) {
+            merk = schluessel
+            bau = null
+            geben = null
+            nebelFeld = -1
+          }
+          const ich = a.ich
+          const karten = ich != null ? z.karten[ich] : null
+          if (geben && (!karten || karten[geben] < 4)) geben = null
+          let modus = null
+          if (a.darf && z.phase === 'start') modus = z.start.ecke < 0 ? 'siedlung' : 'strasse'
+          else if (a.darf && z.phase === 'bauen' && bau) modus = bau
+          if (modus && z.phase === 'bauen' && !I.kann(karten, I.KOSTEN[modus])) modus = bau = null
+
+          const svg = s('svg', { id: 'insel', viewBox: '-205 -185 410 370', role: 'img', 'aria-label': 'Insel mit 19 Feldern' })
+          svg.append(s('rect', { x: -205, y: -185, width: 410, height: 370, rx: 24, class: 'meer' }))
+          I.FELDER.forEach((f, fi) => {
+            const pkt = f.ecken.map((e) => I.ECKEN[e].x.toFixed(1) + ',' + I.ECKEN[e].y.toFixed(1)).join(' ')
+            const waehlbar = a.darf && z.phase === 'nebel' && fi !== z.nebel
+            const p = s('polygon', { points: pkt, class: 'land' + (waehlbar || fi === nebelFeld ? ' waehlbar' : '') })
+            p.style.fill = FARBE[z.felder[fi].art]
+            const t = s('title')
+            t.textContent = I.NAMEN[z.felder[fi].art] + (z.felder[fi].zahl ? ' ' + z.felder[fi].zahl : '')
+            p.append(t)
+            if (waehlbar)
+              p.addEventListener('click', () => {
+                const opfer = I.nebelOpfer(z, ich, fi)
+                if (opfer.length <= 1) return a.sende(opfer.length ? { t: 'nebel', feld: fi, opfer: opfer[0] } : { t: 'nebel', feld: fi })
+                nebelFeld = fi
+                a.neu()
+              })
+            svg.append(p)
+            const zahl = z.felder[fi].zahl
+            if (zahl) {
+              svg.append(s('circle', { cx: f.x, cy: f.y, r: 14, class: 'chip' }))
+              const tz = s('text', { x: f.x, y: f.y - 2, class: 'chip-zahl' + (zahl === 6 || zahl === 8 ? ' heiss' : '') })
+              tz.textContent = zahl
+              svg.append(tz)
+              const n = I.punktwert(zahl)
+              for (let i = 0; i < n; i++) svg.append(s('circle', { cx: f.x + (i - (n - 1) / 2) * 3.4, cy: f.y + 8, r: 1.2, class: 'chip-punkt' }))
+            }
+            if (fi === z.nebel) {
+              ;[[-6, 2, 9], [5, 0, 10], [0, -6, 9]].forEach(([dx, dy, r]) => svg.append(s('circle', { cx: f.x + dx, cy: f.y + dy - 18, r, class: 'nebel' })))
+              const nt = s('text', { x: f.x, y: f.y - 16, class: 'nebel-text' })
+              nt.textContent = 'Nebel'
+              svg.append(nt)
+            }
+          })
+          // Straßen
+          z.strassen.forEach((sp, k) => {
+            if (sp === null) return
+            const A = I.ECKEN[I.KANTEN[k].a]
+            const B = I.ECKEN[I.KANTEN[k].b]
+            const x1 = A.x + (B.x - A.x) * 0.12
+            const y1 = A.y + (B.y - A.y) * 0.12
+            const x2 = B.x + (A.x - B.x) * 0.12
+            const y2 = B.y + (A.y - B.y) * 0.12
+            svg.append(s('line', { x1, y1, x2, y2, class: 'strasse-rand' }))
+            const l = s('line', { x1, y1, x2, y2, class: 'strasse' })
+            l.style.stroke = a.farbe(sp)
+            svg.append(l)
+          })
+          // Bauten
+          z.bauten.forEach((b, e) => {
+            if (!b) return
+            const { x, y } = I.ECKEN[e]
+            const form = b.stadt
+              ? `M${x - 10},${y + 7} V${y - 3} L${x - 5},${y - 8} L${x},${y - 3} V${y - 1} H${x + 10} V${y + 7} Z`
+              : `M${x - 7},${y + 6} V${y - 2} L${x},${y - 8} L${x + 7},${y - 2} V${y + 6} Z`
+            const p = s('path', { d: form, class: 'bau' })
+            p.style.fill = a.farbe(b.s)
+            if (modus === 'stadt' && b.s === ich && !b.stadt) {
+              p.style.cursor = 'pointer'
+              p.style.stroke = 'var(--fokus)'
+              p.style.strokeWidth = '3'
+              p.addEventListener('click', () => a.sende({ t: 'stadt', ecke: e }))
+            }
+            svg.append(p)
+          })
+          // Bauplätze
+          if (modus === 'siedlung')
+            I.ECKEN.forEach((E, e) => {
+              if (!I.siedlungErlaubt(z, ich, e)) return
+              const c = s('circle', { cx: E.x, cy: E.y, r: 6.5, class: 'ort' })
+              c.addEventListener('click', () => a.sende({ t: 'siedlung', ecke: e }))
+              svg.append(c)
+            })
+          if (modus === 'strasse')
+            I.KANTEN.forEach((K, k) => {
+              if (!I.strasseErlaubt(z, ich, k)) return
+              const A = I.ECKEN[K.a]
+              const B = I.ECKEN[K.b]
+              svg.append(s('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, class: 'weg' }))
+              const t = s('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, class: 'weg-treffer' })
+              t.addEventListener('click', () => a.sende({ t: 'strasse', kante: k }))
+              svg.append(t)
+            })
+          a.brett.append(svg)
+
+          // Eigene Rohstoffe
+          if (karten) {
+            a.brett.append(el('p', 'hand-titel', (a.online ? 'Deine' : a.name(ich) + 's') + ' Rohstoffe'))
+            const m = el('div', 'mengen mitte')
+            I.ROHSTOFFE.forEach((r) => {
+              const x = el('span', 'menge')
+              const q = el('i')
+              q.style.background = FARBE[r]
+              x.append(q, document.createTextNode(I.NAMEN[r] + ' ' + karten[r]))
+              m.append(x)
+            })
+            a.brett.append(m)
+          }
+
+          // Seitenleiste
+          if (z.wurf) a.aktionen.append(el('p', 'wurf', 'Gewürfelt: ' + z.wurf[0] + ' + ' + z.wurf[1] + ' = ' + (z.wurf[0] + z.wurf[1])))
+          a.aktionen.append(el('p', 'hinweis', 'Ziel: ' + z.optionen.ziel + ' Punkte' + (z.laengste >= 0 ? ' · Längste Straße: ' + a.name(z.laengste) : '')))
+          if (!a.darf) return
+          if (z.phase === 'start') {
+            a.aktionen.append(el('p', null, z.start.ecke < 0 ? 'Setze eine Siedlung: Tippe einen hellen Kreis an.' : 'Setze eine Straße an deine neue Siedlung.'))
+            return
+          }
+          if (z.phase === 'wuerfeln') {
+            a.aktionen.append(knopf('Würfeln', '', () => a.sende({ t: 'wuerfeln' })))
+            return
+          }
+          if (z.phase === 'nebel') {
+            if (nebelFeld < 0) a.aktionen.append(el('p', null, 'Eine 7! Tippe ein Feld an, auf das der Nebel zieht.'))
+            else {
+              a.aktionen.append(el('p', null, 'Wem nimmst du eine Karte weg?'))
+              const r = el('div', 'knopf-reihe')
+              I.nebelOpfer(z, ich, nebelFeld).forEach((o) => r.append(knopf(a.name(o), 'zweit', () => a.sende({ t: 'nebel', feld: nebelFeld, opfer: o }))))
+              a.aktionen.append(r)
+            }
+            return
+          }
+          // Bauen
+          const bk = el('div', 'bauknoepfe')
+          ;[['strasse', 'Straße'], ['siedlung', 'Siedlung'], ['stadt', 'Stadt']].forEach(([art, name]) => {
+            const b = knopf('', bau === art ? 'gewaehlt' : 'zweit', () => {
+              bau = bau === art ? null : art
+              geben = null
+              a.neu()
+            })
+            b.append(el('span', null, name), el('small', null, kostenText(I.KOSTEN[art])))
+            b.disabled = !I.kann(karten, I.KOSTEN[art]) || I.anzahl(z, ich, art) >= I.VORRAT[art]
+            bk.append(b)
+          })
+          a.aktionen.append(bk)
+          if (bau) a.aktionen.append(el('p', 'hinweis', bau === 'stadt' ? 'Tippe eine eigene Siedlung an.' : bau === 'siedlung' ? 'Tippe einen hellen Kreis an.' : 'Tippe eine gestrichelte Linie an.'))
+          // Tauschen
+          const viele = I.ROHSTOFFE.filter((r) => karten[r] >= 4)
+          if (viele.length) {
+            a.aktionen.append(el('p', 'hinweis', geben ? 'Tausche 4 ' + I.NAMEN[geben] + ' gegen:' : 'Tauschen mit der Bank (4 gleiche gegen 1):'))
+            const r = el('div', 'knopf-reihe')
+            if (!geben)
+              viele.forEach((x) =>
+                r.append(
+                  knopf('4 ' + I.NAMEN[x], 'zweit klein', () => {
+                    geben = x
+                    bau = null
+                    a.neu()
+                  }),
+                ),
+              )
+            else {
+              I.ROHSTOFFE.filter((x) => x !== geben).forEach((x) => r.append(knopf(I.NAMEN[x], 'zweit klein', () => a.sende({ t: 'tausch', geben, nehmen: x }))))
+              r.append(
+                knopf('Abbrechen', 'zweit klein', () => {
+                  geben = null
+                  a.neu()
+                }),
+              )
+            }
+            a.aktionen.append(r)
+          }
+          a.aktionen.append(knopf('Zug beenden', '', () => a.sende({ t: 'ende' })))
+        }
+
+        window.Gruppenspiel({
+          regeln: I,
+          flaeche: document.getElementById('flaeche'),
+          seite: document.getElementById('seite'),
+          zeichne,
+          kiPause: 600,
+        })
+      })()
+    </script>
+  </body>
+</html>

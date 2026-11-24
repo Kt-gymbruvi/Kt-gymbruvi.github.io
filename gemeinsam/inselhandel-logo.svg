@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Inselhandel">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <rect x="0" y="330" width="512" height="200" fill="#0f5c47" opacity="0.18"/>
+    <g stroke="#ffffff" stroke-width="10" stroke-linejoin="round">
+      <polygon points="259.1,178.0 259.1,274.0 176.0,322.0 92.9,274.0 92.9,178.0 176.0,130.0" fill="#0f5c47"/>
+      <polygon points="425.1,178.0 425.1,274.0 342.0,322.0 258.9,274.0 258.9,178.0 342.0,130.0" fill="#ff8a14"/>
+      <polygon points="342.1,322.0 342.1,418.0 259.0,466.0 175.9,418.0 175.9,322.0 259.0,274.0" fill="#16745a"/>
+      <path d="M232 300 V250 L259 222 L286 250 V300 Z" fill="#ffffff" stroke="#06251c" stroke-width="8"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Schienennetz</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script src="../../gemeinsam/design.js"></script>
+    <link rel="stylesheet" href="../../gemeinsam/tokens.css" />
+    <link rel="stylesheet" href="../../gemeinsam/grundlage.css" />
+    <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
+    <link rel="stylesheet" href="../spiel.css" />
+    <link rel="stylesheet" href="../gruppe.css" />
+    <style>
+      #netz {
+        max-width: min(46rem, calc((100dvh - 8rem) * 1.1));
+        margin: 0 auto;
+      }
+      .land {
+        fill: var(--flaeche-2);
+      }
+      .glied {
+        rx: 2;
+      }
+      .glied.frei {
+        opacity: 0.6;
+      }
+      .glied.gebaut {
+        stroke: var(--text);
+        stroke-width: 1.3;
+      }
+      .strecke.waehlbar {
+        cursor: pointer;
+      }
+      .strecke.waehlbar .glied {
+        opacity: 1;
+        stroke: var(--fokus);
+        stroke-width: 2;
+      }
+      .strecke.gewaehlt .glied {
+        stroke: var(--text);
+        stroke-width: 3;
+      }
+      .treffer {
+        stroke: transparent;
+        stroke-width: 16;
+      }
+      .stadt {
+        fill: var(--flaeche);
+        stroke: var(--text);
+        stroke-width: 2;
+      }
+      .stadt.ziel {
+        stroke: var(--fokus);
+        stroke-width: 4;
+      }
+      .stadt-name {
+        fill: var(--text);
+        font-size: 10px;
+        font-weight: 600;
+        paint-order: stroke;
+        stroke: var(--flaeche-2);
+        stroke-width: 3px;
+        pointer-events: none;
+      }
+      .reihe-titel {
+        margin: 0;
+        font-weight: var(--gewicht-betont);
+      }
+      .karten {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+      .wagenkarte {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 4.2rem;
+        min-height: 2.6rem;
+        padding: 0 0.5rem;
+        border: 2px solid var(--flaeche);
+        border-radius: 0.5rem;
+        box-shadow: 0 0 0 1px var(--spieler-rand);
+        color: var(--spieler-hell);
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: var(--gewicht-betont);
+      }
+      button.wagenkarte {
+        cursor: pointer;
+      }
+      button.wagenkarte:disabled {
+        cursor: default;
+        filter: saturate(0.4);
+      }
+      .wagenkarte.f2 {
+        color: var(--spieler-dunkel);
+      }
+      .wagenkarte.f6 {
+        background: conic-gradient(from 45deg, var(--spieler-1), var(--spieler-3), var(--spieler-4), var(--spieler-2), var(--spieler-5), var(--spieler-1)) center / 1.1rem 1.1rem no-repeat, var(--karte-joker);
+        background-position: right 0.35rem center;
+        padding-right: 1.7rem;
+      }
+      .wagenkarte.stapel {
+        background: repeating-linear-gradient(45deg, var(--navy) 0 6px, var(--navy-hell) 6px 12px);
+      }
+      .auftraege {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 0.9rem;
+      }
+      .auftraege li {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.35rem 0.6rem;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+      }
+      .auftraege li.fertig {
+        color: var(--bibliothek);
+        font-weight: var(--gewicht-betont);
+      }
+      .auftraege label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        cursor: pointer;
+      }
+      .auftraege input {
+        width: 1.2rem;
+        height: 1.2rem;
+        accent-color: var(--akzent);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="werkzeug-kopf">
+      <a href="../../vertretung/?art=spiele">Vertretung</a>
+      <h1>Schienennetz</h1>
+    </header>
+    <main class="werkzeug-inhalt">
+      <div class="spielkopf">
+        <img src="../../gemeinsam/schienennetz-logo.svg" alt="" width="56" height="56" />
+        <div>
+          <p class="spielkopf-titel">Schienennetz</p>
+          <p class="spielkopf-text">Strecken durch Niedersachsen bauen und Aufträge erfüllen.</p>
+        </div>
+      </div>
+      <div class="gruppenspiel">
+        <div class="brett-flaeche" id="flaeche"></div>
+        <div class="seite" id="seite">
+          <section class="werkzeug-karte">
+            <h2>So geht's</h2>
+            <ul class="regeln">
+              <li>Zu Beginn wählt jeder mindestens zwei von drei Aufträgen („Verbinde Emden mit Hamburg“).</li>
+              <li>Wer dran ist, macht eins: <b>zwei Wagenkarten ziehen</b> (offen oder vom Stapel; eine offene Lok zählt wie zwei), <b>eine Strecke bauen</b> (so viele Karten ihrer Farbe wie Felder, graue Strecken in einer beliebigen Farbe, Loks ersetzen jede Farbe) oder <b>neue Aufträge ziehen</b> (mindestens einen behalten).</li>
+              <li>Strecken bringen 1, 2, 4, 7 oder 10 Punkte (Länge 1 bis 5).</li>
+              <li>Hat jemand nur noch zwei Wagen oder weniger, hat jeder noch einen Zug. Dann zählen erfüllte Aufträge plus, unerfüllte minus, die längste durchgehende Strecke bringt 10 Punkte.</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script src="../../gemeinsam/symbole.js"></script>
+    <script src="../../werkzeuge/werkzeug.js"></script>
+    <script src="../gruppe-hilfe.js"></script>
+    <script src="regeln.js"></script>
+    <script src="../echtzeit.js"></script>
+    <script src="../raum.js"></script>
+    <script src="../gruppe.js"></script>
+    <script>
+      ;(function () {
+        'use strict'
+        const N = window.Schienennetz
+        const SVG = 'http://www.w3.org/2000/svg'
+        const farbe = (f) => (f === 6 ? 'var(--karte-grau)' : 'var(--spieler-' + (f + 1) + ')')
+        let gewaehlt = -1 // graue Strecke: Farbe fehlt noch
+        let auswahl = new Set() // Aufträge behalten
+        let merk = ''
+
+        function s(name, attr) {
+          const e = document.createElementNS(SVG, name)
+          Object.keys(attr || {}).forEach((k) => e.setAttribute(k, attr[k]))
+          return e
+        }
+        function el(tag, klasse, text) {
+          const e = document.createElement(tag)
+          if (klasse) e.className = klasse
+          if (text != null) e.textContent = text
+          return e
+        }
+        function knopf(text, klasse, bei) {
+          const b = el('button', 'knopf' + (klasse ? ' ' + klasse : ''), text)
+          b.type = 'button'
+          if (bei) b.addEventListener('click', bei)
+          return b
+        }
+        function wagenkarte(f, tag, text) {
+          const e = el(tag || 'span', 'wagenkarte f' + f, text || N.FARBEN[f])
+          if (f < 6) e.style.background = farbe(f)
+          if (tag === 'button') e.type = 'button'
+          return e
+        }
+        const auftragText = (t) => N.STAEDTE[N.AUFTRAEGE[t].a].name + ' – ' + N.STAEDTE[N.AUFTRAEGE[t].b].name
+
+        function zeichne(z, a) {
+          const schluessel = z.dran + ':' + z.phase + ':' + z.log.length + ':' + z.gezogen
+          if (schluessel !== merk) {
+            merk = schluessel
+            gewaehlt = -1
+            auswahl = new Set()
+          }
+          const ich = a.ich
+          const bauen = a.darf && z.phase === 'zug' && z.gezogen === 0
+          const zielStaedte = new Set()
+          if (ich != null) z.auftraege[ich].forEach((t) => !N.verbunden(z, ich, N.AUFTRAEGE[t].a, N.AUFTRAEGE[t].b) && zielStaedte.add(N.AUFTRAEGE[t].a).add(N.AUFTRAEGE[t].b))
+
+          const svg = s('svg', { id: 'netz', viewBox: '0 0 490 445', role: 'img', 'aria-label': 'Karte mit Städten und Strecken' })
+          svg.append(s('rect', { x: 0, y: 0, width: 490, height: 445, rx: 16, class: 'land' }))
+          N.STRECKEN.forEach((r) => {
+            const A = N.STAEDTE[r.a]
+            const B = N.STAEDTE[r.b]
+            const d = Math.hypot(B.x - A.x, B.y - A.y)
+            const winkel = (Math.atan2(B.y - A.y, B.x - A.x) * 180) / Math.PI
+            const laenge = (d - 18) / r.n
+            const g = s('g', { class: 'strecke' })
+            const besitzer = z.strecken[r.id]
+            const moeglich = bauen && besitzer === null ? N.bezahlbar(z, ich, r.id) : []
+            if (moeglich.length) g.classList.add('waehlbar')
+            if (gewaehlt === r.id) g.classList.add('gewaehlt')
+            for (let i = 0; i < r.n; i++) {
+              const m = 9 + laenge * (i + 0.5)
+              const x = A.x + ((B.x - A.x) * m) / d
+              const y = A.y + ((B.y - A.y) * m) / d
+              const q = s('rect', { x: -laenge / 2 + 1.2, y: -4, width: laenge - 2.4, height: 8, class: 'glied ' + (besitzer === null ? 'frei' : 'gebaut'), transform: 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') rotate(' + winkel.toFixed(1) + ')' })
+              q.style.fill = besitzer === null ? farbe(r.f) : a.farbe(besitzer)
+              g.append(q)
+            }
+            const t = s('title')
+            t.textContent = A.name + ' – ' + B.name + ': ' + r.n + ' ' + (r.f === 6 ? 'grau' : N.FARBEN[r.f]) + (besitzer !== null ? ', gebaut von ' + a.name(besitzer) : '')
+            g.append(t)
+            if (moeglich.length) {
+              g.append(s('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, class: 'treffer' }))
+              g.addEventListener('click', () => {
+                if (moeglich.length === 1) return a.sende({ t: 'strecke', id: r.id, farbe: moeglich[0] })
+                gewaehlt = r.id
+                a.neu()
+              })
+            }
+            svg.append(g)
+          })
+          N.STAEDTE.forEach((c, i) => {
+            svg.append(s('circle', { cx: c.x, cy: c.y, r: 6, class: 'stadt' + (zielStaedte.has(i) ? ' ziel' : '') }))
+            const links = c.x > 400
+            const t = s('text', { x: c.x + (links ? -9 : 9), y: c.y - 7, class: 'stadt-name', 'text-anchor': links ? 'end' : 'start' })
+            t.textContent = c.name
+            svg.append(t)
+          })
+          a.brett.append(svg)
+
+          // Offene Karten
+          a.brett.append(el('p', 'reihe-titel', 'Offene Karten'))
+          const reihe = el('div', 'karten')
+          z.auslage.forEach((k, i) => {
+            if (k === null) return
+            const b = wagenkarte(k, 'button')
+            b.disabled = !(a.darf && z.phase === 'zug' && !(k === 6 && z.gezogen > 0))
+            b.addEventListener('click', () => a.sende({ t: 'karte', i }))
+            reihe.append(b)
+          })
+          const st = el('button', 'wagenkarte stapel', 'Stapel (' + z.stapel.length + ')')
+          st.type = 'button'
+          st.disabled = !(a.darf && z.phase === 'zug' && (z.stapel.length || z.ablage.length))
+          st.addEventListener('click', () => a.sende({ t: 'karte', i: 'stapel' }))
+          reihe.append(st)
+          a.brett.append(reihe)
+
+          // Eigene Hand und Aufträge
+          if (ich != null) {
+            a.brett.append(el('p', 'reihe-titel', (a.online ? 'Deine' : a.name(ich) + 's') + ' Karten · ' + z.wagen[ich] + ' Wagen übrig'))
+            const h = el('div', 'karten')
+            z.hand[ich].forEach((n, f) => n && h.append(wagenkarte(f, 'span', N.FARBEN[f] + ' ' + n)))
+            if (!h.childNodes.length) h.append(el('span', 'hinweis', 'keine'))
+            a.brett.append(h)
+            if (z.phase !== 'wahl' || !a.darf) {
+              a.brett.append(el('p', 'reihe-titel', 'Aufträge'))
+              const l = el('ul', 'auftraege')
+              z.auftraege[ich].forEach((t) => {
+                const fertig = N.verbunden(z, ich, N.AUFTRAEGE[t].a, N.AUFTRAEGE[t].b)
+                const li = el('li', fertig ? 'fertig' : '')
+                li.append(el('span', null, (fertig ? '✓ ' : '') + auftragText(t)), el('span', null, N.AUFTRAEGE[t].p + ' P'))
+                l.append(li)
+              })
+              a.brett.append(l)
+            }
+          }
+          if (z.ende && z.endpunkte) a.aktionen.append(el('p', null, 'Endstand: ' + z.spieler.map((sp, i) => sp.name + ' ' + z.endpunkte[i]).join(', ')))
+          if (z.schluss > 0) a.aktionen.append(el('p', 'hinweis', 'Letzte Runde: noch ' + z.schluss + (z.schluss === 1 ? ' Zug.' : ' Züge.')))
+          if (!a.darf) return
+
+          if (z.phase === 'wahl') {
+            a.aktionen.append(el('p', null, 'Welche Aufträge behältst du? (mindestens ' + z.mindestens + ')'))
+            const l = el('ul', 'auftraege')
+            z.angebot.forEach((t, i) => {
+              const li = el('li')
+              const lab = el('label')
+              const c = el('input')
+              c.type = 'checkbox'
+              c.checked = auswahl.has(i)
+              c.addEventListener('change', () => {
+                if (c.checked) auswahl.add(i)
+                else auswahl.delete(i)
+                a.neu()
+              })
+              lab.append(c, document.createTextNode(auftragText(t)))
+              li.append(lab, el('span', null, N.AUFTRAEGE[t].p + ' P'))
+              l.append(li)
+            })
+            a.aktionen.append(l)
+            const b = knopf('Behalten', '', () => a.sende({ t: 'behalte', welche: [...auswahl] }))
+            b.disabled = auswahl.size < z.mindestens
+            a.aktionen.append(b)
+            return
+          }
+          if (gewaehlt >= 0) {
+            a.aktionen.append(el('p', null, 'Mit welcher Farbe bezahlst du?'))
+            const r = el('div', 'karten')
+            N.bezahlbar(z, ich, gewaehlt).forEach((f) => {
+              const b = wagenkarte(f, 'button', z.hand[ich][f] ? N.FARBEN[f] : 'Nur Loks')
+              b.addEventListener('click', () => a.sende({ t: 'strecke', id: gewaehlt, farbe: f }))
+              r.append(b)
+            })
+            a.aktionen.append(r)
+            a.aktionen.append(
+              knopf('Abbrechen', 'zweit', () => {
+                gewaehlt = -1
+                a.neu()
+              }),
+            )
+            return
+          }
+          if (z.gezogen) a.aktionen.append(el('p', null, 'Ziehe noch eine Karte (keine offene Lok).'))
+          else {
+            a.aktionen.append(el('p', null, 'Zwei Karten ziehen, eine leuchtende Strecke antippen oder Aufträge ziehen.'))
+            const b = knopf('Neue Aufträge ziehen', 'zweit', () => a.sende({ t: 'auftraege' }))
+            b.disabled = !z.stapelAuftraege.length
+            a.aktionen.append(b)
+          }
+          const nichts = !z.stapel.length && !z.ablage.length && z.auslage.every((k) => k === null || (k === 6 && z.gezogen))
+          if (nichts) a.aktionen.append(knopf('Passen', 'zweit', () => a.sende({ t: 'passe' })))
+        }
+
+        window.Gruppenspiel({
+          regeln: N,
+          flaeche: document.getElementById('flaeche'),
+          seite: document.getElementById('seite'),
+          zeichne,
+          verdeckt: true,
+          kiPause: 750,
+        })
+      })()
+    </script>
+  </body>
+</html>

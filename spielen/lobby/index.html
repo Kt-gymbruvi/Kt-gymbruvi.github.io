@@ -336,6 +336,22 @@
       #tafel .platz {
         font-size: 1em;
       }
+      .eigenes-mehr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 0.6rem;
+        margin: 0 0 0.6rem;
+      }
+      .eigenes-mehr select {
+        min-height: 2.75rem;
+        padding: 0.4rem 0.8rem;
+        border: 0;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+      }
       .steuerung summary {
         cursor: pointer;
         font-weight: var(--gewicht-betont);
@@ -447,6 +463,7 @@
         </section>
         <section class="werkzeug-karte" id="eigenes" hidden style="margin-bottom: 1rem">
           <p id="eigenes-text" style="margin: 0 0 0.6rem"></p>
+          <div class="eigenes-mehr" id="eigenes-mehr" hidden></div>
           <button type="button" class="knopf zweit" id="eigenes-weg">Angebot zurückziehen</button>
         </section>
         <section class="werkzeug-karte">
@@ -458,6 +475,9 @@
           <div class="kacheln" id="anbieten"></div>
           <p class="hinweis" id="chaos-hinweis" style="margin: 0.75rem 0 0" hidden>
             <b>Chaos-Flitzer 3000</b> und <b>Flip 7</b> laufen auf deinem Gerät (am besten Beamer oder Laptop), du kannst auch allein anfangen. Die anderen steigen unter „Mitspielen“ ein und spielen mit dem Handy, bis zu sechs Personen.
+          </p>
+          <p class="hinweis" id="mehrere-hinweis" style="margin: 0.5rem 0 0" hidden>
+            <b>Würfelglück, Farbenjagd, Ecke an Ecke, Grenzland, Inselhandel, Schienennetz, Kachelland:</b> Wer anbietet, sammelt Mitspieler und startet dann. Freie Plätze kann der Computer übernehmen. Jeder spielt auf dem eigenen Gerät.
           </p>
         </section>
         <section class="werkzeug-karte" style="margin-top: 1rem">
@@ -506,7 +526,18 @@
           'chaos-flitzer': { logo: 'chaosflitzer', plaetze: 6 },
           'flip-7': { logo: 'flip7', plaetze: 6 },
           'schiffe-versenken': { logo: 'schiffe', plaetze: 2 },
+          wuerfelglueck: { logo: 'wuerfelglueck', plaetze: 6 },
+          farbenjagd: { logo: 'farbenjagd', plaetze: 6 },
+          'ecke-an-ecke': { logo: 'eckeanecke', plaetze: 4 },
+          grenzland: { logo: 'grenzland', plaetze: 6 },
+          inselhandel: { logo: 'inselhandel', plaetze: 4 },
+          schienennetz: { logo: 'schienennetz', plaetze: 5 },
+          kachelland: { logo: 'kachelland', plaetze: 5 },
         }
+        // Spiele für mehrere unter spielen/ (spielen/gruppe.js): [mindestens, höchstens] Personen; jeder spielt auf dem eigenen Gerät
+        const MEHRERE = R.GRUPPE || {}
+        // Belegte Plätze eines Angebots für mehrere: Anbieter, Eingestiegene, Computerspieler
+        const belegtMehrere = (a) => 1 + (Array.isArray(a.mit) ? a.mit.length : 0) + (Number(a.ki) || 0)
         // Gruppenspiele: Ordner mit der Seite des Anbieters (index.html) und der Handy-Seite (handy/index.html)
         const GRUPPE = { 'chaos-flitzer': '../../vertretung/chaos-flitzer/', 'flip-7': '../../vertretung/flip-7/' }
         // Spiele zu zweit, die nicht unter spielen/ liegen
@@ -628,7 +659,16 @@
             v.className = (tafel ? 'hinweis ' : '') + (s === 'verbunden' ? '' : 'aus')
             v.textContent = s === 'verbunden' ? 'Verbunden.' : s === 'verbindet' ? 'Verbinde …' : 'Verbindung weg – versuche es erneut …'
           })
-          raum.auf('anwesenheit', zeichnen)
+          raum.auf('anwesenheit', (liste) => {
+            const a = raum.ich.angebot
+            if (!tafel && a && a.gruppe && Array.isArray(a.mit)) {
+              // Eingestiegene, die die Lobby verlassen haben, aus dem eigenen Angebot nehmen
+              const da = new Set(liste.map((x) => x.id))
+              const mit = a.mit.filter((m) => da.has(m.id))
+              if (mit.length !== a.mit.length) return raum.setze({ angebot: Object.assign({}, a, { mit }) })
+            }
+            zeichnen()
+          })
           if (tafel) return // das Smartboard zeigt nur an und spielt nicht mit
 
           // Jemand will bei meinem Angebot mitspielen
@@ -636,6 +676,12 @@
             const a = raum.ich.angebot
             if (gestartet || !a || a.partie !== d.partie || typeof d.von !== 'string' || d.von === raum.id) return
             if (!raum.anwesend().some((x) => x.id === d.von)) return
+            if (a.gruppe) {
+              // Spiel für mehrere: Platz geben, solange einer frei ist (gestartet wird später von Hand)
+              if (!MEHRERE[a.spiel] || a.mit.some((m) => m.id === d.von) || belegtMehrere(a) >= MEHRERE[a.spiel][1]) return
+              raum.setze({ angebot: Object.assign({}, a, { mit: a.mit.concat({ id: d.von, name: R.bereinige(d.name) || 'Gast' }) }) })
+              return
+            }
             const fremd = { id: d.von, name: R.bereinige(d.name) || 'Gast' }
             const ich = { id: raum.id, name: raum.ich.name }
             const ichZuerst = Math.random() < 0.5
@@ -645,8 +691,31 @@
             raum.setze({ angebot: null })
             losSpielen(a.partie, a.spiel, spieler)
           })
+          // Spiel für mehrere: Anfrage wiederholen, bis der Platz bestätigt ist (die erste kann vor der Anwesenheit ankommen)
+          setInterval(() => {
+            if (!wartetAuf || !wartetAuf.gruppe || gestartet) return
+            const bei = raum.anwesend().find((p) => p.angebot && p.angebot.partie === wartetAuf.partie)
+            if (bei && !(Array.isArray(bei.angebot.mit) && bei.angebot.mit.some((m) => m.id === raum.id))) raum.sende('beitritt', { partie: wartetAuf.partie, von: raum.id, name: raum.ich.name })
+          }, 2000)
+          raum.auf('austritt', (d) => {
+            const a = raum.ich.angebot
+            if (!a || !a.gruppe || a.partie !== d.partie || !Array.isArray(a.mit)) return
+            if (a.mit.some((m) => m.id === d.von)) raum.setze({ angebot: Object.assign({}, a, { mit: a.mit.filter((m) => m.id !== d.von) }) })
+          })
+          // Start eines Spiels für mehrere
+          raum.auf('start', (d) => {
+            if (!MEHRERE[d.spiel] || !Array.isArray(d.spieler) || gestartet || typeof d.host !== 'string') return
+            if (d.spieler.some((s) => s && s.id === raum.id)) {
+              zumSpiel(d.spiel, d.partie, d.host)
+            } else if (wartetAuf && wartetAuf.partie === d.partie) {
+              wartetAuf = null
+              meldung('Dieses Spiel hat ohne dich angefangen.')
+              zeichnen()
+            }
+          })
           // Start einer Partie, bei der ich mitspiele (oder: ein Angebot ist vergeben)
           raum.auf('start', (d) => {
+            if (MEHRERE[d.spiel]) return
             if (!Array.isArray(d.spieler) || d.spieler.length !== 2 || !R.SPIELE[d.spiel]) return
             if (gestartet) return
             if (d.spieler.some((s) => s && s.id === raum.id)) {
@@ -672,6 +741,31 @@
           raum.verlassen()
           location.href =
             (ORT[spiel] || '../' + spiel + '/') + '?raum=' + code + '&partie=' + encodeURIComponent(partie) + '&seite=' + seite + '&gegner=' + encodeURIComponent(gegnerPerson.name) + '&gid=' + encodeURIComponent(gegnerPerson.id)
+        }
+
+        function zumSpiel(spiel, partie, host) {
+          gestartet = true
+          raum.verlassen()
+          location.href = '../' + spiel + '/?raum=' + code + '&partie=' + encodeURIComponent(partie) + '&host=' + encodeURIComponent(host)
+        }
+
+        // Eigenes Angebot eines Spiels für mehrere starten: Reihenfolge der Menschen losen, Computer hinten anfügen
+        function starteMehrere(a) {
+          const menschen = [{ id: raum.id, name: raum.ich.name }].concat(a.mit.map((m) => ({ id: m.id, name: R.bereinige(m.name) || 'Gast' })))
+          for (let i = menschen.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[menschen[i], menschen[j]] = [menschen[j], menschen[i]]
+          }
+          const spieler = menschen.concat(Array.from({ length: Number(a.ki) || 0 }, (_, i) => ({ ki: true, name: 'Computer ' + (i + 1) })))
+          try {
+            sessionStorage.setItem('gruppenstart-' + a.partie, JSON.stringify({ spieler }))
+          } catch {
+            /* ohne Speicher kann die Spielleitung die Partie nicht anlegen */
+          }
+          gestartet = true
+          raum.sende('start', { partie: a.partie, spiel: a.spiel, spieler, host: raum.id })
+          raum.setze({ angebot: null })
+          setTimeout(() => zumSpiel(a.spiel, a.partie, raum.id), 300)
         }
 
         // ---------- Gemeinsame Auswertung ----------
@@ -701,10 +795,11 @@
           li.append(logo(a.spiel))
           const t = el('span', 'text')
           t.append(el('div', 'titel', R.SPIELE[a.spiel]))
-          t.append(el('div', 'klein', R.bereinige(p.name) + ' sucht Mitspieler' + (gruppe ? ' (am Handy, bis zu ' + INFO[a.spiel].plaetze + ' Personen)' : '')))
+          const mehrere = !!MEHRERE[a.spiel]
+          t.append(el('div', 'klein', R.bereinige(p.name) + ' sucht Mitspieler' + (mehrere ? ' (bis zu ' + INFO[a.spiel].plaetze + ' Personen)' : gruppe ? ' (am Handy, bis zu ' + INFO[a.spiel].plaetze + ' Personen)' : '')))
           const pl = el('div', 'plaetze')
           if (gruppe) {
-            const n = Math.min(INFO[a.spiel].plaetze, Number(a.belegt) || 0)
+            const n = Math.min(INFO[a.spiel].plaetze, mehrere ? belegtMehrere(a) : Number(a.belegt) || 0)
             for (let i = 0; i < INFO[a.spiel].plaetze; i++) pl.append(el('span', 'platz' + (i < n ? ' voll' : ''), i < n ? String(i + 1) : '–'))
           } else {
             pl.append(el('span', 'platz voll', R.bereinige(p.name)), el('span', 'platz', 'frei'))
@@ -796,7 +891,49 @@
           // Eigenes Angebot
           const meins = raum.ich.angebot
           $('eigenes').hidden = !meins
-          if (meins) $('eigenes-text').textContent = 'Du bietest „' + R.SPIELE[meins.spiel] + '“ an. Sobald jemand einsteigt, geht es los.'
+          const mehr = $('eigenes-mehr')
+          mehr.textContent = ''
+          mehr.hidden = true
+          $('eigenes-weg').textContent = 'Angebot zurückziehen'
+          if (meins && meins.gruppe && MEHRERE[meins.spiel]) {
+            const [min, max] = MEHRERE[meins.spiel]
+            const mit = Array.isArray(meins.mit) ? meins.mit : []
+            const ki = Number(meins.ki) || 0
+            $('eigenes-text').textContent =
+              'Du bietest „' + R.SPIELE[meins.spiel] + '“ an (' + min + ' bis ' + max + ' Personen). ' + (mit.length ? 'Dabei: ' + mit.map((m) => R.bereinige(m.name)).join(', ') + '.' : 'Noch ist niemand eingestiegen.')
+            const l = el('label', 'feld', 'Computerspieler dazu')
+            const wahl = document.createElement('select')
+            for (let n = 0; n <= max - 1 - mit.length; n++) {
+              const op = el('option', null, String(n))
+              op.value = String(n)
+              op.selected = n === ki
+              wahl.append(op)
+            }
+            wahl.addEventListener('change', () => raum.setze({ angebot: Object.assign({}, meins, { ki: Number(wahl.value) }) }))
+            l.append(wahl)
+            const gesamt = belegtMehrere(meins)
+            const los = el('button', 'knopf', 'Starten (' + gesamt + (gesamt === 1 ? ' Person)' : ' Personen)'))
+            los.type = 'button'
+            los.disabled = gesamt < min || gesamt > max
+            los.title = gesamt < min ? 'Es fehlen noch Mitspieler (oder Computerspieler).' : ''
+            los.addEventListener('click', () => starteMehrere(meins))
+            mehr.append(l, los)
+            mehr.hidden = false
+          } else if (meins) $('eigenes-text').textContent = 'Du bietest „' + R.SPIELE[meins.spiel] + '“ an. Sobald jemand einsteigt, geht es los.'
+          // Bei einem Spiel für mehrere eingestiegen: warten, bis der Anbieter startet
+          const wartetMehrere = !meins && wartetAuf && wartetAuf.gruppe
+          if (wartetMehrere) {
+            const bei = angebote.find((p) => p.angebot.partie === wartetAuf.partie)
+            const drin = bei && Array.isArray(bei.angebot.mit) && bei.angebot.mit.some((m) => m.id === raum.id)
+            if (drin) wartetAuf.dabei = true
+            $('eigenes-text').textContent = bei
+              ? drin
+                ? 'Du bist dabei: ' + R.SPIELE[bei.angebot.spiel] + ' bei ' + R.bereinige(bei.name) + '. Warte, bis es losgeht.'
+                : 'Frage nach einem Platz bei ' + R.bereinige(bei.name) + ' …'
+              : 'Das Spiel startet gleich …'
+            $('eigenes-weg').textContent = 'Aussteigen'
+          }
+          $('eigenes').hidden = !meins && !wartetMehrere
           $('anbieten-karte').hidden = !!meins
 
           // Spiel anbieten
@@ -817,21 +954,37 @@
                 location.href = GRUPPE[s] + '?lobby=' + code + '&host=1'
                 return
               }
+              if (MEHRERE[s]) return raum.setze({ angebot: { partie: R.zufallText(8), spiel: s, gruppe: true, mit: [], ki: 0 } })
               raum.setze({ angebot: { partie: R.zufallText(8), spiel: s } })
             })
             an.append(b)
           })
           if (!erlaubt.length) an.append(el('span', 'leer', 'Gerade ist kein Spiel freigegeben.'))
           $('chaos-hinweis').hidden = !erlaubt.some((x) => GRUPPE[x])
+          $('mehrere-hinweis').hidden = !erlaubt.some((x) => MEHRERE[x])
 
           // Angebote anderer
           const ang = $('angebote')
           ang.textContent = ''
           const offen = angebote.filter((p) => p.id !== raum.id)
-          if (wartetAuf && !offen.some((p) => p.angebot.partie === wartetAuf.partie)) wartetAuf = null
+          if (wartetAuf && !offen.some((p) => p.angebot.partie === wartetAuf.partie)) {
+            // Ausweg, falls die Startnachricht verloren ging: Läuft meine Partie schon, steige ich ein
+            const lauf = wartetAuf.dabei && !gestartet && laufend.find((p) => p.spielt.partie === wartetAuf.partie && MEHRERE[p.spielt.spiel])
+            if (lauf) return zumSpiel(lauf.spielt.spiel, wartetAuf.partie, /^[A-Z0-9]{4,16}$/i.test(lauf.spielt.host || '') ? lauf.spielt.host : lauf.id)
+            if (wartetAuf.dabei) {
+              wartetAuf.weg = wartetAuf.weg || Date.now()
+              if (Date.now() - wartetAuf.weg > 20000) wartetAuf = null
+              else if (!wartetAuf.uhr)
+                wartetAuf.uhr = setTimeout(() => {
+                  if (wartetAuf) wartetAuf.uhr = null
+                  zeichnen()
+                }, 2000)
+            } else wartetAuf = null
+          }
           if (!offen.length) ang.append(leer('Gerade bietet niemand ein Spiel an. Biete selbst eins an!'))
           offen.forEach((p) => {
-            const gruppe = INFO[p.angebot.spiel].plaetze > 2
+            const mehrere = !!MEHRERE[p.angebot.spiel]
+            const gruppe = INFO[p.angebot.spiel].plaetze > 2 && !mehrere
             const b = el('button', 'knopf klein')
             b.type = 'button'
             const wartet = wartetAuf && wartetAuf.partie === p.angebot.partie
@@ -839,6 +992,10 @@
             b.disabled = !!wartetAuf || !!raum.ich.angebot
             b.title = raum.ich.angebot ? 'Zieh zuerst dein eigenes Angebot zurück.' : ''
             if (gruppe && !R.istCode(p.angebot.code)) b.disabled = true
+            if (mehrere && !wartet && belegtMehrere(p.angebot) >= MEHRERE[p.angebot.spiel][1]) {
+              b.disabled = true
+              b.textContent = 'Voll'
+            }
             b.addEventListener('click', () => {
               if (gruppe) {
                 // Gruppenspiel (Chaos-Flitzer, Flip 7): das eigene Handy wird zur Steuerung des Spiels des Anbieters
@@ -847,7 +1004,7 @@
                 location.href = GRUPPE[p.angebot.spiel] + 'handy/?raum=' + p.angebot.code + '&lobby=' + code
                 return
               }
-              wartetAuf = { partie: p.angebot.partie }
+              wartetAuf = { partie: p.angebot.partie, gruppe: mehrere }
               raum.sende('beitritt', { partie: p.angebot.partie, von: raum.id, name: raum.ich.name })
               zeichnen()
             })
@@ -866,7 +1023,15 @@
           history.replaceState(null, '', adresseMitSpiel(code))
           zeichnen()
         })
-        $('eigenes-weg').addEventListener('click', () => raum && raum.setze({ angebot: null }))
+        $('eigenes-weg').addEventListener('click', () => {
+          if (!raum) return
+          if (!raum.ich.angebot && wartetAuf && wartetAuf.gruppe) {
+            raum.sende('austritt', { partie: wartetAuf.partie, von: raum.id })
+            wartetAuf = null
+            return zeichnen()
+          }
+          raum.setze({ angebot: null })
+        })
         $('t-link').addEventListener('click', async () => {
           try {
             await navigator.clipboard.writeText(adresse())
