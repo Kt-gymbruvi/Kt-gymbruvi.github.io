@@ -30,7 +30,6 @@
       #haus {
         display: grid;
         width: 100%;
-        max-width: min(36rem, calc(100dvh - 15rem));
         aspect-ratio: 1;
         border: 3px solid var(--text);
         border-radius: 4px;
@@ -127,6 +126,26 @@
       }
       .legende svg { width: 1.1rem; height: 1.1rem; color: var(--text); }
       .legende svg.opfer { color: var(--fehler); }
+      .legende {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.9rem;
+        margin: 0.75rem 0 0;
+        padding: 0;
+        color: var(--text-2);
+        font-size: 0.85rem;
+        list-style: none;
+      }
+      .legende li { display: inline-flex; align-items: center; gap: 0.35rem; }
+      .legende .farbe {
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 1.5px solid var(--text);
+        border-radius: 0.2rem;
+        background: var(--rc);
+      }
+      .legende svg { width: 1.1rem; height: 1.1rem; color: var(--text); }
+      .legende svg.opfer { color: var(--fehler); }
       /* Brett links, Hinweise rechts daneben (ab Tablet-Breite); auf dem Handy untereinander */
       .spiel { grid-template-columns: minmax(0, 38rem) minmax(15rem, 24rem); justify-content: center; }
       .brett-spalte { display: flex; flex-direction: column; align-items: stretch; gap: 1rem; width: 100%; }
@@ -186,8 +205,61 @@
       .kasten-knoepfe { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
       .kasten-knoepfe .knopf { flex: 1 1 6rem; }
       .fall { margin: 0 0 0.6rem; font-size: 0.95rem; line-height: 1.4; }
-      @media (max-width: 52rem) {
+
+      /* Layout: Spielfeld links (so groß wie die Höhe erlaubt), rechts alles Wichtige ohne Scrollen: Verdächtige, Werkzeuge, Hinweise */
+      .spiel { grid-template-columns: minmax(0, 1fr) clamp(18rem, 30vw, 25rem); gap: 1rem; align-items: start; }
+      .brett-spalte { display: flex; flex-direction: column; align-items: center; width: 100%; }
+      .spielkopf { margin-bottom: 0.5rem; }
+      .spielkopf img { width: 2.5rem; height: 2.5rem; }
+      .spielkopf-text { display: none; }
+      .rechts { position: sticky; top: 4.5rem; max-height: calc(100dvh - 8rem); gap: 0.6rem; }
+      .kompakt { padding: 0.6rem 0.75rem; }
+      .kompakt h2 { margin: 0 0 0.3rem; font-size: 0.9rem; }
+      .kopf-zeile { display: flex; align-items: baseline; gap: 0.75rem; }
+      .kopf-zeile .fall { margin: 0; font-size: 0.85rem; line-height: 1.3; }
+      #zeit { flex: none; font-size: 1.3rem; }
+      #meldung.status { min-height: 1.3rem; margin: 0.15rem 0 0.4rem; font-size: 0.9rem; }
+      .leute { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3rem; }
+      .leute button { min-height: 2.1rem; gap: 0.3rem; padding: 0.1rem 0.4rem; font-size: 0.85rem; }
+      .leute .person { width: 1.5rem; font-size: 0.85rem; }
+      .leiste { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.3rem; margin-top: 0.5rem; }
+      .werk {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.1rem;
+        min-height: 3rem;
+        padding: 0.2rem 0;
+        border: 0;
+        border-radius: var(--radius);
+        background: var(--flaeche-2);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.68rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .werk svg { width: 1.3rem; height: 1.3rem; }
+      .werk:active { transform: scale(0.95); }
+      .werk[aria-pressed='true'], .werk.neu { background: var(--akzent); color: var(--akzent-text); }
+      .segmente.klein { margin-top: 0.5rem; }
+      .segmente.klein button { padding: 0.15rem 0.4rem; font-size: 0.85rem; }
+      .hinweis-karte { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+      .hinweis-karte .hinweise { overflow-y: auto; }
+      .hinweise button { padding: 0.1rem 0.45rem; font-size: 0.78rem; line-height: 1.2; }
+      .hinweise li + li { margin-top: 0; }
+      .regeln-box summary { cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+      .regeln-box[open] .regeln { margin-top: 0.4rem; font-size: 0.85rem; }
+      #haus { max-width: min(100%, calc(100dvh - 14rem)); }
+      .brett-flaeche { padding: 0.5rem; }
+      @media (max-width: 40rem) {
+        .spiel { grid-template-columns: minmax(0, 1fr); }
+        .rechts { position: static; max-height: none; }
         #haus { max-width: 100%; }
+        .hinweise button { font-size: 0.9rem; }
+        .spielkopf-text { display: block; }
+        .spielkopf img { width: 2.75rem; height: 2.75rem; }
       }
     </style>
   </head>
@@ -208,52 +280,45 @@
         <div class="brett-spalte">
           <div class="brett-flaeche" style="width: 100%"><div id="haus" role="grid" aria-label="Haus mit Räumen"></div></div>
           <ul class="legende" id="legende" aria-label="Legende"></ul>
+        </div>
 
-          <section class="werkzeug-karte">
-            <div id="zeit" role="timer" aria-live="off">0:00</div>
-            <p id="fall" class="fall"></p>
+        <div class="seite rechts">
+          <section class="werkzeug-karte kompakt">
+            <div class="kopf-zeile">
+              <div id="zeit" role="timer" aria-live="off">0:00</div>
+              <p id="fall" class="fall"></p>
+            </div>
             <p id="meldung" class="status" role="status" aria-live="polite"></p>
-            <h2>Verdächtige</h2>
             <div class="leute" id="leute"></div>
-            <div class="kasten-knoepfe">
-              <button id="notiz" type="button" class="knopf zweit" aria-pressed="false">Notizen</button>
-              <button id="zurueck" type="button" class="knopf zweit">Rückgängig</button>
+            <div class="leiste" role="toolbar" aria-label="Werkzeuge">
+              <button id="notiz" type="button" class="werk" aria-pressed="false" title="Notizen: mögliche Felder merken" aria-label="Notizen: mögliche Felder merken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3"/></svg><span class="lbl">Notiz</span></button>
+              <button id="zurueck" type="button" class="werk" title="Rückgängig" aria-label="Rückgängig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3"/></svg><span class="lbl">Zurück</span></button>
+              <button id="pruefen" type="button" class="werk" title="Prüfen: Wer steht falsch?" aria-label="Prüfen: Wer steht falsch?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg><span class="lbl">Prüfen</span></button>
+              <button id="tipp" type="button" class="werk" title="Tipp: eine Person richtig setzen" aria-label="Tipp: eine Person richtig setzen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.5.4.5 1 .5 1.6V16h6v-.5c0-.6 0-1.2.5-1.6A6 6 0 0012 3z"/></svg><span class="lbl">Tipp</span></button>
+              <button id="loesung" type="button" class="werk" title="Lösung zeigen" aria-label="Lösung zeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl">Lösung</span></button>
+              <button id="neu" type="button" class="werk neu" title="Neuer Fall" aria-label="Neuer Fall"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/></svg><span class="lbl">Neu</span></button>
             </div>
-            <div class="kasten-knoepfe">
-              <button id="pruefen" type="button" class="knopf zweit">Prüfen</button>
-              <button id="tipp" type="button" class="knopf zweit">Tipp</button>
-              <button id="loesung" type="button" class="knopf zweit">Lösung</button>
-            </div>
-            <div class="kasten-knoepfe">
-              <button id="neu" type="button" class="knopf">Neuer Fall</button>
-            </div>
-          </section>
-
-          <section class="werkzeug-karte">
-            <h2>Schwierigkeit</h2>
-            <div class="segmente voll" role="group" aria-label="Schwierigkeit">
+            <div class="segmente voll klein" role="group" aria-label="Schwierigkeit">
               <button type="button" data-stufe="leicht" aria-pressed="false">Leicht</button>
               <button type="button" data-stufe="mittel" aria-pressed="true">Mittel</button>
               <button type="button" data-stufe="schwer" aria-pressed="false">Schwer</button>
             </div>
           </section>
-        </div>
 
-        <div class="seite hinweis-spalte">
-          <section class="werkzeug-karte">
+          <section class="werkzeug-karte kompakt hinweis-karte">
             <h2>Hinweise</h2>
             <ul class="hinweise" id="hinweise"></ul>
           </section>
 
-          <section class="werkzeug-karte">
-            <h2>So geht's</h2>
+          <details class="werkzeug-karte kompakt regeln-box">
+            <summary>So geht's</summary>
             <ul class="regeln">
               <li>Jede Person steht auf genau einem Feld. In jeder Zeile und jeder Spalte steht genau eine Person.</li>
               <li>Auf Möbeln und beim Opfer steht niemand. Die Hinweise sagen, wer wo stand.</li>
-              <li>Person wählen, dann Feld antippen. Mit „Notizen“ merkst du dir mögliche Felder. Hinweise antippen = abhaken.</li>
+              <li>Person wählen, dann Feld antippen. Mit „Notiz“ merkst du dir mögliche Felder. Hinweise antippen = abhaken.</li>
               <li>Der Mörder ist die Person, die im Raum des Opfers steht – und dort allein ist.</li>
             </ul>
-          </section>
+          </details>
         </div>
       </div>
     </main>
@@ -316,6 +381,10 @@
 
         const haus = $('haus')
 
+        function setzeLoesung(an) {
+          $('loesung').querySelector('.lbl').textContent = an ? 'Spiel' : 'Lösung'
+          $('loesung').title = $('loesung').ariaLabel = an ? 'Zurück zum Spiel' : 'Lösung zeigen'
+        }
         function setzeMeldung(text, art) {
           $('meldung').textContent = text || ''
           $('meldung').className = 'status' + (art ? ' ' + art : '')
@@ -527,7 +596,7 @@
             sel = 0
             fertig = false
             zeigeLoesung = false
-            $('loesung').textContent = 'Lösung'
+            setzeLoesung(false)
             aufbauen()
             setzeMeldung('')
             zeichnen()
@@ -592,7 +661,7 @@
           zeigeLoesung = !zeigeLoesung
           falsch.clear()
           verletzt.clear()
-          $('loesung').textContent = zeigeLoesung ? 'Zurück zum Spiel' : 'Lösung'
+          setzeLoesung(zeigeLoesung)
           setzeMeldung(zeigeLoesung ? 'So sieht die Lösung aus: ' + R.personen[R.moerder] + ' ist der Mörder.' : '')
           zeichnen()
         })
