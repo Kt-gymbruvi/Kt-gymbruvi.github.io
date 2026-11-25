@@ -191,9 +191,14 @@ window.WERKZEUGE = [
   {
     bereich: 'Links für den Unterricht',
     symbol: 'mikroskop',
-    titel: 'Virtuelles Mikroskop',
-    text: 'Gewebeschnitte mikroskopieren am Bildschirm (Ruhr-Universität Bochum).',
-    adresse: 'https://www.digital.anatomie.ruhr-uni-bochum.de/de/virtuelles-mikroskop/',
+    titel: 'Virtuelle Mikroskope',
+    text: 'Präparate am Bildschirm mikroskopieren.',
+    adresse: 'https://www.digital.anatomie.ruhr-uni-bochum.de/de/virtuelles-mikroskop/', // für die Suche; die Kachel zeigt die Ziele
+    // mehrere Ziele: je ein Knopf in der Kachel, der QR-Dialog schaltet zwischen den Codes um
+    ziele: [
+      { titel: 'Bochum', text: 'Gewebeschnitte (Ruhr-Universität Bochum)', adresse: 'https://www.digital.anatomie.ruhr-uni-bochum.de/de/virtuelles-mikroskop/' },
+      { titel: 'Duisburg-Essen', text: 'BioSLiDES: Scans von Pflanzen, Tieren und Pilzen (Universität Duisburg-Essen)', adresse: 'https://bioslides.biologie.uni-due.de/collection.php' },
+    ],
   },
   {
     bereich: 'Links für den Unterricht',

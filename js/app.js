@@ -83,20 +83,41 @@
 
   // ---------- QR-Code groß anzeigen ----------
   const dialog = $('qr-dialog')
-  function zeigeQr(titel, adresse) {
-    $('qr-titel').textContent = titel
-    $('qr-adresse').textContent = adresse.replace(/^https?:\/\//, '')
-    const bild = $('qr-bild')
-    bild.textContent = ''
-    window.QRCode.toString(adresse, { type: 'svg', margin: 2, errorCorrectionLevel: 'M' }, (fehler, svg) => {
-      if (fehler) {
-        bild.textContent = 'QR-Code konnte nicht erstellt werden.'
-        return
-      }
-      bild.innerHTML = svg // SVG kommt aus der QR-Bibliothek, nicht aus Nutzereingaben
-      bild.firstElementChild.setAttribute('role', 'img')
-      bild.firstElementChild.setAttribute('aria-label', 'QR-Code für ' + titel)
-    })
+  // ziele (optional): mehrere Adressen zur Auswahl, z. B. [{ titel: 'Bochum', adresse }, …]; dann zeigt das Fenster eine Umschaltung
+  function zeigeQr(titel, adresse, ziele) {
+    const wahl = $('qr-wahl')
+    wahl.textContent = ''
+    wahl.hidden = !(ziele && ziele.length > 1)
+    function zeichne(name, url) {
+      $('qr-titel').textContent = ziele && ziele.length > 1 ? titel : name
+      $('qr-adresse').textContent = url.replace(/^https?:\/\//, '')
+      const bild = $('qr-bild')
+      bild.textContent = ''
+      window.QRCode.toString(url, { type: 'svg', margin: 2, errorCorrectionLevel: 'M' }, (fehler, svg) => {
+        if (fehler) {
+          bild.textContent = 'QR-Code konnte nicht erstellt werden.'
+          return
+        }
+        bild.innerHTML = svg // SVG kommt aus der QR-Bibliothek, nicht aus Nutzereingaben
+        bild.firstElementChild.setAttribute('role', 'img')
+        bild.firstElementChild.setAttribute('aria-label', 'QR-Code für ' + name)
+      })
+    }
+    if (!wahl.hidden) {
+      ziele.forEach((z, i) => {
+        const k = el('button', 'qr-wahl-knopf', z.titel)
+        k.type = 'button'
+        k.addEventListener('click', () => {
+          wahl.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === k)))
+          zeichne(z.titel, volleAdresse(z.adresse))
+        })
+        k.setAttribute('aria-pressed', String(i === 0))
+        wahl.append(k)
+      })
+      zeichne(ziele[0].titel, volleAdresse(ziele[0].adresse))
+    } else {
+      zeichne(titel, adresse)
+    }
     dialog.showModal()
   }
   $('qr-schliessen').addEventListener('click', () => dialog.close())
@@ -104,14 +125,14 @@
     if (e.target === dialog) dialog.close() // Klick neben das Fenster
   })
 
-  function qrKnopf(titel, adresse) {
+  function qrKnopf(titel, adresse, ziele) {
     const k = el('button', 'qr-knopf', 'QR')
     k.type = 'button'
     k.title = 'QR-Code groß zeigen'
     k.setAttribute('aria-label', 'QR-Code für „' + titel + '“ zeigen')
     k.addEventListener('click', (e) => {
       e.preventDefault()
-      zeigeQr(titel, adresse)
+      zeigeQr(titel, adresse, ziele)
     })
     return k
   }
@@ -299,13 +320,25 @@
     const ul = el('ul', 'werkzeug-karten')
     WERKZEUGE.filter((w) => (w.bereich || 'Allgemein') === b).forEach((w) => {
       const li = el('li')
-      const a = verweis('werkzeug', w.adresse)
+      // Mehrere Ziele (w.ziele): Kachel ist kein Link, sondern trägt je Ziel einen kleinen Knopf; der QR-Knopf schaltet zwischen den Codes um
+      const mehrere = Array.isArray(w.ziele) && w.ziele.length > 1
+      const a = mehrere ? el('div', 'werkzeug mehrere') : verweis('werkzeug', w.adresse)
       a.append(zeichen(w.symbol || 'werkzeug', 'werkzeug-symbol', w.bild))
       const textteil = el('span', 'werkzeug-text')
       textteil.append(el('span', 'werkzeug-titel', w.titel))
       if (w.text) textteil.append(el('span', 'werkzeug-info', w.text))
+      if (mehrere) {
+        const ziele = el('span', 'werkzeug-ziele')
+        w.ziele.forEach((z) => {
+          const p = verweis('werkzeug-ziel', z.adresse)
+          p.textContent = z.titel
+          p.title = z.text || z.titel + ' öffnen'
+          ziele.append(p)
+        })
+        textteil.append(ziele)
+      }
       a.append(textteil)
-      li.append(a, qrKnopf(w.titel, volleAdresse(w.adresse)))
+      li.append(a, mehrere ? qrKnopf(w.titel, null, w.ziele) : qrKnopf(w.titel, volleAdresse(w.adresse)))
       ul.append(li)
     })
     gruppe.append(ul)
