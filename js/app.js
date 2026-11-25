@@ -289,6 +289,9 @@
     const liste = $('klassen')
     if (!KLASSEN || !window.LehrraumKlassen) return (bereich.hidden = true)
     $('klassen-alle').href = KLASSEN.verwalten
+    const neuKnopf = $('klassen-neu')
+    neuKnopf.href = KLASSEN.neu
+    if (!neuKnopf.firstChild) neuKnopf.append(zeichen('plus'))
     if (!lehrkraft) return
     const lauf = ++klassenLauf
     const klassen = await window.LehrraumKlassen.laden()
@@ -300,20 +303,13 @@
       const li = el('li')
       const a = verweis('klassen-karte', KLASSEN.tafel + k.id)
       a.setAttribute('aria-label', 'Zur Tafel von ' + name)
-      a.append(el('span', 'klassen-name', k.bezeichnung), el('span', 'klassen-fach', k.fach || 'ohne Fach'))
-      const ziel = el('span', 'klassen-ziel')
-      ziel.append(el('span', 'klassen-ziel-text', 'Tafel starten'), zeichen('pfeil', 'knopf-pfeil'))
-      a.append(ziel)
+      a.title = 'Tafel für ' + name + ' starten'
+      a.append(el('span', 'klassen-name', k.bezeichnung), el('span', 'klassen-fach', k.fach || 'ohne Fach'), zeichen('pfeil', 'klassen-pfeil'))
       li.append(a)
       liste.append(li)
     })
-    const neu = el('li')
-    const a = el('a', 'klassen-neu')
-    a.href = KLASSEN.neu
-    a.title = 'Neue Klasse anlegen'
-    a.append(zeichen('plus', 'klassen-plus'), el('span', 'klassen-neu-text', 'Neue Klasse'))
-    neu.append(a)
-    liste.append(neu)
+    // Noch keine Klasse: Hinweis statt leerer Karte (das + steht oben neben der Überschrift)
+    if (!klassen.length) liste.append(el('li', 'klassen-leer', 'Noch keine Klassen – mit + eine anlegen.'))
   }
 
   // ---------- Werkzeuge und Links: je Bereich ein Dock (Logo + kurze Beschriftung) ----------
