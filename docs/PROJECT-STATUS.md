@@ -3,7 +3,7 @@
 Stand: 21.11.2026 · live unter https://kt-gymbruvi.github.io/ (`main` = `origin/main`). Zweig `sofort-paket` (Fehler aus dem Audit vom 21.11.2026) wartet auf Zustimmung. Die neue Startseite „Lehrraum“ ist damit die Startseite der Plattform; der Zweig `lehrraum-phase-1` ist in `main` aufgegangen.
 Plan und Hintergrund: `docs/PROJECT_AUDIT.md`, `FEATURE_INVENTORY.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`.
 
-## Startseite neu gestaltet: Entwurf D ohne Seitenleiste (25.11.2026, Zweig `startseite-entwurf-d`, nicht veröffentlicht)
+## Startseite neu gestaltet: Entwurf D ohne Seitenleiste (veröffentlicht am 25.11.2026, Zweig `startseite-entwurf-d`)
 - Ziel der Lehrkraft: Startseite „edel und clean“ und auf dem iPad (quer) ohne Scrollen. Entwürfe A–D auf einer Claude-Zeichenfläche, gewählt wurde D (Cockpit aus B + Docks aus C).
 - **Aufbau:** Glas-Kopfleiste (Logo, Suche, Hell/Dunkel, QR, Anmelden/Konto); keine Seitenleiste mehr. Oben grüne Karte (`--kopf`): angemeldet Datum, „Guten Morgen/Tag/Abend“, `SEITE.willkommenZeile`, Knöpfe „Tafel öffnen“ (orange) und „Notenbuch“; daneben „Meine Klassen“ als Raster mit „Tafel starten“. Gast: PIN-Feld mit „Zum Quiz“/„Zur Abstimmung“ in der grünen Karte, daneben große Karte „Tafel als Gast“. Darunter vier Kacheln, unten zwei Docks (Werkzeuge, Links) mit Logos.
 - **Inhalte (`js/inhalte.js`):** `oben: true` an Meine Klassen, Interaktive Tafel, Tafel als Gast (keine Kacheln mehr). `bereich` der Werkzeuge = Dock (`'Werkzeuge'`, `'Links'`), `kurz` = Beschriftung im Dock. Neue Logos `gemeinsam/qr-`, `phet-`, `mikroskop-`, `edubiosim-`, `planet-schule-`, `sport-logo.svg`. `NAVIGATION` dient nur noch dem Notenbuch-Knopf.
