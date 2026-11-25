@@ -235,6 +235,33 @@ a.kachel:active {
   font-size: 0.72rem;
 }
 
+/* ---------- QR-Knopf im Kopf (links neben Anmelden/Konto): Startseite teilen, auch auf dem Handy ---------- */
+.seite-qr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--tippflaeche);
+  height: var(--tippflaeche);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--flaeche-2);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--schnell), transform var(--schnell);
+}
+.seite-qr:hover {
+  background: color-mix(in srgb, var(--flaeche-2), var(--text) 7%);
+}
+.seite-qr:active {
+  transform: scale(0.96);
+}
+.seite-qr .symbol {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 /* ---------- QR-Knöpfe auf Kacheln und Werkzeugen: leises Symbol, deutlich erst unter der Maus ---------- */
 .kacheln .qr-knopf,
 .werkzeug-karten .qr-knopf {

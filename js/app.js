@@ -116,6 +116,11 @@
     return k
   }
 
+  // QR-Knopf im Kopf: Startseite schnell teilen
+  const seiteQr = $('seite-qr')
+  seiteQr.append(zeichen('qr'))
+  seiteQr.addEventListener('click', () => zeigeQr(SEITE.titel || 'Lehrraum', 'https://kt-gymbruvi.github.io/'))
+
   // ---------- Kopf ----------
   if (SEITE.titel) {
     $('titel').textContent = SEITE.titel
