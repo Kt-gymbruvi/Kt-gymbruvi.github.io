@@ -12,9 +12,8 @@
     <script src="gemeinsam/design.js"></script>
   </head>
   <body data-rolle="gast">
-    <div class="geruest" id="geruest">
+    <div class="geruest ohne-leiste" id="geruest">
       <header class="seitenkopf">
-        <button type="button" class="leiste-knopf" id="leiste-knopf" aria-label="Menü öffnen" aria-expanded="false" aria-controls="seitenleiste"></button>
         <a class="marke" href="./">
           <img src="gemeinsam/lehrraum-logo.svg" alt="" width="56" height="56" />
           <span class="marke-text">
@@ -28,6 +27,7 @@
           <ul id="suchtreffer" class="suchtreffer" hidden></ul>
         </div>
         <div class="kopf-rechts">
+          <button type="button" class="seite-qr" id="design-knopf"></button>
           <button type="button" class="seite-qr" id="seite-qr" title="Diese Seite teilen (QR-Code)" aria-label="QR-Code dieser Seite zeigen"></button>
           <button type="button" class="knopf zweit" id="anmelde-knopf">Anmelden</button>
           <div class="konto" id="konto" hidden>
@@ -40,51 +40,50 @@
         </div>
       </header>
 
-      <nav class="seitenleiste" id="seitenleiste" aria-label="Hauptnavigation">
-        <ul id="navigation"></ul>
-        <div class="trenner"></div>
-        <button type="button" class="leisten-punkt" id="design-knopf"></button>
-      </nav>
-
       <main class="hauptbereich">
-        <h1 class="unsichtbar">Lehrraum</h1>
-
-        <section class="begruessung" aria-labelledby="begruessung-titel">
-          <div class="begruessung-kopf">
-            <h2 id="begruessung-titel"></h2>
-            <a class="knopf" id="begruessung-knopf" href="#"></a>
-            <div class="begruessung-bild" id="begruessung-bild" aria-hidden="true"></div>
-          </div>
-          <div class="begruessung-text">
+        <div class="oben">
+          <!-- Große grüne Karte: Lehrkraft = Begrüßung mit Tafel und Notenbuch, Gast = Mitmachen mit PIN -->
+          <section class="begruessung" aria-labelledby="begruessung-titel">
+            <div class="begruessung-kopf">
+              <div>
+                <p class="begruessung-datum nur-lehrkraft" id="begruessung-datum"></p>
+                <h1 id="begruessung-titel"></h1>
+                <p class="begruessung-zeile" id="begruessung-zeile"></p>
+              </div>
+              <div class="begruessung-bild nur-lehrkraft" id="begruessung-bild" aria-hidden="true"></div>
+            </div>
+            <div class="begruessung-knoepfe nur-lehrkraft" id="begruessung-knoepfe"></div>
             <form id="pin-form" class="pin-form nur-gast" novalidate>
               <label for="pin">PIN vom Beamer</label>
-              <input id="pin" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="6 Ziffern" aria-describedby="pin-fehler" />
-              <div class="pin-knoepfe">
+              <div class="pin-reihe">
+                <input id="pin" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="6 Ziffern" aria-describedby="pin-fehler" />
                 <button class="knopf" type="button" data-ziel="quiz">Zum Quiz</button>
                 <button class="knopf" type="button" data-ziel="abstimmung">Zur Abstimmung</button>
               </div>
               <p id="pin-fehler" class="fehler" role="alert" hidden></p>
             </form>
-          </div>
-        </section>
+          </section>
+
+          <!-- Rechts daneben: Lehrkraft = Meine Klassen, Gast = Tafel als Gast -->
+          <section class="karte klassen nur-lehrkraft" aria-labelledby="klassen-titel">
+            <div class="karten-kopf">
+              <h2 id="klassen-titel"><span id="klassen-symbol"></span>Meine Klassen</h2>
+              <a id="klassen-alle" href="#">Verwalten ›</a>
+            </div>
+            <ul id="klassen" class="klassen-liste"></ul>
+          </section>
+          <div class="nur-gast oben-gast" id="oben-gast"></div>
+        </div>
 
         <section aria-labelledby="links-titel">
           <h2 id="links-titel" class="unsichtbar">Bereiche</h2>
           <ul id="links" class="kacheln"></ul>
         </section>
 
-        <section class="karte klassen nur-lehrkraft" aria-labelledby="klassen-titel">
-          <div class="karten-kopf">
-            <h2 id="klassen-titel"><span id="klassen-symbol"></span>Meine Klassen</h2>
-            <a id="klassen-alle" href="#">Klassen verwalten</a>
-          </div>
-          <ul id="klassen" class="klassen-liste"></ul>
-          <p class="hinweis klein">Klassen liegen nur auf diesem Gerät.</p>
-        </section>
-
+        <!-- Werkzeuge und Links als zwei Docks nebeneinander -->
         <section aria-labelledby="werkzeuge-titel" class="werkzeuge" id="werkzeuge-bereich">
-          <h2 id="werkzeuge-titel">Werkzeuge</h2>
-          <ul id="werkzeuge" class="werkzeug-liste"></ul>
+          <h2 id="werkzeuge-titel" class="unsichtbar">Werkzeuge und Links</h2>
+          <div id="werkzeuge" class="docks"></div>
         </section>
 
         <section aria-labelledby="material-titel" class="material" id="material-bereich">

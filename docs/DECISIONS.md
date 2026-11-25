@@ -128,3 +128,9 @@ Grundlage: `docs/PROJECT_AUDIT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.m
 - Fachliche Farben (Blut, Organe, Zellteile, Meer, Allele, Gruppenfarben) bleiben bewusst bestehen; nur Gestaltungsfarben wurden umgestellt.
 - Einsetzen/Erneuern in allen Angeboten: `node lernen/werkzeug/stil.mjs` (Angebote mit `gemeinsam/tokens.css`, z. B. Herzfrequenz-Zonen, werden übersprungen). Angebot mit dunkler 3D-Bühne: `data-ls="buehne"` (Genetiklabor 3D).
 - Neu übernommene Artefakte: nach `uebernehmen.mjs` zusätzlich `node lernen/werkzeug/stil.mjs <ordner>` ausführen.
+
+## Startseite ohne Seitenleiste, Werkzeuge und Links als Docks (25.11.2026, Zweig `startseite-entwurf-d`)
+- Vorgabe der Lehrkraft: auf dem iPad soll alles auf eine Seite passen. Die Seitenleiste zeigte fast nur dieselben Ziele wie die Kacheln und kostete Breite; sie entfällt. Tafel und Notenbuch sitzen als Knöpfe in der grünen Karte, Meine Klassen daneben.
+- Werkzeuge und Links stehen als zwei Docks nebeneinander (Logo + kurze Beschriftung) statt als Kartenraster. Alle Dock-Einträge haben eigene Logos im Stil der Werkzeug-Logos (weißes Rundquadrat, Grün/Orange).
+- QR-Codes im Dock über einen QR-Modus statt kleiner Knöpfe an jedem Symbol (auf dem iPad gibt es kein Hover; lange Druckgesten wären schwer zu finden).
+- Orange Knöpfe auf Grün mit dunkelgrüner Schrift (`--navy-dunkel`), weil weiße Schrift auf Orange zu wenig Kontrast hat.

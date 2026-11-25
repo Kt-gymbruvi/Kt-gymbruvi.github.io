@@ -1,123 +1,415 @@
 /* Startseite „Lehrraum“. Braucht gemeinsam/tokens.css und gemeinsam/grundlage.css.
    <body data-rolle="lehrkraft|gast"> entscheidet, welche Teile zu sehen sind.
-   Kompakt gehalten: Kacheln, Klassen und Werkzeuge stehen nebeneinander (auch auf dem iPad).
-   Stil wie die Tafel: weiße Karten mit Haarlinie, Farbe nur im Symbol, leise QR-Knöpfe. */
+   Aufbau (passt auf dem iPad quer ohne Scrollen): Glas-Kopfleiste, oben grüne Karte + Meine Klassen
+   (Gast: PIN + Tafel als Gast), darunter vier Kacheln, unten zwei Docks (Werkzeuge, Links). Keine Seitenleiste. */
 
 body[data-rolle='gast'] .nur-lehrkraft,
 body[data-rolle='lehrkraft'] .nur-gast {
   display: none !important;
 }
 
-.hauptbereich h2 {
-  margin: 0 0 0.65rem;
-  font-size: 1.25rem;
+/* ---------- Gerüst ohne Seitenleiste, Kopf als schwebende Glasleiste ---------- */
+.geruest.ohne-leiste {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'kopf' 'haupt';
+  grid-template-rows: auto 1fr;
 }
-.hauptbereich > section {
-  margin-top: 1.75rem;
-  scroll-margin-top: 1rem;
+.ohne-leiste .seitenkopf {
+  position: sticky;
+  top: var(--rand);
+  z-index: 30;
+  box-sizing: border-box;
+  width: min(var(--breite), 100% - 2rem);
+  margin: 0.75rem auto 0;
+  padding: 0.375rem 0.5rem 0.375rem 0.875rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: 999px;
+  background: var(--glas);
+  box-shadow: var(--schatten);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
 }
-
-/* ---------- Begrüßung: weiße Karte, großer Titel ---------- */
-.hauptbereich > .begruessung {
+.ohne-leiste .marke img {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+.ohne-leiste .marke-name {
+  font-size: 1.2rem;
+}
+.ohne-leiste .marke-zeile {
+  display: none;
+}
+.ohne-leiste .suchfeld {
+  max-width: 30rem;
+  margin-inline: auto;
+}
+.ohne-leiste .suchfeld input {
+  min-height: 2.75rem;
+}
+.ohne-leiste .kopf-rechts {
+  margin-left: 0;
+}
+.ohne-leiste .hauptbereich {
+  box-sizing: border-box;
+  width: min(var(--breite), 100% - 2rem);
+  margin-inline: auto;
+  padding: 1rem 0 1.5rem;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
+  gap: 0.875rem;
+}
+.hauptbereich > section {
   margin-top: 0;
-  padding: 0.9rem 1.5rem;
+  scroll-margin-top: 5rem;
+}
+.hauptbereich h2 {
+  margin: 0;
+  font-size: 1.1875rem;
+}
+
+/* ---------- Oben: grüne Karte und daneben Meine Klassen bzw. Tafel als Gast ---------- */
+.oben {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 0.875rem;
+}
+body[data-rolle='lehrkraft'] .oben {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+.begruessung {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  min-height: 14.5rem;
+  box-sizing: border-box;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
   border: 1px solid var(--haarlinie);
-  border-radius: var(--radius-gross);
-  background: var(--flaeche);
-  box-shadow: var(--schatten-klein);
-  overflow: hidden;
+  background: var(--kopf);
+  color: var(--kopf-text);
+  box-shadow: var(--schatten-hoch);
 }
 .begruessung-kopf {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 }
-.begruessung-text {
-  min-width: 0;
+.begruessung-datum {
+  margin: 0 0 0.25rem;
+  color: var(--kopf-text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
 }
-.begruessung-text:not(:has(.pin-form:not([hidden]))) {
+.begruessung h1 {
+  margin: 0;
+  color: inherit;
+  font-size: clamp(1.75rem, 3vw, 2.125rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.begruessung-zeile {
+  margin: 0.5rem 0 0;
+  color: var(--kopf-text-2);
+  font-size: 0.9375rem;
+}
+.begruessung-zeile:empty {
   display: none;
 }
-.begruessung h2 {
-  margin: 0;
-  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
-  line-height: 1.1;
-}
 .begruessung-bild {
-  flex: 0 0 auto;
-  width: 3.5rem;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 1.1rem;
+  background: #fff; /* die Logos sind für helle Flächen gezeichnet */
 }
-.begruessung-bild svg,
 .begruessung-bild img {
-  display: block;
-  width: 100%;
-  height: auto;
+  width: 3.25rem;
+  height: 3.25rem;
 }
-
-/* Mitmachen mit PIN (schlanke Fassung) */
-.pin-form {
+.begruessung-knoepfe {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem 0.9rem;
+  gap: 0.6rem;
+}
+/* Orange auf Grün: der wichtigste Knopf. Dunkelgrüne Schrift, damit der Kontrast in hell und dunkel reicht. */
+.knopf.knopf-hell,
+.pin-reihe .knopf[data-ziel='quiz'] {
+  background: var(--tuerkis);
+  color: var(--navy-dunkel);
+}
+.knopf.knopf-hell:hover,
+.pin-reihe .knopf[data-ziel='quiz']:hover {
+  background: var(--tuerkis-hell);
+}
+.knopf.knopf-glas,
+.pin-reihe .knopf[data-ziel='abstimmung'] {
+  background: color-mix(in srgb, var(--kopf-text) 14%, transparent);
+  color: var(--kopf-text);
+}
+.knopf.knopf-glas:hover,
+.pin-reihe .knopf[data-ziel='abstimmung']:hover {
+  background: color-mix(in srgb, var(--kopf-text) 22%, transparent);
+}
+.knopf-logo {
+  display: flex;
+  width: 1.375rem;
+  height: 1.375rem;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: #fff;
+}
+.knopf-logo img {
+  width: 100%;
+  height: 100%;
+}
+.begruessung :focus-visible {
+  outline-color: var(--tuerkis-hell);
+}
+
+/* Mitmachen mit PIN (Gast) in der grünen Karte */
+.pin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 .pin-form label {
-  color: var(--text-2);
-  font-size: 0.9375rem;
+  color: var(--kopf-text-2);
+  font-size: 0.8125rem;
   font-weight: var(--gewicht-betont);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pin-reihe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
 }
 .pin-form input {
-  width: 10.5rem;
-  min-height: var(--tippflaeche);
-  padding: 0.25rem 0.9rem;
+  width: 11rem;
+  min-height: 3.25rem;
+  box-sizing: border-box;
+  padding: 0.25rem 1.1rem;
   border: 0;
-  border-radius: var(--radius);
-  background: var(--flaeche-2);
+  border-radius: 999px;
+  background: var(--flaeche);
   color: var(--text);
   font: inherit;
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: var(--gewicht-betont);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.2em;
-  transition: box-shadow var(--schnell), background-color var(--schnell);
+  letter-spacing: 0.15em;
+  transition: box-shadow var(--schnell);
 }
-/* Platzhalter als Hinweis („6 Ziffern“), nicht wie eine schon eingetragene PIN */
 .pin-form input::placeholder {
   color: var(--text-2);
-  opacity: 0.7;
+  opacity: 0.8;
   font-size: 1rem;
   font-weight: 400;
   letter-spacing: 0;
 }
 .pin-form input:focus {
-  background: var(--flaeche);
-  box-shadow: 0 0 0 1px var(--haarlinie), 0 0 0 4px color-mix(in srgb, var(--fokus) 35%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--tuerkis) 55%, transparent);
   outline: 0;
 }
 .pin-form input[aria-invalid='true'] {
-  box-shadow: 0 0 0 2px var(--fehler);
+  box-shadow: 0 0 0 3px var(--tuerkis);
 }
-.pin-knoepfe {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-/* zweiter Knopf leiser: Quiz ist der häufigere Weg */
-.pin-knoepfe .knopf + .knopf {
-  background: var(--flaeche-2);
-  color: var(--text);
+.pin-reihe .knopf {
+  min-height: 3.25rem;
 }
 .pin-form .fehler {
-  flex-basis: 100%;
+  align-self: flex-start;
   margin: 0;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: var(--flaeche);
+  color: var(--fehler);
+  font-size: 0.9rem;
 }
 
-/* ---------- Kacheln: immer eine Reihe (auf dem Handy drei je Reihe), weiß, Farbe nur im Symbol ---------- */
+/* Meine Klassen (Lehrkraft) */
+.karte {
+  box-sizing: border-box;
+  padding: 1.1rem 1.25rem 1.25rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: 1.5rem;
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+}
+.karte.klassen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.karte h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.titel-symbol {
+  display: flex;
+}
+.titel-symbol .symbol {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+.karten-kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+.karten-kopf a {
+  font-size: 0.9rem;
+  font-weight: var(--gewicht-betont);
+  text-decoration: none;
+}
+.klassen-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.6rem;
+}
+.klassen-liste li {
+  min-width: 0;
+}
+.klassen-karte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border-radius: 1rem;
+  background: var(--flaeche-2);
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color var(--schnell), transform var(--schnell);
+}
+.klassen-karte:hover,
+.klassen-karte:focus-visible {
+  background: color-mix(in srgb, var(--flaeche-2), var(--text) 7%);
+}
+.klassen-karte:active {
+  transform: scale(0.97);
+}
+.klassen-name {
+  font-size: 1.125rem;
+  font-weight: var(--gewicht-titel);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.klassen-fach {
+  overflow: hidden;
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.klassen-ziel {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  color: var(--tafel);
+  font-size: 0.8rem;
+  font-weight: var(--gewicht-betont);
+  white-space: nowrap;
+}
+.knopf-pfeil {
+  display: flex;
+  font-size: 0.6rem;
+}
+.klassen-neu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 100%;
+  min-height: 4.5rem;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border: 1.5px dashed var(--linie-stark);
+  border-radius: 1rem;
+  color: var(--verweis);
+  font-size: 0.875rem;
+  font-weight: var(--gewicht-betont);
+  text-align: center;
+  text-decoration: none;
+}
+.klassen-neu:hover,
+.klassen-neu:focus-visible {
+  background: var(--schwebe);
+}
+.klassen-plus {
+  display: flex;
+}
+
+/* Tafel als Gast: große Karte neben der PIN */
+.oben-gast {
+  display: grid;
+}
+.oben-gast[hidden] {
+  display: none;
+}
+.gast-karte {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  box-sizing: border-box;
+  padding: 1.5rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: 1.5rem;
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+  color: var(--text);
+  text-decoration: none;
+  transition: box-shadow var(--sanft), transform var(--sanft);
+}
+@media (hover: hover) {
+  .gast-karte:hover {
+    box-shadow: var(--schatten);
+    transform: translateY(-2px);
+  }
+}
+.gast-karte:active {
+  transform: scale(0.98);
+}
+.gast-karte-symbol,
+.gast-karte-symbol.hat-bild.bild-rund {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  box-sizing: border-box;
+  padding: 0.6rem;
+  border-radius: 1.1rem;
+  background: var(--tafel-hell);
+}
+.gast-karte-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.gast-karte-titel {
+  font-size: 1.375rem;
+  font-weight: var(--gewicht-titel);
+  letter-spacing: var(--abstand-titel);
+}
+.gast-karte-info {
+  color: var(--text-2);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+/* ---------- Kacheln: eine Reihe (auf dem Handy zwei je Reihe), weiß, Farbe im Symbolfeld ---------- */
 .kacheln {
   list-style: none;
   margin: 0;
@@ -137,7 +429,9 @@ body[data-rolle='lehrkraft'] .nur-gast {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  padding: 0.9rem 1rem 1rem;
+  min-height: 8.75rem;
+  box-sizing: border-box;
+  padding: 1rem 1.1rem 1rem;
   border: 1px solid var(--haarlinie);
   border-radius: var(--radius-gross);
   background: var(--flaeche);
@@ -171,16 +465,21 @@ a.kachel:active {
   width: 1.35rem;
   height: 1.35rem;
 }
-/* Eigenes Logo (Quizzo, Klassenfunk): füllt das Quadrat, Hintergrund stammt aus dem Logo selbst */
-.kachel-symbol.hat-bild {
+/* Eigenes Logo: sitzt im Feld in der hellen Bereichsfarbe (wie im Dock) */
+.kachel-symbol.hat-bild,
+.kachel-symbol.hat-bild.bild-rund {
   width: 3rem;
   height: 3rem;
-  overflow: hidden;
-  border: 1px solid var(--haarlinie);
-  background: #fff; /* die Logos sind für helle Flächen gezeichnet */
+  box-sizing: border-box;
+  padding: 0.4rem;
+  margin-bottom: 0.35rem;
+  border-radius: 0.875rem;
+  background: var(--farbe-hell, var(--akzent-hell));
 }
-.hat-bild.bild-rund,
-.kachel-symbol.hat-bild.bild-rund {
+.kachel-symbol.hat-bild .logo-bild {
+  border-radius: 0.45rem;
+}
+.hat-bild.bild-rund {
   border: 0;
   background: transparent;
 }
@@ -190,24 +489,13 @@ a.kachel:active {
   height: 100%;
   object-fit: contain;
 }
-.werkzeug-symbol.hat-bild {
-  overflow: hidden;
-  background: transparent;
-}
-.leisten-punkt .hat-bild {
-  flex: none;
-  width: 1.5rem;
-  height: 1.5rem;
-  overflow: hidden;
-  border-radius: 0.4rem;
-  background: #fff;
-}
 .kachel.farbe-tafel { --farbe: var(--tafel); --farbe-hell: var(--tafel-hell); }
 .kachel.farbe-unterrichten { --farbe: var(--unterrichten); --farbe-hell: var(--unterrichten-hell); }
 .kachel.farbe-interaktion { --farbe: var(--interaktion); --farbe-hell: var(--interaktion-hell); }
 .kachel.farbe-lernen { --farbe: var(--lernen); --farbe-hell: var(--lernen-hell); }
 .kachel.farbe-bibliothek { --farbe: var(--bibliothek); --farbe-hell: var(--bibliothek-hell); }
 .kachel-titel {
+  margin-top: 0.6rem;
   font-size: 1.0625rem;
   font-weight: var(--gewicht-betont);
   line-height: 1.2;
@@ -263,8 +551,7 @@ a.kachel:active {
 }
 
 /* ---------- QR-Knöpfe auf Kacheln und Werkzeugen: leises Symbol, deutlich erst unter der Maus ---------- */
-.kacheln .qr-knopf,
-.werkzeug-karten .qr-knopf {
+.kacheln .qr-knopf {
   position: absolute;
   top: 0.6rem;
   right: 0.6rem;
@@ -276,8 +563,7 @@ a.kachel:active {
   background: transparent;
   font-size: 0; /* die Beschriftung „QR“ bleibt für Vorleseprogramme, sichtbar ist das Symbol */
 }
-.kacheln .qr-knopf::before,
-.werkzeug-karten .qr-knopf::before {
+.kacheln .qr-knopf::before {
   content: '';
   width: 1.15rem;
   height: 1.15rem;
@@ -285,274 +571,186 @@ a.kachel:active {
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2M14 18v2M18 18h2v2'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2M14 18v2M18 18h2v2'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-.kacheln .qr-knopf:hover,
-.werkzeug-karten .qr-knopf:hover {
+.kacheln .qr-knopf:hover {
   background: var(--schwebe);
 }
 @media (hover: hover) {
-  .kacheln .qr-knopf,
-  .werkzeug-karten .qr-knopf {
+  .kacheln .qr-knopf {
     opacity: 0.55;
     transition: opacity var(--schnell), background-color var(--schnell);
   }
   .kacheln li:hover .qr-knopf,
-  .werkzeug-karten li:hover .qr-knopf,
   .qr-knopf:focus-visible {
     opacity: 1;
   }
 }
 
-/* ---------- Karten (Meine Klassen) ---------- */
-.karte {
-  padding: 1.1rem 1.25rem 0.75rem;
-  border: 1px solid var(--haarlinie);
-  border-radius: var(--radius-gross);
-  background: var(--flaeche);
-  box-shadow: var(--schatten-klein);
+/* ---------- Docks: Werkzeuge und Links nebeneinander, schwebend wie das Dock am iPad ---------- */
+.werkzeuge {
+  margin-top: 0.25rem;
 }
-.karte h2 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.titel-symbol {
-  display: flex;
-}
-.titel-symbol .symbol {
-  width: 2rem;
-  height: 2rem;
-}
-
-/* ---------- Meine Klassen: kleine Karten in einer Reihe, die ganze Karte führt zur Tafel ---------- */
-.karten-kopf {
+.docks {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.25rem 1rem;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.75rem 1.25rem;
 }
-.karten-kopf a {
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-decoration: none;
-}
-.klassen-liste {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  /* immer alle Klassen in einer Reihe: jede Karte bekommt gleich viel Platz, egal wie viele es sind */
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: clamp(0.2rem, 1vw, 0.5rem);
-}
-.klassen-liste li {
-  min-width: 0;
-  container-type: inline-size; /* Schrift und Abstände richten sich nach der Kartenbreite */
-}
-.klassen-karte {
+.dock-gruppe {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: clamp(0.25rem, 8cqi, 0.55rem) clamp(0.25rem, 9cqi, 0.65rem);
-  border-radius: 0.875rem;
-  background: var(--flaeche-2);
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.dock-titel {
+  color: var(--text-2);
+  font-size: 0.75rem;
+  font-weight: var(--gewicht-betont);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.dock {
+  list-style: none;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: 1.875rem;
+  background: var(--glas);
+  box-shadow: var(--schatten-hoch);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+.dock-eintrag {
+  position: relative;
+  display: flex;
+}
+.dock-punkt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  width: 6.25rem;
+  padding: 0.4rem 0 0.3rem;
+  border: 0;
+  border-radius: 1.25rem;
+  background: transparent;
   color: var(--text);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: var(--gewicht-betont);
   text-decoration: none;
+  cursor: pointer;
   transition: background-color var(--schnell), transform var(--schnell);
 }
-.klassen-karte:hover,
-.klassen-karte:focus-visible {
-  background: color-mix(in srgb, var(--flaeche-2), var(--text) 7%);
+.dock-punkt:hover,
+.dock-punkt[aria-expanded='true'] {
+  background: var(--schwebe);
 }
-.klassen-karte:active {
-  transform: scale(0.97);
+.dock-punkt:active {
+  transform: scale(0.96);
 }
-.klassen-name {
-  font-size: clamp(0.75rem, 20cqi, 1.1rem);
-  font-weight: var(--gewicht-titel);
-  line-height: 1.2;
-  overflow-wrap: anywhere;
+.dock-symbol,
+.dock-symbol.hat-bild.bild-rund {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  box-sizing: border-box;
+  padding: 0.55rem;
+  border-radius: 0.95rem;
+  background: var(--flaeche-2);
+  color: var(--tafel);
+  transition: box-shadow var(--schnell);
 }
-.klassen-fach {
-  color: var(--text-2);
-  font-size: clamp(0.6rem, 15cqi, 0.85rem);
+.dock-symbol .symbol {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.dock-name {
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 0.2rem;
   overflow: hidden;
+  line-height: 1.2;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.klassen-ziel {
-  display: flex;
+/* QR-Modus: Knopf am Ende jedes Docks; im Modus zeigt ein Tipp den QR-Code */
+.dock-qr-platz {
   align-items: center;
-  gap: 0.3rem;
-  margin-top: auto;
-  padding-top: 0.35rem;
-  color: var(--tafel);
-  font-size: 0.8rem;
-  font-weight: var(--gewicht-betont);
-  white-space: nowrap;
+  margin-left: 0.15rem;
+  padding-left: 0.4rem;
+  border-left: 1px solid var(--haarlinie);
 }
-.knopf-pfeil {
-  display: flex;
-  font-size: 0.6rem;
-}
-.klassen-neu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  height: 100%;
-  min-height: 5rem;
-  padding: 0.5rem;
-  border: 1.5px dashed var(--linie-stark);
-  border-radius: 0.875rem;
-  color: var(--text-2);
-  font-size: 0.8rem;
-  font-weight: 500;
-  line-height: 1.2;
-  text-align: center;
-  text-decoration: none;
-}
-.klassen-neu:hover,
-.klassen-neu:focus-visible {
-  background: var(--schwebe);
-}
-.klassen-plus {
-  display: flex;
-  font-size: 0.85rem;
-}
-/* Schmale Karten (viele Klassen, Handy): nur noch Pfeil bzw. Plus statt Text */
-@container (max-width: 5.25rem) {
-  .klassen-ziel-text,
-  .klassen-neu-text {
-    display: none;
-  }
-  .klassen-neu {
-    min-height: 3.5rem;
-    padding: 0.25rem;
-  }
-}
-.hinweis.klein {
-  margin: 0.5rem 0 0.15rem;
-  font-size: 0.8rem;
-}
-
-/* ---------- Werkzeuge: nebeneinander, Beschreibung höchstens zwei Zeilen ---------- */
-.werkzeug-liste,
-.werkzeug-karten {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.werkzeug-gruppe h3 {
-  margin: 0.9rem 0 0.5rem;
-  font-size: 0.95rem;
-  color: var(--text-2);
-}
-.werkzeug-liste > li:first-child h3 {
-  margin-top: 0;
-}
-.werkzeug-karten {
+.dock-qr {
   display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--flaeche-2);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background-color var(--schnell), color var(--schnell);
 }
-.werkzeug-karten li {
-  position: relative;
-  min-width: 0;
-}
-.werkzeug {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  height: 100%;
-  padding: 0.85rem 3rem 0.85rem 0.9rem;
-  border: 1px solid var(--haarlinie);
-  border-radius: var(--radius-gross);
-  background: var(--flaeche);
-  box-shadow: var(--schatten-klein);
-  color: var(--text);
-  text-decoration: none;
-  transition: box-shadow var(--sanft), transform var(--sanft);
-}
-@media (hover: hover) {
-  .werkzeug:hover {
-    box-shadow: var(--schatten);
-    transform: translateY(-2px);
-  }
-}
-.werkzeug:active {
-  transform: scale(0.98);
-}
-.werkzeug-symbol {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  flex-shrink: 0;
-  border-radius: 0.625rem;
-  background: var(--akzent-hell);
-  color: var(--tafel);
-}
-.werkzeug-symbol .symbol {
+.dock-qr .symbol {
   width: 1.2rem;
   height: 1.2rem;
 }
-.werkzeug-text {
+.dock-qr[aria-pressed='true'] {
+  background: var(--gewaehlt);
+  color: var(--gewaehlt-text);
+}
+.qr-modus .dock-symbol {
+  box-shadow: 0 0 0 2px var(--tuerkis);
+}
+/* Auswahl bei mehreren Zielen (Virtuelle Mikroskope): klappt über dem Dock auf */
+.dock-auswahl {
+  position: absolute;
+  z-index: 25;
+  bottom: calc(100% + 0.6rem);
+  left: 50%;
   display: flex;
   flex-direction: column;
-  min-width: 0;
+  gap: 0.15rem;
+  width: max-content;
+  max-width: min(20rem, 90vw);
+  padding: 0.4rem;
+  border: 1px solid var(--haarlinie);
+  border-radius: var(--rund);
+  background: var(--flaeche);
+  box-shadow: var(--schatten-hoch);
+  transform: translateX(-50%);
 }
-.werkzeug-titel {
-  font-size: 1rem;
-  font-weight: var(--gewicht-betont);
-  line-height: 1.25;
+.dock-auswahl[hidden] {
+  display: none;
 }
-.werkzeug-info {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  color: var(--text-2);
-  font-size: 0.85rem;
-  line-height: 1.3;
-}
-
-/* Kachel mit mehreren Zielen (z. B. Virtuelle Mikroskope): kein Link als Ganzes, je Ziel ein Pillenknopf */
-.werkzeug.mehrere:hover {
-  transform: none;
-}
-.werkzeug-ziele {
+.dock-ziel {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.45rem;
-}
-.werkzeug-ziel {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.75rem;
-  padding: 0.15rem 0.7rem;
-  border-radius: 999px;
-  background: var(--akzent-hell);
-  color: var(--tafel);
-  font-size: 0.8125rem;
-  font-weight: var(--gewicht-betont);
-  line-height: 1.2;
+  flex-direction: column;
+  min-height: var(--tippflaeche);
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius);
+  color: var(--text);
   text-decoration: none;
 }
-@media (hover: hover) {
-  .werkzeug-ziel:hover {
-    background: var(--tafel);
-    color: var(--flaeche);
-  }
+.dock-ziel:hover,
+.dock-ziel:focus-visible {
+  background: var(--schwebe);
 }
-@media (pointer: coarse) {
-  .werkzeug-ziel {
-    min-height: 2.25rem;
-  }
+.dock-ziel small {
+  color: var(--text-2);
+  font-size: 0.8rem;
 }
 
 /* Umschaltung im QR-Fenster, wenn eine Kachel mehrere Ziele hat */
@@ -580,55 +778,6 @@ a.kachel:active {
   border-color: var(--tafel);
   background: var(--tafel);
   color: var(--flaeche);
-}
-
-/* iPad & Co.: Werkzeuge einer Gruppe stehen immer in einer Zeile; die Knöpfe teilen sich die Breite.
-   Wird es je Knopf zu eng (Container unter ~60rem), schrumpfen sie zu Symbol + Titel wie am Handy. */
-@media (min-width: 40.0625rem) {
-  .werkzeug-gruppe {
-    container-type: inline-size;
-  }
-  .werkzeug-karten {
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
-    grid-template-columns: none;
-  }
-}
-@container (max-width: 60rem) {
-  .werkzeug-karten {
-    gap: 0.5rem;
-  }
-  .werkzeug {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.8rem 0.4rem 0.7rem;
-    text-align: center;
-  }
-  .werkzeug-text {
-    align-items: center;
-  }
-  .werkzeug-info {
-    display: none;
-  }
-  .werkzeug-titel {
-    font-size: 0.875rem;
-    hyphens: auto;
-    overflow-wrap: break-word;
-  }
-  .werkzeug-ziele {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .werkzeug-ziel {
-    justify-content: center;
-    padding-inline: 0.4rem;
-    font-size: 0.75rem;
-  }
-  .werkzeug-karten .qr-knopf {
-    top: 0.25rem;
-    right: 0.25rem;
-  }
 }
 
 /* ---------- Materialien ---------- */
@@ -733,112 +882,141 @@ a.kachel:active {
 }
 
 /* ---------- Fuß ---------- */
-.fuss {
+.ohne-leiste .hauptbereich .fuss {
+  width: 100%;
+  max-width: none;
+  margin-top: 0.75rem;
+  padding: 0.9rem 0 0;
   border-top-color: var(--haarlinie);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+}
+.fuss p {
+  margin: 0.2rem 0;
 }
 
-/* ---------- Schmale Bildschirme ---------- */
+/* ---------- iPad hochkant und schmaler: Kopfleiste bricht um ---------- */
+@media (max-width: 60rem) {
+  .ohne-leiste .seitenkopf {
+    position: static;
+    border-radius: var(--rund);
+    padding: 0.5rem 0.75rem;
+  }
+  .ohne-leiste .suchfeld {
+    max-width: none;
+  }
+  .ohne-leiste .kopf-rechts {
+    margin-left: auto;
+  }
+  .oben,
+  body[data-rolle='lehrkraft'] .oben {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+/* ---------- Schmale Bildschirme (Handy) ---------- */
 @media (max-width: 40rem) {
-  .hauptbereich > .begruessung {
-    padding: 0.9rem 1rem;
+  .oben,
+  body[data-rolle='lehrkraft'] .oben {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .begruessung {
+    min-height: 0;
+    padding: 1.1rem 1.1rem 1.2rem;
   }
   .begruessung-bild {
-    width: 2.75rem;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 0.8rem;
   }
-  .pin-form label {
-    flex-basis: 100%;
+  .begruessung-bild img {
+    width: 2.4rem;
+    height: 2.4rem;
   }
   .pin-form input {
-    flex: 1;
+    flex: 1 1 100%;
     width: auto;
     min-width: 0;
   }
-  .pin-knoepfe {
-    flex-basis: 100%;
-  }
-  .pin-knoepfe .knopf {
+  .pin-reihe .knopf {
     flex: 1 1 auto;
     white-space: nowrap;
   }
-  /* Gast am Handy (meist Schüler): nur die PIN zählt. Tafel-Knopf, Tafel-Bild und Kachel „Tafel als Gast“
-     weglassen – die Tafel braucht man am Beamer oder iPad, nicht auf dem Handy. */
-  body[data-rolle='gast'] #begruessung-knopf,
-  body[data-rolle='gast'] .begruessung-bild,
+  /* Gast am Handy (meist Schüler): nur die PIN zählt; die Tafel braucht man am Beamer oder iPad */
+  body[data-rolle='gast'] .oben-gast,
   body[data-rolle='gast'] .kacheln .nicht-handy {
     display: none;
-  }
-  .eintrag {
-    flex-wrap: wrap;
   }
   /* QR-Codes braucht man am Beamer, nicht auf dem Handy */
   .qr-knopf,
   .kacheln .qr-knopf,
-  .werkzeug-karten .qr-knopf {
+  .dock-qr-platz {
     display: none;
   }
-  /* Handy: Kacheln und Werkzeuge zu dritt nebeneinander wie App-Symbole, nur Symbol und Titel */
   .kacheln {
     grid-auto-flow: row;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
   }
-  .werkzeug-karten {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
+  .kachel {
+    min-height: 0;
+    padding: 0.85rem 0.9rem;
   }
-  .kachel-text,
-  .werkzeug-info {
-    display: none;
+  .kachel-titel {
+    margin-top: 0.5rem;
+    font-size: 1rem;
   }
-  /* Bleibt eine einzelne (sichtbare) Kachel in der letzten Reihe übrig (Klasse „allein“ setzt app.js), geht sie über die ganze Breite (mit Text) statt allein links zu stehen */
+  .kachel-text {
+    font-size: 0.8125rem;
+  }
   .kacheln li.allein {
     grid-column: 1 / -1;
   }
-  .kacheln li.allein .kachel {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 0 0.9rem;
-    padding: 0.7rem 1rem;
-    text-align: left;
+  .klassen-liste {
+    grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
   }
-  .kacheln li.allein .kachel-symbol {
-    grid-row: 1 / span 2;
-    margin: 0;
+  /* Logo ohne Schriftzug, damit Knöpfe und Logo in eine Zeile passen */
+  .ohne-leiste .marke-text {
+    display: none;
   }
-  .kacheln li.allein .kachel-titel {
-    font-size: 1rem;
+  /* Docks über die ganze Breite, alle Symbole in einer Reihe, Beschriftung darf umbrechen */
+  .docks {
+    gap: 0.75rem;
   }
-  .kacheln li.allein .kachel-text {
-    display: block;
-    font-size: 0.8125rem;
+  .dock-gruppe {
+    width: 100%;
   }
-  .kachel,
-  .werkzeug {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.8rem 0.4rem 0.7rem;
-    text-align: center;
+  .dock {
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.4rem;
+    border-radius: 1.5rem;
   }
-  .kachel-symbol {
-    margin-bottom: 0;
+  .dock-eintrag {
+    flex: 1 1 0;
+    min-width: 0;
   }
-  .werkzeug-text {
-    align-items: center;
+  .dock-punkt {
+    width: 100%;
+    font-size: 0.6875rem;
   }
-  .kachel-titel,
-  .werkzeug-titel {
-    font-size: 0.8125rem;
-    font-weight: 500;
+  .dock-name {
+    white-space: normal;
     hyphens: auto;
     overflow-wrap: break-word;
+  }
+  .dock-symbol,
+  .dock-symbol.hat-bild.bild-rund {
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.45rem;
+    border-radius: 0.8rem;
   }
 }
 
 @media print {
-  .begruessung {
+  .begruessung,
+  .docks {
     display: none;
   }
 }

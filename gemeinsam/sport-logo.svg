@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sportunterricht">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <circle cx="256" cy="256" r="168" fill="#ff8a14" stroke="#ffffff" stroke-width="10"/>
+    <g fill="none" stroke="#0f5c47" stroke-width="20" stroke-linecap="round"><path d="M256 88v336M88 256h336"/><path d="M150 125c50 40 50 222 0 262"/><path d="M362 125c-50 40-50 222 0 262"/></g>
+  </g>
+</svg>

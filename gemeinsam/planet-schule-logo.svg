@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Planet Schule">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <circle cx="256" cy="256" r="128" fill="#0f5c47" stroke="#ffffff" stroke-width="10"/>
+    <path d="M150 214c40 30 90 30 120 6s60-28 92 0" fill="none" stroke="#16745a" stroke-width="22" stroke-linecap="round"/>
+    <path d="M88 330c-26 46 82 52 200 14s204-112 172-150c-14-16-52-16-98-4" fill="none" stroke="#ffffff" stroke-width="48" stroke-linecap="round"/>
+    <path d="M88 330c-26 46 82 52 200 14s204-112 172-150c-14-16-52-16-98-4" fill="none" stroke="#ff8a14" stroke-width="26" stroke-linecap="round"/>
+    <path d="M190 360a128 128 0 0 0 194-110" fill="#0f5c47"/>
+  </g>
+</svg>

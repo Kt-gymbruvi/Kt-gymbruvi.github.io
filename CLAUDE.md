@@ -1,7 +1,7 @@
 # Startseite kt-gymbruvi.github.io – Projektregeln
 
 Öffentliche Startseite „Lehrraum“ einer Lehrkraft (Biologie/Sport, Gymnasium Bruchhausen-Vilsen):
-Übersicht der Unterrichtsplattform mit Seitenleiste, Suche und zwei Fassungen: angemeldete Lehrkräfte sehen
+Übersicht der Unterrichtsplattform (ohne Seitenleiste: grüne Karte, Meine Klassen, Kacheln, Docks für Werkzeuge und Links), Suche und zwei Fassungen: angemeldete Lehrkräfte sehen
 alles (Tafel, Meine Klassen), ohne Anmeldung gibt es Mitmachen per PIN, Quizzo, Klassenfunk,
 Lernangebote (übernommene Claude-Artefakte) und Werkzeuge.
 Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECISIONS.md` – beide nach größeren
@@ -26,7 +26,7 @@ Stand und offene Aufgaben: `docs/PROJECT-STATUS.md`, Entscheidungen: `docs/DECIS
 - Vorbild für das Aussehen ist die Tafel (ruhig wie bei Apple): Systemschrift, weiße Flächen mit Haarlinie, Glasleisten, Pillenknöpfe; Bausteine dafür in `gemeinsam/grundlage.css`. Startseite, Lernübersicht (`lernen/lernen.css`), Werkzeuge und Impressum nutzen sie.
 - Werkzeuge mit Glas-Kopfzeile „‹ Startseite“, Lernangebote mit Leiste „‹ Lernangebote“ aus `lernen/werkzeug/leiste.mjs` (Aussehen dort ändern, dann `node lernen/werkzeug/leiste.mjs` erneuert sie in allen Angeboten).
 - Navigationspunkte ohne `adresse` sind noch nicht gebaute Bereiche („folgt“); nie auf eine Seite verlinken, die es nicht gibt.
-- Handy (Hochformat), iPad und Beamer müssen funktionieren. Startseite kompakt halten: Kacheln, Klassen und Werkzeuge stehen nebeneinander, nicht untereinander.
+- Handy (Hochformat), iPad und Beamer müssen funktionieren. Startseite kompakt halten: auf dem iPad quer (1180 × 820) passt alles ohne Scrollen; Kacheln, Klassen und Docks stehen nebeneinander, nicht untereinander.
 - Claude-Artefakt übernehmen: `node lernen/werkzeug/uebernehmen.mjs <datei.html> <ordner>` (lokale Schriften, Leiste, Prüfung), danach `node lernen/werkzeug/stil.mjs <ordner>` (Stil und Lehrkraft-Prüfung), dann Eintrag in `lernen/angebote.js`. Anleitung: `werkzeuge/ANLEITUNG.md`.
 - Wird ein Werkzeug/Angebot verschoben: alte Adresse als Weiterleitungsseite stehen lassen (QR-Codes, Lesezeichen).
 

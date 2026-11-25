@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Virtuelle Mikroskope">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <rect x="110" y="404" width="292" height="48" rx="20" fill="#0f5c47" stroke="#ffffff" stroke-width="10"/>
+    <path d="M330 404c64-20 92-96 52-160" fill="none" stroke="#0f5c47" stroke-width="34" stroke-linecap="round"/>
+    <rect x="170" y="322" width="150" height="34" rx="12" fill="#ff8a14" stroke="#ffffff" stroke-width="10"/>
+    <g transform="rotate(-28 230 190)"><rect x="196" y="64" width="72" height="210" rx="20" fill="#0f5c47" stroke="#ffffff" stroke-width="10"/><rect x="182" y="52" width="100" height="40" rx="14" fill="#ff8a14" stroke="#ffffff" stroke-width="10"/><rect x="212" y="268" width="40" height="44" rx="10" fill="#0f5c47" stroke="#ffffff" stroke-width="10"/></g>
+  </g>
+</svg>

@@ -20,6 +20,8 @@ window.SEITE = {
   // Begrüßung für angemeldete Lehrkräfte
   willkommen: 'Willkommen in deinem Lehrraum!',
   willkommenText: 'Dein zentraler Ort für einen modernen, interaktiven und individuellen Unterricht.',
+  // kurze Zeile unter „Guten Morgen“ in der grünen Karte (angemeldet)
+  willkommenZeile: 'Bereit für die nächste Stunde?',
   // Begrüßung ohne Anmeldung (Schülerinnen und Schüler)
   gastTitel: 'Mitmachen und lernen',
   gastText: 'Gib die PIN vom Beamer ein – oder stöbere in den Lernangeboten.',
@@ -59,7 +61,8 @@ window.MITMACHEN = {
 /**
  * Große Kacheln (Links auf eigene Seiten).
  *   farbe: 'unterrichten' | 'lernen' | 'tafel' | 'interaktion' | 'bibliothek' | 'quizzo' | 'klassenfunk'
- *   bild: eigenes Logo (Pfad) statt Symbol, nur für Quizzo und Klassenfunk
+ *   bild: eigenes Logo (Pfad) statt Symbol
+ *   oben: true = steht nicht als Kachel, sondern oben (Meine Klassen, Tafel)
  *   textGast: anderer Text ohne Anmeldung (optional)
  *   handy: false = auf schmalen Bildschirmen ohne Anmeldung ausblenden (optional)
  */
@@ -73,6 +76,7 @@ window.LINKS = [
     adresse: PLATTFORM + '/Lehrraum/#/klassen',
     qr: false, // Klassen liegen nur auf dem eigenen Gerät – ein QR-Code dorthin nützt niemandem
     nur: 'lehrkraft',
+    oben: true, // steht als Karte „Meine Klassen“ oben, nicht als Kachel
   },
   {
     symbol: 'pokal',
@@ -118,6 +122,7 @@ window.LINKS = [
     text: 'Digital unterrichten',
     adresse: PLATTFORM + '/Lehrraum/#/tafel',
     nur: 'lehrkraft',
+    oben: true, // Knopf „Tafel öffnen“ in der grünen Karte
   },
   {
     symbol: 'bildschirm',
@@ -128,6 +133,7 @@ window.LINKS = [
     adresse: PLATTFORM + '/Lehrraum/#/tafel?gast=1',
     qr: false,
     nur: 'gast',
+    oben: true, // große Karte rechts neben der PIN
     handy: false, // am Handy ohne Anmeldung ausgeblendet (dort zählt nur die PIN)
   },
 ]
@@ -146,11 +152,13 @@ window.KLASSEN = {
 /**
  * Werkzeuge: kleine Web-Apps im Ordner werkzeuge/<name>/index.html
  * (eigene oder aus Claude-Artefakten übernommen – Anleitung in werkzeuge/ANLEITUNG.md).
- *   bereich: Überschrift, unter der das Werkzeug erscheint (z. B. 'Unterricht', 'Sport', 'Biologie')
+ *   bereich: Dock, in dem das Werkzeug erscheint ('Werkzeuge' oder 'Links'); jeder Bereich ist ein eigenes Dock
+ *   kurz:    kurze Beschriftung im Dock (sonst der Titel)
+ *   bild:    Logo im Dock (gemeinsam/…-logo.svg)
  */
 window.WERKZEUGE = [
   {
-    bereich: 'Unterricht',
+    bereich: 'Werkzeuge',
     symbol: 'timer',
     bild: 'gemeinsam/timer-logo.svg',
     titel: 'Timer',
@@ -158,40 +166,48 @@ window.WERKZEUGE = [
     adresse: 'werkzeuge/timer/',
   },
   {
-    bereich: 'Unterricht',
+    bereich: 'Werkzeuge',
     symbol: 'wuerfel',
     bild: 'gemeinsam/gruppen-logo.svg',
     titel: 'Gruppen & Zufall',
+    kurz: 'Gruppen',
     text: 'Gruppen oder Paare auslosen, eine Person ziehen. Namen bleiben auf diesem Gerät.',
     adresse: 'werkzeuge/gruppen/',
   },
   {
-    bereich: 'Unterricht',
+    bereich: 'Werkzeuge',
     symbol: 'ampel',
     bild: 'gemeinsam/ampel-logo.svg',
+    kurz: 'Ampel',
     titel: 'Lautstärke­ampel', // ­ = Trennstelle, falls der Platz (Handy) nicht reicht
     text: 'Zeigt am Beamer, wie laut es in der Klasse ist. Das Mikrofon wird nur auf diesem Gerät ausgewertet, nichts aufgenommen.',
     adresse: 'werkzeuge/lautstaerke/',
   },
   {
-    bereich: 'Unterricht',
+    bereich: 'Werkzeuge',
     symbol: 'qr',
+    bild: 'gemeinsam/qr-logo.svg',
     titel: 'QR-Code erstellen',
+    kurz: 'QR-Code',
     text: 'Aus einem Link einen QR-Code machen – groß für den Beamer oder als Bild zum Ausdrucken.',
     adresse: 'werkzeuge/qr-code/',
   },
   // Links ins Netz (fremde Seiten, öffnen sich dort); der QR-Knopf an jeder Kachel macht daraus einen Code für die Klasse
   {
-    bereich: 'Links für den Unterricht',
+    bereich: 'Links',
     symbol: 'atom',
+    bild: 'gemeinsam/phet-logo.svg',
     titel: 'PhET-Simulationen',
+    kurz: 'PhET',
     text: 'Interaktive Simulationen für Physik, Chemie und Biologie (Universität Colorado).',
     adresse: 'https://phet.colorado.edu/',
   },
   {
-    bereich: 'Links für den Unterricht',
+    bereich: 'Links',
     symbol: 'mikroskop',
+    bild: 'gemeinsam/mikroskop-logo.svg',
     titel: 'Virtuelle Mikroskope',
+    kurz: 'Mikro­skope',
     text: 'Präparate am Bildschirm mikroskopieren.',
     adresse: 'https://www.digital.anatomie.ruhr-uni-bochum.de/de/virtuelles-mikroskop/', // für die Suche; die Kachel zeigt die Ziele
     // mehrere Ziele: je ein Knopf in der Kachel, der QR-Dialog schaltet zwischen den Codes um
@@ -201,23 +217,28 @@ window.WERKZEUGE = [
     ],
   },
   {
-    bereich: 'Links für den Unterricht',
+    bereich: 'Links',
     symbol: 'zelle',
+    bild: 'gemeinsam/edubiosim-logo.svg',
     titel: 'EduBioSim',
     text: 'Biologische Simulationen und Experimente zum Ausprobieren.',
     adresse: 'https://www.edubiosim.de/',
   },
   {
-    bereich: 'Links für den Unterricht',
+    bereich: 'Links',
     symbol: 'planet',
+    bild: 'gemeinsam/planet-schule-logo.svg',
     titel: 'Planet Schule: Biologie',
+    kurz: 'Planet Schule',
     text: 'Filme und Materialien zur Biologie für den Unterricht.',
     adresse: 'https://www.planet-schule.de/fach/biologie-102.html',
   },
   {
-    bereich: 'Links für den Unterricht',
+    bereich: 'Links',
     symbol: 'ball',
+    bild: 'gemeinsam/sport-logo.svg',
     titel: 'Sportunterricht.eu',
+    kurz: 'Sport­unterricht',
     text: 'Ideen, Spiele und Materialien für den Sportunterricht.',
     adresse: 'https://sportunterricht.eu/',
   },

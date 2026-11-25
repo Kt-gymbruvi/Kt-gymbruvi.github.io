@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="EduBioSim">
+  <defs><clipPath id="c"><rect width="512" height="512" rx="112"/></clipPath></defs>
+  <rect x="2" y="2" width="508" height="508" rx="110" fill="#ffffff" stroke="#d9e2ec" stroke-width="4"/>
+  <g clip-path="url(#c)">
+    <ellipse cx="256" cy="256" rx="186" ry="156" fill="#0f5c47" stroke="#ffffff" stroke-width="10"/>
+    <ellipse cx="256" cy="256" rx="156" ry="126" fill="#e3f1ec"/>
+    <circle cx="286" cy="236" r="58" fill="#ff8a14" stroke="#ffffff" stroke-width="10"/><circle cx="300" cy="222" r="18" fill="#ffc46b"/>
+    <ellipse cx="170" cy="300" rx="34" ry="18" fill="#0f5c47" transform="rotate(-20 170 300)"/><circle cx="186" cy="206" r="14" fill="#0f5c47"/><circle cx="336" cy="326" r="12" fill="#0f5c47"/>
+  </g>
+</svg>

@@ -1,4 +1,4 @@
-/* Startseite „Lehrraum“: baut Seitenleiste, Begrüßung, Kacheln, Meine Klassen, Werkzeuge und Materialliste
+/* Startseite „Lehrraum“: baut grüne Begrüßungskarte, Meine Klassen, Kacheln, die Docks (Werkzeuge, Links) und die Materialliste
    aus js/inhalte.js. Zwei Fassungen: angemeldete Lehrkräfte sehen alles, ohne Anmeldung gibt es die schlanke
    Fassung (Mitmachen mit PIN, Lernangebote, Werkzeuge).
    Zum Server geht nur die Anmeldung (lernen/datenbank.js). Die Suche läuft im Gerät. */
@@ -151,22 +151,14 @@
   $('such-symbol').replaceWith(zeichen('suche'))
   $('klassen-symbol').replaceWith(zeichen('klassen', 'titel-symbol'))
 
-  // Seitenleiste auf schmalen Bildschirmen auf- und zuklappen
-  const geruest = $('geruest')
-  const leisteKnopf = $('leiste-knopf')
-  leisteKnopf.append(zeichen('menue'))
-  leisteKnopf.addEventListener('click', () => {
-    const offen = geruest.classList.toggle('leiste-offen')
-    leisteKnopf.setAttribute('aria-expanded', String(offen))
-    leisteKnopf.setAttribute('aria-label', offen ? 'Menü schließen' : 'Menü öffnen')
-  })
-
   // ---------- Heller und dunkler Modus ----------
   const designKnopf = $('design-knopf')
   function zeichneDesignKnopf() {
     const dunkel = window.LehrraumDesign && window.LehrraumDesign.aktuell() === 'dunkel'
     designKnopf.textContent = ''
-    designKnopf.append(zeichen(dunkel ? 'sonne' : 'mond', null, dunkel ? 'gemeinsam/modus-hell-logo.svg' : 'gemeinsam/modus-dunkel-logo.svg'), el('span', null, dunkel ? 'Heller Modus' : 'Dunkler Modus'))
+    designKnopf.append(zeichen(dunkel ? 'sonne' : 'mond'))
+    designKnopf.title = dunkel ? 'Heller Modus' : 'Dunkler Modus'
+    designKnopf.setAttribute('aria-label', designKnopf.title)
   }
   if (window.LehrraumDesign) {
     designKnopf.addEventListener('click', () => window.LehrraumDesign.umschalten())
@@ -177,40 +169,53 @@
     designKnopf.hidden = true
   }
 
-  // ---------- Seitenleiste ----------
-  function zeichneNavigation() {
-    const liste = $('navigation')
-    liste.textContent = ''
-    NAVIGATION.filter(sichtbar).forEach((n) => {
-      if (!n.adresse && !SEITE.geplantesZeigen) return
-      const li = el('li')
-      // Bereiche ohne Adresse gibt es noch nicht: kein Link, sondern Text mit dem Hinweis „folgt“
-      const punkt = n.adresse ? verweis('leisten-punkt', n.adresse) : el('span', 'leisten-punkt geplant')
-      if (n.hier) punkt.setAttribute('aria-current', 'page')
-      punkt.append(zeichen(n.symbol, null, n.bild), el('span', null, n.titel))
-      if (!n.adresse) punkt.append(el('small', null, 'folgt'))
-      li.append(punkt)
-      liste.append(li)
-    })
-  }
-
-  // ---------- Begrüßung ----------
-  /** Zeichnung der Tafel im Logo-Stil (eigene Zeichnung, kein Foto) */
+  // ---------- Begrüßung (grüne Karte) ----------
+  /** Zeichnung der Tafel im Logo-Stil */
   const bildTafel = el('img')
-  bildTafel.src = 'gemeinsam/willkommen-bild.svg'
+  bildTafel.src = 'gemeinsam/tafel-logo.svg'
   bildTafel.alt = ''
   $('begruessung-bild').append(bildTafel)
 
+  function tageszeitGruss() {
+    const h = new Date().getHours()
+    return h < 11 ? 'Guten Morgen' : h < 18 ? 'Guten Tag' : 'Guten Abend'
+  }
+
   function zeichneBegruessung() {
-    $('begruessung-titel').textContent = lehrkraft ? SEITE.willkommen || 'Willkommen!' : SEITE.gastTitel || 'Mitmachen und lernen'
-    const tafel = NAVIGATION.find((n) => n.symbol === 'bildschirm' && n.adresse && sichtbar(n))
-    const knopf = $('begruessung-knopf')
-    knopf.textContent = ''
-    knopf.hidden = !tafel
+    $('begruessung-titel').textContent = lehrkraft ? tageszeitGruss() : SEITE.gastTitel || 'Mitmachen und lernen'
+    $('begruessung-zeile').textContent = lehrkraft ? SEITE.willkommenZeile || '' : SEITE.gastText || ''
+    $('begruessung-datum').textContent = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })
+    // Knöpfe: Tafel (aus den Kacheln mit oben: true) und Notenbuch (aus der Navigation)
+    const knoepfe = $('begruessung-knoepfe')
+    knoepfe.textContent = ''
+    if (!lehrkraft) return
+    const tafel = LINKS.find((l) => l.oben && l.symbol === 'bildschirm' && l.adresse && sichtbar(l))
     if (tafel) {
-      knopf.href = tafel.adresse
-      knopf.append(zeichen('bildschirm'), el('span', null, 'Zur Tafel'))
+      const k = verweis('knopf knopf-hell', tafel.adresse)
+      k.textContent = 'Tafel öffnen'
+      knoepfe.append(k)
     }
+    const notenbuch = NAVIGATION.find((n) => n.symbol === 'notenbuch' && n.adresse && sichtbar(n))
+    if (notenbuch) {
+      const k = verweis('knopf knopf-glas', notenbuch.adresse)
+      k.append(zeichen(notenbuch.symbol, 'knopf-logo', notenbuch.bild), el('span', null, notenbuch.titel))
+      knoepfe.append(k)
+    }
+  }
+
+  // Gast: große Karte „Tafel als Gast“ rechts neben der PIN
+  function zeichneObenGast() {
+    const ziel = $('oben-gast')
+    ziel.textContent = ''
+    const l = LINKS.find((x) => x.oben && x.nur === 'gast' && x.adresse)
+    if (!l) return (ziel.hidden = true)
+    ziel.hidden = false
+    const a = verweis('gast-karte', l.adresse)
+    a.append(zeichen(l.symbol, 'gast-karte-symbol', l.bild))
+    const text = el('span', 'gast-karte-text')
+    text.append(el('span', 'gast-karte-titel', l.titel), el('span', 'gast-karte-info', l.textGast || l.text || ''))
+    a.append(text)
+    ziel.append(a)
   }
 
   // ---------- Mitmachen mit PIN (schlanke Fassung) ----------
@@ -250,6 +255,7 @@
     const liste = $('links')
     liste.textContent = ''
     LINKS.filter(sichtbar).forEach((l) => {
+      if (l.oben) return // steht oben (Meine Klassen, Tafel)
       if (!l.adresse && !SEITE.geplantesZeigen) return
       const li = el('li', l.handy === false ? 'nicht-handy' : null)
       const a = l.adresse ? verweis('kachel', l.adresse) : el('div', 'kachel geplant')
@@ -267,12 +273,12 @@
     markiereAllein()
   }
 
-  // Handy: drei Kacheln je Reihe. Bleibt in der letzten Reihe eine einzelne sichtbare Kachel übrig, bekommt sie die Klasse „allein“
+  // Handy: zwei Kacheln je Reihe. Bleibt in der letzten Reihe eine einzelne sichtbare Kachel übrig, bekommt sie die Klasse „allein“
   // (startseite.css zeigt sie dann über die ganze Breite). Ausgeblendete Kacheln zählen nicht mit.
   function markiereAllein() {
     const sichtbareKacheln = [...$('links').children].filter((li) => li.offsetParent !== null)
     sichtbareKacheln.forEach((li) => li.classList.remove('allein'))
-    if (sichtbareKacheln.length % 3 === 1) sichtbareKacheln[sichtbareKacheln.length - 1].classList.add('allein')
+    if (sichtbareKacheln.length % 2 === 1) sichtbareKacheln[sichtbareKacheln.length - 1].classList.add('allein')
   }
   window.addEventListener('resize', markiereAllein)
 
@@ -296,7 +302,7 @@
       a.setAttribute('aria-label', 'Zur Tafel von ' + name)
       a.append(el('span', 'klassen-name', k.bezeichnung), el('span', 'klassen-fach', k.fach || 'ohne Fach'))
       const ziel = el('span', 'klassen-ziel')
-      ziel.append(el('span', 'klassen-ziel-text', 'Zur Tafel'), zeichen('pfeil', 'knopf-pfeil'))
+      ziel.append(el('span', 'klassen-ziel-text', 'Tafel starten'), zeichen('pfeil', 'knopf-pfeil'))
       a.append(ziel)
       li.append(a)
       liste.append(li)
@@ -305,44 +311,91 @@
     const a = el('a', 'klassen-neu')
     a.href = KLASSEN.neu
     a.title = 'Neue Klasse anlegen'
-    a.append(zeichen('plus', 'klassen-plus'), el('span', 'klassen-neu-text', 'Neue Klasse anlegen'))
+    a.append(zeichen('plus', 'klassen-plus'), el('span', 'klassen-neu-text', 'Neue Klasse'))
     neu.append(a)
     liste.append(neu)
   }
 
-  // ---------- Werkzeuge (nach Bereich gruppiert) ----------
-  const werkzeugListe = $('werkzeuge')
+  // ---------- Werkzeuge und Links: je Bereich ein Dock (Logo + kurze Beschriftung) ----------
+  // QR-Codes: Der QR-Knopf am Ende eines Docks schaltet den QR-Modus ein; dann zeigt ein Tipp auf ein Symbol
+  // den QR-Code statt die Seite zu öffnen. Mehrere Ziele (w.ziele): ein Tipp öffnet eine kleine Auswahl.
+  const dockBereich = $('werkzeuge')
   if (!WERKZEUGE.length) $('werkzeuge-bereich').hidden = true
-  const bereiche = [...new Set(WERKZEUGE.map((w) => w.bereich || 'Allgemein'))]
-  bereiche.forEach((b) => {
-    const gruppe = el('li', 'werkzeug-gruppe')
-    if (bereiche.length > 1) gruppe.append(el('h3', null, b))
-    const ul = el('ul', 'werkzeug-karten')
-    WERKZEUGE.filter((w) => (w.bereich || 'Allgemein') === b).forEach((w) => {
-      const li = el('li')
-      // Mehrere Ziele (w.ziele): Kachel ist kein Link, sondern trägt je Ziel einen kleinen Knopf; der QR-Knopf schaltet zwischen den Codes um
+  let qrModus = false
+  const offeneAuswahl = () => dockBereich.querySelector('.dock-auswahl:not([hidden])')
+  function schliesseAuswahl() {
+    const offen = offeneAuswahl()
+    if (!offen) return
+    offen.hidden = true
+    offen.previousElementSibling.setAttribute('aria-expanded', 'false')
+  }
+  function setzeQrModus(an) {
+    qrModus = an
+    dockBereich.classList.toggle('qr-modus', an)
+    dockBereich.querySelectorAll('.dock-qr').forEach((k) => {
+      k.setAttribute('aria-pressed', String(an))
+      k.title = an ? 'QR-Modus beenden' : 'QR-Codes zeigen: danach ein Symbol antippen'
+    })
+    schliesseAuswahl()
+  }
+  const dockBereiche = [...new Set(WERKZEUGE.map((w) => w.bereich || 'Werkzeuge'))]
+  dockBereiche.forEach((b) => {
+    const nav = el('nav', 'dock-gruppe')
+    nav.setAttribute('aria-label', b)
+    nav.append(el('span', 'dock-titel', b))
+    const ul = el('ul', 'dock')
+    WERKZEUGE.filter((w) => (w.bereich || 'Werkzeuge') === b).forEach((w) => {
+      const li = el('li', 'dock-eintrag')
       const mehrere = Array.isArray(w.ziele) && w.ziele.length > 1
-      const a = mehrere ? el('div', 'werkzeug mehrere') : verweis('werkzeug', w.adresse)
-      a.append(zeichen(w.symbol || 'werkzeug', 'werkzeug-symbol', w.bild))
-      const textteil = el('span', 'werkzeug-text')
-      textteil.append(el('span', 'werkzeug-titel', w.titel))
-      if (w.text) textteil.append(el('span', 'werkzeug-info', w.text))
+      const punkt = mehrere ? el('button', 'dock-punkt') : verweis('dock-punkt', w.adresse)
+      punkt.title = w.titel.replace(/­/g, '') + (w.text ? ' – ' + w.text : '')
+      punkt.append(zeichen(w.symbol || 'werkzeug', 'dock-symbol', w.bild), el('span', 'dock-name', w.kurz || w.titel))
+      li.append(punkt)
       if (mehrere) {
-        const ziele = el('span', 'werkzeug-ziele')
+        punkt.type = 'button'
+        punkt.setAttribute('aria-expanded', 'false')
+        const auswahl = el('div', 'dock-auswahl')
+        auswahl.hidden = true
         w.ziele.forEach((z) => {
-          const p = verweis('werkzeug-ziel', z.adresse)
-          p.textContent = z.titel
-          p.title = z.text || z.titel + ' öffnen'
-          ziele.append(p)
+          const p = verweis('dock-ziel', z.adresse)
+          p.append(el('b', null, z.titel), el('small', null, z.text || ''))
+          auswahl.append(p)
         })
-        textteil.append(ziele)
+        li.append(auswahl)
+        punkt.addEventListener('click', () => {
+          if (qrModus) return zeigeQr(w.titel, null, w.ziele)
+          const war = !auswahl.hidden
+          schliesseAuswahl()
+          auswahl.hidden = war
+          punkt.setAttribute('aria-expanded', String(!war))
+        })
+      } else {
+        punkt.addEventListener('click', (e) => {
+          if (!qrModus) return
+          e.preventDefault()
+          zeigeQr(w.titel.replace(/­/g, ''), volleAdresse(w.adresse))
+        })
       }
-      a.append(textteil)
-      li.append(a, mehrere ? qrKnopf(w.titel, null, w.ziele) : qrKnopf(w.titel, volleAdresse(w.adresse)))
       ul.append(li)
     })
-    gruppe.append(ul)
-    werkzeugListe.append(gruppe)
+    // QR-Modus an/aus
+    const qrLi = el('li', 'dock-eintrag dock-qr-platz')
+    const qr = el('button', 'dock-qr')
+    qr.type = 'button'
+    qr.setAttribute('aria-label', 'QR-Modus')
+    qr.append(zeichen('qr'))
+    qr.addEventListener('click', () => setzeQrModus(!qrModus))
+    qrLi.append(qr)
+    ul.append(qrLi)
+    nav.append(ul)
+    dockBereich.append(nav)
+  })
+  setzeQrModus(false)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      schliesseAuswahl()
+      if (qrModus) setzeQrModus(false)
+    }
   })
 
   // ---------- Materialien ----------
@@ -458,6 +511,7 @@
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.suchfeld')) trefferListe.hidden = true
     if (!e.target.closest('.konto')) schliesseKonto()
+    if (!e.target.closest('.dock-eintrag')) schliesseAuswahl()
   })
 
   // ---------- Anmeldung der Lehrkraft ----------
@@ -493,8 +547,8 @@
       $('konto-name').textContent = email ? 'Angemeldet als ' + email : 'Angemeldet'
     }
     schliesseKonto()
-    zeichneNavigation()
     zeichneBegruessung()
+    zeichneObenGast()
     zeichneKacheln()
     void zeichneKlassen()
     suche()
