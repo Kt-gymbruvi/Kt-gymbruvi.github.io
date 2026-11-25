@@ -180,6 +180,42 @@ window.WERKZEUGE = [
     text: 'Aus einem Link einen QR-Code machen – groß für den Beamer oder als Bild zum Ausdrucken.',
     adresse: 'werkzeuge/qr-code/',
   },
+  // Links ins Netz (fremde Seiten, öffnen sich dort); der QR-Knopf an jeder Kachel macht daraus einen Code für die Klasse
+  {
+    bereich: 'Links für den Unterricht',
+    symbol: 'atom',
+    titel: 'PhET-Simulationen',
+    text: 'Interaktive Simulationen für Physik, Chemie und Biologie (Universität Colorado).',
+    adresse: 'https://phet.colorado.edu/',
+  },
+  {
+    bereich: 'Links für den Unterricht',
+    symbol: 'mikroskop',
+    titel: 'Virtuelles Mikroskop',
+    text: 'Gewebeschnitte mikroskopieren am Bildschirm (Ruhr-Universität Bochum).',
+    adresse: 'https://www.digital.anatomie.ruhr-uni-bochum.de/de/virtuelles-mikroskop/',
+  },
+  {
+    bereich: 'Links für den Unterricht',
+    symbol: 'zelle',
+    titel: 'EduBioSim',
+    text: 'Biologische Simulationen und Experimente zum Ausprobieren.',
+    adresse: 'https://www.edubiosim.de/',
+  },
+  {
+    bereich: 'Links für den Unterricht',
+    symbol: 'planet',
+    titel: 'Planet Schule: Biologie',
+    text: 'Filme und Materialien zur Biologie für den Unterricht.',
+    adresse: 'https://www.planet-schule.de/fach/biologie-102.html',
+  },
+  {
+    bereich: 'Links für den Unterricht',
+    symbol: 'ball',
+    titel: 'Sportunterricht.eu',
+    text: 'Ideen, Spiele und Materialien für den Sportunterricht.',
+    adresse: 'https://sportunterricht.eu/',
+  },
 ]
 
 /**

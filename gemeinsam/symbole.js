@@ -22,6 +22,12 @@
     ampel: '<rect x="8" y="2" width="8" height="20" rx="4"/><circle cx="12" cy="7" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="17" r="1.5"/>',
     raetsel: '<path d="M10 4a2 2 0 1 1 4 0v1h4v4h-1a2 2 0 1 0 0 4h1v4h-4v-1a2 2 0 1 0-4 0v1H6v-4h1a2 2 0 1 0 0-4H6V5h4z"/>',
     werkzeug: '<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L3 18l3 3 6.2-6.2a4 4 0 0 0 5.3-5.3l-2.7 2.7-2.5-.5-.5-2.5z"/>',
+    // Links ins Netz (Simulationen, Mikroskop, Film, Sport)
+    atom: '<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>',
+    mikroskop: '<rect x="9" y="2.5" width="4" height="10" rx="1" transform="rotate(20 11 7.5)"/><path d="M6 21h12M12 21a6.5 6.5 0 0 0 4-11.5M7.5 16.5H12"/>',
+    zelle: '<circle cx="12" cy="12" r="9"/><circle cx="10.5" cy="11" r="3"/><path d="M16.5 15.5h.01M15.5 7.5h.01M8 17h.01"/>',
+    planet: '<circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="10.5" ry="3.5" transform="rotate(-20 12 12)"/>',
+    ball: '<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6c3 3.2 3 9.6 0 12.8M18.4 5.6c-3 3.2-3 9.6 0 12.8"/>',
     // Fächer
     blatt: '<path d="M5 19C5 10 11 5 20 4c0 9-5 15-14 15z"/><path d="M5 19l8-8"/>',
     laufen: '<circle cx="15" cy="4" r="2"/><path d="M13.5 7.5 11 13M8 9.5l3-2 4 1 2.5 2.5M11 13l3 3-1 5M11 13l-2.5 3.5H5"/>',
