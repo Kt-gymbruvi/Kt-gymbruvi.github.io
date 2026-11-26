@@ -137,6 +137,9 @@
     return k
   }
 
+  // Impressum & Datenschutz als Symbol im Kopf
+  $('rechtliches').append(zeichen('schild'))
+
   // QR-Knopf im Kopf: Startseite schnell teilen
   const seiteQr = $('seite-qr')
   seiteQr.append(zeichen('qr'))
