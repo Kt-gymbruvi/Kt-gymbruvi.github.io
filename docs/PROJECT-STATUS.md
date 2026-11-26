@@ -176,3 +176,8 @@ docs/       PROJECT-STATUS.md, DECISIONS.md, PROJECT_AUDIT.md, FEATURE_INVENTORY
 
 ## Logos Quizzo und Klassenfunk
 Kacheln und Seitenleiste zeigen die Logos (`gemeinsam/quizzo-symbol.png`, `gemeinsam/klassenfunk-symbol.png`; Feld `bild` in `js/inhalte.js`). Noch nicht veröffentlicht.
+
+## Lernangebote: persönliche Daten im Konto (Stand 26.11.2026, Zweig `claude/hopeful-pascal-k99kqq`)
+- Turnierplaner speichert angemeldet zusätzlich in Supabase (`lernen/speicher.js`, Tabelle `lernen_daten`); Gäste und fehlende Tabelle: nur lokal.
+- **Offen (Supabase):** `docs/sql/lernen_daten.sql` ausführen (Todoist-Aufgabe angelegt), danach mit echtem Konto testen. Bisher nur gegen Attrappe geprüft.
+- Taktikboard folgt (Hooks `dbPutPlay`, `dbDelPlay`, `dbSaveAuto` an `LernSpeicher` anbinden).

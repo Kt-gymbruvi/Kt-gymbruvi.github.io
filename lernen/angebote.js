@@ -79,7 +79,7 @@ window.ANGEBOTE = [
     titel: 'Taktikboard',
     fach: 'sport',
     stufen: [],
-    text: 'Spielzüge für Handball, Fußball, Basketball, Volleyball, Badminton und Völkerball zeichnen und als Animation abspielen. Gespeichert wird nur auf diesem Gerät.',
+    text: 'Spielzüge für Handball, Fußball, Basketball, Volleyball, Badminton und Völkerball zeichnen und als Animation abspielen. Gespeichert wird auf diesem Gerät, angemeldet zusätzlich im eigenen Konto.',
     datum: '2026-10-25',
   },
   {
@@ -143,7 +143,7 @@ window.ANGEBOTE = [
     titel: 'Versuchsplaner',
     fach: 'bio',
     stufen: ['5'],
-    text: 'Einen Versuch Schritt für Schritt planen und am Ende ein fertiges Versuchsprotokoll herunterladen. Gespeichert wird nur auf diesem Gerät.',
+    text: 'Einen Versuch Schritt für Schritt planen und am Ende ein fertiges Versuchsprotokoll herunterladen. Gespeichert wird auf diesem Gerät, angemeldet zusätzlich im eigenen Konto.',
     datum: '2026-10-31',
   },
   {
@@ -319,7 +319,7 @@ window.ANGEBOTE = [
     titel: 'Turnierplaner',
     fach: 'sport',
     stufen: [],
-    text: 'Turniere mit Gruppen- und K.-o.-Phase planen, Ergebnisse eintragen und Tabellen automatisch berechnen. Gespeichert wird nur auf diesem Gerät.',
+    text: 'Turniere mit Gruppen- und K.-o.-Phase planen, Ergebnisse eintragen und Tabellen automatisch berechnen. Gespeichert wird auf diesem Gerät, angemeldet zusätzlich im eigenen Konto.',
     datum: '2026-10-25',
   },
   {
