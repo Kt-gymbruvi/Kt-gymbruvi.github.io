@@ -139,7 +139,7 @@ window.VERTRETUNG = [
   },
   {
     titel: 'Inselhandel',
-    text: 'Siedeln, bauen und tauschen auf einer Insel aus Sechsecken – Holz, Lehm, Wolle, Korn und Erz.',
+    text: 'Siedeln, bauen und tauschen auf einer Insel aus Sechsecken – mit Entwicklungskarten und der Erweiterung „Ritter & Piraten“.',
     adresse: 'spielen/inselhandel/',
     gruppe: 'spiele',
     logo: 'inselhandel',
