@@ -1,0 +1,769 @@
+/* Inselhandel: Brett, Karten, Würfel und Bauknöpfe. Farben nur aus gemeinsam/tokens.css. */
+.ih-vorrat {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.vorlesen {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Bildchen ---------- */
+.licht-oben {
+  stop-color: var(--spieler-hell);
+  stop-opacity: 0.32;
+}
+.licht-mitte {
+  stop-color: var(--spieler-hell);
+  stop-opacity: 0;
+}
+.licht-unten {
+  stop-color: var(--feld-text);
+  stop-opacity: 0.2;
+}
+.meer-innen {
+  stop-color: var(--feld-meer);
+}
+.meer-aussen {
+  stop-color: var(--feld-meer-tief);
+}
+.welle {
+  fill: none;
+  stroke: var(--feld-schaum);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.32;
+}
+.i-stamm {
+  fill: var(--feld-lehm-dunkel);
+}
+.i-wald {
+  fill: var(--feld-wald-dunkel);
+}
+.i-wald-vorn {
+  stroke: var(--feld-wald);
+  stroke-width: 0.8;
+}
+.i-ziegel {
+  fill: var(--feld-lehm-dunkel);
+}
+.i-gras {
+  fill: var(--feld-weide-dunkel);
+}
+.i-fell {
+  fill: var(--feld-schaum);
+}
+.i-kopf {
+  fill: var(--feld-text);
+}
+.i-halm {
+  fill: none;
+  stroke: var(--feld-korn-dunkel);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.i-aehre {
+  fill: var(--feld-korn-dunkel);
+}
+.i-berg {
+  fill: var(--feld-erz-dunkel);
+}
+.i-schnee {
+  fill: var(--feld-schaum);
+}
+.i-sonne {
+  fill: var(--feld-korn);
+}
+.i-duene {
+  fill: var(--feld-wueste-dunkel);
+}
+.i-kaktus {
+  fill: var(--feld-weide-dunkel);
+}
+.i-blatt {
+  fill: var(--feld-zahl);
+  stroke: var(--feld-wueste-dunkel);
+  stroke-width: 1.2;
+}
+.i-zeile {
+  fill: none;
+  stroke: var(--feld-erz-dunkel);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+.i-feder {
+  fill: var(--feld-erz-dunkel);
+}
+.i-stoff {
+  fill: var(--ware-tuch);
+  stroke: var(--feld-schaum);
+  stroke-width: 1.4;
+}
+.i-stoff-rand {
+  fill: var(--ware-tuch);
+  stroke: var(--feld-schaum);
+  stroke-width: 1.4;
+}
+.i-stoff-kern {
+  fill: var(--feld-schaum);
+}
+.i-naht {
+  fill: none;
+  stroke: var(--feld-schaum);
+  stroke-width: 1.1;
+  stroke-dasharray: 2 2;
+}
+.i-geld {
+  fill: var(--feld-korn);
+  stroke: var(--feld-korn-dunkel);
+  stroke-width: 1.4;
+}
+.i-geld-innen {
+  fill: none;
+  stroke: var(--feld-korn-dunkel);
+  stroke-width: 1;
+}
+.i-geld-zeichen {
+  fill: none;
+  stroke: var(--feld-korn-dunkel);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.i-mast {
+  stroke: var(--pirat);
+  stroke-width: 1.8;
+}
+.i-flagge {
+  fill: var(--feld-text);
+}
+.i-segel {
+  fill: var(--pirat-segel);
+  stroke: var(--pirat);
+  stroke-width: 0.8;
+}
+.i-rumpf {
+  fill: var(--pirat);
+}
+.i-luke {
+  stroke: var(--feld-korn);
+  stroke-width: 1.6;
+}
+.i-strand {
+  fill: var(--feld-sand);
+}
+.i-palme-stamm {
+  fill: none;
+  stroke: var(--feld-lehm-dunkel);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.i-palme {
+  fill: var(--feld-wald);
+}
+.i-hell {
+  fill: var(--feld-schaum);
+}
+.i-hell-linie {
+  fill: none;
+  stroke: var(--feld-schaum);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.i-dunkel {
+  fill: var(--feld-text);
+  opacity: 0.35;
+}
+.i-dunkel-linie {
+  fill: none;
+  stroke: var(--feld-text);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+/* ---------- Brett ---------- */
+.ih-flaeche {
+  padding: 0.6rem;
+}
+#insel {
+  max-width: min(46rem, calc(100dvh - 9rem));
+  margin: 0 auto;
+  border-radius: var(--radius-gross);
+}
+.meer {
+  fill: url(#ih-meer);
+}
+.meer-wellen {
+  fill: url(#ih-wellen);
+}
+.brandung {
+  fill: var(--feld-schaum);
+  opacity: 0.45;
+}
+.strand {
+  fill: var(--feld-sand);
+}
+.land {
+  stroke: var(--feld-wueste-dunkel);
+  stroke-width: 0.8;
+}
+.licht {
+  fill: url(#ih-licht);
+  pointer-events: none;
+}
+.feld use,
+.chip,
+.nebel-wolke {
+  pointer-events: none;
+}
+.feld.waehlbar {
+  cursor: pointer;
+}
+.feld.waehlbar .land {
+  stroke: var(--fokus);
+  stroke-width: 2.5;
+}
+.feld.waehlbar:hover .land,
+.feld.gewaehlt .land {
+  stroke: var(--fokus);
+  stroke-width: 4.5;
+}
+.chip-grund {
+  fill: var(--feld-zahl);
+  filter: url(#ih-schatten);
+}
+.chip-ring {
+  fill: none;
+  stroke: var(--feld-wueste-dunkel);
+  stroke-width: 0.8;
+}
+.chip-zahl {
+  fill: var(--feld-text);
+  font-size: 12.5px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.chip.heiss .chip-zahl {
+  fill: var(--spieler-1);
+}
+.chip-punkt {
+  fill: var(--feld-text);
+}
+.chip.heiss .chip-punkt {
+  fill: var(--spieler-1);
+}
+.nebel {
+  fill: var(--karte-joker);
+  opacity: 0.86;
+}
+.nebel-licht {
+  fill: var(--feld-erz);
+  opacity: 0.7;
+}
+.nebel-wolke.ruht {
+  opacity: 0.55;
+}
+.nebel-text {
+  fill: var(--spieler-hell);
+  font-size: 8.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.strasse-rand {
+  stroke: var(--spieler-rand);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+.strasse {
+  stroke-width: 5.6;
+  stroke-linecap: round;
+}
+.strasse-glanz {
+  stroke: var(--spieler-hell);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0.35;
+}
+.bau {
+  stroke: var(--spieler-rand);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.dach-schatten {
+  fill: var(--feld-text);
+  opacity: 0.28;
+}
+.fenster {
+  fill: var(--feld-zahl);
+  opacity: 0.85;
+}
+.mauer {
+  fill: var(--feld-erz);
+  stroke: var(--spieler-rand);
+  stroke-width: 1;
+}
+.metro-mast {
+  stroke: var(--feld-text);
+  stroke-width: 1.2;
+}
+.figur {
+  filter: url(#ih-schatten);
+}
+.figur.klickbar {
+  cursor: pointer;
+}
+.ziel-ring {
+  fill: none;
+  stroke: var(--fokus);
+  stroke-width: 2.6;
+  pointer-events: none;
+}
+.ritter-leer {
+  fill: var(--feld-zahl);
+  stroke-width: 2;
+}
+.ritter-marke {
+  fill: var(--spieler-hell);
+}
+.ort {
+  fill: var(--feld-zahl);
+  stroke: var(--fokus);
+  stroke-width: 2.6;
+  cursor: pointer;
+}
+.ort.ritter-ort {
+  stroke-dasharray: 3 2;
+}
+.weg {
+  stroke: var(--feld-zahl);
+  stroke-width: 5;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.weg-treffer {
+  stroke: transparent;
+  stroke-width: 16;
+  cursor: pointer;
+}
+.weg-treffer:hover + .weg,
+.weg-treffer:hover {
+  stroke: var(--fokus);
+}
+
+/* ---------- Piratenschiff ---------- */
+.ih-piraten {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.55rem 0.75rem 0.4rem;
+  border-radius: var(--radius);
+  background: var(--flaeche-2);
+}
+.ih-piraten-kopf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.9rem;
+}
+.ih-piraten-kopf span {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.ih-piraten-kopf b.gefahr {
+  color: var(--fehler);
+}
+.ih-piraten svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.bahn {
+  fill: var(--feld-meer);
+}
+.bahn-linie {
+  stroke: var(--feld-schaum);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+  opacity: 0.7;
+}
+.bahn-feld {
+  fill: var(--feld-meer-tief);
+  stroke: var(--feld-schaum);
+  stroke-width: 1;
+}
+.bahn-feld.hinter {
+  fill: var(--feld-schaum);
+}
+
+/* ---------- Karten auf der Hand ---------- */
+.ih-bereich {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.ih-kopfzeile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 0.75rem;
+}
+.ih-kopfzeile h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.ih-kopfzeile span {
+  color: var(--text-2);
+  font-size: 0.85rem;
+}
+.ih-hand {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(3.6rem, 1fr));
+  gap: 0.45rem;
+}
+.rkarte {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--haarlinie);
+  border-radius: 0.7rem;
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+  text-align: center;
+}
+.rkarte-bild {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.6rem;
+}
+.rkarte-bild svg {
+  width: 2.9rem;
+  height: 2rem;
+}
+.rkarte b {
+  font-size: 1.2rem;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+.rkarte small {
+  padding-bottom: 0.25rem;
+  color: var(--text-2);
+  font-size: 0.7rem;
+}
+.rkarte.null .rkarte-bild {
+  opacity: 0.35;
+}
+.rkarte.null b {
+  color: var(--text-2);
+}
+.ih-ekarten {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: 0.5rem;
+}
+.ekarte {
+  display: grid;
+  grid-template-columns: 3.2rem minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--haarlinie);
+  border-radius: 0.8rem;
+  background: var(--flaeche);
+  box-shadow: var(--schatten-klein);
+}
+.ekarte-bild {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ekarte-bild svg {
+  width: 2.7rem;
+  height: 1.9rem;
+}
+.ekarte-zahl {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  min-width: 1.25rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--flaeche);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: var(--gewicht-betont);
+  line-height: 1.25rem;
+  text-align: center;
+}
+.ekarte-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem 0.6rem;
+}
+.ekarte-text b {
+  font-size: 0.95rem;
+}
+.ekarte-text small {
+  color: var(--text-2);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+.ekarte-text .knopf {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+}
+.ih-wahl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--fokus);
+  border-radius: var(--radius);
+}
+.ih-wahl p {
+  margin: 0;
+  font-weight: var(--gewicht-betont);
+}
+
+/* Mini-Karten in Knöpfen und Kosten */
+.mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.15rem;
+  border: 1px solid var(--spieler-rand);
+  border-radius: 0.3rem;
+}
+.mini svg {
+  width: 1.35rem;
+  height: 0.95rem;
+}
+.kosten {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.kosten-teil {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+}
+.knopf .mini {
+  flex: none;
+}
+
+/* ---------- Zünfte ---------- */
+.ih-zuenfte {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.5rem;
+}
+.zunft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--haarlinie);
+  border-top: 4px solid var(--zf);
+  border-radius: var(--radius);
+  background: var(--flaeche);
+}
+.zunft-kopf {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.zunft-kopf .mini {
+  width: 2rem;
+  height: 1.5rem;
+  border: 0;
+  background: var(--zf);
+}
+.zunft-kopf .mini svg {
+  width: 1.8rem;
+  height: 1.25rem;
+}
+.zunft-kopf b {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.zunft-kopf small {
+  color: var(--text-2);
+  white-space: nowrap;
+}
+.stufen {
+  display: flex;
+  gap: 0.25rem;
+}
+.stufen i {
+  flex: 1;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--flaeche-2);
+}
+.stufen i.an {
+  background: var(--zf);
+}
+.stufen i.drei {
+  box-shadow: inset 0 0 0 1.5px var(--text-2);
+}
+.zunft small {
+  color: var(--text-2);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+.zunft small.erreicht {
+  color: var(--text);
+  font-weight: var(--gewicht-betont);
+}
+
+/* ---------- Seitenleiste ---------- */
+.ih-wuerfel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.wuerfel {
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0.3rem;
+  border: 1px solid var(--spieler-rand);
+  border-radius: 0.6rem;
+  background: var(--feld-zahl);
+  box-shadow: var(--schatten-klein);
+}
+.wuerfel i {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+  background: var(--feld-text);
+  place-self: center;
+}
+.wuerfel.rot {
+  background: var(--spieler-1);
+}
+.wuerfel.rot i {
+  background: var(--spieler-hell);
+}
+.wuerfel.ereignis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem;
+}
+.wuerfel.ereignis svg {
+  width: 100%;
+  height: 100%;
+}
+.ih-summe {
+  font-size: 1.5rem;
+  font-weight: var(--gewicht-titel);
+  font-variant-numeric: tabular-nums;
+}
+.ih-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.ih-info span {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--flaeche-2);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+.ih-bau {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+}
+.ih-bau .knopf {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-height: 3.2rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius);
+  text-align: left;
+}
+.ih-bau .knopf.breit {
+  grid-column: 1 / -1;
+}
+.ih-tausch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.ih-tausch p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.ih-tausch .knopf-reihe {
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.ih-regeln-mehr {
+  margin-top: 0.75rem;
+}
+.ih-regeln-mehr summary {
+  margin-bottom: 0.4rem;
+  font-weight: var(--gewicht-betont);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ort,
+  .ziel-ring {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ih-puls 1.4s ease-in-out infinite;
+  }
+  .nebel-wolke {
+    animation: ih-treiben 5s ease-in-out infinite alternate;
+  }
+  .wuerfel.rollt {
+    animation: ih-rollen 0.55s ease-out;
+  }
+  .rkarte.neu {
+    animation: ih-hoch 0.6s ease-out;
+  }
+}
+@keyframes ih-puls {
+  50% {
+    transform: scale(1.22);
+  }
+}
+@keyframes ih-treiben {
+  to {
+    transform: translateX(3px);
+  }
+}
+@keyframes ih-rollen {
+  from {
+    transform: rotate(-220deg) scale(0.5);
+  }
+}
+@keyframes ih-hoch {
+  30% {
+    transform: translateY(-0.4rem);
+  }
+}

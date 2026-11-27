@@ -206,6 +206,24 @@
   --feld-meer: #3d86c6;
   --feld-zahl: #fbf6e9; /* Zahlenchips */
   --feld-text: #1b1b1b;
+  /* Inselhandel: dunklere Töne für Bildchen auf den Feldern, Strand, tiefes Meer, Waren und Zünfte */
+  --feld-wald-dunkel: #1d5426;
+  --feld-lehm-dunkel: #8e4024;
+  --feld-weide-dunkel: #6c9e3c;
+  --feld-korn-dunkel: #b8901c;
+  --feld-erz-dunkel: #5a636e;
+  --feld-wueste-dunkel: #c9ad6d;
+  --feld-sand: #f1dfae;
+  --feld-meer-tief: #1f5f99;
+  --feld-schaum: #e8f4fb;
+  --ware-papier: #e9e2cf;
+  --ware-tuch: #c2577e;
+  --ware-muenze: #d9a62b;
+  --zunft-handel: #e0a81a;
+  --zunft-politik: #2f63c4;
+  --zunft-wissen: #2f8f4e;
+  --pirat: #3b2a1e;
+  --pirat-segel: #f4efe3;
 
   --kachel-wiese: #8cbf63;
   --kachel-weg: #f5efdf;

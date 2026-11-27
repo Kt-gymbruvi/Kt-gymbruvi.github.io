@@ -11,112 +11,165 @@
     <link rel="stylesheet" href="../../werkzeuge/werkzeug.css" />
     <link rel="stylesheet" href="../spiel.css" />
     <link rel="stylesheet" href="../gruppe.css" />
-    <style>
-      #insel {
-        max-width: min(42rem, calc(100dvh - 10rem));
-        margin: 0 auto;
-      }
-      .meer {
-        fill: var(--feld-meer);
-      }
-      .land {
-        stroke: var(--feld-zahl);
-        stroke-width: 2;
-      }
-      .land.waehlbar {
-        cursor: pointer;
-        stroke: var(--fokus);
-        stroke-width: 4;
-      }
-      .chip {
-        fill: var(--feld-zahl);
-        stroke: var(--spieler-rand);
-        stroke-width: 1;
-      }
-      .chip-zahl {
-        fill: var(--feld-text);
-        font-size: 13px;
-        font-weight: 700;
-        text-anchor: middle;
-        dominant-baseline: central;
-      }
-      .chip-zahl.heiss {
-        fill: var(--spieler-1);
-      }
-      .chip-punkt {
-        fill: var(--feld-text);
-      }
-      .nebel {
-        fill: var(--karte-joker);
-        opacity: 0.82;
-        pointer-events: none;
-      }
-      .nebel-text {
-        fill: var(--spieler-hell);
-        font-size: 8px;
-        font-weight: 700;
-        text-anchor: middle;
-        pointer-events: none;
-      }
-      .strasse {
-        stroke-width: 6;
-        stroke-linecap: round;
-      }
-      .strasse-rand {
-        stroke: var(--spieler-rand);
-        stroke-width: 8.5;
-        stroke-linecap: round;
-      }
-      .bau {
-        stroke: var(--spieler-rand);
-        stroke-width: 1.2;
-        stroke-linejoin: round;
-      }
-      .ort {
-        fill: var(--flaeche);
-        stroke: var(--fokus);
-        stroke-width: 2.5;
-        cursor: pointer;
-      }
-      .weg {
-        stroke: var(--flaeche);
-        stroke-width: 5;
-        stroke-dasharray: 4 3;
-        stroke-linecap: round;
-      }
-      .weg-treffer {
-        stroke: transparent;
-        stroke-width: 16;
-        cursor: pointer;
-      }
-      .wurf {
-        margin: 0;
-        font-variant-numeric: tabular-nums;
-      }
-      .bauknoepfe {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0.4rem;
-      }
-      .bauknoepfe .knopf {
-        justify-content: space-between;
-        width: 100%;
-      }
-      .bauknoepfe small {
-        font-weight: 400;
-        opacity: 0.85;
-      }
-      .hand-titel {
-        margin: 0;
-        font-weight: var(--gewicht-betont);
-        text-align: center;
-      }
-      .mengen.mitte {
-        justify-content: center;
-      }
-    </style>
+    <link rel="stylesheet" href="inselhandel.css" />
   </head>
   <body>
+    <!-- Bildchen für Brett, Karten und Knöpfe (werden mit <use href="#ih-…"> eingesetzt) -->
+    <svg class="ih-vorrat" aria-hidden="true" width="0" height="0">
+      <defs>
+        <linearGradient id="ih-licht" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" class="licht-oben" />
+          <stop offset="0.45" class="licht-mitte" />
+          <stop offset="1" class="licht-unten" />
+        </linearGradient>
+        <radialGradient id="ih-meer" cx="0.5" cy="0.5" r="0.7">
+          <stop offset="0.35" class="meer-innen" />
+          <stop offset="1" class="meer-aussen" />
+        </radialGradient>
+        <pattern id="ih-wellen" width="28" height="16" patternUnits="userSpaceOnUse">
+          <path class="welle" d="M2 6 q3.5 -3 7 0 t7 0" />
+          <path class="welle" d="M16 14 q3.5 -3 7 0 t7 0" />
+        </pattern>
+        <filter id="ih-schatten" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="1.3" stdDeviation="1.2" flood-opacity="0.38" />
+        </filter>
+        <g id="ih-aehre">
+          <path class="i-halm" d="M0 24 V4" />
+          <ellipse class="i-aehre" cx="0" cy="3" rx="1.7" ry="2.7" />
+          <ellipse class="i-aehre" cx="-2.1" cy="7.2" rx="1.6" ry="2.6" transform="rotate(-28 -2.1 7.2)" />
+          <ellipse class="i-aehre" cx="2.1" cy="7.2" rx="1.6" ry="2.6" transform="rotate(28 2.1 7.2)" />
+          <ellipse class="i-aehre" cx="-2.1" cy="11.6" rx="1.6" ry="2.6" transform="rotate(-28 -2.1 11.6)" />
+          <ellipse class="i-aehre" cx="2.1" cy="11.6" rx="1.6" ry="2.6" transform="rotate(28 2.1 11.6)" />
+          <ellipse class="i-aehre" cx="-2.1" cy="16" rx="1.6" ry="2.6" transform="rotate(-28 -2.1 16)" />
+          <ellipse class="i-aehre" cx="2.1" cy="16" rx="1.6" ry="2.6" transform="rotate(28 2.1 16)" />
+        </g>
+      </defs>
+      <symbol id="ih-holz" viewBox="0 0 44 30">
+        <rect class="i-stamm" x="9.5" y="21" width="3" height="7" rx="1" />
+        <rect class="i-stamm" x="32.5" y="22" width="3" height="6" rx="1" />
+        <rect class="i-stamm" x="20.5" y="19" width="3" height="9" rx="1" />
+        <path class="i-wald" d="M11 4 L18.5 15.5 H15 L20 23 H2 L7 15.5 H3.5 Z" />
+        <path class="i-wald" d="M34 6 L41 17 H37.8 L42.5 24 H25.5 L30.2 17 H27 Z" />
+        <path class="i-wald i-wald-vorn" d="M22 1 L30.5 13.5 H26.8 L32.5 21.5 H11.5 L17.2 13.5 H13.5 Z" />
+      </symbol>
+      <symbol id="ih-lehm" viewBox="0 0 44 30">
+        <g class="i-ziegel">
+          <rect x="3" y="7" width="12" height="5.2" rx="1" />
+          <rect x="16.2" y="7" width="12" height="5.2" rx="1" />
+          <rect x="29.4" y="7" width="12" height="5.2" rx="1" />
+          <rect x="3" y="13.6" width="5.4" height="5.2" rx="1" />
+          <rect x="9.6" y="13.6" width="12" height="5.2" rx="1" />
+          <rect x="22.8" y="13.6" width="12" height="5.2" rx="1" />
+          <rect x="36" y="13.6" width="5.4" height="5.2" rx="1" />
+          <rect x="3" y="20.2" width="12" height="5.2" rx="1" />
+          <rect x="16.2" y="20.2" width="12" height="5.2" rx="1" />
+          <rect x="29.4" y="20.2" width="12" height="5.2" rx="1" />
+        </g>
+      </symbol>
+      <symbol id="ih-wolle" viewBox="0 0 44 30">
+        <path class="i-gras" d="M0 30 Q22 18 44 30 Z" />
+        <rect class="i-kopf" x="14" y="18" width="2.4" height="7" rx="1" />
+        <rect class="i-kopf" x="24" y="18" width="2.4" height="7" rx="1" />
+        <g class="i-fell">
+          <circle cx="13" cy="14" r="4.6" />
+          <circle cx="18.5" cy="10.5" r="5" />
+          <circle cx="25" cy="11" r="5" />
+          <circle cx="28.5" cy="15.5" r="4.4" />
+          <circle cx="15" cy="18" r="4.4" />
+          <circle cx="22.5" cy="18" r="4.8" />
+        </g>
+        <ellipse class="i-kopf" cx="32.5" cy="12.5" rx="3.8" ry="3.2" />
+        <path class="i-gras" d="M3 28 l1.5 -5 l1.5 5 Z M38 28 l1.5 -6 l1.5 6 Z" />
+      </symbol>
+      <symbol id="ih-korn" viewBox="0 0 44 30">
+        <use href="#ih-aehre" transform="translate(10 4) rotate(-12)" />
+        <use href="#ih-aehre" transform="translate(18 2)" />
+        <use href="#ih-aehre" transform="translate(26 2)" />
+        <use href="#ih-aehre" transform="translate(34 4) rotate(12)" />
+      </symbol>
+      <symbol id="ih-erz" viewBox="0 0 44 30">
+        <path class="i-berg" d="M1 28 L13 9 L19 18 L27 4 L43 28 Z" />
+        <path class="i-schnee" d="M13 9 L16.4 14.4 L14.2 13.4 L11.8 15 L10.4 13.2 Z" />
+        <path class="i-schnee" d="M27 4 L31.8 11.6 L29 10.4 L26.6 12.6 L23.8 10.6 L22.6 11.4 Z" />
+      </symbol>
+      <symbol id="ih-wueste" viewBox="0 0 44 30">
+        <circle class="i-sonne" cx="35" cy="7" r="4.2" />
+        <path class="i-duene" d="M0 29 Q10 16 22 24 Q32 15 44 21 V30 H0 Z" />
+        <rect class="i-kaktus" x="13" y="9" width="4" height="15" rx="2" />
+        <rect class="i-kaktus" x="9.4" y="12" width="2.8" height="6" rx="1.4" />
+        <rect class="i-kaktus" x="9.4" y="16" width="5" height="2.6" rx="1.3" />
+        <rect class="i-kaktus" x="18" y="10.5" width="2.8" height="5.5" rx="1.4" />
+        <rect class="i-kaktus" x="16" y="13.6" width="4.8" height="2.6" rx="1.3" />
+      </symbol>
+      <symbol id="ih-papier" viewBox="0 0 44 30">
+        <rect class="i-blatt" x="11" y="4" width="22" height="22" rx="2" />
+        <path class="i-zeile" d="M15 10 H29 M15 14 H29 M15 18 H29 M15 22 H24" />
+        <path class="i-feder" d="M36 2 Q28 8 25 18 L27 18 Q32 10 36 2 Z" />
+      </symbol>
+      <symbol id="ih-tuch" viewBox="0 0 44 30">
+        <rect class="i-stoff" x="6" y="6" width="26" height="18" rx="3" />
+        <ellipse class="i-stoff-rand" cx="32" cy="15" rx="5" ry="9" />
+        <ellipse class="i-stoff-kern" cx="32" cy="15" rx="2" ry="3.6" />
+        <path class="i-naht" d="M10 10 H27 M10 15 H27 M10 20 H27" />
+      </symbol>
+      <symbol id="ih-muenze" viewBox="0 0 44 30">
+        <ellipse class="i-geld" cx="17" cy="21" rx="9" ry="4" />
+        <ellipse class="i-geld" cx="17" cy="18" rx="9" ry="4" />
+        <circle class="i-geld" cx="27" cy="13" r="9" />
+        <circle class="i-geld-innen" cx="27" cy="13" r="6" />
+        <path class="i-geld-zeichen" d="M27 9 V17 M24.5 11 H29.5 M24.5 15 H29.5" />
+      </symbol>
+      <symbol id="ih-schiff" viewBox="0 0 44 30">
+        <path class="i-mast" d="M22 2 V21" />
+        <path class="i-flagge" d="M22 2 H29 L27 4 L29 6 H22 Z" />
+        <path class="i-segel" d="M23.5 6 Q34 12 23.5 19 Z" />
+        <path class="i-segel" d="M20.5 7 Q12 12.5 20.5 18.5 Z" />
+        <path class="i-rumpf" d="M3 20 H41 L35.5 27.5 H8.5 Z" />
+        <path class="i-luke" d="M12 23 h2 M18 23 h2 M24 23 h2 M30 23 h2" />
+      </symbol>
+      <symbol id="ih-insel" viewBox="0 0 44 30">
+        <ellipse class="i-strand" cx="22" cy="24" rx="19" ry="5" />
+        <path class="i-palme-stamm" d="M22 23 Q21 14 24 7" />
+        <path class="i-palme" d="M24 7 Q18 3 13 7 Q19 5 24 8 Q29 3 35 6 Q29 5 24 8 Q28 9 31 14 Q26 9 24 8 Q20 10 18 14 Q20 9 24 8 Z" />
+      </symbol>
+      <symbol id="ih-handel" viewBox="0 0 44 30">
+        <path class="i-hell-linie" d="M22 4 V26 M15 26 H29 M9 9 H35" />
+        <path class="i-hell" d="M4 17 L9 9 L14 17 Q9 21 4 17 Z M30 17 L35 9 L40 17 Q35 21 30 17 Z" />
+      </symbol>
+      <symbol id="ih-politik" viewBox="0 0 44 30">
+        <path class="i-hell" d="M22 3 L37 10 H7 Z" />
+        <path class="i-hell" d="M9 12 h4 v11 h-4 Z M16.5 12 h4 v11 h-4 Z M23.5 12 h4 v11 h-4 Z M31 12 h4 v11 h-4 Z M6 24.5 H38 V27.5 H6 Z" />
+      </symbol>
+      <symbol id="ih-wissen" viewBox="0 0 44 30">
+        <path class="i-hell" d="M5 7 Q13 4 21 8 V26 Q13 22 5 25 Z M23 8 Q31 4 39 7 V25 Q31 22 23 26 Z" />
+      </symbol>
+      <symbol id="ih-waechter" viewBox="0 0 44 30">
+        <path class="i-hell-linie" d="M33 2 V28" />
+        <path class="i-hell" d="M33 1 L36 6 H30 Z" />
+        <path class="i-hell" d="M11 5 H27 V13 Q27 22 19 27 Q11 22 11 13 Z" />
+        <path class="i-dunkel-linie" d="M19 9 V22 M14 14 H24" />
+      </symbol>
+      <symbol id="ih-wegebau" viewBox="0 0 44 30">
+        <path class="i-hell" d="M17 3 H27 L36 28 H8 Z" />
+        <path class="i-dunkel-linie" d="M22 6 V10 M22 14 V18 M22 22 V26" />
+      </symbol>
+      <symbol id="ih-ernte" viewBox="0 0 44 30">
+        <use href="#ih-korn" width="44" height="30" />
+      </symbol>
+      <symbol id="ih-markt" viewBox="0 0 44 30">
+        <path class="i-hell" d="M6 4 H38 L41 11 H3 Z" />
+        <path class="i-dunkel" d="M11 4 H16 L15 11 H9 Z M21 4 H26 V11 H21 Z M31 4 H36 L38 11 H31 Z" />
+        <path class="i-hell" d="M7 12 h3 v14 h-3 Z M34 12 h3 v14 h-3 Z M5 18 H39 V21 H5 Z" />
+        <circle class="i-hell" cx="16" cy="16" r="2" />
+        <circle class="i-hell" cx="22" cy="16" r="2" />
+        <circle class="i-hell" cx="28" cy="16" r="2" />
+      </symbol>
+      <symbol id="ih-denkmal" viewBox="0 0 44 30">
+        <circle class="i-hell" cx="22" cy="5" r="3" />
+        <path class="i-hell" d="M18 9 H26 L25 19 H19 Z M15 20 H29 V23 H15 Z M12 24 H32 V28 H12 Z" />
+      </symbol>
+    </svg>
+
     <header class="werkzeug-kopf">
       <a href="../../vertretung/?art=spiele">Vertretung</a>
       <h1>Inselhandel</h1>
@@ -126,21 +179,32 @@
         <img src="../../gemeinsam/inselhandel-logo.svg" alt="" width="56" height="56" />
         <div>
           <p class="spielkopf-titel">Inselhandel</p>
-          <p class="spielkopf-text">Siedeln, bauen, tauschen – wer zuerst genug Punkte hat, gewinnt.</p>
+          <p class="spielkopf-text">Siedeln, bauen, tauschen – wer zuerst genug Punkte hat, gewinnt. Mit Entwicklungskarten und der Erweiterung „Ritter &amp; Piraten“.</p>
         </div>
       </div>
       <div class="gruppenspiel">
-        <div class="brett-flaeche" id="flaeche"></div>
+        <div class="brett-flaeche ih-flaeche" id="flaeche"></div>
         <div class="seite" id="seite">
           <section class="werkzeug-karte">
             <h2>So geht's</h2>
             <ul class="regeln">
-              <li>Zu Beginn setzt jeder zwei Siedlungen mit je einer Straße (erst der Reihe nach, dann rückwärts). Für die zweite Siedlung gibt es die Rohstoffe der Nachbarfelder.</li>
+              <li>Wer beginnt, lost das Spiel aus. Zu Beginn setzt jeder zwei Siedlungen mit je einer Straße (erst der Reihe nach, dann rückwärts). Für die zweite Siedlung gibt es die Rohstoffe der Nachbarfelder.</li>
               <li>Wer dran ist, würfelt. Jedes Feld mit dieser Zahl bringt allen, die daran eine Siedlung haben, einen Rohstoff (Stadt: zwei).</li>
               <li>Bei einer 7 verliert jeder mit mehr als 7 Karten die Hälfte. Der Nebel zieht weiter: Sein Feld bringt nichts, und man nimmt einem Nachbarn eine Karte weg.</li>
               <li>Bauen: Straße (Holz, Lehm), Siedlung (Holz, Lehm, Wolle, Korn) an eigener Straße und mit einer freien Ecke Abstand, Stadt aus Siedlung (2 Korn, 3 Erz). Tauschen mit der Bank: 4 gleiche gegen 1.</li>
-              <li>Punkte: Siedlung 1, Stadt 2, längste Straße (ab 5) 2.</li>
+              <li>Entwicklungskarte (Wolle, Korn, Erz): Wächter (Nebel versetzen), Wegebau (2 Straßen), Gute Ernte (2 Rohstoffe), Marktrecht (alle geben dir eine Sorte), Denkmal (1 Punkt). Eine Karte pro Zug, nicht im Zug des Kaufs; Wächter auch vor dem Würfeln.</li>
+              <li>Punkte: Siedlung 1, Stadt 2, längste Straße (ab 5) 2, stärkste Wache (ab 3 Wächtern) 2, Denkmal 1.</li>
             </ul>
+            <details class="ih-regeln-mehr">
+              <summary>Erweiterung „Ritter &amp; Piraten“</summary>
+              <ul class="regeln">
+                <li>Ein dritter Würfel zeigt Ereignisse: Dreimal das Piratenschiff – es segelt ein Feld näher. Nach 7 Feldern legt es an.</li>
+                <li>Beim Angriff zählt jede Stadt 1 Stärke, jeder aktive Ritter seine Stufe. Reicht die Abwehr, wird der stärkste Verteidiger Inselretter (1 Punkt). Sonst verlieren die schwächsten Verteidiger eine Stadt. Danach sind alle Ritter wieder inaktiv.</li>
+                <li>Ritter (Wolle, Erz) stehen an einer eigenen Straße. Ausrüsten mit 1 Korn macht sie aktiv; befördern (Wolle, Erz) bis Stufe 2, mit Politik 3 bis Stufe 3. Ein aktiver Ritter am Nebelfeld kann den Nebel vertreiben.</li>
+                <li>Städte am Wald, an der Weide und am Gebirge bringen 1 Rohstoff und 1 Ware: Papier, Tuch, Münze. Damit baut man die Zünfte aus (Stufe n kostet n Waren): Handel (Tuch), Politik (Münze), Wissenschaft (Papier). Ab Stufe 3 gibt es einen Vorteil, wer zuerst Stufe 4 hat, bekommt die Metropole (2 Punkte, vor Piraten sicher).</li>
+                <li>Zeigt der Ereigniswürfel eine Zunft, bekommt jeder mit dieser Zunft eine Fortschrittskarte, wenn der rote Würfel höchstens Stufe + 1 zeigt. Stadtmauer (2 Lehm): 2 Karten mehr bei einer 7. Der Nebel ruht bis zum ersten Angriff. Empfohlen: 13 Punkte.</li>
+              </ul>
+            </details>
           </section>
         </div>
       </div>
@@ -153,224 +217,6 @@
     <script src="../echtzeit.js"></script>
     <script src="../raum.js"></script>
     <script src="../gruppe.js"></script>
-    <script>
-      ;(function () {
-        'use strict'
-        const I = window.Inselhandel
-        const SVG = 'http://www.w3.org/2000/svg'
-        const FARBE = { holz: 'var(--feld-wald)', lehm: 'var(--feld-lehm)', wolle: 'var(--feld-weide)', korn: 'var(--feld-korn)', erz: 'var(--feld-erz)', wueste: 'var(--feld-wueste)' }
-        let bau = null // 'strasse' | 'siedlung' | 'stadt'
-        let geben = null // Tausch: was abgeben
-        let nebelFeld = -1
-        let merk = ''
-
-        function s(name, attr) {
-          const e = document.createElementNS(SVG, name)
-          Object.keys(attr || {}).forEach((k) => e.setAttribute(k, attr[k]))
-          return e
-        }
-        function el(tag, klasse, text) {
-          const e = document.createElement(tag)
-          if (klasse) e.className = klasse
-          if (text != null) e.textContent = text
-          return e
-        }
-        function knopf(text, klasse, bei) {
-          const b = el('button', 'knopf' + (klasse ? ' ' + klasse : ''), text)
-          b.type = 'button'
-          if (bei) b.addEventListener('click', bei)
-          return b
-        }
-        const kostenText = (k) => Object.keys(k).map((r) => (k[r] > 1 ? k[r] + ' ' : '') + I.NAMEN[r]).join(', ')
-
-        function zeichne(z, a) {
-          const schluessel = z.dran + ':' + z.phase + ':' + (z.start ? z.start.pos + ':' + z.start.ecke : '')
-          if (schluessel !== merk) {
-            merk = schluessel
-            bau = null
-            geben = null
-            nebelFeld = -1
-          }
-          const ich = a.ich
-          const karten = ich != null ? z.karten[ich] : null
-          if (geben && (!karten || karten[geben] < 4)) geben = null
-          let modus = null
-          if (a.darf && z.phase === 'start') modus = z.start.ecke < 0 ? 'siedlung' : 'strasse'
-          else if (a.darf && z.phase === 'bauen' && bau) modus = bau
-          if (modus && z.phase === 'bauen' && !I.kann(karten, I.KOSTEN[modus])) modus = bau = null
-
-          const svg = s('svg', { id: 'insel', viewBox: '-205 -185 410 370', role: 'img', 'aria-label': 'Insel mit 19 Feldern' })
-          svg.append(s('rect', { x: -205, y: -185, width: 410, height: 370, rx: 24, class: 'meer' }))
-          I.FELDER.forEach((f, fi) => {
-            const pkt = f.ecken.map((e) => I.ECKEN[e].x.toFixed(1) + ',' + I.ECKEN[e].y.toFixed(1)).join(' ')
-            const waehlbar = a.darf && z.phase === 'nebel' && fi !== z.nebel
-            const p = s('polygon', { points: pkt, class: 'land' + (waehlbar || fi === nebelFeld ? ' waehlbar' : '') })
-            p.style.fill = FARBE[z.felder[fi].art]
-            const t = s('title')
-            t.textContent = I.NAMEN[z.felder[fi].art] + (z.felder[fi].zahl ? ' ' + z.felder[fi].zahl : '')
-            p.append(t)
-            if (waehlbar)
-              p.addEventListener('click', () => {
-                const opfer = I.nebelOpfer(z, ich, fi)
-                if (opfer.length <= 1) return a.sende(opfer.length ? { t: 'nebel', feld: fi, opfer: opfer[0] } : { t: 'nebel', feld: fi })
-                nebelFeld = fi
-                a.neu()
-              })
-            svg.append(p)
-            const zahl = z.felder[fi].zahl
-            if (zahl) {
-              svg.append(s('circle', { cx: f.x, cy: f.y, r: 14, class: 'chip' }))
-              const tz = s('text', { x: f.x, y: f.y - 2, class: 'chip-zahl' + (zahl === 6 || zahl === 8 ? ' heiss' : '') })
-              tz.textContent = zahl
-              svg.append(tz)
-              const n = I.punktwert(zahl)
-              for (let i = 0; i < n; i++) svg.append(s('circle', { cx: f.x + (i - (n - 1) / 2) * 3.4, cy: f.y + 8, r: 1.2, class: 'chip-punkt' }))
-            }
-            if (fi === z.nebel) {
-              ;[[-6, 2, 9], [5, 0, 10], [0, -6, 9]].forEach(([dx, dy, r]) => svg.append(s('circle', { cx: f.x + dx, cy: f.y + dy - 18, r, class: 'nebel' })))
-              const nt = s('text', { x: f.x, y: f.y - 16, class: 'nebel-text' })
-              nt.textContent = 'Nebel'
-              svg.append(nt)
-            }
-          })
-          // Straßen
-          z.strassen.forEach((sp, k) => {
-            if (sp === null) return
-            const A = I.ECKEN[I.KANTEN[k].a]
-            const B = I.ECKEN[I.KANTEN[k].b]
-            const x1 = A.x + (B.x - A.x) * 0.12
-            const y1 = A.y + (B.y - A.y) * 0.12
-            const x2 = B.x + (A.x - B.x) * 0.12
-            const y2 = B.y + (A.y - B.y) * 0.12
-            svg.append(s('line', { x1, y1, x2, y2, class: 'strasse-rand' }))
-            const l = s('line', { x1, y1, x2, y2, class: 'strasse' })
-            l.style.stroke = a.farbe(sp)
-            svg.append(l)
-          })
-          // Bauten
-          z.bauten.forEach((b, e) => {
-            if (!b) return
-            const { x, y } = I.ECKEN[e]
-            const form = b.stadt
-              ? `M${x - 10},${y + 7} V${y - 3} L${x - 5},${y - 8} L${x},${y - 3} V${y - 1} H${x + 10} V${y + 7} Z`
-              : `M${x - 7},${y + 6} V${y - 2} L${x},${y - 8} L${x + 7},${y - 2} V${y + 6} Z`
-            const p = s('path', { d: form, class: 'bau' })
-            p.style.fill = a.farbe(b.s)
-            if (modus === 'stadt' && b.s === ich && !b.stadt) {
-              p.style.cursor = 'pointer'
-              p.style.stroke = 'var(--fokus)'
-              p.style.strokeWidth = '3'
-              p.addEventListener('click', () => a.sende({ t: 'stadt', ecke: e }))
-            }
-            svg.append(p)
-          })
-          // Bauplätze
-          if (modus === 'siedlung')
-            I.ECKEN.forEach((E, e) => {
-              if (!I.siedlungErlaubt(z, ich, e)) return
-              const c = s('circle', { cx: E.x, cy: E.y, r: 6.5, class: 'ort' })
-              c.addEventListener('click', () => a.sende({ t: 'siedlung', ecke: e }))
-              svg.append(c)
-            })
-          if (modus === 'strasse')
-            I.KANTEN.forEach((K, k) => {
-              if (!I.strasseErlaubt(z, ich, k)) return
-              const A = I.ECKEN[K.a]
-              const B = I.ECKEN[K.b]
-              svg.append(s('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, class: 'weg' }))
-              const t = s('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, class: 'weg-treffer' })
-              t.addEventListener('click', () => a.sende({ t: 'strasse', kante: k }))
-              svg.append(t)
-            })
-          a.brett.append(svg)
-
-          // Eigene Rohstoffe
-          if (karten) {
-            a.brett.append(el('p', 'hand-titel', (a.online ? 'Deine' : a.name(ich) + 's') + ' Rohstoffe'))
-            const m = el('div', 'mengen mitte')
-            I.ROHSTOFFE.forEach((r) => {
-              const x = el('span', 'menge')
-              const q = el('i')
-              q.style.background = FARBE[r]
-              x.append(q, document.createTextNode(I.NAMEN[r] + ' ' + karten[r]))
-              m.append(x)
-            })
-            a.brett.append(m)
-          }
-
-          // Seitenleiste
-          if (z.wurf) a.aktionen.append(el('p', 'wurf', 'Gewürfelt: ' + z.wurf[0] + ' + ' + z.wurf[1] + ' = ' + (z.wurf[0] + z.wurf[1])))
-          a.aktionen.append(el('p', 'hinweis', 'Ziel: ' + z.optionen.ziel + ' Punkte' + (z.laengste >= 0 ? ' · Längste Straße: ' + a.name(z.laengste) : '')))
-          if (!a.darf) return
-          if (z.phase === 'start') {
-            a.aktionen.append(el('p', null, z.start.ecke < 0 ? 'Setze eine Siedlung: Tippe einen hellen Kreis an.' : 'Setze eine Straße an deine neue Siedlung.'))
-            return
-          }
-          if (z.phase === 'wuerfeln') {
-            a.aktionen.append(knopf('Würfeln', '', () => a.sende({ t: 'wuerfeln' })))
-            return
-          }
-          if (z.phase === 'nebel') {
-            if (nebelFeld < 0) a.aktionen.append(el('p', null, 'Eine 7! Tippe ein Feld an, auf das der Nebel zieht.'))
-            else {
-              a.aktionen.append(el('p', null, 'Wem nimmst du eine Karte weg?'))
-              const r = el('div', 'knopf-reihe')
-              I.nebelOpfer(z, ich, nebelFeld).forEach((o) => r.append(knopf(a.name(o), 'zweit', () => a.sende({ t: 'nebel', feld: nebelFeld, opfer: o }))))
-              a.aktionen.append(r)
-            }
-            return
-          }
-          // Bauen
-          const bk = el('div', 'bauknoepfe')
-          ;[['strasse', 'Straße'], ['siedlung', 'Siedlung'], ['stadt', 'Stadt']].forEach(([art, name]) => {
-            const b = knopf('', bau === art ? 'gewaehlt' : 'zweit', () => {
-              bau = bau === art ? null : art
-              geben = null
-              a.neu()
-            })
-            b.append(el('span', null, name), el('small', null, kostenText(I.KOSTEN[art])))
-            b.disabled = !I.kann(karten, I.KOSTEN[art]) || I.anzahl(z, ich, art) >= I.VORRAT[art]
-            bk.append(b)
-          })
-          a.aktionen.append(bk)
-          if (bau) a.aktionen.append(el('p', 'hinweis', bau === 'stadt' ? 'Tippe eine eigene Siedlung an.' : bau === 'siedlung' ? 'Tippe einen hellen Kreis an.' : 'Tippe eine gestrichelte Linie an.'))
-          // Tauschen
-          const viele = I.ROHSTOFFE.filter((r) => karten[r] >= 4)
-          if (viele.length) {
-            a.aktionen.append(el('p', 'hinweis', geben ? 'Tausche 4 ' + I.NAMEN[geben] + ' gegen:' : 'Tauschen mit der Bank (4 gleiche gegen 1):'))
-            const r = el('div', 'knopf-reihe')
-            if (!geben)
-              viele.forEach((x) =>
-                r.append(
-                  knopf('4 ' + I.NAMEN[x], 'zweit klein', () => {
-                    geben = x
-                    bau = null
-                    a.neu()
-                  }),
-                ),
-              )
-            else {
-              I.ROHSTOFFE.filter((x) => x !== geben).forEach((x) => r.append(knopf(I.NAMEN[x], 'zweit klein', () => a.sende({ t: 'tausch', geben, nehmen: x }))))
-              r.append(
-                knopf('Abbrechen', 'zweit klein', () => {
-                  geben = null
-                  a.neu()
-                }),
-              )
-            }
-            a.aktionen.append(r)
-          }
-          a.aktionen.append(knopf('Zug beenden', '', () => a.sende({ t: 'ende' })))
-        }
-
-        window.Gruppenspiel({
-          regeln: I,
-          flaeche: document.getElementById('flaeche'),
-          seite: document.getElementById('seite'),
-          zeichne,
-          kiPause: 600,
-        })
-      })()
-    </script>
+    <script src="inselhandel.js"></script>
   </body>
 </html>
